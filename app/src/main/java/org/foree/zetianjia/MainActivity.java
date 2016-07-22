@@ -24,44 +24,25 @@ public class MainActivity extends AppCompatActivity {
     private ArrayAdapter<String> adapter;
     private ArrayList<String>  hrefList;
     private ArrayList<String>  titleList;
+    private String update_time;
+    ListView lvContent;
+    TextView tvUpdate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final ListView lvContent = (ListView)findViewById(R.id.lv_content);
-        final TextView tvUpdate = (TextView)findViewById(R.id.tv_update);
+        lvContent = (ListView)findViewById(R.id.lv_content);
+        tvUpdate = (TextView)findViewById(R.id.tv_update);
         hrefList = new ArrayList<>();
         titleList = new ArrayList<>();
 
         NetRequest.getHtml(url, new NetCallback() {
             @Override
             public void onSuccess(String data) {
-                Document doc = Jsoup.parse(data);
-                Elements elements_contents = doc.select("dd");
-                Elements updates = doc.select("[property~=.*update_time]");
-                for(Element update: updates){
-                    Log.i("MM", update.toString());
-                    tvUpdate.setText("最后更新时间：" + update.attr("content"));
-                }
-                Document contents = Jsoup.parse(elements_contents.toString());
-                Elements elements_a = contents.getElementsByTag("a");
-                for(Element link: elements_a){
-                    hrefList.add(link.attr("href"));
-                    titleList.add(link.text());
-//                    Log.i("HH", link.text());
-//                    Log.i("HH", link.attr("href"));
-                }
+                parseHtml(data);
+                updateUI();
 
-                Collections.reverse(hrefList);
-                Collections.reverse(titleList);
-                adapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_list_item_1);
-                Log.i("HH", titleList.size() + "");
-                for(int i = 0; i < titleList.size(); i++){
-                    adapter.add(titleList.get(i));
-                }
-
-                lvContent.setAdapter(adapter);
             }
             @Override
             public void onFail(String msg) {
@@ -82,6 +63,39 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    private void parseHtml(String data){
+        Document doc = Jsoup.parse(data);
+        Elements elements_contents = doc.select("dd");
+        Elements updates = doc.select("[property~=.*update_time]");
+        for(Element update: updates){
+            Log.i("MM", update.toString());
+            update_time = update.attr("content");
+        }
+        Document contents = Jsoup.parse(elements_contents.toString());
+        Elements elements_a = contents.getElementsByTag("a");
+        for(Element link: elements_a){
+            hrefList.add(link.attr("href"));
+            titleList.add(link.text());
+//                    Log.i("HH", link.text());
+//                    Log.i("HH", link.attr("href"));
+        }
+
+        Collections.reverse(hrefList);
+        Collections.reverse(titleList);
+    }
+
+    private void updateUI(){
+        if (update_time != null){
+            tvUpdate.setText("最后更新时间：" + update_time);
+        }
+        adapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_list_item_1);
+        Log.i("HH", titleList.size() + "");
+        for(int i = 0; i < titleList.size(); i++){
+            adapter.add(titleList.get(i));
+        }
+        lvContent.setAdapter(adapter);
     }
 
 }
