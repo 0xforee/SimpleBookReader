@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
             public void onSuccess(String data) {
                 parseHtml(data);
                 updateUI();
-
+                parseTest(data);
             }
             @Override
             public void onFail(String msg) {
@@ -84,6 +84,14 @@ public class MainActivity extends AppCompatActivity {
 
         Collections.reverse(hrefList);
         Collections.reverse(titleList);
+    }
+
+    private void parseTest(String data){
+        Document doc = Jsoup.parse(data);
+        Elements elements_contents = doc.select("dt");
+        for(Element link: elements_contents){
+            Log.i("HH", link.text());
+        }
     }
 
     private void updateUI(){
