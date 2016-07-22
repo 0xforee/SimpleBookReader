@@ -2,6 +2,7 @@ package org.foree.zetianji;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.webkit.WebView;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 public class ArticleActivity extends AppCompatActivity{
     private String Host = "http://www.biquge.com";
     private static final String TAG = ArticleActivity.class.getSimpleName();
+    private String articleData;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,7 +24,10 @@ public class ArticleActivity extends AppCompatActivity{
         String url = getIntent().getStringExtra("href");
         String title = getIntent().getStringExtra("title");
 
-        getSupportActionBar().setTitle(title);
+        ActionBar bar = getSupportActionBar();
+        if (bar != null) {
+            bar.setTitle(title);
+        }
 
         String target_url = Host + url;
 
@@ -30,7 +35,8 @@ public class ArticleActivity extends AppCompatActivity{
             @Override
             public void onSuccess(String data) {
                 Log.i(TAG, data);
-                wb.loadData(data,"text/html","UTF-8");
+                articleData = data;
+
             }
 
             @Override
@@ -38,6 +44,8 @@ public class ArticleActivity extends AppCompatActivity{
 
             }
         });
-
+        if (wb != null) {
+            wb.loadData(articleData,"text/html","UTF-8");
+        }
     }
 }
