@@ -1,6 +1,5 @@
-package org.foree.zetianjia;
+package org.foree.zetianji;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;

@@ -1,4 +1,4 @@
-package org.foree.zetianjia;
+package org.foree.zetianji;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

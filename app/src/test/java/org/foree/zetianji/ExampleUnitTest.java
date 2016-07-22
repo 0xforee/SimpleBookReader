@@ -1,4 +1,4 @@
-package org.foree.zetianjia;
+package org.foree.zetianji;
 
 import org.junit.Test;
 

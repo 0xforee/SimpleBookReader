@@ -1,6 +1,4 @@
-package org.foree.zetianjia;
-
-import java.util.List;
+package org.foree.zetianji;
 
 /**
  * Created by foree on 16-7-19.
