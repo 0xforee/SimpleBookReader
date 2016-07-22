@@ -11,7 +11,7 @@ import android.widget.TextView;
  * Created by foree on 16-7-21.
  */
 public class ArticleActivity extends AppCompatActivity{
-    private String Host = "http://www.xxbiquge.com/5_5422/";
+    private String Host = "http://www.biquge.com";
     private static final String TAG = ArticleActivity.class.getSimpleName();
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

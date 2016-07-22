@@ -1,6 +1,5 @@
 package org.foree.zetianjia;
 
-import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -19,10 +18,9 @@ import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    String url = "http://www.xxbiquge.com/5_5422/";
+    String url = "http://www.biquge.com/0_168/";
     private ArrayAdapter<String> adapter;
     private ArrayList<String>  hrefList;
     private ArrayList<String>  titleList;
