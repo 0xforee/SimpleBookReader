@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class MainActivity extends AppCompatActivity {
-    String url = "http://www.biquge.com/0_168/";
+    String url = "http://www.biquge.la/book/168/";
     private ArrayAdapter<String> adapter;
     private ArrayList<String>  hrefList;
     private ArrayList<String>  titleList;
@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
             }
             @Override
             public void onFail(String msg) {
-
+                Toast.makeText(MainActivity.this,"getContentListError: " + msg, Toast.LENGTH_LONG).show();
             }
         });
 

@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.webkit.WebView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -16,7 +17,7 @@ import org.jsoup.nodes.Element;
  * Created by foree on 16-7-21.
  */
 public class ArticleActivity extends AppCompatActivity{
-    private String Host = "http://www.biquge.com";
+    private String Host = "http://www.biquge.la/book/168/";
     private static final String TAG = ArticleActivity.class.getSimpleName();
     private String articleData;
     WebView wb;
@@ -46,7 +47,7 @@ public class ArticleActivity extends AppCompatActivity{
 
             @Override
             public void onFail(String msg) {
-
+                Toast.makeText(ArticleActivity.this, "getArticleError: " + msg, Toast.LENGTH_LONG).show();
             }
         });
 

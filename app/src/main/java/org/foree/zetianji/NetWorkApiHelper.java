@@ -36,7 +36,7 @@ public class NetWorkApiHelper {
         protected Response<String> parseNetworkResponse(NetworkResponse response) {
             String str = null;
             try {
-                str = new String(response.data, "utf-8");
+                str = new String(response.data, "gbk");
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
