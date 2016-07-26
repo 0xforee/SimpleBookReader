@@ -95,16 +95,37 @@ public class BQGWebSiteHelper extends AbsWebSiteHelper{
     // 解析得到小说的属性
     private Novel parseNovel(String data){
         Novel novel = new Novel();
+        Chapter newestChapter = new Chapter();
 
         Document doc = Jsoup.parse(data);
-        Elements elements_contents = doc.select("dd");
-        Elements updates = doc.select("[property~=.*update_time]");
+        Elements updates = doc.select("[property~=og:novel*]");
         for(Element update: updates){
-            Log.i("MM", update.toString());
-            novel.setUpdate_time(update.attr("content"));
+            Log.i(TAG, update.toString());
+            switch (update.attr("property")){
+                case "og:novel:category":
+                    novel.setCategory(update.attr("content"));
+                    break;
+                case "og:novel:author":
+                    novel.setAuthor(update.attr("content"));
+                    break;
+                case "og:novel:book_name":
+                    novel.setBook_name(update.attr("content"));
+                    break;
+                case "og:novel:update_time":
+                    novel.setUpdate_time(update.attr("content"));
+                    break;
+                case "og:novel:latest_chapter_name":
+                    newestChapter.setTitle(update.attr("content"));
+                    break;
+                case "og:novel:latest_chapter_url":
+                    newestChapter.setTitle(update.attr("content"));
+                    break;
+            }
         }
+        novel.setNewest_chapter(newestChapter);
 
         List<Chapter> chapters = new ArrayList<>();
+        Elements elements_contents = doc.select("dd");
         Document contents = Jsoup.parse(elements_contents.toString());
         Elements elements_a = contents.getElementsByTag("a");
         for(Element link: elements_a){

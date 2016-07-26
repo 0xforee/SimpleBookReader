@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         absWebSiteHelper.getNovel(new NetCallback<Novel>() {
             @Override
             public void onSuccess(Novel data) {
-                updateUI((Novel)data);
+                updateUI(data);
             }
 
             @Override
@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateUI(Novel data){
         if (data.getUpdate_time() != null){
-            tvUpdate.setText("最后更新时间：" + data.getUpdate_time());
+            tvUpdate.setText(getString(R.string.update_string) + data.getUpdate_time());
         }
 
         chapterList = data.getChapter_list();
