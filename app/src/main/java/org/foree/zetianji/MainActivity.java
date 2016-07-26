@@ -20,7 +20,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class MainActivity extends AppCompatActivity {
-    String url = "http://www.biquge.la/book/168/";
+    // TODO:增加切换来源的按钮
+    String url = "http://www.biquge.com/0_168/";
     private ArrayAdapter<String> adapter;
     private ArrayList<String>  hrefList;
     private ArrayList<String>  titleList;
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        // TODO 增加下载单章与下载全部按钮
         lvContent = (ListView)findViewById(R.id.lv_content);
         tvUpdate = (TextView)findViewById(R.id.tv_update);
         hrefList = new ArrayList<>();

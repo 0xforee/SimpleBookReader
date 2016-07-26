@@ -36,7 +36,8 @@ public class NetWorkApiHelper {
         protected Response<String> parseNetworkResponse(NetworkResponse response) {
             String str = null;
             try {
-                str = new String(response.data, "gbk");
+                // TODO:增加手动切换编码或者自动获取编码的功能
+                str = new String(response.data, "utf-8");
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
