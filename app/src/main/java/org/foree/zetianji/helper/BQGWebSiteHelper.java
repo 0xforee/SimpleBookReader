@@ -20,6 +20,7 @@ import java.util.List;
 
 /**
  * Created by foree on 16-7-26.
+ * 小说的数据来源
  */
 public class BQGWebSiteHelper extends AbsWebSiteHelper{
     private static final String TAG = BQGWebSiteHelper.class.getSimpleName();
@@ -91,6 +92,7 @@ public class BQGWebSiteHelper extends AbsWebSiteHelper{
         );
     }
 
+    // 解析得到小说的属性
     private Novel parseNovel(String data){
         Novel novel = new Novel();
 
@@ -120,6 +122,7 @@ public class BQGWebSiteHelper extends AbsWebSiteHelper{
 
     }
 
+    // 将章节的编码解析出来
     private String decodeUrl(String url){
         if (url.contains(index_page)){
             return host_url + url;
@@ -127,6 +130,7 @@ public class BQGWebSiteHelper extends AbsWebSiteHelper{
             return host_url + index_page + url;
     }
 
+    // 解析章节的内容
     private String parseChapterContent(String data){
         Document doc = Jsoup.parse(data);
         Element content = doc.getElementById("content");

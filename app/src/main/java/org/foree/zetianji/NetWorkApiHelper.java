@@ -9,7 +9,6 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Map;
 
 /**
  * Created by foree on 16-7-18.
