@@ -17,6 +17,7 @@ import org.jsoup.nodes.Element;
  * Created by foree on 16-7-21.
  */
 public class ArticleActivity extends AppCompatActivity{
+    // TODO:增加过滤网址中重复的部分
     private String Host = "http://www.biquge.com";
     private static final String TAG = ArticleActivity.class.getSimpleName();
     private String articleData;

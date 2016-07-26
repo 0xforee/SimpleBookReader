@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    // TODO:重构：隐藏解析的细节，使用中间层
     private void parseHtml(String data){
         Document doc = Jsoup.parse(data);
         Elements elements_contents = doc.select("dd");
