@@ -13,15 +13,12 @@ import android.widget.Toast;
 
 import org.foree.zetianji.book.Chapter;
 import org.foree.zetianji.book.Novel;
-import org.foree.zetianji.book.ZeTianJi;
-import org.foree.zetianji.helper.AbsWebSiteHelper;
 import org.foree.zetianji.helper.BQGWebSiteHelper;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -43,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         absWebSiteHelper.getNovel(new NetCallback<Novel>() {
             @Override
             public void onSuccess(Novel data) {
-                updateUI((ZeTianJi)data);
+                updateUI((Novel)data);
             }
 
             @Override
@@ -74,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void updateUI(ZeTianJi data){
+    private void updateUI(Novel data){
         if (data.getUpdate_time() != null){
             tvUpdate.setText("最后更新时间：" + data.getUpdate_time());
         }

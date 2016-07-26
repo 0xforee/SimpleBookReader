@@ -9,7 +9,6 @@ import org.foree.zetianji.NetCallback;
 import org.foree.zetianji.NetWorkApiHelper;
 import org.foree.zetianji.book.Chapter;
 import org.foree.zetianji.book.Novel;
-import org.foree.zetianji.book.ZeTianJi;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -93,14 +92,14 @@ public class BQGWebSiteHelper extends AbsWebSiteHelper{
     }
 
     private Novel parseNovel(String data){
-        ZeTianJi ztj = new ZeTianJi();
+        Novel novel = new Novel();
 
         Document doc = Jsoup.parse(data);
         Elements elements_contents = doc.select("dd");
         Elements updates = doc.select("[property~=.*update_time]");
         for(Element update: updates){
             Log.i("MM", update.toString());
-            ztj.setUpdate_time(update.attr("content"));
+            novel.setUpdate_time(update.attr("content"));
         }
 
         List<Chapter> chapters = new ArrayList<>();
@@ -115,9 +114,9 @@ public class BQGWebSiteHelper extends AbsWebSiteHelper{
             chapters.add(chapter);
         }
         Collections.reverse(chapters);
-        ztj.setChapter_list(chapters);
+        novel.setChapter_list(chapters);
 
-        return ztj;
+        return novel;
 
     }
 
