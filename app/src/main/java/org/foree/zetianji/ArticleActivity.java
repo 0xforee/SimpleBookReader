@@ -17,7 +17,7 @@ import org.jsoup.nodes.Element;
  * Created by foree on 16-7-21.
  */
 public class ArticleActivity extends AppCompatActivity{
-    private String Host = "http://www.biquge.la/book/168/";
+    private String Host = "http://www.biquge.com";
     private static final String TAG = ArticleActivity.class.getSimpleName();
     private String articleData;
     WebView wb;
