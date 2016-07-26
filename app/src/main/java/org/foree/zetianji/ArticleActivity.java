@@ -9,6 +9,7 @@ import android.webkit.WebView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.foree.zetianji.book.Chapter;
 import org.foree.zetianji.helper.AbsWebSiteHelper;
 import org.foree.zetianji.helper.BQGWebSiteHelper;
 import org.jsoup.Jsoup;
@@ -28,16 +29,15 @@ public class ArticleActivity extends AppCompatActivity{
         setContentView(R.layout.activity_article);
         TextView tv = (TextView)findViewById(R.id.tv_content);
         wb = (WebView)findViewById(R.id.wb_content);
-        String url = getIntent().getStringExtra("href");
-        String title = getIntent().getStringExtra("title");
+        Chapter chapter = (Chapter)getIntent().getSerializableExtra("chapter");
 
         ActionBar bar = getSupportActionBar();
         if (bar != null) {
-            bar.setTitle(title);
+            bar.setTitle(chapter.getTitle());
         }
 
         apiHelper = new BQGWebSiteHelper();
-        apiHelper.getChapterContent(url, new NetCallback<String>() {
+        apiHelper.getChapterContent(chapter.getUrl(), new NetCallback<String>() {
             @Override
             public void onSuccess(String data) {
                 Log.i(TAG, data);

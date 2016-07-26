@@ -22,15 +22,12 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     // TODO:增加切换来源的按钮
-    String url = "http://www.biquge.com/0_168/";
     private ArrayAdapter<String> adapter;
     private List<Chapter> chapterList;
-    private ArrayList<String>  titleList;
     ListView lvContent;
     TextView tvUpdate;
 
@@ -41,7 +38,6 @@ public class MainActivity extends AppCompatActivity {
         // TODO 增加下载单章与下载全部按钮
         lvContent = (ListView)findViewById(R.id.lv_content);
         tvUpdate = (TextView)findViewById(R.id.tv_update);
-        titleList = new ArrayList<>();
 
         BQGWebSiteHelper absWebSiteHelper  = new BQGWebSiteHelper();
         absWebSiteHelper.getNovel(new NetCallback<Novel>() {
@@ -62,8 +58,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this,i+"",Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(MainActivity.this, ArticleActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putString("href", chapterList.get(i).getUrl());
-                bundle.putString("title", chapterList.get(i).getTitle());
+                bundle.putSerializable("chapter", chapterList.get(i));
                 intent.putExtras(bundle);
 
                 startActivity(intent);

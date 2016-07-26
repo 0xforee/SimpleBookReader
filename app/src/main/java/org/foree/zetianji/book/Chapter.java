@@ -1,9 +1,11 @@
 package org.foree.zetianji.book;
 
+import java.io.Serializable;
+
 /**
  * Created by foree on 16-7-26.
  */
-public class Chapter {
+public class Chapter implements Serializable{
     private String title;
     private String url;
 
