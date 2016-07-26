@@ -30,14 +30,14 @@ public class NetWorkApiHelper {
         queue = Volley.newRequestQueue(BaseApplication.getInstance().getApplicationContext());
     }
 
-    public void getRequest(String requestUrl, final Map<String, String> headers, Response.Listener<String> listener, Response.ErrorListener errorListener){
+    public void getRequest(String requestUrl, final String charSet, Response.Listener<String> listener, Response.ErrorListener errorListener){
         StringRequest stringRequest = new StringRequest(Request.Method.GET, requestUrl, listener, errorListener){
         @Override
         protected Response<String> parseNetworkResponse(NetworkResponse response) {
             String str = null;
             try {
                 // TODO:增加手动切换编码或者自动获取编码的功能
-                str = new String(response.data, "utf-8");
+                str = new String(response.data, charSet);
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }

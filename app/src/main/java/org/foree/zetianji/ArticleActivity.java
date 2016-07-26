@@ -9,6 +9,8 @@ import android.webkit.WebView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.foree.zetianji.helper.AbsWebSiteHelper;
+import org.foree.zetianji.helper.BQGWebSiteHelper;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -17,10 +19,8 @@ import org.jsoup.nodes.Element;
  * Created by foree on 16-7-21.
  */
 public class ArticleActivity extends AppCompatActivity{
-    // TODO:增加过滤网址中重复的部分
-    private String Host = "http://www.biquge.com";
+    BQGWebSiteHelper apiHelper;
     private static final String TAG = ArticleActivity.class.getSimpleName();
-    private String articleData;
     WebView wb;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -36,14 +36,12 @@ public class ArticleActivity extends AppCompatActivity{
             bar.setTitle(title);
         }
 
-        String target_url = Host + url;
-
-        NetRequest.getHtml(target_url, new NetCallback() {
+        apiHelper = new BQGWebSiteHelper();
+        apiHelper.getChapterContent(url, new NetCallback<String>() {
             @Override
             public void onSuccess(String data) {
                 Log.i(TAG, data);
-                parseHtml(data);
-                updateUI();
+                updateUI(data);
             }
 
             @Override
@@ -54,17 +52,10 @@ public class ArticleActivity extends AppCompatActivity{
 
     }
 
-    private void updateUI(){
+    private void updateUI(String data){
         if (wb != null) {
-            wb.getSettings().setDefaultTextEncodingName("UTF-8");
-            wb.loadDataWithBaseURL(null, articleData,"text/html","UTF-8",null);
+            wb.getSettings().setDefaultTextEncodingName(apiHelper.getWebsiteCharSet());
+            wb.loadDataWithBaseURL(null, data,"text/html",apiHelper.getWebsiteCharSet(),null);
         }
-    }
-
-    private void parseHtml(String data){
-        Document doc = Jsoup.parse(data);
-        Element content = doc.getElementById("content");
-        articleData = content.toString();
-        Log.i(TAG, content.toString());
     }
 }

@@ -11,6 +11,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.foree.zetianji.book.Chapter;
+import org.foree.zetianji.book.Novel;
+import org.foree.zetianji.book.ZeTianJi;
+import org.foree.zetianji.helper.AbsWebSiteHelper;
+import org.foree.zetianji.helper.BQGWebSiteHelper;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -18,14 +23,14 @@ import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     // TODO:增加切换来源的按钮
     String url = "http://www.biquge.com/0_168/";
     private ArrayAdapter<String> adapter;
-    private ArrayList<String>  hrefList;
+    private List<Chapter> chapterList;
     private ArrayList<String>  titleList;
-    private String update_time;
     ListView lvContent;
     TextView tvUpdate;
 
@@ -36,19 +41,18 @@ public class MainActivity extends AppCompatActivity {
         // TODO 增加下载单章与下载全部按钮
         lvContent = (ListView)findViewById(R.id.lv_content);
         tvUpdate = (TextView)findViewById(R.id.tv_update);
-        hrefList = new ArrayList<>();
         titleList = new ArrayList<>();
 
-        NetRequest.getHtml(url, new NetCallback() {
+        BQGWebSiteHelper absWebSiteHelper  = new BQGWebSiteHelper();
+        absWebSiteHelper.getNovel(new NetCallback<Novel>() {
             @Override
-            public void onSuccess(String data) {
-                parseHtml(data);
-                updateUI();
-                parseTest(data);
+            public void onSuccess(Novel data) {
+                updateUI((ZeTianJi)data);
             }
+
             @Override
             public void onFail(String msg) {
-                Toast.makeText(MainActivity.this,"getContentListError: " + msg, Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "getContentListError: " + msg, Toast.LENGTH_LONG).show();
             }
         });
 
@@ -58,35 +62,13 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this,i+"",Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(MainActivity.this, ArticleActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putString("href", hrefList.get(i));
-                bundle.putString("title", titleList.get(i));
+                bundle.putString("href", chapterList.get(i).getUrl());
+                bundle.putString("title", chapterList.get(i).getTitle());
                 intent.putExtras(bundle);
 
                 startActivity(intent);
             }
         });
-    }
-
-    // TODO:重构：隐藏解析的细节，使用中间层
-    private void parseHtml(String data){
-        Document doc = Jsoup.parse(data);
-        Elements elements_contents = doc.select("dd");
-        Elements updates = doc.select("[property~=.*update_time]");
-        for(Element update: updates){
-            Log.i("MM", update.toString());
-            update_time = update.attr("content");
-        }
-        Document contents = Jsoup.parse(elements_contents.toString());
-        Elements elements_a = contents.getElementsByTag("a");
-        for(Element link: elements_a){
-            hrefList.add(link.attr("href"));
-            titleList.add(link.text());
-//                    Log.i("HH", link.text());
-//                    Log.i("HH", link.attr("href"));
-        }
-
-        Collections.reverse(hrefList);
-        Collections.reverse(titleList);
     }
 
     private void parseTest(String data){
@@ -97,14 +79,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void updateUI(){
-        if (update_time != null){
-            tvUpdate.setText("最后更新时间：" + update_time);
+    private void updateUI(ZeTianJi data){
+        if (data.getUpdate_time() != null){
+            tvUpdate.setText("最后更新时间：" + data.getUpdate_time());
         }
+
+        chapterList = data.getChapter_list();
         adapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_list_item_1);
-        Log.i("HH", titleList.size() + "");
-        for(int i = 0; i < titleList.size(); i++){
-            adapter.add(titleList.get(i));
+        Log.i("HH", chapterList.size() + "");
+        for(int i = 0; i < chapterList.size(); i++){
+            adapter.add(chapterList.get(i).getTitle());
         }
         lvContent.setAdapter(adapter);
     }

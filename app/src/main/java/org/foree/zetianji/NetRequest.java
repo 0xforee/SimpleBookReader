@@ -5,16 +5,13 @@ import android.util.Log;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by foree on 16-7-21.
  */
 public class NetRequest {
-    public static void getHtml(String url, final NetCallback netCallback) {
-        final Map<String,String> headers = new HashMap<>();
-        NetWorkApiHelper.newInstance().getRequest(url, headers, new Response.Listener<String>() {
+    public static void getHtml(String url, String charSet, final NetCallback netCallback) {
+        NetWorkApiHelper.newInstance().getRequest(url, charSet, new Response.Listener<String>() {
                     @Override
                     public void onResponse (String response){
                         //Log.i("HH", "onResponse " + response);
