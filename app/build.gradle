@@ -10,6 +10,8 @@ android {
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
+
+        //APP_ID、APP_KEY、APP_SECRET请根据个推开发者后台申请到的应用参数进行相应替换
         manifestPlaceholders = [
                 GETUI_APP_ID : "s7imd2wTRa7dZw1641WCg8",
                 GETUI_APP_KEY : "4HzEvd6DAr6SB61bc2CkM5",
@@ -17,7 +19,7 @@ android {
                 PACKAGE_NAME : applicationId
         ]
         ndk {
-            abiFilters "armeabi", "armeabi-v7a", "arm64-v8a", "mips", "mips64", "x86", "x86_64"
+            abiFilters "armeabi", "armeabi-v7a", "arm64-v8a"
         }
     }
     buildTypes {
@@ -35,5 +37,7 @@ dependencies {
     compile 'com.getui:sdk:2.9.0.0'
     compile 'com.android.support:support-v4:23.4.0'
     compile 'org.jsoup:jsoup:1.9.2'
+    compile 'com.getui:sdk:2.9.0.0'
+    compile 'com.android.support:support-v4:23.4.0'
     compile project(path: ':libraries:Volley')
 }
