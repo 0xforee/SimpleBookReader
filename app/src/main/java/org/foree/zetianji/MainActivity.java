@@ -18,6 +18,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import com.igexin.sdk.PushManager;
 
 import java.util.List;
 
@@ -35,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
         // TODO 增加下载单章与下载全部按钮
         lvContent = (ListView)findViewById(R.id.lv_content);
         tvUpdate = (TextView)findViewById(R.id.tv_update);
+
+        PushManager.getInstance().initialize(this.getApplicationContext());
 
         BQGWebSiteHelper absWebSiteHelper  = new BQGWebSiteHelper();
         absWebSiteHelper.getNovel(new NetCallback<Novel>() {

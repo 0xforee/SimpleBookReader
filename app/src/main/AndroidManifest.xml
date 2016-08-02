@@ -18,6 +18,15 @@
         </activity>
         <activity android:name="org.foree.zetianji.ArticleActivity">
         </activity>
-    </application>
+        <!-- 配置第三方Receiver -->
+        <receiver
+        android:name="org.foree.zetianji.PushReceiver"
+        android:exported="false">
+        <intent-filter>
+            <action android:name="com.igexin.sdk.action.${GETUI_APP_ID}" />
+        </intent-filter>
+    </receiver>
+
+</application>
 
 </manifest>
