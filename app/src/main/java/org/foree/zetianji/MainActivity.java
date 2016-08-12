@@ -14,7 +14,9 @@ import android.widget.Toast;
 
 import org.foree.zetianji.book.Chapter;
 import org.foree.zetianji.book.Novel;
+import org.foree.zetianji.dao.NovelDao;
 import org.foree.zetianji.helper.BQGLAWebSiteHelper;
+import org.foree.zetianji.helper.WebSiteInfo;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -39,6 +41,8 @@ public class MainActivity extends AppCompatActivity implements Drawer.OnDrawerIt
     ListView lvContent;
     TextView tvUpdate;
     Toolbar toolbar;
+    NovelDao novelDao;
+    List<WebSiteInfo> webSiteInfoList;
 
     private AccountHeader headerResult = null;
     private Drawer result = null;
@@ -47,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements Drawer.OnDrawerIt
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        novelDao = new NovelDao(this);
         // TODO 增加下载单章与下载全部按钮
         lvContent = (ListView)findViewById(R.id.lv_content);
         tvUpdate = (TextView)findViewById(R.id.tv_update);
@@ -80,6 +85,8 @@ public class MainActivity extends AppCompatActivity implements Drawer.OnDrawerIt
                 startActivity(intent);
             }
         });
+
+        initWebSites();
         setUpDrawerLayout(savedInstanceState);
 
 
@@ -113,15 +120,23 @@ public class MainActivity extends AppCompatActivity implements Drawer.OnDrawerIt
                 .withShowDrawerOnFirstLaunch(true)
                 .withOnDrawerItemClickListener(this)
                 .build();
-        
+
+        // init website
+        if ( novelDao.findAll().size() > 0){
+            for(WebSiteInfo wb: novelDao.findAll()){
+                result.addItem(new PrimaryDrawerItem().withName(wb.getName()).withIdentifier(wb.getId()));
+            }
+        }
+
     }
 
-    private void parseTest(String data){
-        Document doc = Jsoup.parse(data);
-        Elements elements_contents = doc.select("dt");
-        for(Element link: elements_contents){
-            Log.i("HH", link.text());
-        }
+    private void initWebSites(){
+        WebSiteInfo webSiteInfo1 = new WebSiteInfo("笔趣阁", "http://www.biquge.com", "/0_168/", "utf-8");
+        WebSiteInfo webSiteInfo2 = new WebSiteInfo("笔趣阁LA", "http://www.biquge.la", "/book/168/", "gbk");
+
+        novelDao.insertWebSite(webSiteInfo1);
+        novelDao.insertWebSite(webSiteInfo2);
+
     }
 
     private void updateUI(Novel data){
