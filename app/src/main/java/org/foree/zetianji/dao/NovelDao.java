@@ -117,6 +117,7 @@ public class NovelDao {
                     "url=?", new String[]{chapter.getUrl()}, null, null, null);
             if (cursor.getCount() == 0) {
                 contentValues.put("title", chapter.getTitle());
+                contentValues.put("host_url", chapter.getHostUrl());
                 contentValues.put("url", chapter.getUrl());
                 if (db.insert(NovelSQLiteOpenHelper.DB_TABLE_CHAPTERS, null, contentValues) == -1) {
                     Log.e(TAG, "Database insert url: " + chapter.getUrl() + " error");
@@ -127,6 +128,30 @@ public class NovelDao {
         db.setTransactionSuccessful();
         db.endTransaction();
         db.close();
+    }
+
+    public List<Chapter> findChapterByHostUrl(String hostUrl){
+        Log.d(TAG, "get chapterList from db, hostUrl = " + hostUrl);
+        Cursor cursor;
+        List<org.foree.zetianji.book.Chapter> chapterList = new ArrayList<>();
+        SQLiteDatabase db = novelSQLiteOpenHelper.getReadableDatabase();
+        db.beginTransaction();
+
+        cursor = db.query(NovelSQLiteOpenHelper.DB_TABLE_WEBSITES, null,
+                "host_url=?", new String[]{hostUrl}, null, null, null);
+        while(cursor.moveToNext()){
+            String title = cursor.getString(cursor.getColumnIndex("title"));
+            String host_url = cursor.getString(cursor.getColumnIndex("host_url"));
+            String url = cursor.getString(cursor.getColumnIndex("url"));
+            Chapter chapter = new Chapter(title, url, host_url);
+            chapterList.add(chapter);
+
+        }
+        cursor.close();
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        db.close();
+        return chapterList;
     }
 //
 //    /**

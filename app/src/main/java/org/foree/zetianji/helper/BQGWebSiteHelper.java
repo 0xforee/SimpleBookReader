@@ -143,6 +143,7 @@ public class BQGWebSiteHelper extends AbsWebSiteHelper{
         for(Element link: elements_a){
             Chapter chapter = new Chapter();
             chapter.setTitle(link.text());
+            chapter.setHostUrl(host_url);
             chapter.setUrl(decodeUrl(link.attr("href")));
 //          Log.i("HH", link.text());
 //          Log.i("HH", link.attr("href"));
