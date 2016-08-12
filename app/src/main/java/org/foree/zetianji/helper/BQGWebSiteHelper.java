@@ -28,6 +28,9 @@ public class BQGWebSiteHelper extends AbsWebSiteHelper{
     private String host_url;
     private String index_page;
 
+    public BQGWebSiteHelper() {
+    }
+
     public BQGWebSiteHelper(WebSiteInfo webSiteInfo) {
         this.websiteCharSet = webSiteInfo.getWeb_char();
         this.host_url = webSiteInfo.getHost_url();
@@ -75,7 +78,7 @@ public class BQGWebSiteHelper extends AbsWebSiteHelper{
     }
 
     @Override
-    public void getChapterContent(String chapter_url, final NetCallback<String> netCallback) {
+    public void getChapterContent(String chapter_url, String websiteCharSet, final NetCallback<String> netCallback) {
         NetWorkApiHelper.newInstance().getRequest(chapter_url, websiteCharSet, new Response.Listener<String>() {
                     @Override
                     public void onResponse (String response){

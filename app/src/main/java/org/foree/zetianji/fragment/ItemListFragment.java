@@ -39,6 +39,7 @@ public class ItemListFragment extends Fragment{
     private RecyclerView mRecyclerView;
     private ItemListAdapter mAdapter;
     private List<Chapter> chapterList;
+    BQGWebSiteHelper absWebSiteHelper;
     TextView tvUpdate;
     NovelDao rssDao;
 
@@ -87,6 +88,7 @@ public class ItemListFragment extends Fragment{
                 Intent intent = new Intent(getActivity(), ArticleActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("chapter", chapterList.get(position));
+                bundle.putString("web_char",absWebSiteHelper.getWebsiteCharSet());
                 intent.putExtras(bundle);
 
                 startActivity(intent);
@@ -103,7 +105,7 @@ public class ItemListFragment extends Fragment{
 
         long id = getArguments().getLong(KEY_ID);
         // getChapterList
-        BQGWebSiteHelper absWebSiteHelper  = new BQGWebSiteHelper(rssDao.find(id));
+        absWebSiteHelper  = new BQGWebSiteHelper(rssDao.find(id));
         absWebSiteHelper.getNovel(new NetCallback<Novel>() {
             @Override
             public void onSuccess(Novel data) {

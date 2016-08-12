@@ -10,35 +10,33 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.foree.zetianji.book.Chapter;
-import org.foree.zetianji.helper.AbsWebSiteHelper;
-import org.foree.zetianji.helper.BQGLAWebSiteHelper;
 import org.foree.zetianji.helper.BQGWebSiteHelper;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 
 /**
  * Created by foree on 16-7-21.
  */
 public class ArticleActivity extends AppCompatActivity{
-    BQGLAWebSiteHelper apiHelper;
+    BQGWebSiteHelper apiHelper;
     private static final String TAG = ArticleActivity.class.getSimpleName();
     WebView wb;
+    String webChar;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_article);
         TextView tv = (TextView)findViewById(R.id.tv_content);
         wb = (WebView)findViewById(R.id.wb_content);
-        Chapter chapter = (Chapter)getIntent().getSerializableExtra("chapter");
+        Bundle bundle = getIntent().getExtras();
+        Chapter chapter = (Chapter)bundle.getSerializable("chapter");
+        webChar = bundle.getString("web_char");
 
         ActionBar bar = getSupportActionBar();
         if (bar != null) {
             bar.setTitle(chapter.getTitle());
         }
 
-        apiHelper = new BQGLAWebSiteHelper();
-        apiHelper.getChapterContent(chapter.getUrl(), new NetCallback<String>() {
+        apiHelper = new BQGWebSiteHelper();
+        apiHelper.getChapterContent(chapter.getUrl(), webChar, new NetCallback<String>() {
             @Override
             public void onSuccess(String data) {
                 Log.i(TAG, data);
@@ -55,8 +53,9 @@ public class ArticleActivity extends AppCompatActivity{
 
     private void updateUI(String data){
         if (wb != null) {
-            wb.getSettings().setDefaultTextEncodingName(apiHelper.getWebsiteCharSet());
-            wb.loadDataWithBaseURL(null, data,"text/html",apiHelper.getWebsiteCharSet(),null);
+            Log.d(TAG, "webChar: " + webChar);
+            wb.getSettings().setDefaultTextEncodingName(webChar);
+            wb.loadDataWithBaseURL(null, data,"text/html",webChar,null);
         }
     }
 }

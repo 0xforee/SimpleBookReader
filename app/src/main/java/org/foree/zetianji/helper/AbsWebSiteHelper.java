@@ -9,5 +9,5 @@ import org.foree.zetianji.book.Novel;
 public abstract class AbsWebSiteHelper {
     public abstract String getWebsiteCharSet();
     public abstract void getNovel(NetCallback<Novel> netCallback);
-    public abstract void getChapterContent(String chapter_url, NetCallback<String> netCallback);
+    public abstract void getChapterContent(String chapter_url, String webChar, NetCallback<String> netCallback);
 }

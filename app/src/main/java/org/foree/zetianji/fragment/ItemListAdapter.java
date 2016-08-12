@@ -79,14 +79,10 @@ public class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.MyView
 
     class MyViewHolder extends RecyclerView.ViewHolder{
         TextView tvTitle;
-        TextView tvSummary;
-        TextView tvPublished;
 
         public MyViewHolder(View view){
             super(view);
             tvTitle = (TextView)view.findViewById(R.id.tv_item_title);
-            tvSummary = (TextView)view.findViewById(R.id.tv_item_summary);
-            tvPublished = (TextView)view.findViewById(R.id.tv_item_published);
         }
     }
 }
