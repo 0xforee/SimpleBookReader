@@ -64,7 +64,7 @@ public class BaseApplication extends Application{
 
     }
 
-    public String getConfigDirString(){
-        return myApplicationDirPath + File.separator + myApplicationConfigsName;
+    public String getCacheDirString(){
+        return myApplicationDirPath + File.separator + myApplicationCacheName;
     }
 }

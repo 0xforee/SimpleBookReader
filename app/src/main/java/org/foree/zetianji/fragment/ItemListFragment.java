@@ -20,13 +20,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.foree.zetianji.ArticleActivity;
+import org.foree.zetianji.BaseApplication;
 import org.foree.zetianji.NetCallback;
 import org.foree.zetianji.R;
 import org.foree.zetianji.book.Chapter;
 import org.foree.zetianji.book.Novel;
 import org.foree.zetianji.dao.NovelDao;
 import org.foree.zetianji.helper.BQGWebSiteHelper;
+import org.foree.zetianji.helper.WebSiteInfo;
+import org.foree.zetianji.utils.FileUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -40,6 +45,7 @@ public class ItemListFragment extends Fragment{
     private ItemListAdapter mAdapter;
     private List<Chapter> chapterList;
     BQGWebSiteHelper absWebSiteHelper;
+    WebSiteInfo webSiteInfo;
     TextView tvUpdate;
     NovelDao rssDao;
 
@@ -105,7 +111,8 @@ public class ItemListFragment extends Fragment{
 
         long id = getArguments().getLong(KEY_ID);
         // getChapterList
-        absWebSiteHelper  = new BQGWebSiteHelper(rssDao.find(id));
+        webSiteInfo = rssDao.find(id);
+        absWebSiteHelper  = new BQGWebSiteHelper(webSiteInfo);
         absWebSiteHelper.getNovel(new NetCallback<Novel>() {
             @Override
             public void onSuccess(Novel data) {
@@ -120,6 +127,27 @@ public class ItemListFragment extends Fragment{
             @Override
             public void onFail(String msg) {
                 Toast.makeText(getActivity(), "getContentListError: " + msg, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+
+    private void downloadChapter(final Chapter chapter){
+        absWebSiteHelper.getChapterContent(chapter.getUrl(), webSiteInfo.getWeb_char(), new NetCallback<String>() {
+            @Override
+            public void onSuccess(String data) {
+                File chapterCache = new File(BaseApplication.getInstance().getCacheDirString()
+                        + File.separator + webSiteInfo.getHost_url() + webSiteInfo.getIndex_page() + chapter.getUrl());
+                try {
+                    FileUtils.writeFile(chapterCache, data);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFail(String msg) {
+
             }
         });
     }
