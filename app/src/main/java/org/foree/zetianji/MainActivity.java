@@ -3,6 +3,7 @@ package org.foree.zetianji;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -13,21 +14,34 @@ import android.widget.Toast;
 
 import org.foree.zetianji.book.Chapter;
 import org.foree.zetianji.book.Novel;
-import org.foree.zetianji.helper.BQGWebSiteHelper;
+import org.foree.zetianji.helper.BQGLAWebSiteHelper;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import com.igexin.sdk.PushManager;
+import com.mikepenz.materialdrawer.AccountHeader;
+import com.mikepenz.materialdrawer.AccountHeaderBuilder;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
+import com.mikepenz.materialdrawer.model.ProfileSettingDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements Drawer.OnDrawerItemClickListener{
     // TODO:增加切换来源的按钮
     private ArrayAdapter<String> adapter;
     private List<Chapter> chapterList;
     ListView lvContent;
     TextView tvUpdate;
+    Toolbar toolbar;
+
+    private AccountHeader headerResult = null;
+    private Drawer result = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,9 +51,12 @@ public class MainActivity extends AppCompatActivity {
         lvContent = (ListView)findViewById(R.id.lv_content);
         tvUpdate = (TextView)findViewById(R.id.tv_update);
 
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         PushManager.getInstance().initialize(this.getApplicationContext());
 
-        BQGWebSiteHelper absWebSiteHelper  = new BQGWebSiteHelper();
+        BQGLAWebSiteHelper absWebSiteHelper  = new BQGLAWebSiteHelper();
         absWebSiteHelper.getNovel(new NetCallback<Novel>() {
             @Override
             public void onSuccess(Novel data) {
@@ -63,6 +80,40 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        setUpDrawerLayout(savedInstanceState);
+
+
+    }
+    private void setUpDrawerLayout(Bundle savedInstanceState){
+
+        // Create a few sample profile
+        // NOTE you have to define the loader logic too. See the CustomApplication for more details
+        final IProfile profile = new ProfileDrawerItem().withName("").withEmail("").withIcon("").withIdentifier(100);
+
+        // Create the AccountHeader
+        headerResult = new AccountHeaderBuilder()
+                .withActivity(MainActivity.this)
+                .withTranslucentStatusBar(true)
+                .withHeaderBackground(R.drawable.header)
+                .addProfiles(
+                        profile,
+                        //don't ask but google uses 14dp for the add account icon in gmail but 20dp for the normal icons (like manage account)
+                        new ProfileSettingDrawerItem().withName("Add Account").withDescription("Add new GitHub Account").withIdentifier(1001),
+                        new ProfileSettingDrawerItem().withName("Manage Account").withIdentifier(100001)
+                )
+                .withSavedInstance(savedInstanceState)
+                .build();
+
+        result = new DrawerBuilder()
+                .withActivity(this)
+                .withToolbar(toolbar)
+                .withHasStableIds(true)
+                .withAccountHeader(headerResult)
+                .withSavedInstance(savedInstanceState)
+                .withShowDrawerOnFirstLaunch(true)
+                .withOnDrawerItemClickListener(this)
+                .build();
+        
     }
 
     private void parseTest(String data){
@@ -87,4 +138,8 @@ public class MainActivity extends AppCompatActivity {
         lvContent.setAdapter(adapter);
     }
 
+    @Override
+    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+        return false;
+    }
 }

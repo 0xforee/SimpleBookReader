@@ -9,7 +9,8 @@
         android:supportsRtl="true"
         android:name="org.foree.zetianji.BaseApplication"
         android:theme="@style/AppTheme">
-        <activity android:name="org.foree.zetianji.MainActivity">
+        <activity android:name="org.foree.zetianji.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

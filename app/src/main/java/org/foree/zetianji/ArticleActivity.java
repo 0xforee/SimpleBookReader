@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import org.foree.zetianji.book.Chapter;
 import org.foree.zetianji.helper.AbsWebSiteHelper;
+import org.foree.zetianji.helper.BQGLAWebSiteHelper;
 import org.foree.zetianji.helper.BQGWebSiteHelper;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -20,7 +21,7 @@ import org.jsoup.nodes.Element;
  * Created by foree on 16-7-21.
  */
 public class ArticleActivity extends AppCompatActivity{
-    BQGWebSiteHelper apiHelper;
+    BQGLAWebSiteHelper apiHelper;
     private static final String TAG = ArticleActivity.class.getSimpleName();
     WebView wb;
     @Override
@@ -36,7 +37,7 @@ public class ArticleActivity extends AppCompatActivity{
             bar.setTitle(chapter.getTitle());
         }
 
-        apiHelper = new BQGWebSiteHelper();
+        apiHelper = new BQGLAWebSiteHelper();
         apiHelper.getChapterContent(chapter.getUrl(), new NetCallback<String>() {
             @Override
             public void onSuccess(String data) {
