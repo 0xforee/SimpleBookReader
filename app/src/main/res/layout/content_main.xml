@@ -12,15 +12,4 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".MainActivity"
     tools:showIn="@layout/app_bar_main">
-    <TextView
-        android:id="@+id/tv_update"
-        android:gravity="center"
-        android:padding="6dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <ListView
-        android:layout_below="@id/tv_update"
-        android:id="@+id/lv_content"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
 </RelativeLayout>

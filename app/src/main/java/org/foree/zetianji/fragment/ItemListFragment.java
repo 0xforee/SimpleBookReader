@@ -33,7 +33,7 @@ import java.util.List;
  * Created by foree on 16-7-20.
  */
 public class ItemListFragment extends Fragment{
-    private static final String KEY_FEEDID = "feedId";
+    private static final String KEY_ID = "websiteId";
     private static final String TAG = ItemListFragment.class.getSimpleName();
 
     private RecyclerView mRecyclerView;
@@ -51,7 +51,7 @@ public class ItemListFragment extends Fragment{
 
         Bundle args = new Bundle();
 
-        args.putLong(KEY_FEEDID, id);
+        args.putLong(KEY_ID, id);
         f.setArguments(args);
 
         return (f);
@@ -66,6 +66,7 @@ public class ItemListFragment extends Fragment{
         rssDao = new NovelDao(getActivity());
 
         mRecyclerView = (RecyclerView) linearLayout.findViewById(R.id.rv_item_list);
+        tvUpdate = (TextView)linearLayout.findViewById(R.id.tv_update);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(),
@@ -100,12 +101,15 @@ public class ItemListFragment extends Fragment{
 
     private void syncDate(){
 
-        long id = getArguments().getLong(KEY_FEEDID);
+        long id = getArguments().getLong(KEY_ID);
         // getChapterList
         BQGWebSiteHelper absWebSiteHelper  = new BQGWebSiteHelper(rssDao.find(id));
         absWebSiteHelper.getNovel(new NetCallback<Novel>() {
             @Override
             public void onSuccess(Novel data) {
+                if( data.getUpdate_time() != null){
+                    tvUpdate.setText(getResources().getString(R.string.update_string) + data.getUpdate_time());
+                }
                 chapterList = data.getChapter_list();
                 initAdapter();
 
