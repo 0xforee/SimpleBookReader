@@ -25,7 +25,6 @@ import org.foree.zetianji.R;
 import org.foree.zetianji.book.Chapter;
 import org.foree.zetianji.book.Novel;
 import org.foree.zetianji.dao.NovelDao;
-import org.foree.zetianji.helper.BQGLAWebSiteHelper;
 import org.foree.zetianji.helper.BQGWebSiteHelper;
 
 import java.util.List;

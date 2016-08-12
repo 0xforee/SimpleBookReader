@@ -1,30 +1,13 @@
 package org.foree.zetianji;
 
 import android.app.Fragment;
-import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import org.foree.zetianji.book.Chapter;
-import org.foree.zetianji.book.Novel;
-import org.foree.zetianji.dao.NovelDao;
-import org.foree.zetianji.fragment.ItemListFragment;
-import org.foree.zetianji.helper.AbsWebSiteHelper;
-import org.foree.zetianji.helper.BQGLAWebSiteHelper;
-import org.foree.zetianji.helper.BQGWebSiteHelper;
-import org.foree.zetianji.helper.WebSiteInfo;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import com.igexin.sdk.PushManager;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
@@ -36,15 +19,13 @@ import com.mikepenz.materialdrawer.model.ProfileSettingDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
-import java.util.List;
+import org.foree.zetianji.dao.NovelDao;
+import org.foree.zetianji.fragment.ItemListFragment;
+import org.foree.zetianji.helper.WebSiteInfo;
 
 public class MainActivity extends AppCompatActivity implements Drawer.OnDrawerItemClickListener{
-    // TODO:增加切换来源的按钮
-    private ArrayAdapter<String> adapter;
-
     Toolbar toolbar;
     NovelDao novelDao;
-    List<WebSiteInfo> webSiteInfoList;
 
     private AccountHeader headerResult = null;
     private Drawer result = null;
@@ -111,16 +92,16 @@ public class MainActivity extends AppCompatActivity implements Drawer.OnDrawerIt
     }
 
     private void initWebSites(){
-        WebSiteInfo webSiteInfo1 = new WebSiteInfo("笔趣阁", "http://www.biquge.com", "/0_168/", "utf-8");
-        WebSiteInfo webSiteInfo2 = new WebSiteInfo("笔趣阁LA", "http://www.biquge.la", "/book/168/", "gbk");
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(BaseApplication.getInstance());
+        if(sp.getBoolean("first_run", true)) {
+            WebSiteInfo webSiteInfo1 = new WebSiteInfo("笔趣阁", "http://www.biquge.com", "/0_168/", "utf-8");
+            WebSiteInfo webSiteInfo2 = new WebSiteInfo("笔趣阁LA", "http://www.biquge.la", "/book/168/", "gbk");
 
-        novelDao.insertWebSite(webSiteInfo1);
-        novelDao.insertWebSite(webSiteInfo2);
+            novelDao.insertWebSite(webSiteInfo1);
+            novelDao.insertWebSite(webSiteInfo2);
 
-    }
-
-    private void updateUI(Novel data){
-
+            sp.edit().putBoolean("first_run", false).apply();
+        }
     }
 
     @Override

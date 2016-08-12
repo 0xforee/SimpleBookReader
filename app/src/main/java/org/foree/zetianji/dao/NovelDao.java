@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-
 import org.foree.zetianji.helper.WebSiteInfo;
 
 import java.util.ArrayList;
