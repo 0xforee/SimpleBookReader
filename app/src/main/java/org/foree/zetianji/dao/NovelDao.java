@@ -55,6 +55,7 @@ public class NovelDao {
         Cursor cursor;
         List<WebSiteInfo> webSiteInfoList = new ArrayList<>();
         SQLiteDatabase db = novelSQLiteOpenHelper.getReadableDatabase();
+        db.beginTransaction();
 
         cursor = db.query(NovelSQLiteOpenHelper.DB_TABLE_WEBSITES, null,
                     null, null, null, null, null);
@@ -69,6 +70,8 @@ public class NovelDao {
 
         }
         cursor.close();
+        db.setTransactionSuccessful();
+        db.endTransaction();
         db.close();
         return webSiteInfoList;
     }
@@ -77,6 +80,7 @@ public class NovelDao {
         Log.d(TAG, "get website from db, id = " + id);
         Cursor cursor;
         SQLiteDatabase db = novelSQLiteOpenHelper.getReadableDatabase();
+        db.beginTransaction();
 
         cursor = db.query(NovelSQLiteOpenHelper.DB_TABLE_WEBSITES, null,
                 "id=?", new String[]{id +""}, null, null, null);
@@ -88,6 +92,8 @@ public class NovelDao {
         WebSiteInfo webSiteInfo = new WebSiteInfo(name, host_url, index_page, webSiteCharSet);
 
         cursor.close();
+        db.setTransactionSuccessful();
+        db.endTransaction();
         db.close();
         return webSiteInfo;
     }
