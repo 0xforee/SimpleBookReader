@@ -73,6 +73,25 @@ public class NovelDao {
         db.close();
         return webSiteInfoList;
     }
+
+    public WebSiteInfo find(long id){
+        Log.d(TAG, "get website from db, id = " + id);
+        Cursor cursor;
+        SQLiteDatabase db = novelSQLiteOpenHelper.getReadableDatabase();
+
+        cursor = db.query(NovelSQLiteOpenHelper.DB_TABLE_WEBSITES, null,
+                "id=?", new String[]{id +""}, null, null, null);
+        cursor.moveToNext();
+        String name = cursor.getString(cursor.getColumnIndex("name"));
+        String host_url = cursor.getString(cursor.getColumnIndex("host_url"));
+        String index_page = cursor.getString(cursor.getColumnIndex("index_page"));
+        String webSiteCharSet = cursor.getString(cursor.getColumnIndex("web_char"));
+        WebSiteInfo webSiteInfo = new WebSiteInfo(name, host_url, index_page, webSiteCharSet);
+
+        cursor.close();
+        db.close();
+        return webSiteInfo;
+    }
 //
 //    /**
 //     * 清空表

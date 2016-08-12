@@ -1,5 +1,6 @@
 package org.foree.zetianji;
 
+import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -15,7 +16,10 @@ import android.widget.Toast;
 import org.foree.zetianji.book.Chapter;
 import org.foree.zetianji.book.Novel;
 import org.foree.zetianji.dao.NovelDao;
+import org.foree.zetianji.fragment.ItemListFragment;
+import org.foree.zetianji.helper.AbsWebSiteHelper;
 import org.foree.zetianji.helper.BQGLAWebSiteHelper;
+import org.foree.zetianji.helper.BQGWebSiteHelper;
 import org.foree.zetianji.helper.WebSiteInfo;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -37,9 +41,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements Drawer.OnDrawerItemClickListener{
     // TODO:增加切换来源的按钮
     private ArrayAdapter<String> adapter;
-    private List<Chapter> chapterList;
-    ListView lvContent;
-    TextView tvUpdate;
+
     Toolbar toolbar;
     NovelDao novelDao;
     List<WebSiteInfo> webSiteInfoList;
@@ -53,38 +55,16 @@ public class MainActivity extends AppCompatActivity implements Drawer.OnDrawerIt
         setContentView(R.layout.activity_main);
         novelDao = new NovelDao(this);
         // TODO 增加下载单章与下载全部按钮
-        lvContent = (ListView)findViewById(R.id.lv_content);
-        tvUpdate = (TextView)findViewById(R.id.tv_update);
+
+        if (savedInstanceState == null) {
+            Fragment f = ItemListFragment.newInstance(1);
+            getFragmentManager().beginTransaction().replace(R.id.content_main, f).commit();
+        }
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         PushManager.getInstance().initialize(this.getApplicationContext());
-
-        BQGLAWebSiteHelper absWebSiteHelper  = new BQGLAWebSiteHelper();
-        absWebSiteHelper.getNovel(new NetCallback<Novel>() {
-            @Override
-            public void onSuccess(Novel data) {
-                updateUI(data);
-            }
-
-            @Override
-            public void onFail(String msg) {
-                Toast.makeText(MainActivity.this, "getContentListError: " + msg, Toast.LENGTH_LONG).show();
-            }
-        });
-
-        lvContent.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent intent = new Intent(MainActivity.this, ArticleActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("chapter", chapterList.get(i));
-                intent.putExtras(bundle);
-
-                startActivity(intent);
-            }
-        });
 
         initWebSites();
         setUpDrawerLayout(savedInstanceState);
@@ -140,21 +120,15 @@ public class MainActivity extends AppCompatActivity implements Drawer.OnDrawerIt
     }
 
     private void updateUI(Novel data){
-        if (data.getUpdate_time() != null){
-            tvUpdate.setText(getString(R.string.update_string) + data.getUpdate_time());
-        }
 
-        chapterList = data.getChapter_list();
-        adapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_list_item_1);
-        Log.i("HH", chapterList.size() + "");
-        for(int i = 0; i < chapterList.size(); i++){
-            adapter.add(chapterList.get(i).getTitle());
-        }
-        lvContent.setAdapter(adapter);
     }
 
     @Override
     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+        if( drawerItem != null){
+            Fragment f = ItemListFragment.newInstance(position);
+            getFragmentManager().beginTransaction().replace(R.id.content_main, f).commit();
+        }
         return false;
     }
 }

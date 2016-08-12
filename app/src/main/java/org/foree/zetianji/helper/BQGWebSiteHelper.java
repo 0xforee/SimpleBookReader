@@ -24,9 +24,15 @@ import java.util.List;
  */
 public class BQGWebSiteHelper extends AbsWebSiteHelper{
     private static final String TAG = BQGWebSiteHelper.class.getSimpleName();
-    private String websiteCharSet = "utf-8";
-    private String host_url = "http://www.biquge.com";
-    private String index_page="/0_168/";
+    private String websiteCharSet;
+    private String host_url;
+    private String index_page;
+
+    public BQGWebSiteHelper(WebSiteInfo webSiteInfo) {
+        this.websiteCharSet = webSiteInfo.getWeb_char();
+        this.host_url = webSiteInfo.getHost_url();
+        this.index_page = webSiteInfo.getIndex_page();
+    }
 
     @Override
     public String getWebsiteCharSet() {
