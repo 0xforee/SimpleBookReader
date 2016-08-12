@@ -39,8 +39,12 @@ public class ArticleActivity extends AppCompatActivity{
         apiHelper.getChapterContent(chapter.getUrl(), webChar, new NetCallback<String>() {
             @Override
             public void onSuccess(String data) {
-                Log.i(TAG, data);
-                updateUI(data);
+                if(data != null) {
+                    Log.i(TAG, data);
+                    updateUI(data);
+                }else{
+                    updateUI("获取数据失败，请重新获取");
+                }
             }
 
             @Override

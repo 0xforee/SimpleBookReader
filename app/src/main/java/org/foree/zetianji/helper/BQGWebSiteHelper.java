@@ -168,7 +168,11 @@ public class BQGWebSiteHelper extends AbsWebSiteHelper{
     private String parseChapterContent(String data){
         Document doc = Jsoup.parse(data);
         Element content = doc.getElementById("content");
-        Log.d(TAG, content.toString());
-        return content.toString();
+        if( content != null) {
+            Log.d(TAG, content.toString());
+            return content.toString();
+        }else{
+            return null;
+        }
     }
 }
