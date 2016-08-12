@@ -35,7 +35,6 @@ public class NetWorkApiHelper {
         protected Response<String> parseNetworkResponse(NetworkResponse response) {
             String str = null;
             try {
-                // TODO:增加手动切换编码或者自动获取编码的功能
                 str = new String(response.data, charSet);
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();

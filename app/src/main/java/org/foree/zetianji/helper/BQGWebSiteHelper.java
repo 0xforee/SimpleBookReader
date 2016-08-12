@@ -28,18 +28,20 @@ public class BQGWebSiteHelper extends AbsWebSiteHelper{
     private String host_url = "http://www.biquge.com";
     private String index_page="/0_168/";
 
+    @Override
     public String getWebsiteCharSet() {
         return websiteCharSet;
     }
 
-    public String getHost_url() {
+    private String getHost_url() {
         return host_url;
     }
 
-    public String getIndex_page() {
+    private String getIndex_page() {
         return index_page;
     }
 
+    @Override
     public void getNovel(final NetCallback<Novel> netCallback) {
         NetWorkApiHelper.newInstance().getRequest(host_url+index_page, websiteCharSet, new Response.Listener<String>() {
                     @Override
@@ -66,6 +68,7 @@ public class BQGWebSiteHelper extends AbsWebSiteHelper{
         );
     }
 
+    @Override
     public void getChapterContent(String chapter_url, final NetCallback<String> netCallback) {
         NetWorkApiHelper.newInstance().getRequest(chapter_url, websiteCharSet, new Response.Listener<String>() {
                     @Override
