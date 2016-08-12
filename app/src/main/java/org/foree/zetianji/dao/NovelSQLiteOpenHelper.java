@@ -55,8 +55,8 @@ public class NovelSQLiteOpenHelper extends SQLiteOpenHelper{
         );
 
         db.execSQL("create table chapters(" +
-                "title varchar(255), " +
-                "url varchar(255), " +
+                "url varchar(255) primary key," +
+                "title varchar(255)" +
                 ")"
         );
     }

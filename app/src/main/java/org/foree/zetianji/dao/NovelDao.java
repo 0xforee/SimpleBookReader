@@ -96,13 +96,14 @@ public class NovelDao {
 
     public void insertChapterList(List<Chapter> chapterList){
         synchronized (this) {
-            Log.d(TAG, "insert rssItems.size= " + chapterList.size() + " to db");
+            int tmp = 1;
+            Log.d(TAG, "insert chapterList.size= " + chapterList.size() + " to db");
             // 拆分itemList，dataBase 一次事务只能插入1000条数据
-            while(chapterList.size()>1000){
-                insertInternal(chapterList.subList(0,1000));
-                chapterList.removeAll(chapterList.subList(0,1000));
+            while(chapterList.size()>(1000*tmp)){
+                insertInternal(chapterList.subList(1000*(tmp-1),1000*tmp));
+                tmp++;
             }
-            insertInternal(chapterList);
+            insertInternal(chapterList.subList(1000*(tmp-1), chapterList.size()));
         }
     }
 

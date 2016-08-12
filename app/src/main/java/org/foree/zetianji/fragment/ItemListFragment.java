@@ -47,7 +47,7 @@ public class ItemListFragment extends Fragment{
     BQGWebSiteHelper absWebSiteHelper;
     WebSiteInfo webSiteInfo;
     TextView tvUpdate;
-    NovelDao rssDao;
+    NovelDao novelDao;
 
     public ItemListFragment() {
         // Required empty public constructor
@@ -70,7 +70,7 @@ public class ItemListFragment extends Fragment{
         LinearLayout linearLayout = (LinearLayout)inflater.inflate(R.layout.fragment_itemlist, container, false);
 
         // database
-        rssDao = new NovelDao(getActivity());
+        novelDao = new NovelDao(getActivity());
 
         mRecyclerView = (RecyclerView) linearLayout.findViewById(R.id.rv_item_list);
         tvUpdate = (TextView)linearLayout.findViewById(R.id.tv_update);
@@ -111,7 +111,7 @@ public class ItemListFragment extends Fragment{
 
         long id = getArguments().getLong(KEY_ID);
         // getChapterList
-        webSiteInfo = rssDao.findWebSiteById(id);
+        webSiteInfo = novelDao.findWebSiteById(id);
         absWebSiteHelper  = new BQGWebSiteHelper(webSiteInfo);
         absWebSiteHelper.getNovel(new NetCallback<Novel>() {
             @Override
@@ -120,6 +120,7 @@ public class ItemListFragment extends Fragment{
                     tvUpdate.setText(getResources().getString(R.string.update_string) + data.getUpdate_time());
                 }
                 chapterList = data.getChapter_list();
+                novelDao.insertChapterList(chapterList);
                 initAdapter();
 
             }
