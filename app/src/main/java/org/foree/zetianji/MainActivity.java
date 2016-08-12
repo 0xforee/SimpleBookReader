@@ -83,8 +83,8 @@ public class MainActivity extends AppCompatActivity implements Drawer.OnDrawerIt
                 .build();
 
         // init website
-        if ( novelDao.findAll().size() > 0){
-            for(WebSiteInfo wb: novelDao.findAll()){
+        if ( novelDao.findAllWebSites().size() > 0){
+            for(WebSiteInfo wb: novelDao.findAllWebSites()){
                 result.addItem(new PrimaryDrawerItem().withName(wb.getName()).withIdentifier(wb.getId()));
             }
         }

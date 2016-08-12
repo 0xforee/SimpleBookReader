@@ -111,7 +111,7 @@ public class ItemListFragment extends Fragment{
 
         long id = getArguments().getLong(KEY_ID);
         // getChapterList
-        webSiteInfo = rssDao.find(id);
+        webSiteInfo = rssDao.findWebSiteById(id);
         absWebSiteHelper  = new BQGWebSiteHelper(webSiteInfo);
         absWebSiteHelper.getNovel(new NetCallback<Novel>() {
             @Override
@@ -137,7 +137,7 @@ public class ItemListFragment extends Fragment{
             @Override
             public void onSuccess(String data) {
                 File chapterCache = new File(BaseApplication.getInstance().getCacheDirString()
-                        + File.separator + webSiteInfo.getHost_url() + webSiteInfo.getIndex_page() + chapter.getUrl());
+                        + File.separator + chapter.getUrl());
                 try {
                     FileUtils.writeFile(chapterCache, data);
                 } catch (IOException e) {

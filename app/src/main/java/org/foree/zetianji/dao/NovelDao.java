@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import org.foree.zetianji.book.Chapter;
 import org.foree.zetianji.helper.WebSiteInfo;
 
 import java.util.ArrayList;
@@ -23,7 +24,6 @@ public class NovelDao {
     public NovelDao(Context context){
         novelSQLiteOpenHelper = new NovelSQLiteOpenHelper(context);
     }
-
 
     public void insertWebSite(WebSiteInfo webSiteInfo){
         SQLiteDatabase db = novelSQLiteOpenHelper.getWritableDatabase();
@@ -46,11 +46,7 @@ public class NovelDao {
         db.close();
     }
 
-    /**
-     * 根据feedId, unread状态来查询文章
-     * @return 符合要求的rssItemList
-     */
-    public List<WebSiteInfo> findAll(){
+    public List<WebSiteInfo> findAllWebSites(){
         Log.d(TAG, "get website from db");
         Cursor cursor;
         List<WebSiteInfo> webSiteInfoList = new ArrayList<>();
@@ -76,7 +72,7 @@ public class NovelDao {
         return webSiteInfoList;
     }
 
-    public WebSiteInfo find(long id){
+    public WebSiteInfo findWebSiteById(long id){
         Log.d(TAG, "get website from db, id = " + id);
         Cursor cursor;
         SQLiteDatabase db = novelSQLiteOpenHelper.getReadableDatabase();
@@ -96,6 +92,40 @@ public class NovelDao {
         db.endTransaction();
         db.close();
         return webSiteInfo;
+    }
+
+    public void insertChapterList(List<Chapter> chapterList){
+        synchronized (this) {
+            Log.d(TAG, "insert rssItems.size= " + chapterList.size() + " to db");
+            // 拆分itemList，dataBase 一次事务只能插入1000条数据
+            while(chapterList.size()>1000){
+                insertInternal(chapterList.subList(0,1000));
+                chapterList.removeAll(chapterList.subList(0,1000));
+            }
+            insertInternal(chapterList);
+        }
+    }
+
+    private void insertInternal(List<Chapter> subItemList){
+        SQLiteDatabase db = novelSQLiteOpenHelper.getWritableDatabase();
+        db.beginTransaction();
+        ContentValues contentValues = new ContentValues();
+        for (Chapter chapter : subItemList) {
+            // 内容不重复
+            Cursor cursor = db.query(NovelSQLiteOpenHelper.DB_TABLE_CHAPTERS, null,
+                    "url=?", new String[]{chapter.getUrl()}, null, null, null);
+            if (cursor.getCount() == 0) {
+                contentValues.put("title", chapter.getTitle());
+                contentValues.put("url", chapter.getUrl());
+                if (db.insert(NovelSQLiteOpenHelper.DB_TABLE_CHAPTERS, null, contentValues) == -1) {
+                    Log.e(TAG, "Database insert url: " + chapter.getUrl() + " error");
+                }
+            }
+            cursor.close();
+        }
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        db.close();
     }
 //
 //    /**
