@@ -27,6 +27,7 @@
             <action android:name="com.igexin.sdk.action.${GETUI_APP_ID}" />
         </intent-filter>
     </receiver>
+        <service android:name=".service.StreamReceiverService" />
 
 </application>
 

@@ -1,11 +1,17 @@
 package org.foree.zetianji.ui.activity;
 
 import android.app.Fragment;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 
 import com.igexin.sdk.PushManager;
@@ -22,12 +28,17 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import org.foree.zetianji.base.BaseApplication;
 import org.foree.zetianji.R;
 import org.foree.zetianji.dao.NovelDao;
+import org.foree.zetianji.service.StreamReceiverService;
 import org.foree.zetianji.ui.fragment.ItemListFragment;
 import org.foree.zetianji.helper.WebSiteInfo;
 
-public class MainActivity extends AppCompatActivity implements Drawer.OnDrawerItemClickListener{
+public class MainActivity extends AppCompatActivity implements Drawer.OnDrawerItemClickListener, StreamReceiverService.StreamCallBack{
     Toolbar toolbar;
     NovelDao novelDao;
+    FloatingActionButton testFloatingButton;
+    private StreamReceiverService.MyBinder mBinder;
+    private StreamReceiverService mStreamService;
+    private ServiceConnection mServiceConnect = new MyServiceConnection();
 
     private AccountHeader headerResult = null;
     private Drawer result = null;
@@ -37,7 +48,6 @@ public class MainActivity extends AppCompatActivity implements Drawer.OnDrawerIt
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         novelDao = new NovelDao(this);
-        // TODO 增加下载单章与下载全部按钮
 
         if (savedInstanceState == null) {
             Fragment f = ItemListFragment.newInstance(1);
@@ -51,6 +61,21 @@ public class MainActivity extends AppCompatActivity implements Drawer.OnDrawerIt
 
         initWebSites();
         setUpDrawerLayout(savedInstanceState);
+
+        // bind service
+        Intent intent = new Intent(this, StreamReceiverService.class);
+        bindService(intent, mServiceConnect, BIND_AUTO_CREATE);
+
+        // get FloatActionButton
+        testFloatingButton = (FloatingActionButton)findViewById(R.id.fab);
+        testFloatingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if( mStreamService != null){
+                    mStreamService.getChapterList(1);
+                }
+            }
+        });
 
 
     }
@@ -113,5 +138,29 @@ public class MainActivity extends AppCompatActivity implements Drawer.OnDrawerIt
             getFragmentManager().beginTransaction().replace(R.id.content_main, f).commit();
         }
         return false;
+    }
+
+    @Override
+    public void notifyUpdate() {
+
+    }
+
+    private class MyServiceConnection implements ServiceConnection {
+        private final String TAG = MyServiceConnection.class.getSimpleName();
+
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            Log.d(TAG, "onServiceConnected");
+            mBinder = (StreamReceiverService.MyBinder) iBinder;
+            mStreamService = mBinder.getService();
+            mStreamService.registerCallBack(MainActivity.this);
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            Log.d(TAG, "onServiceDisconnected");
+
+        }
     }
 }

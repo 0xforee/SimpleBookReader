@@ -2,4 +2,8 @@
     <string name="app_name">择天记</string>
     <string name="app_dir_name">zetianji</string>
     <string name="update_string">最后更新时间：</string>
+    <string name="down_fail">下载失败</string>
+    <string name="is_downing">正在下载</string>
+    <string name="down_success">下载成功</string>
+
 </resources>
