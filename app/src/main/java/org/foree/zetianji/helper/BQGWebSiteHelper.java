@@ -5,8 +5,8 @@ import android.util.Log;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 
-import org.foree.zetianji.NetCallback;
-import org.foree.zetianji.NetWorkApiHelper;
+import org.foree.zetianji.net.NetCallback;
+import org.foree.zetianji.net.NetWorkApiHelper;
 import org.foree.zetianji.book.Chapter;
 import org.foree.zetianji.book.Novel;
 import org.jsoup.Jsoup;

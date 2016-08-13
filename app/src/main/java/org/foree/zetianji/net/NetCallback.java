@@ -1,4 +1,4 @@
-package org.foree.zetianji;
+package org.foree.zetianji.net;
 
 /**
  * Created by foree on 16-7-19.

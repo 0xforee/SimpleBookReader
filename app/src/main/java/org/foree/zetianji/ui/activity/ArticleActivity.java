@@ -1,4 +1,4 @@
-package org.foree.zetianji;
+package org.foree.zetianji.ui.activity;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -9,6 +9,8 @@ import android.webkit.WebView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.foree.zetianji.net.NetCallback;
+import org.foree.zetianji.R;
 import org.foree.zetianji.book.Chapter;
 import org.foree.zetianji.helper.BQGWebSiteHelper;
 

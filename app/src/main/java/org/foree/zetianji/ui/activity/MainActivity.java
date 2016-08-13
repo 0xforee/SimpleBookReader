@@ -1,4 +1,4 @@
-package org.foree.zetianji;
+package org.foree.zetianji.ui.activity;
 
 import android.app.Fragment;
 import android.content.SharedPreferences;
@@ -19,8 +19,10 @@ import com.mikepenz.materialdrawer.model.ProfileSettingDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
+import org.foree.zetianji.base.BaseApplication;
+import org.foree.zetianji.R;
 import org.foree.zetianji.dao.NovelDao;
-import org.foree.zetianji.fragment.ItemListFragment;
+import org.foree.zetianji.ui.fragment.ItemListFragment;
 import org.foree.zetianji.helper.WebSiteInfo;
 
 public class MainActivity extends AppCompatActivity implements Drawer.OnDrawerItemClickListener{

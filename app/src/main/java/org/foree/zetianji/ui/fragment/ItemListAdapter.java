@@ -1,4 +1,4 @@
-package org.foree.zetianji.fragment;
+package org.foree.zetianji.ui.fragment;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;

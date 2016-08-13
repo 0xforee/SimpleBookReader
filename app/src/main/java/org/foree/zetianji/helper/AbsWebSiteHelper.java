@@ -1,6 +1,6 @@
 package org.foree.zetianji.helper;
 
-import org.foree.zetianji.NetCallback;
+import org.foree.zetianji.net.NetCallback;
 import org.foree.zetianji.book.Novel;
 
 /**

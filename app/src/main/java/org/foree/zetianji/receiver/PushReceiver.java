@@ -1,4 +1,4 @@
-package org.foree.zetianji;
+package org.foree.zetianji.receiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

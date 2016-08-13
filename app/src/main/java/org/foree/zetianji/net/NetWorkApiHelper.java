@@ -1,4 +1,4 @@
-package org.foree.zetianji;
+package org.foree.zetianji.net;
 
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
@@ -7,6 +7,8 @@ import com.android.volley.Response;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+
+import org.foree.zetianji.base.BaseApplication;
 
 import java.io.UnsupportedEncodingException;
 

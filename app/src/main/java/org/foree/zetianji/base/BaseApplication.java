@@ -1,4 +1,4 @@
-package org.foree.zetianji;
+package org.foree.zetianji.base;
 
 import android.app.Application;
 import android.os.Environment;

@@ -1,4 +1,4 @@
-package org.foree.zetianji.fragment;
+package org.foree.zetianji.ui.fragment;
 
 import android.app.Fragment;
 import android.content.Context;
@@ -19,9 +19,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.foree.zetianji.ArticleActivity;
-import org.foree.zetianji.BaseApplication;
-import org.foree.zetianji.NetCallback;
+import org.foree.zetianji.ui.activity.ArticleActivity;
+import org.foree.zetianji.base.BaseApplication;
+import org.foree.zetianji.net.NetCallback;
 import org.foree.zetianji.R;
 import org.foree.zetianji.book.Chapter;
 import org.foree.zetianji.book.Novel;
