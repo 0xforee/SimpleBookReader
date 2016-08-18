@@ -46,7 +46,7 @@ public class ChapterListActivity extends AppCompatActivity implements RefreshSer
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_chapterlist);
         novelDao = new NovelDao(this);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);

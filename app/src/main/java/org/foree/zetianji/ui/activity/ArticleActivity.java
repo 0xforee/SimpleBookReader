@@ -51,7 +51,7 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
             @Override
             public void onSuccess(String data) {
                 if(data != null) {
-                    Log.d(TAG, data);
+                //    Log.d(TAG, data);
                     updateUI(data);
                 }else{
                     errorUI();
