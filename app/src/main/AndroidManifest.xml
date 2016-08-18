@@ -23,7 +23,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.activity.MainActivity"
+            android:name=".ui.activity.ChapterListActivity"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity android:name=".ui.activity.ArticleActivity"/>

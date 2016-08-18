@@ -30,7 +30,7 @@ import org.foree.zetianji.ui.fragment.ItemListAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements RefreshService.StreamCallBack{
+public class ChapterListActivity extends AppCompatActivity implements RefreshService.StreamCallBack{
     Toolbar toolbar;
     NovelDao novelDao;
     FloatingActionButton testFloatingButton;
@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements RefreshService.St
         mAdapter.setOnItemClickListener(new ItemListAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                Intent intent = new Intent(MainActivity.this, ArticleActivity.class);
+                Intent intent = new Intent(ChapterListActivity.this, ArticleActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("chapter", chapterList.get(position));
                 bundle.putString("web_char",absWebSiteHelper.getWebsiteCharSet());
@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements RefreshService.St
 
             @Override
             public void onFail(String msg) {
-                Toast.makeText(MainActivity.this, "getContentListError: " + msg, Toast.LENGTH_LONG).show();
+                Toast.makeText(ChapterListActivity.this, "getContentListError: " + msg, Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -133,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements RefreshService.St
             Log.d(TAG, "onServiceConnected");
             mBinder = (RefreshService.MyBinder) iBinder;
             mStreamService = mBinder.getService();
-            mStreamService.registerCallBack(MainActivity.this);
+            mStreamService.registerCallBack(ChapterListActivity.this);
 
         }
 

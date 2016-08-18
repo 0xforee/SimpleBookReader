@@ -41,7 +41,7 @@ public class BookShelfActivity extends AppCompatActivity implements CardView.OnC
 
     @Override
     public void onClick(View view) {
-        Intent intent = new Intent(BookShelfActivity.this, MainActivity.class);
+        Intent intent = new Intent(BookShelfActivity.this, ChapterListActivity.class);
         startActivity(intent);
     }
 
