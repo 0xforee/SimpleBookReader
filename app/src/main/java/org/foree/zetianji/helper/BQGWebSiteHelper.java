@@ -169,6 +169,7 @@ public class BQGWebSiteHelper extends AbsWebSiteHelper{
         Document doc = Jsoup.parse(data);
         Element content = doc.getElementById("content");
         if( content != null) {
+            content.select("script").remove();
             Log.d(TAG, content.toString());
             return content.toString();
         }else{
