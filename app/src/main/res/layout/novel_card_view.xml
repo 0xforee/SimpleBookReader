@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:id="@+id/novel_card"
     android:layout_margin="16dp">
 
     <LinearLayout
@@ -19,7 +19,7 @@
             android:orientation="horizontal">
             <ImageView
                 android:src="@drawable/zetianji_image"
-                android:id="@+id/novel_image"
+                android:id="@+id/iv_novel_image"
                 android:scaleType="fitXY"
                 android:layout_width="100dp"
                 android:layout_height="130dp" />
@@ -30,34 +30,34 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
                 <TextView
-                    android:id="@+id/novel_name"
+                    android:id="@+id/tv_novel_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="择天记"
                     android:textAppearance="@style/TextAppearance.AppCompat.Title" />
                 <TextView
-                    android:id="@+id/novel_author"
+                    android:id="@+id/tv_novel_author"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="作者：猫腻" />
                 <TextView
-                    android:id="@+id/novel_category"
+                    android:id="@+id/tv_novel_category"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="类型：东方玄幻" />
 
                 <TextView
-                    android:id="@+id/novel_status"
+                    android:id="@+id/tv_novel_status"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="状态：连载" />
                 <TextView
-                    android:id="@+id/novel_update_time"
+                    android:id="@+id/tv_novel_update_time"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="更新时间：2016/8/18 1:24:22" />
                 <TextView
-                    android:id="@+id/novel_update_chapter"
+                    android:id="@+id/tv_novel_update_chapter"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="最新章节：第一百五十九章 听见你的声音" />
@@ -71,7 +71,7 @@
             android:background="@color/gainsboro"
             android:layout_height="1dp"/>
         <TextView
-            android:id="@+id/novel_description"
+            android:id="@+id/tv_novel_description"
             android:layout_marginTop="5dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
