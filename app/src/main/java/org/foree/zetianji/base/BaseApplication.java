@@ -1,8 +1,14 @@
 package org.foree.zetianji.base;
 
 import android.app.Application;
+import android.content.SharedPreferences;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.util.Log;
+
+import org.foree.zetianji.book.Novel;
+import org.foree.zetianji.dao.NovelDao;
+import org.foree.zetianji.helper.WebSiteInfo;
 
 import java.io.File;
 
@@ -31,7 +37,7 @@ public class BaseApplication extends Application{
         mInstance = this;
 
         initApplicationDir();
-
+        initWebSites();
     }
 
     public void initApplicationDir() {
@@ -66,5 +72,20 @@ public class BaseApplication extends Application{
 
     public String getCacheDirString(){
         return myApplicationDirPath + File.separator + myApplicationCacheName;
+    }
+
+    private void initWebSites(){
+        NovelDao novelDao = new NovelDao(this);
+
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(BaseApplication.getInstance());
+        if(sp.getBoolean("first_run", true)) {
+            WebSiteInfo webSiteInfo1 = new WebSiteInfo("笔趣阁", "http://www.biquge.com", "/0_168/", "utf-8");
+            WebSiteInfo webSiteInfo2 = new WebSiteInfo("笔趣阁LA", "http://www.biquge.la", "/book/168/", "gbk");
+
+            novelDao.insertWebSite(webSiteInfo1);
+            novelDao.insertWebSite(webSiteInfo2);
+
+            sp.edit().putBoolean("first_run", false).apply();
+        }
     }
 }

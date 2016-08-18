@@ -1,47 +1,47 @@
 package org.foree.zetianji.ui.activity;
 
-import android.app.Fragment;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.igexin.sdk.PushManager;
-import com.mikepenz.materialdrawer.AccountHeader;
-import com.mikepenz.materialdrawer.AccountHeaderBuilder;
-import com.mikepenz.materialdrawer.Drawer;
-import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
-import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
-import com.mikepenz.materialdrawer.model.ProfileSettingDrawerItem;
-import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
-import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
-import org.foree.zetianji.base.BaseApplication;
 import org.foree.zetianji.R;
+import org.foree.zetianji.book.Chapter;
+import org.foree.zetianji.book.Novel;
 import org.foree.zetianji.dao.NovelDao;
-import org.foree.zetianji.service.StreamReceiverService;
-import org.foree.zetianji.ui.fragment.ItemListFragment;
+import org.foree.zetianji.helper.BQGWebSiteHelper;
 import org.foree.zetianji.helper.WebSiteInfo;
+import org.foree.zetianji.net.NetCallback;
+import org.foree.zetianji.service.RefreshService;
+import org.foree.zetianji.ui.fragment.ItemListAdapter;
 
-public class MainActivity extends AppCompatActivity implements Drawer.OnDrawerItemClickListener, StreamReceiverService.StreamCallBack{
+import java.util.ArrayList;
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity implements RefreshService.StreamCallBack{
     Toolbar toolbar;
     NovelDao novelDao;
     FloatingActionButton testFloatingButton;
-    private StreamReceiverService.MyBinder mBinder;
-    private StreamReceiverService mStreamService;
+    private RecyclerView mRecyclerView;
+    private ItemListAdapter mAdapter;
+    private List<Chapter> chapterList = new ArrayList<>();
+    BQGWebSiteHelper absWebSiteHelper;
+    WebSiteInfo webSiteInfo;
+    private RefreshService.MyBinder mBinder;
+    private RefreshService mStreamService;
     private ServiceConnection mServiceConnect = new MyServiceConnection();
-
-    private AccountHeader headerResult = null;
-    private Drawer result = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,21 +49,19 @@ public class MainActivity extends AppCompatActivity implements Drawer.OnDrawerIt
         setContentView(R.layout.activity_main);
         novelDao = new NovelDao(this);
 
-        if (savedInstanceState == null) {
-            Fragment f = ItemListFragment.newInstance(1);
-            getFragmentManager().beginTransaction().replace(R.id.content_main, f).commit();
-        }
-
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        mRecyclerView = (RecyclerView) findViewById(R.id.rv_item_list);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(this,
+                DividerItemDecoration.VERTICAL_LIST));
+
         PushManager.getInstance().initialize(this.getApplicationContext());
 
-        initWebSites();
-        setUpDrawerLayout(savedInstanceState);
-
         // bind service
-        Intent intent = new Intent(this, StreamReceiverService.class);
+        Intent intent = new Intent(this, RefreshService.class);
         bindService(intent, mServiceConnect, BIND_AUTO_CREATE);
 
         // get FloatActionButton
@@ -76,68 +74,50 @@ public class MainActivity extends AppCompatActivity implements Drawer.OnDrawerIt
                 }
             }
         });
+        initAdapter();
 
-
+        syncDate();
     }
-    private void setUpDrawerLayout(Bundle savedInstanceState){
+    private void initAdapter() {
+        mAdapter = new ItemListAdapter(this, chapterList);
+        mRecyclerView.setAdapter(mAdapter);
+        mAdapter.setOnItemClickListener(new ItemListAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                Intent intent = new Intent(MainActivity.this, ArticleActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("chapter", chapterList.get(position));
+                bundle.putString("web_char",absWebSiteHelper.getWebsiteCharSet());
+                intent.putExtras(bundle);
 
-        // Create a few sample profile
-        // NOTE you have to define the loader logic too. See the CustomApplication for more details
-        final IProfile profile = new ProfileDrawerItem().withName("").withEmail("").withIcon("").withIdentifier(100);
-
-        // Create the AccountHeader
-        headerResult = new AccountHeaderBuilder()
-                .withActivity(MainActivity.this)
-                .withTranslucentStatusBar(true)
-                .withHeaderBackground(R.drawable.header)
-                .addProfiles(
-                        profile,
-                        //don't ask but google uses 14dp for the add account icon in gmail but 20dp for the normal icons (like manage account)
-                        new ProfileSettingDrawerItem().withName("Add Account").withDescription("Add new GitHub Account").withIdentifier(1001),
-                        new ProfileSettingDrawerItem().withName("Manage Account").withIdentifier(100001)
-                )
-                .withSavedInstance(savedInstanceState)
-                .build();
-
-        result = new DrawerBuilder()
-                .withActivity(this)
-                .withToolbar(toolbar)
-                .withHasStableIds(true)
-                .withAccountHeader(headerResult)
-                .withSavedInstance(savedInstanceState)
-                .withShowDrawerOnFirstLaunch(true)
-                .withOnDrawerItemClickListener(this)
-                .build();
-
-        // init website
-        if ( novelDao.findAllWebSites().size() > 0){
-            for(WebSiteInfo wb: novelDao.findAllWebSites()){
-                result.addItem(new PrimaryDrawerItem().withName(wb.getName()).withIdentifier(wb.getId()));
+                startActivity(intent);
             }
-        }
 
+            @Override
+            public void onItemLongClick(View view, int position) {
+
+            }
+        });
     }
 
-    private void initWebSites(){
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(BaseApplication.getInstance());
-        if(sp.getBoolean("first_run", true)) {
-            WebSiteInfo webSiteInfo1 = new WebSiteInfo("笔趣阁", "http://www.biquge.com", "/0_168/", "utf-8");
-            WebSiteInfo webSiteInfo2 = new WebSiteInfo("笔趣阁LA", "http://www.biquge.la", "/book/168/", "gbk");
+    private void syncDate(){
+        // getChapterList
+        webSiteInfo = novelDao.findWebSiteById(2);
+        absWebSiteHelper  = new BQGWebSiteHelper(webSiteInfo);
+        absWebSiteHelper.getNovel(new NetCallback<Novel>() {
+            @Override
+            public void onSuccess(Novel data) {
+                chapterList.clear();
+                chapterList.addAll(data.getChapter_list());
+                novelDao.insertChapterList(chapterList);
+                mAdapter.notifyDataSetChanged();
+            }
 
-            novelDao.insertWebSite(webSiteInfo1);
-            novelDao.insertWebSite(webSiteInfo2);
-
-            sp.edit().putBoolean("first_run", false).apply();
-        }
-    }
-
-    @Override
-    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-        if( drawerItem != null){
-            Fragment f = ItemListFragment.newInstance(position);
-            getFragmentManager().beginTransaction().replace(R.id.content_main, f).commit();
-        }
-        return false;
+            @Override
+            public void onFail(String msg) {
+                Toast.makeText(MainActivity.this, "getContentListError: " + msg, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     @Override
@@ -151,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements Drawer.OnDrawerIt
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             Log.d(TAG, "onServiceConnected");
-            mBinder = (StreamReceiverService.MyBinder) iBinder;
+            mBinder = (RefreshService.MyBinder) iBinder;
             mStreamService = mBinder.getService();
             mStreamService.registerCallBack(MainActivity.this);
 

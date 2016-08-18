@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <service android:name=".service.StreamReceiverService" />
+        <service android:name=".service.RefreshService" />
 
         <activity android:name=".ui.activity.BookShelfActivity"
             android:theme="@style/AppTheme.NoActionBar">

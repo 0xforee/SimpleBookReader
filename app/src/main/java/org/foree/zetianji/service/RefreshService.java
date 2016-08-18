@@ -28,8 +28,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-public class StreamReceiverService extends Service {
-    private static final String TAG = StreamReceiverService.class.getSimpleName();
+public class RefreshService extends Service {
+    private static final String TAG = RefreshService.class.getSimpleName();
     private final int MSG_DOWNLOAD_CHAPTER_DOWN = 0;
     private final int MSG_DOWNLOAD_OK = 1;
     private final int MSG_START_DOWNLOAD = 2;
@@ -47,12 +47,12 @@ public class StreamReceiverService extends Service {
     NotificationManager notificationManager;
     private MyBinder mBinder = new MyBinder();
 
-    public StreamReceiverService() {
+    public RefreshService() {
     }
 
     public class MyBinder extends Binder {
-        public StreamReceiverService getService(){
-            return StreamReceiverService.this;
+        public RefreshService getService(){
+            return RefreshService.this;
         }
     }
     public void registerCallBack(StreamCallBack callback){
