@@ -130,7 +130,7 @@ public class BQGWebSiteHelper extends AbsWebSiteHelper{
                     newestChapter.setTitle(update.attr("content"));
                     break;
                 case "og:novel:latest_chapter_url":
-                    newestChapter.setTitle(update.attr("content"));
+                    newestChapter.setUrl(update.attr("content"));
                     break;
             }
         }
@@ -145,7 +145,7 @@ public class BQGWebSiteHelper extends AbsWebSiteHelper{
             chapter.setTitle(link.text());
             chapter.setHostUrl(host_url);
             chapter.setUrl(decodeUrl(link.attr("href")));
-//          Log.i("HH", link.text());
+          Log.i("HH", link.text());
 //          Log.i("HH", link.attr("href"));
             chapters.add(chapter);
         }

@@ -55,13 +55,11 @@
                 <TextView
                     android:id="@+id/tv_novel_update_time"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="更新时间：2016/8/18 1:24:22" />
+                    android:layout_height="wrap_content" />
                 <TextView
                     android:id="@+id/tv_novel_update_chapter"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="最新章节：第一百五十九章 听见你的声音" />
+                    android:layout_height="wrap_content" />
 
             </LinearLayout>
 

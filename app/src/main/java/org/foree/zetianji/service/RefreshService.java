@@ -132,7 +132,21 @@ public class RefreshService extends Service {
         notification.contentView = contentView;
         notificationManager.notify(R.layout.notification_download, notification);
     }
+    public void updateNovelInfo(long id){
+        // getChapterList
+        webSiteInfo = novelDao.findWebSiteById(id);
+        absWebSiteHelper  = new BQGWebSiteHelper(webSiteInfo);
+        absWebSiteHelper.getNovel(new NetCallback<Novel>() {
+            @Override
+            public void onSuccess(Novel data) {
+                mCallBack.notifyUpdate(data);
+            }
 
+            @Override
+            public void onFail(String msg) {
+            }
+        });
+    }
     public void getChapterList(long id){
         // getChapterList
         webSiteInfo = novelDao.findWebSiteById(id);
@@ -203,6 +217,6 @@ public class RefreshService extends Service {
 
     public interface StreamCallBack {
         // 数据同步结束，更新UI
-        void notifyUpdate();
+        void notifyUpdate(Novel data);
     }
 }

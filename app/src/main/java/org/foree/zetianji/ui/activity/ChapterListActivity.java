@@ -121,7 +121,7 @@ public class ChapterListActivity extends AppCompatActivity implements RefreshSer
     }
 
     @Override
-    public void notifyUpdate() {
+    public void notifyUpdate(Novel novel) {
 
     }
 
