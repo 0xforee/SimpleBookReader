@@ -160,7 +160,7 @@ public class StreamReceiverService extends Service {
     }
     // sync data from server
     private void downloadChapter(final Chapter chapter) {
-
+        // TODO:和数据库组合
         Thread downloadThread = new Thread() {
             @Override
             public void run() {

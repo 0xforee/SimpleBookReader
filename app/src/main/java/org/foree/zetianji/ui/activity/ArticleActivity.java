@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
 import android.util.Log;
 import android.webkit.WebView;
 import android.widget.TextView;
@@ -20,14 +21,13 @@ import org.foree.zetianji.helper.BQGWebSiteHelper;
 public class ArticleActivity extends AppCompatActivity{
     BQGWebSiteHelper apiHelper;
     private static final String TAG = ArticleActivity.class.getSimpleName();
-    WebView wb;
+    TextView tv;
     String webChar;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_article);
-        TextView tv = (TextView)findViewById(R.id.tv_content);
-        wb = (WebView)findViewById(R.id.wb_content);
+        tv = (TextView)findViewById(R.id.tv_content);
         Bundle bundle = getIntent().getExtras();
         Chapter chapter = (Chapter)bundle.getSerializable("chapter");
         webChar = bundle.getString("web_char");
@@ -58,10 +58,7 @@ public class ArticleActivity extends AppCompatActivity{
     }
 
     private void updateUI(String data){
-        if (wb != null) {
-            Log.d(TAG, "webChar: " + webChar);
-            wb.getSettings().setDefaultTextEncodingName(webChar);
-            wb.loadDataWithBaseURL(null, data,"text/html",webChar,null);
-        }
+        // use textView format
+        tv.setText(Html.fromHtml(data));
     }
 }
