@@ -39,6 +39,7 @@ public class RefreshService extends Service {
     Notification notification;
     int successCount = 0;
     int failCount = 0;
+    Thread downloadThread;
     RemoteViews contentView;
     List<Chapter> chapterList;
     NotificationManager notificationManager;
@@ -49,7 +50,7 @@ public class RefreshService extends Service {
 
     Handler myHandler = new H();
     private class H extends Handler{
-        private static final int MSG_DOWNLOAD_CHAPTER_DOWN = 0;
+        private static final int MSG_UPDATE_CHAPTER_NOTIFICATION = 0;
         private static final int MSG_DOWNLOAD_OK = 1;
         private static final int MSG_START_DOWNLOAD = 2;
 
@@ -57,9 +58,8 @@ public class RefreshService extends Service {
         public void handleMessage(Message msg) {
             switch (msg.what){
                 case MSG_START_DOWNLOAD:
-                case MSG_DOWNLOAD_CHAPTER_DOWN:
-                    downloadChapter(chapterList.get(successCount+failCount));
-                    updateNotification(chapterList.size(), successCount+failCount+1);
+                case MSG_UPDATE_CHAPTER_NOTIFICATION:
+                    updateNotification(successCount++);
                     break;
                 case MSG_DOWNLOAD_OK:
                     contentView.setTextViewText(R.id.notificationPercent, "Success:" + successCount + "/Fail:" + failCount);
@@ -105,6 +105,7 @@ public class RefreshService extends Service {
     public void onDestroy() {
         Log.d(TAG, "onDestroy");
         super.onDestroy();
+        downloadThread.interrupt();
     }
 
     @Override
@@ -127,10 +128,10 @@ public class RefreshService extends Service {
         notificationManager.notify(R.layout.notification_download, notification);
     }
 
-    private void updateNotification(int chapterCounts, int updateCount) {
-        Log.d(TAG, "updateNotification: " + updateCount);
-        contentView.setTextViewText(R.id.notificationPercent,updateCount + "/" + chapterCounts);
-        contentView.setProgressBar(R.id.notificationProgress, chapterCounts, updateCount, false);
+    private void updateNotification(int currentCount) {
+        Log.d(TAG, "updateNotification: " + currentCount++);
+        contentView.setTextViewText(R.id.notificationPercent,currentCount + "/" + chapterList.size());
+        contentView.setProgressBar(R.id.notificationProgress, chapterList.size(), currentCount, false);
         notification.contentView = contentView;
         notificationManager.notify(R.layout.notification_download, notification);
     }
@@ -152,6 +153,7 @@ public class RefreshService extends Service {
 
     }
 
+    // TODO:可能无法准确获取到是否完全下载完成
     public void downloadNovel(List<Chapter> downloadList){
         // downloadNovel
 
@@ -160,56 +162,53 @@ public class RefreshService extends Service {
         // create notification
         createNotification(chapterList.size());
 
-        // post sync done
-        Message msg = new Message();
-        msg.what = H.MSG_DOWNLOAD_CHAPTER_DOWN;
-        msg.arg1 = chapterList.size();
+        // download chapters
+        downloadThread = new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
 
-        myHandler.sendMessage(msg);
+                for(Chapter chapter: chapterList){
+                    downloadChapter(chapter);
+                }
 
+                // downloadAllNovelDone
+                myHandler.sendEmptyMessage(H.MSG_DOWNLOAD_OK);
+            }
+        };
+
+        downloadThread.start();
     }
 
     // sync data from server
     private void downloadChapter(final Chapter chapter) {
-        // TODO:和数据库组合
-        Thread downloadThread = new Thread() {
+        webSiteInfo = novelDao.findWebSiteById(2);
+        absWebSiteHelper  = new BQGWebSiteHelper(webSiteInfo);
+        absWebSiteHelper.getChapterContent(chapter.getUrl(), webSiteInfo.getWeb_char(), new NetCallback<String>() {
             @Override
-            public void run() {
-                Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-                    absWebSiteHelper.getChapterContent(chapter.getUrl(), webSiteInfo.getWeb_char(), new NetCallback<String>() {
-                        @Override
-                        public void onSuccess(String data) {
-                            File chapterCache = new File(BaseApplication.getInstance().getCacheDirString()
-                                    + File.separator + FileUtils.encodeUrl(chapter.getUrl()));
-                            try {
-                                if( data != null)
-                                    FileUtils.writeFile(chapterCache, data);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                            // post sync done
-                            Message msg = new Message();
-                            if (successCount == chapterList.size()-1)
-                                msg.what = H.MSG_DOWNLOAD_OK;
-                            else
-                                msg.what = H.MSG_DOWNLOAD_CHAPTER_DOWN;
-
-                            successCount++;
-                            myHandler.sendMessage(msg);
-
-                        }
-
-                        @Override
-                        public void onFail(String msg) {
-                            failCount++;
-                            Message msgError = new Message();
-                            msgError.what = H.MSG_DOWNLOAD_CHAPTER_DOWN;
-                            myHandler.sendMessage(msgError);
-                        }
-                    });
+            public void onSuccess(String data) {
+                File chapterCache = new File(BaseApplication.getInstance().getCacheDirString()
+                        + File.separator + FileUtils.encodeUrl(chapter.getUrl()));
+                try {
+                    if( data != null)
+                        FileUtils.writeFile(chapterCache, data);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-        };
-        downloadThread.start();
+
+                // update db download column
+
+                // post sync done
+                myHandler.sendEmptyMessage(H.MSG_UPDATE_CHAPTER_NOTIFICATION);
+
+            }
+
+            @Override
+            public void onFail(String msg) {
+                Log.e(TAG, "download error " + msg);
+            }
+        });
     }
 
     public interface StreamCallBack {
