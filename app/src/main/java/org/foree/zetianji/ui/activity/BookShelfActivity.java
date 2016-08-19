@@ -92,9 +92,12 @@ public class BookShelfActivity extends AppCompatActivity implements CardView.OnC
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                // refresh success, update text
                 mSwipeRefreshLayout.setRefreshing(false);
-                refreshNovelViews(novel);
+
+                // refresh success, update text
+                if( novel != null) {
+                    refreshNovelViews(novel);
+                }
             }
         },15);
     }

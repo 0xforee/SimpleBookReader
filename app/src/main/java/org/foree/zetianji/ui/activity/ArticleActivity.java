@@ -10,6 +10,9 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,41 +61,28 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
         apiHelper.getChapterContent(chapter.getUrl(), webChar, new NetCallback<String>() {
             @Override
             public void onSuccess(String data) {
-                if(data != null) {
-                //    Log.d(TAG, data);
                     updateUI(data);
-                }else{
-                    errorUI();
-                }
             }
 
             @Override
             public void onFail(String msg) {
-                errorUI();
+                updateUI(null);
             }
         });
     }
 
-    private void errorUI(){
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                // use textView format
-                tv.setText("no data");
-                mSwipeRefreshLayout.setRefreshing(false);
-                Snackbar.make(mSwipeRefreshLayout, "获取数据失败，请下拉刷新重新获取", Snackbar.LENGTH_LONG).show();
-            }
-        }, 0);
-
-    }
     private void updateUI(final String data){
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                // use textView format
-                tv.setText(Html.fromHtml(data));
                 mSwipeRefreshLayout.setRefreshing(false);
-                Snackbar.make(mSwipeRefreshLayout, "加载成功", Snackbar.LENGTH_SHORT).show();
+                if( data != null){
+                    // use textView format
+                    tv.setText(Html.fromHtml(data));
+                    Snackbar.make(mSwipeRefreshLayout, "加载成功", Snackbar.LENGTH_SHORT).show();
+                }else{
+                    Snackbar.make(mSwipeRefreshLayout, "获取数据失败，请下拉刷新重新获取", Snackbar.LENGTH_LONG).show();
+                }
             }
         }, 0);
 

@@ -148,6 +148,7 @@ public class RefreshService extends Service {
 
             @Override
             public void onFail(String msg) {
+                mCallBack.notifyUpdateCallBack(null);
             }
         });
 
