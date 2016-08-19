@@ -132,20 +132,27 @@ public class RefreshService extends Service {
         notification.contentView = contentView;
         notificationManager.notify(R.layout.notification_download, notification);
     }
-    public void updateNovelInfo(long id){
-        // getChapterList
-        webSiteInfo = novelDao.findWebSiteById(id);
-        absWebSiteHelper  = new BQGWebSiteHelper(webSiteInfo);
-        absWebSiteHelper.getNovel(new NetCallback<Novel>() {
+    public void updateNovelInfo(final long id){
+        new Thread(){
             @Override
-            public void onSuccess(Novel data) {
-                mCallBack.notifyUpdate(data);
-            }
+            public void run() {
+                super.run();
+                // getChapterList
+                webSiteInfo = novelDao.findWebSiteById(id);
+                absWebSiteHelper  = new BQGWebSiteHelper(webSiteInfo);
+                absWebSiteHelper.getNovel(new NetCallback<Novel>() {
+                    @Override
+                    public void onSuccess(Novel data) {
+                        mCallBack.notifyUpdate(data);
+                    }
 
-            @Override
-            public void onFail(String msg) {
+                    @Override
+                    public void onFail(String msg) {
+                    }
+                });
             }
-        });
+        }.start();
+
     }
     public void getChapterList(long id){
         // getChapterList
