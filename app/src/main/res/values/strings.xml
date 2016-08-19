@@ -6,5 +6,7 @@
     <string name="down_fail">下载失败</string>
     <string name="is_downing">正在下载</string>
     <string name="down_success">下载成功</string>
+    <string name="load_success">加载成功</string>
+    <string name="load_fail">"获取数据失败，请下拉刷新重新获取"</string>
 
 </resources>

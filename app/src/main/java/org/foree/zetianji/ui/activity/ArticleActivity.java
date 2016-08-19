@@ -111,9 +111,9 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
                 if( data != null){
                     // use textView format
                     tv.setText(Html.fromHtml(data));
-                    Snackbar.make(mSwipeRefreshLayout, "加载成功", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(mSwipeRefreshLayout, R.string.load_success, Snackbar.LENGTH_SHORT).show();
                 }else{
-                    Snackbar.make(mSwipeRefreshLayout, "获取数据失败，请下拉刷新重新获取", Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(mSwipeRefreshLayout, R.string.load_fail , Snackbar.LENGTH_LONG).show();
                 }
             }
         }, 0);
