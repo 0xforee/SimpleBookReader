@@ -49,9 +49,9 @@ public class RefreshService extends Service {
 
     Handler myHandler = new H();
     private class H extends Handler{
-        private final int MSG_DOWNLOAD_CHAPTER_DOWN = 0;
-        private final int MSG_DOWNLOAD_OK = 1;
-        private final int MSG_START_DOWNLOAD = 2;
+        private static final int MSG_DOWNLOAD_CHAPTER_DOWN = 0;
+        private static final int MSG_DOWNLOAD_OK = 1;
+        private static final int MSG_START_DOWNLOAD = 2;
 
         @Override
         public void handleMessage(Message msg) {
@@ -136,7 +136,7 @@ public class RefreshService extends Service {
     }
 
     public void updateNovelInfo(final long id){
-        // getChapterList
+        // downloadNovel
         webSiteInfo = novelDao.findWebSiteById(id);
         absWebSiteHelper  = new BQGWebSiteHelper(webSiteInfo);
         absWebSiteHelper.getNovel(new NetCallback<Novel>() {
@@ -152,31 +152,23 @@ public class RefreshService extends Service {
 
     }
 
-    public void getChapterList(long id){
-        // getChapterList
-        webSiteInfo = novelDao.findWebSiteById(id);
-        absWebSiteHelper  = new BQGWebSiteHelper(webSiteInfo);
-        absWebSiteHelper.getNovel(new NetCallback<Novel>() {
-            @Override
-            public void onSuccess(Novel data) {
-                chapterList = data.getChapter_list().subList(0,20);
+    public void downloadNovel(List<Chapter> downloadList){
+        // downloadNovel
 
-                // create notification
-                createNotification(chapterList.size());
+        chapterList = downloadList;
 
-                // post sync done
-                Message msg = new Message();
-                msg.what = H.MSG_DOWNLOAD_CHAPTER_DOWN;
-                msg.arg1 = chapterList.size();
+        // create notification
+        createNotification(chapterList.size());
 
-                myHandler.sendMessage(msg);
-            }
+        // post sync done
+        Message msg = new Message();
+        msg.what = H.MSG_DOWNLOAD_CHAPTER_DOWN;
+        msg.arg1 = chapterList.size();
 
-            @Override
-            public void onFail(String msg) {
-            }
-        });
+        myHandler.sendMessage(msg);
+
     }
+
     // sync data from server
     private void downloadChapter(final Chapter chapter) {
         // TODO:和数据库组合

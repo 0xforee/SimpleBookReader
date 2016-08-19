@@ -55,8 +55,27 @@ public class ChapterListActivity extends AppCompatActivity implements RefreshSer
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chapterlist);
+
         novelDao = new NovelDao(this);
 
+        setUpLayoutViews();
+
+        PushManager.getInstance().initialize(this.getApplicationContext());
+
+        // bind service
+        Intent refreshIntent = new Intent(this, RefreshService.class);
+        bindService(refreshIntent, mServiceConnect, BIND_AUTO_CREATE);
+
+        syncChapterList();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbindService(mServiceConnect);
+    }
+
+    private void setUpLayoutViews() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -66,27 +85,21 @@ public class ChapterListActivity extends AppCompatActivity implements RefreshSer
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this,
                 DividerItemDecoration.VERTICAL_LIST));
 
-        PushManager.getInstance().initialize(this.getApplicationContext());
-
-        // bind service
-        Intent intent = new Intent(this, RefreshService.class);
-        bindService(intent, mServiceConnect, BIND_AUTO_CREATE);
-
         // get FloatActionButton
         testFloatingButton = (FloatingActionButton)findViewById(R.id.fab);
         testFloatingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if( mStreamService != null){
-                    mStreamService.getChapterList(1);
+                    mStreamService.downloadNovel(chapterList);
                 }
             }
         });
-        initAdapter();
 
-        syncDate();
+        setUpRecyclerViewAdapter();
     }
-    private void initAdapter() {
+
+    private void setUpRecyclerViewAdapter() {
         mAdapter = new ItemListAdapter(this, chapterList);
         mRecyclerView.setAdapter(mAdapter);
         mAdapter.setOnItemClickListener(new ItemListAdapter.OnItemClickListener() {
@@ -108,8 +121,8 @@ public class ChapterListActivity extends AppCompatActivity implements RefreshSer
         });
     }
 
-    private void syncDate(){
-        // getChapterList
+    private void syncChapterList(){
+        // downloadNovel
         webSiteInfo = novelDao.findWebSiteById(2);
         absWebSiteHelper  = new BQGWebSiteHelper(webSiteInfo);
         absWebSiteHelper.getNovel(new NetCallback<Novel>() {
