@@ -3,7 +3,9 @@ package org.foree.zetianji.ui.activity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -22,7 +24,9 @@ public class BookShelfActivity extends AppCompatActivity implements CardView.OnC
     private RefreshService.MyBinder mBinder;
     private RefreshService mRefreshService;
     private ServiceConnection mServiceConnect = new MyServiceConnection();
+    private static final int MSG_UPDATE_NOVEL = 0;
 
+    Handler mHandler;
     CardView cardView;
     Toolbar toolbar;
     SwipeRefreshLayout mSwipeRefreshLayout;
@@ -42,10 +46,24 @@ public class BookShelfActivity extends AppCompatActivity implements CardView.OnC
         cardView = (CardView) findViewById(R.id.novel_card);
         cardView.setOnClickListener(this);
 
+        initNovelTextView();
+
         // start refresh service
         Intent intent = new Intent(this, RefreshService.class);
         startService(intent);
         bindService(intent, mServiceConnect, BIND_AUTO_CREATE);
+
+        mHandler = new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                switch (msg.what){
+                    case MSG_UPDATE_NOVEL:
+                        updateNovelInfo((Novel)msg.obj);
+
+                }
+            }
+        };
     }
 
     @Override
@@ -61,26 +79,34 @@ public class BookShelfActivity extends AppCompatActivity implements CardView.OnC
     }
 
     @Override
-    public void notifyUpdate(Novel novel) {
-        updateNovelInfo(novel);
+    public void notifyUpdate(final Novel novel) {
         mSwipeRefreshLayout.setRefreshing(false);
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                updateNovelInfo(novel);
+            }
+        },15);
     }
     private void updateNovelInfo(Novel novel){
-        tvNovelAuthor = (TextView) findViewById(R.id.tv_novel_author);
-        tvNovelCategory = (TextView) findViewById(R.id.tv_novel_category);
-        tvNovelName = (TextView)findViewById(R.id.tv_novel_name);
-        tvNovelStatus = (TextView)findViewById(R.id.tv_novel_status);
-        tvNovelUpdateTime = (TextView)findViewById(R.id.tv_novel_update_time);
-        tvNovelUpdateChapter = (TextView)findViewById(R.id.tv_novel_update_chapter);
-
         tvNovelUpdateChapter.setText(getString(R.string.update_chapter_string) + novel.getNewest_chapter().getTitle());
         tvNovelUpdateTime.setText(getString(R.string.update_time_string) + novel.getUpdate_time());
     }
+
+    private void initNovelTextView() {
+        //tvNovelAuthor = (TextView) findViewById(R.id.tv_novel_author);
+        //tvNovelCategory = (TextView) findViewById(R.id.tv_novel_category);
+       // tvNovelName = (TextView)findViewById(R.id.tv_novel_name);
+      //  tvNovelStatus = (TextView)findViewById(R.id.tv_novel_status);
+        tvNovelUpdateTime = (TextView)findViewById(R.id.tv_novel_update_time);
+        tvNovelUpdateChapter = (TextView)findViewById(R.id.tv_novel_update_chapter);
+    }
+
     @Override
     public void onRefresh() {
         if( mRefreshService != null){
             mSwipeRefreshLayout.setRefreshing(true);
-            mRefreshService.updateNovelInfo(1);
+            mRefreshService.updateNovelInfo(2);
         }
     }
 

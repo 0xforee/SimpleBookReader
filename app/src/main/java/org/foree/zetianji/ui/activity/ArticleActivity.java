@@ -66,6 +66,7 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
     }
 
     private void errorUI(){
+        tv.setText("no data");
         Snackbar.make(mSwipeRefreshLayout, "获取数据失败，请下拉刷新重新获取", Snackbar.LENGTH_LONG).show();
     }
     private void updateUI(String data){
