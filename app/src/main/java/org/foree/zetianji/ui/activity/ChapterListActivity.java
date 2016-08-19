@@ -4,7 +4,9 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -42,6 +44,12 @@ public class ChapterListActivity extends AppCompatActivity implements RefreshSer
     private RefreshService.MyBinder mBinder;
     private RefreshService mStreamService;
     private ServiceConnection mServiceConnect = new MyServiceConnection();
+    private Handler mHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,11 +114,17 @@ public class ChapterListActivity extends AppCompatActivity implements RefreshSer
         absWebSiteHelper  = new BQGWebSiteHelper(webSiteInfo);
         absWebSiteHelper.getNovel(new NetCallback<Novel>() {
             @Override
-            public void onSuccess(Novel data) {
-                chapterList.clear();
-                chapterList.addAll(data.getChapter_list());
-                novelDao.insertChapterList(chapterList);
-                mAdapter.notifyDataSetChanged();
+            public void onSuccess(final Novel data) {
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        chapterList.clear();
+                        chapterList.addAll(data.getChapter_list());
+                        novelDao.insertChapterList(chapterList);
+                        mAdapter.notifyDataSetChanged();
+                    }
+                },0);
+
             }
 
             @Override
