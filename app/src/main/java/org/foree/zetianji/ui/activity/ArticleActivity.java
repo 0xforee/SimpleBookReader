@@ -79,6 +79,7 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
             public void run() {
                 // use textView format
                 tv.setText("no data");
+                mSwipeRefreshLayout.setRefreshing(false);
                 Snackbar.make(mSwipeRefreshLayout, "获取数据失败，请下拉刷新重新获取", Snackbar.LENGTH_LONG).show();
             }
         }, 0);
