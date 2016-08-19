@@ -8,6 +8,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
@@ -41,7 +42,12 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_article);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         tv = (TextView)findViewById(R.id.tv_content);
+
         Bundle bundle = getIntent().getExtras();
         chapter = (Chapter)bundle.getSerializable("chapter");
         webChar = bundle.getString("web_char");
