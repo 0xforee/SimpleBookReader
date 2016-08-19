@@ -14,6 +14,9 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.RemoteViews;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+
 import org.foree.zetianji.R;
 import org.foree.zetianji.base.BaseApplication;
 import org.foree.zetianji.book.Chapter;
@@ -22,6 +25,7 @@ import org.foree.zetianji.dao.NovelDao;
 import org.foree.zetianji.helper.BQGWebSiteHelper;
 import org.foree.zetianji.helper.WebSiteInfo;
 import org.foree.zetianji.net.NetCallback;
+import org.foree.zetianji.net.NetWorkApiHelper;
 import org.foree.zetianji.utils.FileUtils;
 
 import java.io.File;
@@ -133,25 +137,19 @@ public class RefreshService extends Service {
         notificationManager.notify(R.layout.notification_download, notification);
     }
     public void updateNovelInfo(final long id){
-        new Thread(){
+        // getChapterList
+        webSiteInfo = novelDao.findWebSiteById(id);
+        absWebSiteHelper  = new BQGWebSiteHelper(webSiteInfo);
+        absWebSiteHelper.getNovel(new NetCallback<Novel>() {
             @Override
-            public void run() {
-                super.run();
-                // getChapterList
-                webSiteInfo = novelDao.findWebSiteById(id);
-                absWebSiteHelper  = new BQGWebSiteHelper(webSiteInfo);
-                absWebSiteHelper.getNovel(new NetCallback<Novel>() {
-                    @Override
-                    public void onSuccess(Novel data) {
-                        mCallBack.notifyUpdate(data);
-                    }
-
-                    @Override
-                    public void onFail(String msg) {
-                    }
-                });
+            public void onSuccess(Novel data) {
+                mCallBack.notifyUpdate(data);
             }
-        }.start();
+
+            @Override
+            public void onFail(String msg) {
+            }
+        });
 
     }
     public void getChapterList(long id){
