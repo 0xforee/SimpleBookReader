@@ -26,7 +26,15 @@ public class BookShelfActivity extends AppCompatActivity implements CardView.OnC
     private ServiceConnection mServiceConnect = new MyServiceConnection();
     private static final int MSG_UPDATE_NOVEL = 0;
 
-    Handler mHandler;
+    Handler mHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what){
+
+            }
+        }
+    };;
     CardView cardView;
     Toolbar toolbar;
     SwipeRefreshLayout mSwipeRefreshLayout;
@@ -53,15 +61,12 @@ public class BookShelfActivity extends AppCompatActivity implements CardView.OnC
         startService(intent);
         bindService(intent, mServiceConnect, BIND_AUTO_CREATE);
 
-        mHandler = new Handler(){
+        mHandler.postDelayed(new Runnable() {
             @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                switch (msg.what){
-
-                }
+            public void run() {
+                onRefresh();
             }
-        };
+        }, 300);
     }
 
     @Override
@@ -120,7 +125,6 @@ public class BookShelfActivity extends AppCompatActivity implements CardView.OnC
             mBinder = (RefreshService.MyBinder) iBinder;
             mRefreshService = mBinder.getService();
             mRefreshService.registerCallBack(BookShelfActivity.this);
-
         }
 
         @Override
