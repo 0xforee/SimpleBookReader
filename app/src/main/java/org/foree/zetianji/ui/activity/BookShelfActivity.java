@@ -34,7 +34,7 @@ public class BookShelfActivity extends AppCompatActivity implements CardView.OnC
 
             }
         }
-    };;
+    };
     CardView cardView;
     Toolbar toolbar;
     SwipeRefreshLayout mSwipeRefreshLayout;
