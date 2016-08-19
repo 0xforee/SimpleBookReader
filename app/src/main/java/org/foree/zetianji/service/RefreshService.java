@@ -14,9 +14,6 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.RemoteViews;
 
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-
 import org.foree.zetianji.R;
 import org.foree.zetianji.base.BaseApplication;
 import org.foree.zetianji.book.Chapter;
@@ -25,7 +22,6 @@ import org.foree.zetianji.dao.NovelDao;
 import org.foree.zetianji.helper.BQGWebSiteHelper;
 import org.foree.zetianji.helper.WebSiteInfo;
 import org.foree.zetianji.net.NetCallback;
-import org.foree.zetianji.net.NetWorkApiHelper;
 import org.foree.zetianji.utils.FileUtils;
 
 import java.io.File;
@@ -34,11 +30,8 @@ import java.util.List;
 
 public class RefreshService extends Service {
     private static final String TAG = RefreshService.class.getSimpleName();
-    private final int MSG_DOWNLOAD_CHAPTER_DOWN = 0;
-    private final int MSG_DOWNLOAD_OK = 1;
-    private final int MSG_START_DOWNLOAD = 2;
+
     private StreamCallBack mCallBack;
-    Handler myHandler;
     SharedPreferences sp;
     BQGWebSiteHelper absWebSiteHelper;
     WebSiteInfo webSiteInfo;
@@ -52,6 +45,31 @@ public class RefreshService extends Service {
     private MyBinder mBinder = new MyBinder();
 
     public RefreshService() {
+    }
+
+    Handler myHandler = new H();
+    private class H extends Handler{
+        private final int MSG_DOWNLOAD_CHAPTER_DOWN = 0;
+        private final int MSG_DOWNLOAD_OK = 1;
+        private final int MSG_START_DOWNLOAD = 2;
+
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what){
+                case MSG_START_DOWNLOAD:
+                case MSG_DOWNLOAD_CHAPTER_DOWN:
+                    downloadChapter(chapterList.get(successCount+failCount));
+                    updateNotification(chapterList.size(), successCount+failCount+1);
+                    break;
+                case MSG_DOWNLOAD_OK:
+                    contentView.setTextViewText(R.id.notificationPercent, "Success:" + successCount + "/Fail:" + failCount);
+                    notification.flags = Notification.FLAG_AUTO_CANCEL;
+                    notificationManager.notify(R.layout.notification_download, notification);
+                    break;
+
+            }
+            super.handleMessage(msg);
+        }
     }
 
     public class MyBinder extends Binder {
@@ -73,26 +91,6 @@ public class RefreshService extends Service {
         Log.d(TAG, "onCreate");
         novelDao = new NovelDao(this);
         sp = PreferenceManager.getDefaultSharedPreferences(BaseApplication.getInstance());
-
-        myHandler = new Handler(){
-            @Override
-            public void handleMessage(Message msg) {
-                switch (msg.what){
-                    case MSG_START_DOWNLOAD:
-                    case MSG_DOWNLOAD_CHAPTER_DOWN:
-                        downloadChapter(chapterList.get(successCount+failCount));
-                        updateNotification(chapterList.size(), successCount+failCount+1);
-                        break;
-                    case MSG_DOWNLOAD_OK:
-                        contentView.setTextViewText(R.id.notificationPercent, "Success:" + successCount + "/Fail:" + failCount);
-                        notification.flags = Notification.FLAG_AUTO_CANCEL;
-                        notificationManager.notify(R.layout.notification_download, notification);
-                        break;
-
-                }
-                super.handleMessage(msg);
-            }
-        };
     }
 
 
@@ -136,6 +134,7 @@ public class RefreshService extends Service {
         notification.contentView = contentView;
         notificationManager.notify(R.layout.notification_download, notification);
     }
+
     public void updateNovelInfo(final long id){
         // getChapterList
         webSiteInfo = novelDao.findWebSiteById(id);
@@ -143,7 +142,7 @@ public class RefreshService extends Service {
         absWebSiteHelper.getNovel(new NetCallback<Novel>() {
             @Override
             public void onSuccess(Novel data) {
-                mCallBack.notifyUpdate(data);
+                mCallBack.notifyUpdateCallBack(data);
             }
 
             @Override
@@ -152,6 +151,7 @@ public class RefreshService extends Service {
         });
 
     }
+
     public void getChapterList(long id){
         // getChapterList
         webSiteInfo = novelDao.findWebSiteById(id);
@@ -166,7 +166,7 @@ public class RefreshService extends Service {
 
                 // post sync done
                 Message msg = new Message();
-                msg.what = MSG_DOWNLOAD_CHAPTER_DOWN;
+                msg.what = H.MSG_DOWNLOAD_CHAPTER_DOWN;
                 msg.arg1 = chapterList.size();
 
                 myHandler.sendMessage(msg);
@@ -198,9 +198,9 @@ public class RefreshService extends Service {
                             // post sync done
                             Message msg = new Message();
                             if (successCount == chapterList.size()-1)
-                                msg.what = MSG_DOWNLOAD_OK;
+                                msg.what = H.MSG_DOWNLOAD_OK;
                             else
-                                msg.what = MSG_DOWNLOAD_CHAPTER_DOWN;
+                                msg.what = H.MSG_DOWNLOAD_CHAPTER_DOWN;
 
                             successCount++;
                             myHandler.sendMessage(msg);
@@ -211,7 +211,7 @@ public class RefreshService extends Service {
                         public void onFail(String msg) {
                             failCount++;
                             Message msgError = new Message();
-                            msgError.what = MSG_DOWNLOAD_CHAPTER_DOWN;
+                            msgError.what = H.MSG_DOWNLOAD_CHAPTER_DOWN;
                             myHandler.sendMessage(msgError);
                         }
                     });
@@ -222,6 +222,6 @@ public class RefreshService extends Service {
 
     public interface StreamCallBack {
         // 数据同步结束，更新UI
-        void notifyUpdate(Novel data);
+        void notifyUpdateCallBack(Novel data);
     }
 }
