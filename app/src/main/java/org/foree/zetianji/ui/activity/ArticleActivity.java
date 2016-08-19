@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
@@ -12,10 +14,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.foree.zetianji.R;
 import org.foree.zetianji.book.Chapter;
@@ -30,6 +29,7 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
     private static final String TAG = ArticleActivity.class.getSimpleName();
     TextView tv;
     Chapter chapter;
+    FloatingActionButton turnNightMode;
     SwipeRefreshLayout mSwipeRefreshLayout;
     private Handler mHandler = new Handler(){
         @Override
@@ -38,12 +38,14 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
         }
     };
     String webChar;
+    Toolbar toolbar;
+    boolean turnFlag = true;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_article);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         tv = (TextView)findViewById(R.id.tv_content);
@@ -53,10 +55,34 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
         webChar = bundle.getString("web_char");
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_ly);
         mSwipeRefreshLayout.setOnRefreshListener(this);
-        ActionBar bar = getSupportActionBar();
-        if (bar != null) {
-            bar.setTitle(chapter.getTitle());
-        }
+
+        ActionBar ab = getSupportActionBar();
+        if( ab != null)
+            ab.setTitle(chapter.getTitle());
+        // toolbar设置标题不管用....
+        //toolbar.setTitle(chapter.getTitle());
+
+        // get FloatActionButton
+        turnNightMode = (FloatingActionButton)findViewById(R.id.fab);
+        turnNightMode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(turnFlag) {
+                    // night Mode
+                    tv.setTextColor(getResources().getColor(R.color.nightTextColor));
+                    mSwipeRefreshLayout.setBackgroundColor(getResources().getColor(R.color.nightBackground));
+                    toolbar.setBackgroundColor(getResources().getColor(R.color.nightBackground));
+                    turnFlag = false;
+                }else{
+                    // day Mode
+                    tv.setTextColor(getResources().getColor(R.color.dayTextColor));
+                    mSwipeRefreshLayout.setBackgroundColor(getResources().getColor(R.color.dayBackground));
+                    toolbar.setBackgroundColor(getResources().getColor(R.color.primary));
+                    turnFlag = true;
+                }
+            }
+        });
+
 
         syncArticleContent();
 
