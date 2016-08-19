@@ -1,6 +1,8 @@
 package org.foree.zetianji.ui.activity;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -25,6 +27,12 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
     TextView tv;
     Chapter chapter;
     SwipeRefreshLayout mSwipeRefreshLayout;
+    private Handler mHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+        }
+    };
     String webChar;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -66,14 +74,27 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
     }
 
     private void errorUI(){
-        tv.setText("no data");
-        Snackbar.make(mSwipeRefreshLayout, "获取数据失败，请下拉刷新重新获取", Snackbar.LENGTH_LONG).show();
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // use textView format
+                tv.setText("no data");
+                Snackbar.make(mSwipeRefreshLayout, "获取数据失败，请下拉刷新重新获取", Snackbar.LENGTH_LONG).show();
+            }
+        }, 0);
+
     }
-    private void updateUI(String data){
-        // use textView format
-        tv.setText(Html.fromHtml(data));
-        mSwipeRefreshLayout.setRefreshing(false);
-        Snackbar.make(mSwipeRefreshLayout, "加载成功", Snackbar.LENGTH_SHORT).show();
+    private void updateUI(final String data){
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // use textView format
+                tv.setText(Html.fromHtml(data));
+                mSwipeRefreshLayout.setRefreshing(false);
+                Snackbar.make(mSwipeRefreshLayout, "加载成功", Snackbar.LENGTH_SHORT).show();
+            }
+        }, 0);
+
 
     }
 
