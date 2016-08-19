@@ -45,26 +45,18 @@ public class BookShelfActivity extends AppCompatActivity implements CardView.OnC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_shelf);
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.content_main);
-        mSwipeRefreshLayout.setOnRefreshListener(this);
-
-        cardView = (CardView) findViewById(R.id.novel_card);
-        cardView.setOnClickListener(this);
-
-        initNovelTextView();
+        setUpLayoutViews();
 
         // start refresh service
         Intent intent = new Intent(this, RefreshService.class);
         startService(intent);
         bindService(intent, mServiceConnect, BIND_AUTO_CREATE);
 
+        // start refresh
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                onRefresh();
+                syncNovelInfo();
             }
         }, 300);
     }
@@ -82,38 +74,52 @@ public class BookShelfActivity extends AppCompatActivity implements CardView.OnC
         super.onDestroy();
     }
 
+    // SwipeRefreshLayout onRefresh
     @Override
-    public void notifyUpdate(final Novel novel) {
+    public void onRefresh() {
+        syncNovelInfo();
+    }
+
+    private void syncNovelInfo() {
+        if( mRefreshService != null){
+            mSwipeRefreshLayout.setRefreshing(true);
+            mRefreshService.updateNovelInfo(2);
+        }
+    }
+
+    @Override
+    public void notifyUpdateCallBack(final Novel novel) {
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 // refresh success, update text
                 mSwipeRefreshLayout.setRefreshing(false);
-                updateNovelInfo(novel);
+                refreshNovelViews(novel);
             }
         },15);
     }
-    private void updateNovelInfo(Novel novel){
-        tvNovelUpdateChapter.setText(getString(R.string.update_chapter_string) + novel.getNewest_chapter().getTitle());
-        tvNovelUpdateTime.setText(getString(R.string.update_time_string) + novel.getUpdate_time());
-    }
 
-    private void initNovelTextView() {
-        //tvNovelAuthor = (TextView) findViewById(R.id.tv_novel_author);
-        //tvNovelCategory = (TextView) findViewById(R.id.tv_novel_category);
-       // tvNovelName = (TextView)findViewById(R.id.tv_novel_name);
-      //  tvNovelStatus = (TextView)findViewById(R.id.tv_novel_status);
+    private void setUpLayoutViews() {
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.content_main);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+
+        cardView = (CardView) findViewById(R.id.novel_card);
+        cardView.setOnClickListener(this);
+
+        tvNovelAuthor = (TextView) findViewById(R.id.tv_novel_author);
+        tvNovelCategory = (TextView) findViewById(R.id.tv_novel_category);
+        tvNovelName = (TextView)findViewById(R.id.tv_novel_name);
+        tvNovelStatus = (TextView)findViewById(R.id.tv_novel_status);
         tvNovelUpdateTime = (TextView)findViewById(R.id.tv_novel_update_time);
         tvNovelUpdateChapter = (TextView)findViewById(R.id.tv_novel_update_chapter);
     }
 
-    // SwipeRefreshLayout onRefresh
-    @Override
-    public void onRefresh() {
-        if( mRefreshService != null){
-            mSwipeRefreshLayout.setRefreshing(true);
-            mRefreshService.updateNovelInfo(2);
-        }
+    private void refreshNovelViews(Novel novel){
+        tvNovelUpdateChapter.setText(getString(R.string.update_chapter_string) + novel.getNewest_chapter().getTitle());
+        tvNovelUpdateTime.setText(getString(R.string.update_time_string) + novel.getUpdate_time());
     }
 
     private class MyServiceConnection implements ServiceConnection {
