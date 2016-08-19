@@ -58,8 +58,6 @@ public class BookShelfActivity extends AppCompatActivity implements CardView.OnC
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
                 switch (msg.what){
-                    case MSG_UPDATE_NOVEL:
-                        updateNovelInfo((Novel)msg.obj);
 
                 }
             }
@@ -74,16 +72,18 @@ public class BookShelfActivity extends AppCompatActivity implements CardView.OnC
 
     @Override
     protected void onDestroy() {
+        mRefreshService.unregisterCallBack();
         unbindService(mServiceConnect);
         super.onDestroy();
     }
 
     @Override
     public void notifyUpdate(final Novel novel) {
-        mSwipeRefreshLayout.setRefreshing(false);
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
+                // refresh success, update text
+                mSwipeRefreshLayout.setRefreshing(false);
                 updateNovelInfo(novel);
             }
         },15);
@@ -102,6 +102,7 @@ public class BookShelfActivity extends AppCompatActivity implements CardView.OnC
         tvNovelUpdateChapter = (TextView)findViewById(R.id.tv_novel_update_chapter);
     }
 
+    // SwipeRefreshLayout onRefresh
     @Override
     public void onRefresh() {
         if( mRefreshService != null){

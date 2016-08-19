@@ -57,12 +57,11 @@ public class BQGWebSiteHelper extends AbsWebSiteHelper{
                     public void onResponse (String response){
                         Log.d(TAG, "getNovel: " + response);
                         if (netCallback != null){
-                            netCallback.onSuccess(parseNovel(response));
+                            parseNovel(response, netCallback);
                         }
                     }
                 }
                 ,new Response.ErrorListener()
-
                 {
                     @Override
                     public void onErrorResponse (VolleyError error){
@@ -84,7 +83,7 @@ public class BQGWebSiteHelper extends AbsWebSiteHelper{
                     public void onResponse (String response){
                         Log.d(TAG, "getNovel: " + response);
                         if (netCallback != null){
-                            netCallback.onSuccess(parseChapterContent(response));
+                            parseChapterContent(response, netCallback);
                         }
                     }
                 }
@@ -105,54 +104,61 @@ public class BQGWebSiteHelper extends AbsWebSiteHelper{
     }
 
     // 解析得到小说的属性
-    private Novel parseNovel(String data){
-        Novel novel = new Novel();
-        Chapter newestChapter = new Chapter();
+    private void parseNovel(final String data, final NetCallback<Novel> netCallback){
+        new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                Novel novel = new Novel();
+                Chapter newestChapter = new Chapter();
 
-        Document doc = Jsoup.parse(data);
-        Elements updates = doc.select("[property~=og:novel*]");
-        for(Element update: updates){
-            Log.i(TAG, update.toString());
-            switch (update.attr("property")){
-                case "og:novel:category":
-                    novel.setCategory(update.attr("content"));
-                    break;
-                case "og:novel:author":
-                    novel.setAuthor(update.attr("content"));
-                    break;
-                case "og:novel:book_name":
-                    novel.setBook_name(update.attr("content"));
-                    break;
-                case "og:novel:update_time":
-                    novel.setUpdate_time(update.attr("content"));
-                    break;
-                case "og:novel:latest_chapter_name":
-                    newestChapter.setTitle(update.attr("content"));
-                    break;
-                case "og:novel:latest_chapter_url":
-                    newestChapter.setUrl(update.attr("content"));
-                    break;
-            }
-        }
-        novel.setNewest_chapter(newestChapter);
+                Document doc = Jsoup.parse(data);
+                Elements updates = doc.select("[property~=og:novel*]");
+                for(Element update: updates){
+                    Log.i(TAG, update.toString());
+                    switch (update.attr("property")){
+                        case "og:novel:category":
+                            novel.setCategory(update.attr("content"));
+                            break;
+                        case "og:novel:author":
+                            novel.setAuthor(update.attr("content"));
+                            break;
+                        case "og:novel:book_name":
+                            novel.setBook_name(update.attr("content"));
+                            break;
+                        case "og:novel:update_time":
+                            novel.setUpdate_time(update.attr("content"));
+                            break;
+                        case "og:novel:latest_chapter_name":
+                            newestChapter.setTitle(update.attr("content"));
+                            break;
+                        case "og:novel:latest_chapter_url":
+                            newestChapter.setUrl(update.attr("content"));
+                            break;
+                    }
+                }
+                novel.setNewest_chapter(newestChapter);
 
-        List<Chapter> chapters = new ArrayList<>();
-        Elements elements_contents = doc.select("dd");
-        Document contents = Jsoup.parse(elements_contents.toString());
-        Elements elements_a = contents.getElementsByTag("a");
-        for(Element link: elements_a){
-            Chapter chapter = new Chapter();
-            chapter.setTitle(link.text());
-            chapter.setHostUrl(host_url);
-            chapter.setUrl(decodeUrl(link.attr("href")));
+                List<Chapter> chapters = new ArrayList<>();
+                Elements elements_contents = doc.select("dd");
+                Document contents = Jsoup.parse(elements_contents.toString());
+                Elements elements_a = contents.getElementsByTag("a");
+                for(Element link: elements_a){
+                    Chapter chapter = new Chapter();
+                    chapter.setTitle(link.text());
+                    chapter.setHostUrl(host_url);
+                    chapter.setUrl(decodeUrl(link.attr("href")));
 //          Log.i("HH", link.text());
 //          Log.i("HH", link.attr("href"));
-            chapters.add(chapter);
-        }
-        Collections.reverse(chapters);
-        novel.setChapter_list(chapters);
+                    chapters.add(chapter);
+                }
+                Collections.reverse(chapters);
+                novel.setChapter_list(chapters);
 
-        return novel;
+                netCallback.onSuccess(novel);
+
+            }
+        }.start();
 
     }
 
@@ -165,15 +171,21 @@ public class BQGWebSiteHelper extends AbsWebSiteHelper{
     }
 
     // 解析章节的内容
-    private String parseChapterContent(String data){
-        Document doc = Jsoup.parse(data);
-        Element content = doc.getElementById("content");
-        if( content != null) {
-            content.select("script").remove();
-            Log.d(TAG, content.toString());
-            return content.toString();
-        }else{
-            return null;
-        }
+    private void parseChapterContent(final String data, final NetCallback<String> netCallback){
+        new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                Document doc = Jsoup.parse(data);
+                Element content = doc.getElementById("content");
+                if( content != null) {
+                    content.select("script").remove();
+                    Log.d(TAG, content.toString());
+                    netCallback.onSuccess(content.toString());
+                }else{
+                    netCallback.onFail("content is null");
+                }
+            }
+        }.start();
     }
 }
