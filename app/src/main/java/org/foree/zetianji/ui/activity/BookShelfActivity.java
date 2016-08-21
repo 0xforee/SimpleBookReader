@@ -112,10 +112,10 @@ public class BookShelfActivity extends AppCompatActivity implements CardView.OnC
         cardView = (CardView) findViewById(R.id.novel_card);
         cardView.setOnClickListener(this);
 
-        tvNovelAuthor = (TextView) findViewById(R.id.tv_novel_author);
-        tvNovelCategory = (TextView) findViewById(R.id.tv_novel_category);
-        tvNovelName = (TextView)findViewById(R.id.tv_novel_name);
-        tvNovelStatus = (TextView)findViewById(R.id.tv_novel_status);
+        //tvNovelAuthor = (TextView) findViewById(R.id.tv_novel_author);
+       // tvNovelCategory = (TextView) findViewById(R.id.tv_novel_category);
+       // tvNovelName = (TextView)findViewById(R.id.tv_novel_name);
+       // tvNovelStatus = (TextView)findViewById(R.id.tv_novel_status);
         tvNovelUpdateTime = (TextView)findViewById(R.id.tv_novel_update_time);
         tvNovelUpdateChapter = (TextView)findViewById(R.id.tv_novel_update_chapter);
     }
