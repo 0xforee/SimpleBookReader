@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -84,6 +85,9 @@ public class BookShelfActivity extends AppCompatActivity implements CardView.OnC
         if( mRefreshService != null){
             mSwipeRefreshLayout.setRefreshing(true);
             mRefreshService.updateNovelInfo(2);
+        }else {
+            mSwipeRefreshLayout.setRefreshing(false);
+            Snackbar.make(mSwipeRefreshLayout, "出了什么问题，请稍后再试", Snackbar.LENGTH_SHORT).show();
         }
     }
 
