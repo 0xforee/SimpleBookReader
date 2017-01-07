@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.foree.zetianji">
+    package="org.foree.bookreader">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:name=".base.BaseApplication"
+        android:name="org.foree.bookreader.base.BaseApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
 
-        <service android:name=".service.RefreshService" />
+        <service android:name="org.foree.bookreader.service.RefreshService" />
 
-        <activity android:name=".ui.activity.BookShelfActivity">
+        <activity android:name="org.foree.bookreader.ui.activity.BookShelfActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -22,13 +22,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.activity.ChapterListActivity">
+            android:name="org.foree.bookreader.ui.activity.ChapterListActivity">
         </activity>
-        <activity android:name=".ui.activity.ArticleActivity"/>
+        <activity android:name="org.foree.bookreader.ui.activity.ArticleActivity"/>
 
         <!-- 配置第三方Receiver -->
         <receiver
-            android:name=".receiver.PushReceiver"
+            android:name="org.foree.bookreader.receiver.PushReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.igexin.sdk.action.${GETUI_APP_ID}" />
