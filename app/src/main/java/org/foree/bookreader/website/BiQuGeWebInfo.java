@@ -107,6 +107,13 @@ public class BiQuGeWebInfo extends WebInfo {
 
     @Override
     Article parseArticle(Document doc) {
-        return null;
+        Article article = new Article();
+        Element content = doc.getElementById("content");
+        if( content != null) {
+            content.select("script").remove();
+            Log.d(TAG, content.toString());
+            article.setContents(content.toString());
+        }
+        return article;
     }
 }
