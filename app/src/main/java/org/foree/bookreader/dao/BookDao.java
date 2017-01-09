@@ -25,6 +25,50 @@ public class BookDao {
         bookSQLiteOpenHelper = new BookSQLiteOpenHelper(context);
     }
 
+    public List<Book> findAllBookList(){
+        Cursor cursor;
+        List<Book> bookList = new ArrayList<>();
+        SQLiteDatabase db = bookSQLiteOpenHelper.getReadableDatabase();
+        db.beginTransaction();
+
+        cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_BOOK_LIST, null,
+                null, null, null, null, null);
+        while(cursor.moveToNext()){
+            String bookName = cursor.getString(cursor.getColumnIndex("book_name"));
+            String bookUrl = cursor.getString(cursor.getColumnIndex("book_url"));
+            String updateTime = cursor.getString(cursor.getColumnIndex("update_time"));
+            String category = cursor.getString(cursor.getColumnIndex("category"));
+            String author = cursor.getString(cursor.getColumnIndex("author"));
+            Book book = new Book(bookName, bookUrl, updateTime, category, author);
+            bookList.add(book);
+        }
+
+        cursor.close();
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        db.close();
+        return bookList;
+    }
+
+    public void addBookInfo(Book book){
+        SQLiteDatabase db = bookSQLiteOpenHelper.getWritableDatabase();
+        db.beginTransaction();
+        ContentValues contentValues = new ContentValues();
+
+        // 内容不重复
+        contentValues.put("book_url", book.getUrl());
+        contentValues.put("book_name", book.getBookName());
+        contentValues.put("update_time", book.getUpdateTime());
+        contentValues.put("category", book.getCategory());
+        contentValues.put("author", book.getAuthor());
+        if (db.insertWithOnConflict(BookSQLiteOpenHelper.DB_TABLE_BOOK_LIST, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE) == -1) {
+            Log.e(TAG, "Database insert id: " + book.getUrl() + " error");
+        }
+
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        db.close();
+    }
 
     public void insertChapterList(List<Chapter> chapterList){
         synchronized (this) {
@@ -37,47 +81,6 @@ public class BookDao {
             }
             insertInternal(chapterList.subList(1000*(tmp-1), chapterList.size()));
         }
-    }
-
-    public List<Book> findAllBookList(){
-        Cursor cursor;
-        List<Book> bookList = new ArrayList<>();
-        SQLiteDatabase db = bookSQLiteOpenHelper.getReadableDatabase();
-        db.beginTransaction();
-
-        cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_BOOK_LIST, null,
-                null, null, null, null, null);
-        while(cursor.moveToNext()){
-            String book_name = cursor.getString(cursor.getColumnIndex("book_name"));
-            String book_url = cursor.getString(cursor.getColumnIndex("book_url"));
-            Book book = new Book(book_name, book_url);
-            bookList.add(book);
-
-        }
-        cursor.close();
-        db.setTransactionSuccessful();
-        db.endTransaction();
-        db.close();
-        return bookList;
-    }
-
-    public void addBook(Book book){
-        SQLiteDatabase db = bookSQLiteOpenHelper.getWritableDatabase();
-        db.beginTransaction();
-        ContentValues contentValues = new ContentValues();
-        Cursor cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_BOOK_LIST, new String[]{"book_url"},
-                "book_url=?", new String[]{book.getUrl()}, null, null, null);
-        if (cursor.getCount() == 0) {
-            // 内容不重复
-            contentValues.put("book_url", book.getUrl());
-            contentValues.put("book_name", book.getBookName());
-            if (db.insert(BookSQLiteOpenHelper.DB_TABLE_BOOK_LIST, null, contentValues) == -1) {
-                Log.e(TAG, "Database insert id: " + book.getUrl() + " error");
-            }
-        }
-        db.setTransactionSuccessful();
-        db.endTransaction();
-        db.close();
     }
 
     private void insertInternal(List<Chapter> subItemList){

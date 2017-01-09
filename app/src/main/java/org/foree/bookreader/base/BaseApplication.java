@@ -90,8 +90,8 @@ public class BaseApplication extends Application{
         Book ztj = new Book("择天记", "http://www.biquge.com/0_168/");
         Book xylz = new Book("雪鹰领主","http://www.biquge.com/5_5094/");
 
-        bookDao.addBook(wxt);
-        bookDao.addBook(ztj);
-        bookDao.addBook(xylz);
+        bookDao.addBookInfo(wxt);
+        bookDao.addBookInfo(ztj);
+        bookDao.addBookInfo(xylz);
     }
 }
