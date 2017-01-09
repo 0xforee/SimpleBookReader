@@ -10,6 +10,7 @@ public class Book {
     private String update_time;
     private String category;
     private String author;
+    private String url;
     private List<Chapter> chapter_list;
     private Chapter newest_chapter;
 
@@ -60,4 +61,14 @@ public class Book {
     public void setNewest_chapter(Chapter newest_chapter) {
         this.newest_chapter = newest_chapter;
     }
+
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
 }

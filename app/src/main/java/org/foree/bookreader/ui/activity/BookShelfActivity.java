@@ -27,6 +27,7 @@ import java.util.List;
 
 public class BookShelfActivity extends AppCompatActivity implements CardView.OnClickListener, RefreshService.StreamCallBack, SwipeRefreshLayout.OnRefreshListener{
 
+    private static final String TAG = BookShelfActivity.class.getSimpleName();
     private RefreshService.MyBinder mBinder;
     private RefreshService mRefreshService;
     private ServiceConnection mServiceConnect = new MyServiceConnection();
@@ -125,7 +126,11 @@ public class BookShelfActivity extends AppCompatActivity implements CardView.OnC
         webInfo.searchBook("择天记", new NetCallback<List<Book>>() {
             @Override
             public void onSuccess(List<Book> data) {
-
+                if( data != null){
+                    for(Book book:data){
+                        Log.d(TAG, book.getBook_name());
+                    }
+                }
             }
 
             @Override

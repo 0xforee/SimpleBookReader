@@ -5,18 +5,11 @@ import android.util.Log;
 import org.foree.bookreader.book.Article;
 import org.foree.bookreader.book.Book;
 import org.foree.bookreader.book.Chapter;
-import org.foree.bookreader.utils.FileUtils;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -35,8 +28,10 @@ public class BiQuGeWebInfo extends WebInfo {
 
     @Override
     List<Book> parseBookList(Document doc) {
+        List<Book> bookList = new ArrayList<>();
         Elements resultList = doc.getElementsByClass("result-game-item");
         for(Element result: resultList){
+            Book book = new Book();
             //Log.d(TAG, result.toString());
             Elements titles = result.getElementsByClass("result-game-item-title-link");
             //Log.d(TAG, titles.toString());
@@ -45,8 +40,12 @@ public class BiQuGeWebInfo extends WebInfo {
             Log.d(TAG, title.attr("href"));
             Log.d(TAG, title.attr("title"));
 
+            book.setBook_name(title.attr("title"));
+            book.setUrl(title.attr("href"));
+            bookList.add(book);
+
         }
-        return null;
+        return bookList;
     }
 
     @Override
