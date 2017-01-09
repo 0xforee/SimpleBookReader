@@ -6,36 +6,43 @@ import java.util.List;
  * Created by foree on 16-7-26.
  */
 public class Book {
-    private String book_name;
-    private String update_time;
+    private String bookName;
+    private String updateTime;
     private String category;
     private String author;
     private String url;
-    private List<Chapter> chapter_list;
-    private Chapter newest_chapter;
+    private List<Chapter> chapterList;
+    private Chapter newestChapter;
 
     public Book() {
     }
 
-    public Book(String book_name, String url) {
-        this.book_name = book_name;
+    public Book(String bookName, String url) {
+        this(bookName, url, "", "", "");
+    }
+
+    public Book(String bookName, String url, String updateTime, String category, String author) {
         this.url = url;
+        this.bookName = bookName;
+        this.updateTime = updateTime;
+        this.category = category;
+        this.author = author;
     }
 
-    public String getBook_name() {
-        return book_name;
+    public String getBookName() {
+        return bookName;
     }
 
-    public void setBook_name(String book_name) {
-        this.book_name = book_name;
+    public void setBookName(String bookName) {
+        this.bookName = bookName;
     }
 
-    public String getUpdate_time() {
-        return update_time;
+    public String getUpdateTime() {
+        return updateTime;
     }
 
-    public void setUpdate_time(String update_time) {
-        this.update_time = update_time;
+    public void setUpdateTime(String updateTime) {
+        this.updateTime = updateTime;
     }
 
     public String getCategory() {
@@ -54,20 +61,20 @@ public class Book {
         this.author = author;
     }
 
-    public List<Chapter> getChapter_list() {
-        return chapter_list;
+    public List<Chapter> getChapterList() {
+        return chapterList;
     }
 
-    public void setChapter_list(List<Chapter> chapter_list) {
-        this.chapter_list = chapter_list;
+    public void setChapterList(List<Chapter> chapterList) {
+        this.chapterList = chapterList;
     }
 
-    public Chapter getNewest_chapter() {
-        return newest_chapter;
+    public Chapter getNewestChapter() {
+        return newestChapter;
     }
 
-    public void setNewest_chapter(Chapter newest_chapter) {
-        this.newest_chapter = newest_chapter;
+    public void setNewestChapter(Chapter newestChapter) {
+        this.newestChapter = newestChapter;
     }
 
 

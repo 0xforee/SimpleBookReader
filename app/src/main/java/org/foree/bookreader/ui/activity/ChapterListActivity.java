@@ -133,7 +133,7 @@ public class ChapterListActivity extends AppCompatActivity implements RefreshSer
 //                    @Override
 //                    public void run() {
 //                        chapterList.clear();
-//                        chapterList.addAll(data.getChapter_list());
+//                        chapterList.addAll(data.getChapterList());
 //                        bookDao.insertChapterList(chapterList);
 //                        mAdapter.notifyDataSetChanged();
 //                    }
@@ -155,7 +155,7 @@ public class ChapterListActivity extends AppCompatActivity implements RefreshSer
                     @Override
                     public void run() {
                         chapterList.clear();
-                        chapterList.addAll(data.getChapter_list());
+                        chapterList.addAll(data.getChapterList());
                         bookDao.insertChapterList(chapterList);
                         mAdapter.notifyDataSetChanged();
                     }

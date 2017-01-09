@@ -42,7 +42,7 @@ public class BiQuGeWebInfo extends WebInfo {
             Log.d(TAG, title.attr("href"));
             Log.d(TAG, title.attr("title"));
 
-            book.setBook_name(title.attr("title"));
+            book.setBookName(title.attr("title"));
             book.setUrl(title.attr("href"));
             bookList.add(book);
 
@@ -66,10 +66,10 @@ public class BiQuGeWebInfo extends WebInfo {
                     book.setAuthor(update.attr("content"));
                     break;
                 case "og:book:book_name":
-                    book.setBook_name(update.attr("content"));
+                    book.setBookName(update.attr("content"));
                     break;
                 case "og:book:update_time":
-                    book.setUpdate_time(update.attr("content"));
+                    book.setUpdateTime(update.attr("content"));
                     break;
                 case "og:book:latest_chapter_name":
                     newestChapter.setTitle(update.attr("content"));
@@ -79,7 +79,7 @@ public class BiQuGeWebInfo extends WebInfo {
                     break;
             }
         }
-        book.setNewest_chapter(newestChapter);
+        book.setNewestChapter(newestChapter);
 
         // ChapterList
         List<Chapter> chapters = new ArrayList<>();
@@ -95,7 +95,7 @@ public class BiQuGeWebInfo extends WebInfo {
             chapters.add(chapter);
         }
         Collections.reverse(chapters);
-        book.setChapter_list(chapters);
+        book.setChapterList(chapters);
 
         return book;
     }

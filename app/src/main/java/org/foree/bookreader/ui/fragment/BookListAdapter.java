@@ -46,7 +46,7 @@ public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.MyView
     @Override
     public void onBindViewHolder(final BookListAdapter.MyViewHolder holder, int position) {
         if( bookList != null && !bookList.isEmpty())
-            holder.tvBookName.setText(bookList.get(position).getBook_name());
+            holder.tvBookName.setText(bookList.get(position).getBookName());
 
         // 如果设置了回调，则设置点击事件
         if (mOnItemClickListener != null)

@@ -70,7 +70,7 @@ public class BookDao {
         if (cursor.getCount() == 0) {
             // 内容不重复
             contentValues.put("book_url", book.getUrl());
-            contentValues.put("book_name", book.getBook_name());
+            contentValues.put("book_name", book.getBookName());
             if (db.insert(BookSQLiteOpenHelper.DB_TABLE_BOOK_LIST, null, contentValues) == -1) {
                 Log.e(TAG, "Database insert id: " + book.getUrl() + " error");
             }

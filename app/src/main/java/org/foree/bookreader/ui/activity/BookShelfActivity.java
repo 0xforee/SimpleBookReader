@@ -157,8 +157,8 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
     }
 
     private void refreshNovelViews(Book book){
-//        tvNovelUpdateChapter.setText(getString(R.string.update_chapter_string) + book.getNewest_chapter().getTitle());
- //       tvNovelUpdateTime.setText(getString(R.string.update_time_string) + book.getUpdate_time());
+//        tvNovelUpdateChapter.setText(getString(R.string.update_chapter_string) + book.getNewestChapter().getTitle());
+ //       tvNovelUpdateTime.setText(getString(R.string.update_time_string) + book.getUpdateTime());
     }
 
     private class MyServiceConnection implements ServiceConnection {
