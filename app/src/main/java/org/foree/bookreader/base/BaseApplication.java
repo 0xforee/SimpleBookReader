@@ -6,6 +6,7 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import org.foree.bookreader.book.Book;
 import org.foree.bookreader.dao.BookDao;
 import org.foree.bookreader.helper.WebSiteInfo;
 
@@ -84,7 +85,21 @@ public class BaseApplication extends Application{
             bookDao.insertWebSite(webSiteInfo1);
             bookDao.insertWebSite(webSiteInfo2);
 
+            addBooks();
+
             sp.edit().putBoolean("first_run", false).apply();
         }
+    }
+
+    public void addBooks(){
+        BookDao bookDao = new BookDao(this);
+
+        Book wxt = new Book("五行天", "http://www.biquge.com/11_11298");
+        Book ztj = new Book("择天记", "http://www.biquge.com/0_168/");
+        Book xylz = new Book("雪鹰领主","http://www.biquge.com/5_5094/");
+
+        bookDao.addBook(wxt);
+        bookDao.addBook(ztj);
+        bookDao.addBook(xylz);
     }
 }

@@ -15,6 +15,7 @@ public class BookSQLiteOpenHelper extends SQLiteOpenHelper{
     public static final String DB_NAME = "bookreader.db";
     public static final String DB_TABLE_WEBSITES = "websites";
     public static final String DB_TABLE_CHAPTERS = "chapters";
+    public static final String DB_TABLE_BOOK_LIST = "book_list";
 
     public BookSQLiteOpenHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -61,6 +62,12 @@ public class BookSQLiteOpenHelper extends SQLiteOpenHelper{
                 "content varchar," +
                 "offline integer," +
                 "read integer" +
+                ")"
+        );
+
+        db.execSQL("create table book_list(" +
+                "book_url varchar(255) primary key," +
+                "book_name varchar(255)" +
                 ")"
         );
     }

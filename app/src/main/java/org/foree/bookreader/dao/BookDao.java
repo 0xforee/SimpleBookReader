@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import org.foree.bookreader.book.Book;
 import org.foree.bookreader.book.Chapter;
 import org.foree.bookreader.helper.WebSiteInfo;
 
@@ -105,6 +106,47 @@ public class BookDao {
             }
             insertInternal(chapterList.subList(1000*(tmp-1), chapterList.size()));
         }
+    }
+
+    public List<Book> findAllBookList(){
+        Cursor cursor;
+        List<Book> bookList = new ArrayList<>();
+        SQLiteDatabase db = bookSQLiteOpenHelper.getReadableDatabase();
+        db.beginTransaction();
+
+        cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_BOOK_LIST, null,
+                null, null, null, null, null);
+        while(cursor.moveToNext()){
+            String book_name = cursor.getString(cursor.getColumnIndex("book_name"));
+            String book_url = cursor.getString(cursor.getColumnIndex("book_url"));
+            Book book = new Book(book_name, book_url);
+            bookList.add(book);
+
+        }
+        cursor.close();
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        db.close();
+        return bookList;
+    }
+
+    public void addBook(Book book){
+        SQLiteDatabase db = bookSQLiteOpenHelper.getWritableDatabase();
+        db.beginTransaction();
+        ContentValues contentValues = new ContentValues();
+        Cursor cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_BOOK_LIST, new String[]{"book_url"},
+                "book_url=?", new String[]{book.getUrl()}, null, null, null);
+        if (cursor.getCount() == 0) {
+            // 内容不重复
+            contentValues.put("book_url", book.getUrl());
+            contentValues.put("book_name", book.getBook_name());
+            if (db.insert(BookSQLiteOpenHelper.DB_TABLE_BOOK_LIST, null, contentValues) == -1) {
+                Log.e(TAG, "Database insert id: " + book.getUrl() + " error");
+            }
+        }
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        db.close();
     }
 
     private void insertInternal(List<Chapter> subItemList){

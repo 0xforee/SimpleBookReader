@@ -14,6 +14,14 @@ public class Book {
     private List<Chapter> chapter_list;
     private Chapter newest_chapter;
 
+    public Book() {
+    }
+
+    public Book(String book_name, String url) {
+        this.book_name = book_name;
+        this.url = url;
+    }
+
     public String getBook_name() {
         return book_name;
     }
