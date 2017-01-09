@@ -55,7 +55,7 @@ public class BQGWebSiteHelper extends AbsWebSiteHelper{
         NetWorkApiHelper.newInstance().getRequest(host_url+index_page, websiteCharSet, new Response.Listener<String>() {
                     @Override
                     public void onResponse (String response){
-                        Log.d(TAG, "getNovel: " + response);
+                        //Log.d(TAG, "getNovel: " + response);
                         if (netCallback != null){
                             parseNovel(response, netCallback);
                         }
@@ -81,7 +81,7 @@ public class BQGWebSiteHelper extends AbsWebSiteHelper{
         NetWorkApiHelper.newInstance().getRequest(chapter_url, websiteCharSet, new Response.Listener<String>() {
                     @Override
                     public void onResponse (String response){
-                        Log.d(TAG, "getNovel: " + response);
+                        //Log.d(TAG, "getNovel: " + response);
                         if (netCallback != null){
                             parseChapterContent(response, netCallback);
                         }

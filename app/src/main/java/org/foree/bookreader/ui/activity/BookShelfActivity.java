@@ -18,7 +18,12 @@ import android.widget.TextView;
 
 import org.foree.bookreader.R;
 import org.foree.bookreader.book.Book;
+import org.foree.bookreader.net.NetCallback;
 import org.foree.bookreader.service.RefreshService;
+import org.foree.bookreader.website.BiQuGeWebInfo;
+import org.foree.bookreader.website.WebInfo;
+
+import java.util.List;
 
 public class BookShelfActivity extends AppCompatActivity implements CardView.OnClickListener, RefreshService.StreamCallBack, SwipeRefreshLayout.OnRefreshListener{
 
@@ -115,6 +120,19 @@ public class BookShelfActivity extends AppCompatActivity implements CardView.OnC
 
         cardView = (CardView) findViewById(R.id.novel_card);
         cardView.setOnClickListener(this);
+
+        WebInfo webInfo = new BiQuGeWebInfo();
+        webInfo.searchBook("择天记", new NetCallback<List<Book>>() {
+            @Override
+            public void onSuccess(List<Book> data) {
+
+            }
+
+            @Override
+            public void onFail(String msg) {
+
+            }
+        });
 
         //tvNovelAuthor = (TextView) findViewById(R.id.tv_novel_author);
        // tvNovelCategory = (TextView) findViewById(R.id.tv_novel_category);

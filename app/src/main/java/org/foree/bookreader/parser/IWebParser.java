@@ -3,6 +3,7 @@ package org.foree.bookreader.parser;
 import org.foree.bookreader.book.Article;
 import org.foree.bookreader.book.Book;
 import org.foree.bookreader.book.Chapter;
+import org.foree.bookreader.net.NetCallback;
 
 import java.util.List;
 
@@ -12,8 +13,8 @@ import java.util.List;
  */
 
 public interface IWebParser {
-    List<Book> searchBook(String keyword);
-    Book parseBookInfo(String bookUrl);
-    List<Chapter> parseChapterList(String bookUrl);
-    Article parseArticle(String chapterUrl);
+    void searchBook(String keywords, NetCallback<List<Book>> netCallback);
+    void getBookInfo(String bookUrl, NetCallback<Book> netCallback);
+    void getChapterList(String bookUrl, NetCallback<List<Chapter>> netCallback);
+    void getArticle(String chapterUrl, NetCallback<Article> netCallback);
 }
