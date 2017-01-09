@@ -15,8 +15,6 @@ import android.widget.TextView;
 
 import org.foree.bookreader.R;
 import org.foree.bookreader.book.Article;
-import org.foree.bookreader.book.Chapter;
-import org.foree.bookreader.helper.BQGWebSiteHelper;
 import org.foree.bookreader.net.NetCallback;
 import org.foree.bookreader.website.BiQuGeWebInfo;
 import org.foree.bookreader.website.WebInfo;
@@ -25,7 +23,6 @@ import org.foree.bookreader.website.WebInfo;
  * Created by foree on 16-7-21.
  */
 public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener{
-    BQGWebSiteHelper apiHelper;
     private static final String TAG = ArticleActivity.class.getSimpleName();
     TextView tvContent,tvTitle;
     FloatingActionButton turnNightMode;
@@ -83,7 +80,7 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
         webInfo.getArticle(chapterUrl, new NetCallback<Article>() {
             @Override
             public void onSuccess(Article data) {
-                updateUI(data.getContents());
+                updateUI(data);
             }
 
             @Override
@@ -91,29 +88,17 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
 
             }
         });
-//        apiHelper = new BQGWebSiteHelper();
-//        apiHelper.getChapterContent(chapter.getUrl(), webChar, new NetCallback<String>() {
-//            @Override
-//            public void onSuccess(String data) {
-//                    updateUI(data);
-//            }
-//
-//            @Override
-//            public void onFail(String msg) {
-//                updateUI(null);
-//            }
-//        });
     }
 
-    private void updateUI(final String data){
+    private void updateUI(final Article article){
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 mSwipeRefreshLayout.setRefreshing(false);
-                if( data != null){
+                if( article != null){
                     // use textView format
-                    tvContent.setText(Html.fromHtml(data));
-                    //tvTitle.setText(chapter.getTitle());
+                    tvContent.setText(Html.fromHtml(article.getContents()));
+                    tvTitle.setText(Html.fromHtml(article.getTitle()));
                     Snackbar.make(mSwipeRefreshLayout, R.string.load_success, Snackbar.LENGTH_SHORT).show();
                 }else{
                     Snackbar.make(mSwipeRefreshLayout, R.string.load_fail , Snackbar.LENGTH_LONG).show();

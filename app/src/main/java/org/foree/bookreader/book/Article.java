@@ -5,7 +5,16 @@ package org.foree.bookreader.book;
  */
 
 public class Article {
-    String contents;
+    private String title;
+    private String contents;
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
     public String getContents() {
         return contents;
