@@ -14,9 +14,12 @@ import android.view.WindowManager;
 import android.widget.TextView;
 
 import org.foree.bookreader.R;
+import org.foree.bookreader.book.Article;
 import org.foree.bookreader.book.Chapter;
 import org.foree.bookreader.helper.BQGWebSiteHelper;
 import org.foree.bookreader.net.NetCallback;
+import org.foree.bookreader.website.BiQuGeWebInfo;
+import org.foree.bookreader.website.WebInfo;
 
 /**
  * Created by foree on 16-7-21.
@@ -25,7 +28,6 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
     BQGWebSiteHelper apiHelper;
     private static final String TAG = ArticleActivity.class.getSimpleName();
     TextView tvContent,tvTitle;
-    Chapter chapter;
     FloatingActionButton turnNightMode;
     SwipeRefreshLayout mSwipeRefreshLayout;
     private Handler mHandler = new Handler(){
@@ -34,7 +36,7 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
             super.handleMessage(msg);
         }
     };
-    String webChar;
+    String chapterUrl;
     boolean turnFlag = true;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -46,8 +48,7 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
         tvContent = (TextView)findViewById(R.id.tv_content);
         tvTitle = (TextView)findViewById(R.id.tv_title);
         Bundle bundle = getIntent().getExtras();
-        chapter = (Chapter)bundle.getSerializable("chapter");
-        webChar = bundle.getString("web_char");
+        chapterUrl = bundle.getString("url");
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_ly);
         mSwipeRefreshLayout.setOnRefreshListener(this);
 
@@ -78,18 +79,30 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
     }
     private void syncArticleContent(){
         mSwipeRefreshLayout.setRefreshing(true);
-        apiHelper = new BQGWebSiteHelper();
-        apiHelper.getChapterContent(chapter.getUrl(), webChar, new NetCallback<String>() {
+        WebInfo webInfo = new BiQuGeWebInfo();
+        webInfo.getArticle(chapterUrl, new NetCallback<Article>() {
             @Override
-            public void onSuccess(String data) {
-                    updateUI(data);
+            public void onSuccess(Article data) {
+                updateUI(data.getContents());
             }
 
             @Override
             public void onFail(String msg) {
-                updateUI(null);
+
             }
         });
+//        apiHelper = new BQGWebSiteHelper();
+//        apiHelper.getChapterContent(chapter.getUrl(), webChar, new NetCallback<String>() {
+//            @Override
+//            public void onSuccess(String data) {
+//                    updateUI(data);
+//            }
+//
+//            @Override
+//            public void onFail(String msg) {
+//                updateUI(null);
+//            }
+//        });
     }
 
     private void updateUI(final String data){
@@ -100,7 +113,7 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
                 if( data != null){
                     // use textView format
                     tvContent.setText(Html.fromHtml(data));
-                    tvTitle.setText(chapter.getTitle());
+                    //tvTitle.setText(chapter.getTitle());
                     Snackbar.make(mSwipeRefreshLayout, R.string.load_success, Snackbar.LENGTH_SHORT).show();
                 }else{
                     Snackbar.make(mSwipeRefreshLayout, R.string.load_fail , Snackbar.LENGTH_LONG).show();

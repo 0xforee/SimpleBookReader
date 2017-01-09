@@ -28,6 +28,8 @@ import org.foree.bookreader.helper.WebSiteInfo;
 import org.foree.bookreader.net.NetCallback;
 import org.foree.bookreader.service.RefreshService;
 import org.foree.bookreader.ui.fragment.ItemListAdapter;
+import org.foree.bookreader.website.BiQuGeWebInfo;
+import org.foree.bookreader.website.WebInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +44,7 @@ public class ChapterListActivity extends AppCompatActivity implements RefreshSer
     BQGWebSiteHelper absWebSiteHelper;
     WebSiteInfo webSiteInfo;
     private RefreshService.MyBinder mBinder;
+    private String bookUrl;
     private RefreshService mStreamService;
     private ServiceConnection mServiceConnect = new MyServiceConnection();
     private Handler mHandler = new Handler(){
@@ -57,6 +60,9 @@ public class ChapterListActivity extends AppCompatActivity implements RefreshSer
         setContentView(R.layout.activity_chapterlist);
 
         bookDao = new BookDao(this);
+
+        Bundle bundle = getIntent().getExtras();
+        bookUrl = bundle.getString("book_url");
 
         setUpLayoutViews();
 
@@ -107,8 +113,8 @@ public class ChapterListActivity extends AppCompatActivity implements RefreshSer
             public void onItemClick(View view, int position) {
                 Intent intent = new Intent(ChapterListActivity.this, ArticleActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putSerializable("chapter", chapterList.get(position));
-                bundle.putString("web_char",absWebSiteHelper.getWebsiteCharSet());
+                //bundle.putSerializable("chapter", chapterList.get(position));
+                bundle.putString("url",chapterList.get(position).getUrl());
                 intent.putExtras(bundle);
 
                 startActivity(intent);
@@ -123,9 +129,31 @@ public class ChapterListActivity extends AppCompatActivity implements RefreshSer
 
     private void syncChapterList(){
         // downloadNovel
-        webSiteInfo = bookDao.findWebSiteById(2);
-        absWebSiteHelper  = new BQGWebSiteHelper(webSiteInfo);
-        absWebSiteHelper.getNovel(new NetCallback<Book>() {
+//        webSiteInfo = bookDao.findWebSiteById(2);
+//        absWebSiteHelper  = new BQGWebSiteHelper(webSiteInfo);
+//        absWebSiteHelper.getNovel(new NetCallback<Book>() {
+//            @Override
+//            public void onSuccess(final Book data) {
+//                mHandler.postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        chapterList.clear();
+//                        chapterList.addAll(data.getChapter_list());
+//                        bookDao.insertChapterList(chapterList);
+//                        mAdapter.notifyDataSetChanged();
+//                    }
+//                },0);
+//
+//            }
+//
+//            @Override
+//            public void onFail(String msg) {
+//                Toast.makeText(ChapterListActivity.this, "getContentListError: " + msg, Toast.LENGTH_LONG).show();
+//            }
+//        });
+
+        WebInfo webInfo = new BiQuGeWebInfo();
+        webInfo.getBookInfo(bookUrl, new NetCallback<Book>() {
             @Override
             public void onSuccess(final Book data) {
                 mHandler.postDelayed(new Runnable() {
@@ -137,12 +165,11 @@ public class ChapterListActivity extends AppCompatActivity implements RefreshSer
                         mAdapter.notifyDataSetChanged();
                     }
                 },0);
-
             }
 
             @Override
             public void onFail(String msg) {
-                Toast.makeText(ChapterListActivity.this, "getContentListError: " + msg, Toast.LENGTH_LONG).show();
+
             }
         });
     }
