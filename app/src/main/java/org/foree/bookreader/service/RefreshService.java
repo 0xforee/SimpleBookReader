@@ -16,13 +16,14 @@ import android.widget.RemoteViews;
 
 import org.foree.bookreader.R;
 import org.foree.bookreader.base.BaseApplication;
+import org.foree.bookreader.book.Article;
 import org.foree.bookreader.book.Book;
 import org.foree.bookreader.book.Chapter;
 import org.foree.bookreader.dao.BookDao;
-import org.foree.bookreader.helper.BQGWebSiteHelper;
-import org.foree.bookreader.helper.WebSiteInfo;
 import org.foree.bookreader.net.NetCallback;
 import org.foree.bookreader.utils.FileUtils;
+import org.foree.bookreader.website.BiQuGeWebInfo;
+import org.foree.bookreader.website.WebInfo;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,8 +34,6 @@ public class RefreshService extends Service {
 
     private StreamCallBack mCallBack;
     SharedPreferences sp;
-    BQGWebSiteHelper absWebSiteHelper;
-    WebSiteInfo webSiteInfo;
     BookDao bookDao;
     Notification notification;
     int successCount = 0;
@@ -136,24 +135,6 @@ public class RefreshService extends Service {
         notificationManager.notify(R.layout.notification_download, notification);
     }
 
-    public void updateNovelInfo(final long id){
-        // downloadNovel
-        webSiteInfo = bookDao.findWebSiteById(id);
-        absWebSiteHelper  = new BQGWebSiteHelper(webSiteInfo);
-        absWebSiteHelper.getNovel(new NetCallback<Book>() {
-            @Override
-            public void onSuccess(Book data) {
-                mCallBack.notifyUpdateCallBack(data);
-            }
-
-            @Override
-            public void onFail(String msg) {
-                mCallBack.notifyUpdateCallBack(null);
-            }
-        });
-
-    }
-
     // TODO:可能无法准确获取到是否完全下载完成
     public void downloadNovel(List<Chapter> downloadList){
         // downloadNovel
@@ -184,16 +165,15 @@ public class RefreshService extends Service {
 
     // sync data from server
     private void downloadChapter(final Chapter chapter) {
-        webSiteInfo = bookDao.findWebSiteById(2);
-        absWebSiteHelper  = new BQGWebSiteHelper(webSiteInfo);
-        absWebSiteHelper.getChapterContent(chapter.getUrl(), webSiteInfo.getWeb_char(), new NetCallback<String>() {
+        WebInfo webInfo = new BiQuGeWebInfo();
+        webInfo.getArticle(chapter.getUrl(), new NetCallback<Article>() {
             @Override
-            public void onSuccess(String data) {
+            public void onSuccess(Article data) {
                 File chapterCache = new File(BaseApplication.getInstance().getCacheDirString()
                         + File.separator + FileUtils.encodeUrl(chapter.getUrl()));
                 try {
                     if( data != null)
-                        FileUtils.writeFile(chapterCache, data);
+                        FileUtils.writeFile(chapterCache, data.getContents());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -207,7 +187,7 @@ public class RefreshService extends Service {
 
             @Override
             public void onFail(String msg) {
-                Log.e(TAG, "download error " + msg);
+
             }
         });
     }

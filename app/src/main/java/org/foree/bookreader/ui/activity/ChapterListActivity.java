@@ -15,16 +15,13 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import com.igexin.sdk.PushManager;
 
 import org.foree.bookreader.R;
-import org.foree.bookreader.book.Chapter;
 import org.foree.bookreader.book.Book;
+import org.foree.bookreader.book.Chapter;
 import org.foree.bookreader.dao.BookDao;
-import org.foree.bookreader.helper.BQGWebSiteHelper;
-import org.foree.bookreader.helper.WebSiteInfo;
 import org.foree.bookreader.net.NetCallback;
 import org.foree.bookreader.service.RefreshService;
 import org.foree.bookreader.ui.fragment.ItemListAdapter;
@@ -41,8 +38,6 @@ public class ChapterListActivity extends AppCompatActivity implements RefreshSer
     private RecyclerView mRecyclerView;
     private ItemListAdapter mAdapter;
     private List<Chapter> chapterList = new ArrayList<>();
-    BQGWebSiteHelper absWebSiteHelper;
-    WebSiteInfo webSiteInfo;
     private RefreshService.MyBinder mBinder;
     private String bookUrl;
     private RefreshService mStreamService;

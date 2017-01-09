@@ -18,19 +18,14 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.foree.bookreader.R;
-import org.foree.bookreader.base.BaseApplication;
 import org.foree.bookreader.book.Article;
 import org.foree.bookreader.book.Book;
-import org.foree.bookreader.book.Chapter;
 import org.foree.bookreader.dao.BookDao;
-import org.foree.bookreader.helper.BQGWebSiteHelper;
 import org.foree.bookreader.net.NetCallback;
 import org.foree.bookreader.service.RefreshService;
 import org.foree.bookreader.ui.fragment.BookListAdapter;
-import org.foree.bookreader.ui.fragment.ItemListAdapter;
 import org.foree.bookreader.website.BiQuGeWebInfo;
 import org.foree.bookreader.website.WebInfo;
 
@@ -84,12 +79,6 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
         }, 300);
     }
 
-//    @Override
-//    public void onClick(View view) {
-//        Intent intent = new Intent(BookShelfActivity.this, ChapterListActivity.class);
-//        startActivity(intent);
-//    }
-
     @Override
     protected void onDestroy() {
         mRefreshService.unregisterCallBack();
@@ -106,7 +95,7 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
     private void syncNovelInfo() {
         if( mRefreshService != null){
             mSwipeRefreshLayout.setRefreshing(true);
-            mRefreshService.updateNovelInfo(2);
+            //mRefreshService.updateNovelInfo(2);
         }else {
             mSwipeRefreshLayout.setRefreshing(false);
             Snackbar.make(mSwipeRefreshLayout, "出了什么问题，请稍后再试", Snackbar.LENGTH_SHORT).show();
