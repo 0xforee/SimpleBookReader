@@ -6,8 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import org.foree.bookreader.R;
 
+import org.foree.bookreader.R;
 import org.foree.bookreader.book.Book;
 
 import java.util.List;
@@ -38,7 +38,7 @@ public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.MyView
 
     @Override
     public BookListAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        MyViewHolder holder = new MyViewHolder(mLayoutInflater.inflate(R.layout.item_list_holder, parent, false));
+        MyViewHolder holder = new MyViewHolder(mLayoutInflater.inflate(R.layout.novel_card_view, parent, false));
 
         return holder;
     }
@@ -83,7 +83,7 @@ public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.MyView
 
         public MyViewHolder(View view){
             super(view);
-            tvBookName = (TextView)view.findViewById(R.id.tv_item_title);
+            tvBookName = (TextView)view.findViewById(R.id.tv_novel_name);
         }
     }
 }

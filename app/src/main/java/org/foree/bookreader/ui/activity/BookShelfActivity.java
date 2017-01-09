@@ -10,7 +10,6 @@ import android.os.Message;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,14 +19,10 @@ import android.view.View;
 import android.widget.TextView;
 
 import org.foree.bookreader.R;
-import org.foree.bookreader.book.Article;
 import org.foree.bookreader.book.Book;
 import org.foree.bookreader.dao.BookDao;
-import org.foree.bookreader.net.NetCallback;
 import org.foree.bookreader.service.RefreshService;
 import org.foree.bookreader.ui.fragment.BookListAdapter;
-import org.foree.bookreader.website.BiQuGeWebInfo;
-import org.foree.bookreader.website.WebInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +44,6 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
             }
         }
     };
-    CardView cardView;
     Toolbar toolbar;
     private RecyclerView mRecyclerView;
     private BookListAdapter mAdapter;
@@ -127,24 +121,6 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
         mRecyclerView = (RecyclerView) findViewById(R.id.rv_book_list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(this,
-                DividerItemDecoration.VERTICAL_LIST));
-
-        //cardView = (CardView) findViewById(R.id.novel_card);
-        //cardView.setOnClickListener(this);
-
-        WebInfo webInfo = new BiQuGeWebInfo();
-        webInfo.getArticle("http://www.biquge.com/11_11298/7058348.html", new NetCallback<Article>() {
-            @Override
-            public void onSuccess(Article data) {
-
-            }
-
-            @Override
-            public void onFail(String msg) {
-
-            }
-        });
 
         //tvNovelAuthor = (TextView) findViewById(R.id.tv_novel_author);
        // tvNovelCategory = (TextView) findViewById(R.id.tv_novel_category);
