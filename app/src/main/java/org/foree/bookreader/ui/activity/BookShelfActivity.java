@@ -17,13 +17,12 @@ import android.view.View;
 import android.widget.TextView;
 
 import org.foree.bookreader.R;
+import org.foree.bookreader.book.Article;
 import org.foree.bookreader.book.Book;
 import org.foree.bookreader.net.NetCallback;
 import org.foree.bookreader.service.RefreshService;
 import org.foree.bookreader.website.BiQuGeWebInfo;
 import org.foree.bookreader.website.WebInfo;
-
-import java.util.List;
 
 public class BookShelfActivity extends AppCompatActivity implements CardView.OnClickListener, RefreshService.StreamCallBack, SwipeRefreshLayout.OnRefreshListener{
 
@@ -123,14 +122,10 @@ public class BookShelfActivity extends AppCompatActivity implements CardView.OnC
         cardView.setOnClickListener(this);
 
         WebInfo webInfo = new BiQuGeWebInfo();
-        webInfo.searchBook("择天记", new NetCallback<List<Book>>() {
+        webInfo.getArticle("http://www.biquge.com/11_11298/7058348.html", new NetCallback<Article>() {
             @Override
-            public void onSuccess(List<Book> data) {
-                if( data != null){
-                    for(Book book:data){
-                        Log.d(TAG, book.getBook_name());
-                    }
-                }
+            public void onSuccess(Article data) {
+
             }
 
             @Override

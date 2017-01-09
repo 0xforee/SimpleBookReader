@@ -17,19 +17,19 @@ import java.util.List;
  * 数据库操作方法
  * TODO:性能优化，批量操作不使用循环
  */
-public class NovelDao {
-    private static final String TAG = NovelDao.class.getSimpleName();
-    private NovelSQLiteOpenHelper novelSQLiteOpenHelper;
+public class BookDao {
+    private static final String TAG = BookDao.class.getSimpleName();
+    private BookSQLiteOpenHelper bookSQLiteOpenHelper;
 
-    public NovelDao(Context context){
-        novelSQLiteOpenHelper = new NovelSQLiteOpenHelper(context);
+    public BookDao(Context context){
+        bookSQLiteOpenHelper = new BookSQLiteOpenHelper(context);
     }
 
     public void insertWebSite(WebSiteInfo webSiteInfo){
-        SQLiteDatabase db = novelSQLiteOpenHelper.getWritableDatabase();
+        SQLiteDatabase db = bookSQLiteOpenHelper.getWritableDatabase();
         db.beginTransaction();
         ContentValues contentValues = new ContentValues();
-        Cursor cursor = db.query(NovelSQLiteOpenHelper.DB_TABLE_WEBSITES, new String[]{"host_url"},
+        Cursor cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_WEBSITES, new String[]{"host_url"},
                 "host_url=?", new String[]{webSiteInfo.getHost_url()}, null, null, null);
         if (cursor.getCount() == 0) {
             // 内容不重复
@@ -37,7 +37,7 @@ public class NovelDao {
             contentValues.put("index_page", webSiteInfo.getIndex_page());
             contentValues.put("host_url", webSiteInfo.getHost_url());
             contentValues.put("web_char", webSiteInfo.getWeb_char());
-            if (db.insert(NovelSQLiteOpenHelper.DB_TABLE_WEBSITES, null, contentValues) == -1) {
+            if (db.insert(BookSQLiteOpenHelper.DB_TABLE_WEBSITES, null, contentValues) == -1) {
                 Log.e(TAG, "Database insert id: " + webSiteInfo.getHost_url() + " error");
             }
         }
@@ -50,10 +50,10 @@ public class NovelDao {
         Log.d(TAG, "get website from db");
         Cursor cursor;
         List<WebSiteInfo> webSiteInfoList = new ArrayList<>();
-        SQLiteDatabase db = novelSQLiteOpenHelper.getReadableDatabase();
+        SQLiteDatabase db = bookSQLiteOpenHelper.getReadableDatabase();
         db.beginTransaction();
 
-        cursor = db.query(NovelSQLiteOpenHelper.DB_TABLE_WEBSITES, null,
+        cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_WEBSITES, null,
                     null, null, null, null, null);
         while(cursor.moveToNext()){
             long id = cursor.getLong(cursor.getColumnIndex("id"));
@@ -75,10 +75,10 @@ public class NovelDao {
     public WebSiteInfo findWebSiteById(long id){
         Log.d(TAG, "get website from db, id = " + id);
         Cursor cursor;
-        SQLiteDatabase db = novelSQLiteOpenHelper.getReadableDatabase();
+        SQLiteDatabase db = bookSQLiteOpenHelper.getReadableDatabase();
         db.beginTransaction();
 
-        cursor = db.query(NovelSQLiteOpenHelper.DB_TABLE_WEBSITES, null,
+        cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_WEBSITES, null,
                 "id=?", new String[]{id +""}, null, null, null);
         cursor.moveToNext();
         String name = cursor.getString(cursor.getColumnIndex("name"));
@@ -108,18 +108,18 @@ public class NovelDao {
     }
 
     private void insertInternal(List<Chapter> subItemList){
-        SQLiteDatabase db = novelSQLiteOpenHelper.getWritableDatabase();
+        SQLiteDatabase db = bookSQLiteOpenHelper.getWritableDatabase();
         db.beginTransaction();
         ContentValues contentValues = new ContentValues();
         for (Chapter chapter : subItemList) {
             // 内容不重复
-            Cursor cursor = db.query(NovelSQLiteOpenHelper.DB_TABLE_CHAPTERS, null,
+            Cursor cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_CHAPTERS, null,
                     "url=?", new String[]{chapter.getUrl()}, null, null, null);
             if (cursor.getCount() == 0) {
                 contentValues.put("title", chapter.getTitle());
                 contentValues.put("host_url", chapter.getHostUrl());
                 contentValues.put("url", chapter.getUrl());
-                if (db.insert(NovelSQLiteOpenHelper.DB_TABLE_CHAPTERS, null, contentValues) == -1) {
+                if (db.insert(BookSQLiteOpenHelper.DB_TABLE_CHAPTERS, null, contentValues) == -1) {
                     Log.e(TAG, "Database insert url: " + chapter.getUrl() + " error");
                 }
             }
@@ -134,10 +134,10 @@ public class NovelDao {
         Log.d(TAG, "get chapterList from db, hostUrl = " + hostUrl);
         Cursor cursor;
         List<org.foree.bookreader.book.Chapter> chapterList = new ArrayList<>();
-        SQLiteDatabase db = novelSQLiteOpenHelper.getReadableDatabase();
+        SQLiteDatabase db = bookSQLiteOpenHelper.getReadableDatabase();
         db.beginTransaction();
 
-        cursor = db.query(NovelSQLiteOpenHelper.DB_TABLE_WEBSITES, null,
+        cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_WEBSITES, null,
                 "host_url=?", new String[]{hostUrl}, null, null, null);
         while(cursor.moveToNext()){
             String title = cursor.getString(cursor.getColumnIndex("title"));
@@ -159,7 +159,7 @@ public class NovelDao {
 //     * @param table 表名称
 //     */
 //    public void cleanTable(String table){
-//        SQLiteDatabase db = novelSQLiteOpenHelper.getWritableDatabase();
+//        SQLiteDatabase db = bookSQLiteOpenHelper.getWritableDatabase();
 //        db.delete(table, null, null);
 //        db.close();
 //    }
@@ -169,11 +169,11 @@ public class NovelDao {
 //     */
 //    public int update(String id, boolean newValue){
 //
-//        SQLiteDatabase db = novelSQLiteOpenHelper.getReadableDatabase();
+//        SQLiteDatabase db = bookSQLiteOpenHelper.getReadableDatabase();
 //        ContentValues contentValues = new ContentValues();
 //        contentValues.put("unread", newValue);
 //
-//        int result = db.update(NovelSQLiteOpenHelper.DB_TABLE_ENTRIES, contentValues, "id=?", new String[]{id});
+//        int result = db.update(BookSQLiteOpenHelper.DB_TABLE_ENTRIES, contentValues, "id=?", new String[]{id});
 //
 //        db.close();
 //
@@ -186,8 +186,8 @@ public class NovelDao {
 //     */
 //    public int delete(String id){
 //
-//        SQLiteDatabase db = novelSQLiteOpenHelper.getReadableDatabase();
-//        int result = db.delete(NovelSQLiteOpenHelper.DB_TABLE_ENTRIES, "id=?", new String[]{id});
+//        SQLiteDatabase db = bookSQLiteOpenHelper.getReadableDatabase();
+//        int result = db.delete(BookSQLiteOpenHelper.DB_TABLE_ENTRIES, "id=?", new String[]{id});
 //        db.close();
 //        return result;
 //    }
@@ -198,9 +198,9 @@ public class NovelDao {
 //     */
 //    public int deleteSome(List<RssItem> itemList){
 //        int result = 0;
-//        SQLiteDatabase db = novelSQLiteOpenHelper.getReadableDatabase();
+//        SQLiteDatabase db = bookSQLiteOpenHelper.getReadableDatabase();
 //        for(RssItem item: itemList) {
-//            result = db.delete(NovelSQLiteOpenHelper.DB_TABLE_ENTRIES, "id=?", new String[]{item.getEntryId()});
+//            result = db.delete(BookSQLiteOpenHelper.DB_TABLE_ENTRIES, "id=?", new String[]{item.getEntryId()});
 //        }
 //        db.close();
 //        return result;

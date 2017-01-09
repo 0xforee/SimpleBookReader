@@ -6,7 +6,7 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import org.foree.bookreader.dao.NovelDao;
+import org.foree.bookreader.dao.BookDao;
 import org.foree.bookreader.helper.WebSiteInfo;
 
 import java.io.File;
@@ -74,15 +74,15 @@ public class BaseApplication extends Application{
     }
 
     private void initWebSites(){
-        NovelDao novelDao = new NovelDao(this);
+        BookDao bookDao = new BookDao(this);
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(BaseApplication.getInstance());
         if(sp.getBoolean("first_run", true)) {
             WebSiteInfo webSiteInfo1 = new WebSiteInfo("笔趣阁", "http://www.biquge.com", "/0_168/", "utf-8");
             WebSiteInfo webSiteInfo2 = new WebSiteInfo("笔趣阁LA", "http://www.biquge.la", "/book/168/", "gbk");
 
-            novelDao.insertWebSite(webSiteInfo1);
-            novelDao.insertWebSite(webSiteInfo2);
+            bookDao.insertWebSite(webSiteInfo1);
+            bookDao.insertWebSite(webSiteInfo2);
 
             sp.edit().putBoolean("first_run", false).apply();
         }

@@ -22,7 +22,7 @@ import com.igexin.sdk.PushManager;
 import org.foree.bookreader.R;
 import org.foree.bookreader.book.Chapter;
 import org.foree.bookreader.book.Book;
-import org.foree.bookreader.dao.NovelDao;
+import org.foree.bookreader.dao.BookDao;
 import org.foree.bookreader.helper.BQGWebSiteHelper;
 import org.foree.bookreader.helper.WebSiteInfo;
 import org.foree.bookreader.net.NetCallback;
@@ -34,7 +34,7 @@ import java.util.List;
 
 public class ChapterListActivity extends AppCompatActivity implements RefreshService.StreamCallBack{
     Toolbar toolbar;
-    NovelDao novelDao;
+    BookDao bookDao;
     FloatingActionButton testFloatingButton;
     private RecyclerView mRecyclerView;
     private ItemListAdapter mAdapter;
@@ -56,7 +56,7 @@ public class ChapterListActivity extends AppCompatActivity implements RefreshSer
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chapterlist);
 
-        novelDao = new NovelDao(this);
+        bookDao = new BookDao(this);
 
         setUpLayoutViews();
 
@@ -123,7 +123,7 @@ public class ChapterListActivity extends AppCompatActivity implements RefreshSer
 
     private void syncChapterList(){
         // downloadNovel
-        webSiteInfo = novelDao.findWebSiteById(2);
+        webSiteInfo = bookDao.findWebSiteById(2);
         absWebSiteHelper  = new BQGWebSiteHelper(webSiteInfo);
         absWebSiteHelper.getNovel(new NetCallback<Book>() {
             @Override
@@ -133,7 +133,7 @@ public class ChapterListActivity extends AppCompatActivity implements RefreshSer
                     public void run() {
                         chapterList.clear();
                         chapterList.addAll(data.getChapter_list());
-                        novelDao.insertChapterList(chapterList);
+                        bookDao.insertChapterList(chapterList);
                         mAdapter.notifyDataSetChanged();
                     }
                 },0);

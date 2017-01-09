@@ -18,7 +18,7 @@ import org.foree.bookreader.R;
 import org.foree.bookreader.base.BaseApplication;
 import org.foree.bookreader.book.Book;
 import org.foree.bookreader.book.Chapter;
-import org.foree.bookreader.dao.NovelDao;
+import org.foree.bookreader.dao.BookDao;
 import org.foree.bookreader.helper.BQGWebSiteHelper;
 import org.foree.bookreader.helper.WebSiteInfo;
 import org.foree.bookreader.net.NetCallback;
@@ -35,7 +35,7 @@ public class RefreshService extends Service {
     SharedPreferences sp;
     BQGWebSiteHelper absWebSiteHelper;
     WebSiteInfo webSiteInfo;
-    NovelDao novelDao;
+    BookDao bookDao;
     Notification notification;
     int successCount = 0;
     int failCount = 0;
@@ -89,7 +89,7 @@ public class RefreshService extends Service {
     public void onCreate() {
         super.onCreate();
         Log.d(TAG, "onCreate");
-        novelDao = new NovelDao(this);
+        bookDao = new BookDao(this);
         sp = PreferenceManager.getDefaultSharedPreferences(BaseApplication.getInstance());
     }
 
@@ -138,7 +138,7 @@ public class RefreshService extends Service {
 
     public void updateNovelInfo(final long id){
         // downloadNovel
-        webSiteInfo = novelDao.findWebSiteById(id);
+        webSiteInfo = bookDao.findWebSiteById(id);
         absWebSiteHelper  = new BQGWebSiteHelper(webSiteInfo);
         absWebSiteHelper.getNovel(new NetCallback<Book>() {
             @Override
@@ -184,7 +184,7 @@ public class RefreshService extends Service {
 
     // sync data from server
     private void downloadChapter(final Chapter chapter) {
-        webSiteInfo = novelDao.findWebSiteById(2);
+        webSiteInfo = bookDao.findWebSiteById(2);
         absWebSiteHelper  = new BQGWebSiteHelper(webSiteInfo);
         absWebSiteHelper.getChapterContent(chapter.getUrl(), webSiteInfo.getWeb_char(), new NetCallback<String>() {
             @Override
