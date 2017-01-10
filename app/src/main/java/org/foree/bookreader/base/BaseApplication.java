@@ -77,21 +77,7 @@ public class BaseApplication extends Application{
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(BaseApplication.getInstance());
         if(sp.getBoolean("first_run", true)) {
 
-            addBooks();
-
             sp.edit().putBoolean("first_run", false).apply();
         }
-    }
-
-    public void addBooks(){
-        BookDao bookDao = new BookDao(this);
-
-        Book wxt = new Book("五行天", "http://www.biquge.com/11_11298/");
-        Book ztj = new Book("择天记", "http://www.biquge.com/0_168/");
-        Book xylz = new Book("雪鹰领主","http://www.biquge.com/5_5094/");
-
-        bookDao.addBookInfo(wxt);
-        bookDao.addBookInfo(ztj);
-        bookDao.addBookInfo(xylz);
     }
 }
