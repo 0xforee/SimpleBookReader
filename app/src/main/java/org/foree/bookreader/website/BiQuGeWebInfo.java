@@ -55,26 +55,29 @@ public class BiQuGeWebInfo extends WebInfo {
         Book book = new Book();
         Chapter newestChapter = new Chapter();
 
-        Elements updates = doc.select("[property~=og:book*]");
+        Elements updates = doc.select("[property~=og:novel*]");
         for(Element update: updates){
             Log.i(TAG, update.toString());
             switch (update.attr("property")){
-                case "og:book:category":
+                case "og:novel:category":
                     book.setCategory(update.attr("content"));
                     break;
-                case "og:book:author":
+                case "og:novel:author":
                     book.setAuthor(update.attr("content"));
                     break;
-                case "og:book:book_name":
+                case "og:novel:book_name":
                     book.setBookName(update.attr("content"));
                     break;
-                case "og:book:update_time":
+                case "og:novel:read_url":
+                    book.setBookUrl(update.attr("content"));
+                    break;
+                case "og:novel:update_time":
                     book.setUpdateTime(update.attr("content"));
                     break;
-                case "og:book:latest_chapter_name":
+                case "og:novel:latest_chapter_name":
                     newestChapter.setChapterTitle(update.attr("content"));
                     break;
-                case "og:book:latest_chapter_url":
+                case "og:novel:latest_chapter_url":
                     newestChapter.setChapterUrl(update.attr("content"));
                     break;
             }
@@ -88,8 +91,14 @@ public class BiQuGeWebInfo extends WebInfo {
         Elements elements_a = contents.getElementsByTag("a");
         for(Element link: elements_a){
             Chapter chapter = new Chapter();
+
             chapter.setChapterTitle(link.text());
             chapter.setChapterUrl(url + link.attr("href"));
+            // set bookUrl
+            chapter.setBookUrl(book.getBookUrl());
+            // set chapterId for sort
+            chapter.setChapterId(getChapterId(link.attr("href")));
+
             //Log.i("HH", link.text());
             //Log.i("HH", link.attr("href"));
             chapters.add(chapter);
@@ -98,6 +107,13 @@ public class BiQuGeWebInfo extends WebInfo {
         book.setChapterList(chapters);
 
         return book;
+    }
+
+    private int getChapterId(String url) {
+        // convert http://m.bxwx9.org/0_168/2512063.html ==> 2512063
+
+        String[] subString = url.split("/|\\.");
+        return Integer.parseInt(subString[subString.length-2]);
     }
 
     @Override
