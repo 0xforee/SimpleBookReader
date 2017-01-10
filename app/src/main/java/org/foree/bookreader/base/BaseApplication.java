@@ -86,7 +86,7 @@ public class BaseApplication extends Application{
     public void addBooks(){
         BookDao bookDao = new BookDao(this);
 
-        Book wxt = new Book("五行天", "http://www.biquge.com/11_11298");
+        Book wxt = new Book("五行天", "http://www.biquge.com/11_11298/");
         Book ztj = new Book("择天记", "http://www.biquge.com/0_168/");
         Book xylz = new Book("雪鹰领主","http://www.biquge.com/5_5094/");
 

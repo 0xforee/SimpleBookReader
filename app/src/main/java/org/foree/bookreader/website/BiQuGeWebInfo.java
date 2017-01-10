@@ -103,7 +103,6 @@ public class BiQuGeWebInfo extends WebInfo {
             //Log.i("HH", link.attr("href"));
             chapters.add(chapter);
         }
-        Collections.reverse(chapters);
         book.setChapterList(chapters);
 
         return book;

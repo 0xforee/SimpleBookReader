@@ -123,30 +123,6 @@ public class ChapterListActivity extends AppCompatActivity implements RefreshSer
     }
 
     private void syncChapterList(){
-        // downloadNovel
-//        webSiteInfo = bookDao.findWebSiteById(2);
-//        absWebSiteHelper  = new BQGWebSiteHelper(webSiteInfo);
-//        absWebSiteHelper.getNovel(new NetCallback<Book>() {
-//            @Override
-//            public void onSuccess(final Book data) {
-//                mHandler.postDelayed(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        chapterList.clear();
-//                        chapterList.addAll(data.getChapterList());
-//                        bookDao.insertChapterList(chapterList);
-//                        mAdapter.notifyDataSetChanged();
-//                    }
-//                },0);
-//
-//            }
-//
-//            @Override
-//            public void onFail(String msg) {
-//                Toast.makeText(ChapterListActivity.this, "getContentListError: " + msg, Toast.LENGTH_LONG).show();
-//            }
-//        });
-
         WebInfo webInfo = new BiQuGeWebInfo();
         webInfo.getBookInfo(bookUrl, new NetCallback<Book>() {
             @Override
@@ -154,9 +130,9 @@ public class ChapterListActivity extends AppCompatActivity implements RefreshSer
                 mHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
+                        bookDao.insertChapterList(data.getChapterList());
                         chapterList.clear();
-                        chapterList.addAll(data.getChapterList());
-                        bookDao.insertChapterList(chapterList);
+                        chapterList.addAll(bookDao.findChapterListByBookUrl(bookUrl));
                         mAdapter.notifyDataSetChanged();
                     }
                 },0);

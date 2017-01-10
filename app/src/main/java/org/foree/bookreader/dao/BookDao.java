@@ -126,8 +126,9 @@ public class BookDao {
         SQLiteDatabase db = bookSQLiteOpenHelper.getReadableDatabase();
         db.beginTransaction();
 
+        // chapter_id sort by desc or asc
         cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_CHAPTER_LIST, null,
-                "book_url=?", new String[]{bookUrl}, null, null, null);
+                "book_url=?", new String[]{bookUrl}, null, null, "chapter_id desc");
         while (cursor.moveToNext()) {
             String title = cursor.getString(cursor.getColumnIndex("chapter_title"));
             String url = cursor.getString(cursor.getColumnIndex("chapter_url"));
