@@ -8,6 +8,7 @@ import android.util.Log;
 
 import org.foree.bookreader.book.Book;
 import org.foree.bookreader.book.Chapter;
+import org.foree.bookreader.ui.activity.BookShelfActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,6 +71,20 @@ public class BookDao {
         db.close();
     }
 
+    public void removeBookInfo(String book_url){
+        SQLiteDatabase db = bookSQLiteOpenHelper.getWritableDatabase();
+        Cursor cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_BOOK_LIST, null,
+                "book_url=?", new String[]{book_url}, null, null, null);
+        if (cursor.getCount() != 0) {
+            if(db.delete(BookSQLiteOpenHelper.DB_TABLE_BOOK_LIST, "book_url=?", new String[]{book_url}) == -1 ){
+                Log.e(TAG, "delete book_url:" + book_url + " error");
+            }
+        }
+
+        cursor.close();
+        db.close();
+    }
+
     public void insertChapterList(List<Chapter> chapterList){
         synchronized (this) {
             int tmp = 1;
@@ -106,15 +121,15 @@ public class BookDao {
         db.close();
     }
 
-    public List<Chapter> findChapterByHostUrl(String hostUrl){
-        Log.d(TAG, "get chapterList from db, hostUrl = " + hostUrl);
+    public List<Chapter> findChapterListByBookUrl(String bookUrl){
+        Log.d(TAG, "get chapterList from db, bookUrl = " + bookUrl);
         Cursor cursor;
-        List<org.foree.bookreader.book.Chapter> chapterList = new ArrayList<>();
+        List<Chapter> chapterList = new ArrayList<>();
         SQLiteDatabase db = bookSQLiteOpenHelper.getReadableDatabase();
         db.beginTransaction();
 
-        cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_WEBSITES, null,
-                "host_url=?", new String[]{hostUrl}, null, null, null);
+        cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_CHAPTERS, null,
+                "host_url=?", new String[]{bookUrl}, null, null, null);
         while(cursor.moveToNext()){
             String title = cursor.getString(cursor.getColumnIndex("title"));
             String host_url = cursor.getString(cursor.getColumnIndex("host_url"));

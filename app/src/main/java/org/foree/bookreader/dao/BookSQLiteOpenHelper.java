@@ -13,8 +13,7 @@ public class BookSQLiteOpenHelper extends SQLiteOpenHelper{
     private static final String TAG = BookSQLiteOpenHelper.class.getSimpleName();
     public static final int DB_VERSION = 1;
     public static final String DB_NAME = "bookreader.db";
-    public static final String DB_TABLE_WEBSITES = "websites";
-    public static final String DB_TABLE_CHAPTERS = "chapters";
+    public static final String DB_TABLE_CHAPTERS = "chapter_list";
     public static final String DB_TABLE_BOOK_LIST = "book_list";
 
     public BookSQLiteOpenHelper(Context context) {
@@ -46,20 +45,12 @@ public class BookSQLiteOpenHelper extends SQLiteOpenHelper{
     }
 
     private void createEntriesTable(SQLiteDatabase db) {
-        db.execSQL("create table websites(" +
+        //章节有对应的book_url, chapter_url的md5为章节内容的缓存文件名称
+        db.execSQL("create table chapter_list(" +
                 "id integer primary key autoincrement," +
-                "name varchar(255), " +
-                "host_url varchar(255), " +
-                "index_page varchar(255), " +
-                "web_char varchar(255)" +
-                ")"
-        );
-
-        db.execSQL("create table chapters(" +
-                "url varchar(255) primary key," +
-                "host_url varchar(255)," +
-                "title varchar(255)," +
-                "content varchar," +
+                "chapter_url varchar(255) unique," +
+                "book_url varchar(255) unique," +
+                "chapter_title varchar(255)," +
                 "offline integer," +
                 "read integer" +
                 ")"
