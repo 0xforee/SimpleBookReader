@@ -9,5 +9,6 @@
     <string name="load_success">加载成功</string>
     <string name="load_fail">"获取数据失败，请下拉刷新重新获取"</string>
     <string name="search_title">搜索</string>
-    <string name="search_hint">书名</string>
+    <string name="search_hint">搜索小说</string>
+    <string name="action_about">关于</string>
 </resources>
