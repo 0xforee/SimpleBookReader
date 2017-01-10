@@ -8,7 +8,6 @@ import android.util.Log;
 
 import org.foree.bookreader.book.Book;
 import org.foree.bookreader.book.Chapter;
-import org.foree.bookreader.ui.activity.BookShelfActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,13 +56,13 @@ public class BookDao {
         ContentValues contentValues = new ContentValues();
 
         // 内容不重复
-        contentValues.put("book_url", book.getUrl());
+        contentValues.put("book_url", book.getBookUrl());
         contentValues.put("book_name", book.getBookName());
         contentValues.put("update_time", book.getUpdateTime());
         contentValues.put("category", book.getCategory());
         contentValues.put("author", book.getAuthor());
         if (db.insertWithOnConflict(BookSQLiteOpenHelper.DB_TABLE_BOOK_LIST, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE) == -1) {
-            Log.e(TAG, "Database insert id: " + book.getUrl() + " error");
+            Log.e(TAG, "Database insert id: " + book.getBookUrl() + " error");
         }
 
         db.setTransactionSuccessful();
@@ -104,18 +103,14 @@ public class BookDao {
         ContentValues contentValues = new ContentValues();
         for (Chapter chapter : subItemList) {
             // 内容不重复
-            Cursor cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_CHAPTERS, null,
-                    "url=?", new String[]{chapter.getUrl()}, null, null, null);
-            if (cursor.getCount() == 0) {
-                contentValues.put("title", chapter.getTitle());
-                contentValues.put("host_url", chapter.getHostUrl());
-                contentValues.put("url", chapter.getUrl());
-                if (db.insert(BookSQLiteOpenHelper.DB_TABLE_CHAPTERS, null, contentValues) == -1) {
-                    Log.e(TAG, "Database insert url: " + chapter.getUrl() + " error");
+                contentValues.put("chapter_title", chapter.getChapterTitle());
+                contentValues.put("chapter_url", chapter.getChapterUrl());
+                if (db.insertWithOnConflict(BookSQLiteOpenHelper.DB_TABLE_CHAPTER_LIST, null,
+                        contentValues, SQLiteDatabase.CONFLICT_REPLACE) == -1) {
+                    Log.e(TAG, "Database insert chapter_url: " + chapter.getChapterUrl() + " error");
                 }
-            }
-            cursor.close();
         }
+
         db.setTransactionSuccessful();
         db.endTransaction();
         db.close();
@@ -128,13 +123,12 @@ public class BookDao {
         SQLiteDatabase db = bookSQLiteOpenHelper.getReadableDatabase();
         db.beginTransaction();
 
-        cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_CHAPTERS, null,
-                "host_url=?", new String[]{bookUrl}, null, null, null);
+        cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_CHAPTER_LIST, null,
+                "book_url=?", new String[]{bookUrl}, null, null, null);
         while(cursor.moveToNext()){
-            String title = cursor.getString(cursor.getColumnIndex("title"));
-            String host_url = cursor.getString(cursor.getColumnIndex("host_url"));
-            String url = cursor.getString(cursor.getColumnIndex("url"));
-            Chapter chapter = new Chapter(title, url, host_url);
+            String title = cursor.getString(cursor.getColumnIndex("chapter_title"));
+            String url = cursor.getString(cursor.getColumnIndex("chapter_url"));
+            Chapter chapter = new Chapter(title, url);
             chapterList.add(chapter);
 
         }

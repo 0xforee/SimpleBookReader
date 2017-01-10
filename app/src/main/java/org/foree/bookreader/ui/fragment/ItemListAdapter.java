@@ -46,7 +46,7 @@ public class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.MyView
     @Override
     public void onBindViewHolder(final ItemListAdapter.MyViewHolder holder, int position) {
         if( chapterList != null && !chapterList.isEmpty())
-            holder.tvTitle.setText(chapterList.get(position).getTitle());
+            holder.tvTitle.setText(chapterList.get(position).getChapterTitle());
 
         // 如果设置了回调，则设置点击事件
         if (mOnItemClickListener != null)

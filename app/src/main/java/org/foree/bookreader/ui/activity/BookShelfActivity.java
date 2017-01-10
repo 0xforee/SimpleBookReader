@@ -143,7 +143,7 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
             public void onItemClick(View view, int position) {
                 Intent intent = new Intent(BookShelfActivity.this, ChapterListActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putString("book_url",bookList.get(position).getUrl());
+                bundle.putString("book_url",bookList.get(position).getBookUrl());
                 intent.putExtras(bundle);
 
                 startActivity(intent);
@@ -157,7 +157,7 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
     }
 
     private void refreshNovelViews(Book book){
-//        tvNovelUpdateChapter.setText(getString(R.string.update_chapter_string) + book.getNewestChapter().getTitle());
+//        tvNovelUpdateChapter.setText(getString(R.string.update_chapter_string) + book.getNewestChapter().getChapterTitle());
  //       tvNovelUpdateTime.setText(getString(R.string.update_time_string) + book.getUpdateTime());
     }
 

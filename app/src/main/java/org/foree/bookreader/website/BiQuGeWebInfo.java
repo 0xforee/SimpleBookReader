@@ -43,7 +43,7 @@ public class BiQuGeWebInfo extends WebInfo {
             Log.d(TAG, title.attr("title"));
 
             book.setBookName(title.attr("title"));
-            book.setUrl(title.attr("href"));
+            book.setBookUrl(title.attr("href"));
             bookList.add(book);
 
         }
@@ -72,10 +72,10 @@ public class BiQuGeWebInfo extends WebInfo {
                     book.setUpdateTime(update.attr("content"));
                     break;
                 case "og:book:latest_chapter_name":
-                    newestChapter.setTitle(update.attr("content"));
+                    newestChapter.setChapterTitle(update.attr("content"));
                     break;
                 case "og:book:latest_chapter_url":
-                    newestChapter.setUrl(update.attr("content"));
+                    newestChapter.setChapterUrl(update.attr("content"));
                     break;
             }
         }
@@ -88,8 +88,8 @@ public class BiQuGeWebInfo extends WebInfo {
         Elements elements_a = contents.getElementsByTag("a");
         for(Element link: elements_a){
             Chapter chapter = new Chapter();
-            chapter.setTitle(link.text());
-            chapter.setUrl(url + link.attr("href"));
+            chapter.setChapterTitle(link.text());
+            chapter.setChapterUrl(url + link.attr("href"));
             //Log.i("HH", link.text());
             //Log.i("HH", link.attr("href"));
             chapters.add(chapter);

@@ -109,7 +109,7 @@ public class ChapterListActivity extends AppCompatActivity implements RefreshSer
                 Intent intent = new Intent(ChapterListActivity.this, ArticleActivity.class);
                 Bundle bundle = new Bundle();
                 //bundle.putSerializable("chapter", chapterList.get(position));
-                bundle.putString("url",chapterList.get(position).getUrl());
+                bundle.putString("url",chapterList.get(position).getChapterUrl());
                 intent.putExtras(bundle);
 
                 startActivity(intent);

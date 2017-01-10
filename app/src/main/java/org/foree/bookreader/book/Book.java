@@ -10,19 +10,19 @@ public class Book {
     private String updateTime;
     private String category;
     private String author;
-    private String url;
+    private String bookUrl;
     private List<Chapter> chapterList;
     private Chapter newestChapter;
 
     public Book() {
     }
 
-    public Book(String bookName, String url) {
-        this(bookName, url, "", "", "");
+    public Book(String bookName, String bookUrl) {
+        this(bookName, bookUrl, "", "", "");
     }
 
-    public Book(String bookName, String url, String updateTime, String category, String author) {
-        this.url = url;
+    public Book(String bookName, String bookUrl, String updateTime, String category, String author) {
+        this.bookUrl = bookUrl;
         this.bookName = bookName;
         this.updateTime = updateTime;
         this.category = category;
@@ -78,12 +78,12 @@ public class Book {
     }
 
 
-    public String getUrl() {
-        return url;
+    public String getBookUrl() {
+        return bookUrl;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setBookUrl(String bookUrl) {
+        this.bookUrl = bookUrl;
     }
 
 }

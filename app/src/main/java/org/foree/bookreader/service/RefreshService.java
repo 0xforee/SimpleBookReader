@@ -166,11 +166,11 @@ public class RefreshService extends Service {
     // sync data from server
     private void downloadChapter(final Chapter chapter) {
         WebInfo webInfo = new BiQuGeWebInfo();
-        webInfo.getArticle(chapter.getUrl(), new NetCallback<Article>() {
+        webInfo.getArticle(chapter.getChapterUrl(), new NetCallback<Article>() {
             @Override
             public void onSuccess(Article data) {
                 File chapterCache = new File(BaseApplication.getInstance().getCacheDirString()
-                        + File.separator + FileUtils.encodeUrl(chapter.getUrl()));
+                        + File.separator + FileUtils.encodeUrl(chapter.getChapterUrl()));
                 try {
                     if( data != null)
                         FileUtils.writeFile(chapterCache, data.getContents());

@@ -6,38 +6,29 @@ import java.io.Serializable;
  * Created by foree on 16-7-26.
  */
 public class Chapter implements Serializable{
-    private String hostUrl;
-    private String title;
-    private String url;
+    private String chapterTitle;
+    private String chapterUrl;
 
     public Chapter(){}
 
-    public Chapter(String title, String url, String hostUrl) {
-        this.hostUrl = hostUrl;
-        this.title = title;
-        this.url = url;
+    public Chapter(String chapterTitle, String chapterUrl) {
+        this.chapterTitle = chapterTitle;
+        this.chapterUrl = chapterUrl;
     }
 
-    public String getHostUrl() {
-        return hostUrl;
+    public String getChapterTitle() {
+        return chapterTitle;
     }
 
-    public void setHostUrl(String hostUrl) {
-        this.hostUrl = hostUrl;
-    }
-    public String getTitle() {
-        return title;
+    public void setChapterTitle(String chapterTitle) {
+        this.chapterTitle = chapterTitle;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public String getChapterUrl() {
+        return chapterUrl;
     }
 
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
+    public void setChapterUrl(String chapterUrl) {
+        this.chapterUrl = chapterUrl;
     }
 }

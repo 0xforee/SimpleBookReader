@@ -13,7 +13,7 @@ public class BookSQLiteOpenHelper extends SQLiteOpenHelper{
     private static final String TAG = BookSQLiteOpenHelper.class.getSimpleName();
     public static final int DB_VERSION = 1;
     public static final String DB_NAME = "bookreader.db";
-    public static final String DB_TABLE_CHAPTERS = "chapter_list";
+    public static final String DB_TABLE_CHAPTER_LIST = "chapter_list";
     public static final String DB_TABLE_BOOK_LIST = "book_list";
 
     public BookSQLiteOpenHelper(Context context) {
