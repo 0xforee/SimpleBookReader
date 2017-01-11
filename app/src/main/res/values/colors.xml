@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#1CAF9A</color>
-    <color name="colorPrimaryDark">#1CAF9A</color>
-    <color name="colorAccent">#991CAF9A</color>
+    <color name="colorPrimary">#03A9F4</color>
+    <color name="colorPrimaryDark">#03A9F4</color>
+    <color name="colorAccent">#1CAF9A</color>
     <color name="colorPrimaryLight">#C4C9E8</color>
     <color name="gainsboro">#DCDCDC</color>
     <color name="dayTextColor">#000000</color>
