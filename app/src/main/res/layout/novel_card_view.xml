@@ -12,7 +12,7 @@
         android:clickable="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="14dp"
+        android:layout_margin="5dp"
         android:foreground="?attr/selectableItemBackground">
 
         <LinearLayout

@@ -42,14 +42,14 @@ public class SearchResultsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search_results);
+        setContentView(R.layout.activity_book_shelf);
         setUpLayoutViews();
         handlerIntent(getIntent());
 
     }
 
     private void setUpLayoutViews() {
-        mRecyclerView = (RecyclerView) findViewById(R.id.rv_search_list);
+        mRecyclerView = (RecyclerView) findViewById(R.id.rv_book_list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
