@@ -14,21 +14,24 @@ public class Book {
     private List<Chapter> chapterList;
     private String description;
     private Chapter newestChapter;
+    // recentChapterId默认为-1，在openBook时检查病初始化
+    private int recentChapterId;
 
     public Book() {
     }
 
     public Book(String bookName, String bookUrl) {
-        this(bookName, bookUrl, "", "", "", "");
+        this(bookName, bookUrl, "", "", "", "", -1);
     }
 
-    public Book(String bookName, String bookUrl, String updateTime, String category, String author, String description) {
+    public Book(String bookName, String bookUrl, String updateTime, String category, String author, String description, int recentChapterId) {
         this.bookUrl = bookUrl;
         this.bookName = bookName;
         this.updateTime = updateTime;
         this.category = category;
         this.author = author;
         this.description = description;
+        this.recentChapterId = recentChapterId;
     }
 
     public String getBookName() {
@@ -96,4 +99,11 @@ public class Book {
         this.bookUrl = bookUrl;
     }
 
+    public int getRecentChapterId() {
+        return recentChapterId;
+    }
+
+    public void setRecentChapterId(int recentChapterId) {
+        this.recentChapterId = recentChapterId;
+    }
 }

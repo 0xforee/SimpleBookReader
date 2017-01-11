@@ -1,6 +1,5 @@
 package org.foree.bookreader.ui.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -19,9 +18,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
@@ -59,26 +55,23 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
     boolean turnFlag = true;
     private PopupWindow popupWindow;
     private View rootView;
-    private ListView lv;
-    private ListAdapter lvAdapter;
+    private BookDao bookDao;
+    private int recentChapterId = -1;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_article);
 
+        bookUrl = getIntent().getExtras().getString("book_url");
+
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        tvContent = (TextView)findViewById(R.id.tv_content);
-        tvTitle = (TextView)findViewById(R.id.tv_title);
-        Bundle bundle = getIntent().getExtras();
-        chapterUrl = bundle.getString("url");
-        bookUrl = bundle.getString("book_url");
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_ly);
-        mSwipeRefreshLayout.setOnRefreshListener(this);
+        setUpLayoutViews();
 
-        // get FloatActionButton
-        turnNightMode = (FloatingActionButton)findViewById(R.id.fab);
+        bookDao = new BookDao(this);
+
+
         /*turnNightMode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -98,6 +91,30 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
             }
         });
 */
+        openBook(bookUrl);
+
+        syncArticleContent();
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        closeBook();
+        super.onDestroy();
+    }
+
+    private void setUpLayoutViews(){
+        tvContent = (TextView)findViewById(R.id.tv_content);
+        tvTitle = (TextView)findViewById(R.id.tv_title);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_ly);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+
+        rootView = LayoutInflater.from(this).inflate(R.layout.activity_article, null);
+
+
+        // get FloatActionButton
+        turnNightMode = (FloatingActionButton)findViewById(R.id.fab);
+
         turnNightMode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -107,15 +124,10 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
                     popupWindow.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
             }
         });
-
-        syncArticleContent();
-
     }
 
     private void showPopup(){
-        BookDao bookDao = new BookDao(this);
         View view = LayoutInflater.from(this).inflate(R.layout.popupwindow_layout, null);
-        rootView = LayoutInflater.from(this).inflate(R.layout.activity_article, null);
 
         DisplayMetrics dp = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dp);
@@ -134,8 +146,6 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this,
                 DividerItemDecoration.VERTICAL_LIST));
 
-        chapterList = bookDao.findChapterListByBookUrl(bookUrl);
-
         setUpRecyclerViewAdapter();
     }
 
@@ -145,14 +155,11 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
         mAdapter.setOnItemClickListener(new ItemListAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
+                chapterUrl = chapterList.get(position).getChapterUrl();
+                syncArticleContent();
+                recentChapterId = chapterList.get(position).getChapterId();
+                popupWindow.dismiss();
 
-                Intent intent = new Intent(ArticleActivity.this, ArticleActivity.class);
-                Bundle bundle = new Bundle();
-                //bundle.putSerializable("chapter", chapterList.get(position));
-                bundle.putString("url",chapterList.get(position).getChapterUrl());
-                bundle.putString("book_url", chapterList.get(position).getBookUrl());
-                intent.putExtras(bundle);
-                startActivity(intent);
             }
 
             @Override
@@ -200,5 +207,32 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
     @Override
     public void onRefresh() {
         syncArticleContent();
+    }
+
+    private void openBook(String bookUrl){
+        //get all chapter
+        Book book = bookDao.findBookInfoByUrl(bookUrl);
+        // get chapterList
+        chapterList = book.getChapterList();
+        // check init
+        if ( book.getRecentChapterId() == -1){
+            // get first chapter id
+            setChapterId(bookUrl, chapterList.get(0).getChapterId());
+            // update book object recentChapterId
+            book.setRecentChapterId(chapterList.get(0).getChapterId());
+        }
+
+        // open by chapter id
+        chapterUrl = bookDao.findChapterUrlById(book.getRecentChapterId());
+    }
+
+    private void setChapterId(String bookUrl, int newId) {
+        bookDao.updateRecentChapterId(bookUrl, newId);
+    }
+
+    private void closeBook(){
+        // set ChapterId
+        if( recentChapterId != -1)
+            bookDao.updateRecentChapterId(bookUrl, recentChapterId);
     }
 }

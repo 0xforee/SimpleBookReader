@@ -40,7 +40,8 @@ public class BookDao {
             String category = cursor.getString(cursor.getColumnIndex("category"));
             String author = cursor.getString(cursor.getColumnIndex("author"));
             String description = cursor.getString(cursor.getColumnIndex("description"));
-            Book book = new Book(bookName, bookUrl, updateTime, category, author, description);
+            int recentChapterId = cursor.getInt(cursor.getColumnIndex("recent_chapter_id"));
+            Book book = new Book(bookName, bookUrl, updateTime, category, author, description, recentChapterId);
             bookList.add(book);
         }
 
@@ -63,6 +64,7 @@ public class BookDao {
         contentValues.put("category", book.getCategory());
         contentValues.put("author", book.getAuthor());
         contentValues.put("description", book.getDescription());
+        contentValues.put("recent_chapter_id", -1);
         if (db.insertWithOnConflict(BookSQLiteOpenHelper.DB_TABLE_BOOK_LIST, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE) == -1) {
             Log.e(TAG, "Database insert id: " + book.getBookUrl() + " error");
         }
@@ -70,6 +72,9 @@ public class BookDao {
         db.setTransactionSuccessful();
         db.endTransaction();
         db.close();
+
+        // insert chapter list
+        insertChapterList(book.getChapterList());
     }
 
     public void removeBookInfo(String book_url) {
@@ -145,5 +150,77 @@ public class BookDao {
         db.close();
 
         return chapterList;
+    }
+
+    public Book findBookInfoByUrl(String bookUrl){
+        Log.d(TAG, "get book info from db, bookUrl = " + bookUrl);
+        Book book = new Book();
+        Cursor cursor;
+        SQLiteDatabase db = bookSQLiteOpenHelper.getReadableDatabase();
+        db.beginTransaction();
+
+        cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_BOOK_LIST, null,
+                "book_url=?", new String[]{bookUrl}, null, null, null);
+        if (cursor.getCount() != 0 && cursor.moveToFirst()) {
+            book.setBookName(cursor.getString(cursor.getColumnIndex("book_name")));
+            book.setUpdateTime(cursor.getString(cursor.getColumnIndex("update_time")));
+            book.setBookUrl(bookUrl);
+            book.setCategory(cursor.getString(cursor.getColumnIndex("category")));
+            book.setAuthor(cursor.getString(cursor.getColumnIndex("author")));
+            book.setDescription(cursor.getString(cursor.getColumnIndex("description")));
+            book.setRecentChapterId(cursor.getInt(cursor.getColumnIndex("recent_chapter_id")));
+        }
+
+        cursor.close();
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        db.close();
+
+        book.setChapterList(findChapterListByBookUrl(bookUrl));
+
+        return book;
+    }
+
+    public void updateRecentChapterId(String bookUrl, int recentChapterId){
+        Cursor cursor;
+        SQLiteDatabase db = bookSQLiteOpenHelper.getWritableDatabase();
+        db.beginTransaction();
+
+        cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_BOOK_LIST, null,
+                "book_url=?", new String[]{bookUrl}, null, null, null);
+        if( cursor.getCount() != 0 ) {
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("recent_chapter_id", recentChapterId);
+            if (db.update(BookSQLiteOpenHelper.DB_TABLE_BOOK_LIST, contentValues,
+                    "book_url=?", new String[]{bookUrl}) == -1) {
+                Log.e(TAG, "Database insert book_url: " + bookUrl + " error");
+            }
+        }
+
+        cursor.close();
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        db.close();
+
+    }
+
+    public String findChapterUrlById(int chapterId){
+        Cursor cursor;
+        String chapterUrl = null;
+        SQLiteDatabase db = bookSQLiteOpenHelper.getReadableDatabase();
+        db.beginTransaction();
+
+        cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_CHAPTER_LIST, null,
+                "chapter_id=?", new String[]{chapterId + ""}, null, null, null);
+        if( cursor.getCount() != 0 && cursor.moveToFirst()) {
+            chapterUrl = cursor.getString(cursor.getColumnIndex("chapter_url"));
+        }
+
+        cursor.close();
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        db.close();
+
+        return chapterUrl;
     }
 }

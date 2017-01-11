@@ -26,6 +26,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.igexin.sdk.PushManager;
+
 import org.foree.bookreader.R;
 import org.foree.bookreader.book.Book;
 import org.foree.bookreader.dao.BookDao;
@@ -68,6 +70,8 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
         setContentView(R.layout.activity_book_shelf);
 
         setUpLayoutViews();
+
+        PushManager.getInstance().initialize(this.getApplicationContext());
 
         bookDao = new BookDao(this);
 
@@ -156,7 +160,7 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
                 if( mActionMode != null){
                     onListItemSelect(position);
                 }else {
-                    Intent intent = new Intent(BookShelfActivity.this, ChapterListActivity.class);
+                    Intent intent = new Intent(BookShelfActivity.this, ArticleActivity.class);
                     Bundle bundle = new Bundle();
                     bundle.putString("book_url", bookList.get(position).getBookUrl());
                     intent.putExtras(bundle);

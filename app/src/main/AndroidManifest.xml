@@ -24,7 +24,6 @@
                 android:name="android.app.default_searchable"
                 android:value=".ui.activity.SearchResultsActivity" />
         </activity>
-        <activity android:name=".ui.activity.ChapterListActivity" />
         <activity android:name=".ui.activity.ArticleActivity" />
 
         <!-- 配置第三方Receiver -->

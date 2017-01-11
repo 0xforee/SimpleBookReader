@@ -62,6 +62,7 @@ public class BookSQLiteOpenHelper extends SQLiteOpenHelper{
                 "book_url varchar(255) unique," +
                 "book_name varchar(255)," +
                 "update_time varchar(255)," +
+                "recent_chapter_id integer(255)," +
                 "category varchar(255)," +
                 "description varchar(255)," +
                 "author varchar(255)" +
