@@ -40,6 +40,7 @@
                     android:id="@+id/tv_novel_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/md_black_1000"
                     android:textAppearance="@style/TextAppearance.AppCompat.Title" />
 
                 <TextView

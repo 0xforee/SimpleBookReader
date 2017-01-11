@@ -12,14 +12,17 @@ import android.os.Message;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -37,6 +40,8 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
     private static final String TAG = BookShelfActivity.class.getSimpleName();
     private RefreshService.MyBinder mBinder;
     private RefreshService mRefreshService;
+    private ActionMode mActionMode;
+    private BookDao bookDao;
     private ServiceConnection mServiceConnect = new MyServiceConnection();
     private static final int MSG_UPDATE_NOVEL = 0;
 
@@ -63,6 +68,8 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
         setContentView(R.layout.activity_book_shelf);
 
         setUpLayoutViews();
+
+        bookDao = new BookDao(this);
 
         // start refresh service
         Intent intent = new Intent(this, RefreshService.class);
@@ -146,19 +153,57 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
         mAdapter.setOnItemClickListener(new BookListAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                Intent intent = new Intent(BookShelfActivity.this, ChapterListActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putString("book_url",bookList.get(position).getBookUrl());
-                intent.putExtras(bundle);
+                if( mActionMode != null){
+                    onListItemSelect(position);
+                }else {
+                    Intent intent = new Intent(BookShelfActivity.this, ChapterListActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("book_url", bookList.get(position).getBookUrl());
+                    intent.putExtras(bundle);
 
-                startActivity(intent);
+                    startActivity(intent);
+                }
             }
 
             @Override
             public void onItemLongClick(View view, int position) {
-
+                onListItemSelect(position);
             }
         });
+    }
+
+    private void onListItemSelect(int position) {
+        mAdapter.toggleSelection(position);
+
+        boolean hasCheckedItems = mAdapter.getSelectedCount() > 0 ;
+
+        if( hasCheckedItems && mActionMode == null) {
+            mActionMode = this.startSupportActionMode(new ToolbarActionModeCallback());
+        }else if(!hasCheckedItems){
+            mActionMode.finish();
+        }
+
+        if( mActionMode != null){
+            mActionMode.setTitle(String.valueOf(mAdapter.getSelectedCount() + "selected"));
+        }
+    }
+
+    private void deleteBooks(){
+        SparseBooleanArray selected = mAdapter.getSelectedItemsIds();
+        for( int i = (selected.size() -1); i >= 0; i--){
+            if(selected.valueAt(i)){
+                bookDao.removeBookInfo(bookList.get(i).getBookUrl());
+                bookList.remove(i);
+                mAdapter.notifyDataSetChanged();
+            }
+        }
+
+        mActionMode.finish();
+    }
+
+    private void setNullToActionMode(){
+        if( mActionMode != null)
+            mActionMode = null;
     }
 
     private void refreshNovelViews(Book book){
@@ -196,5 +241,34 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
         return true;
+    }
+
+    class ToolbarActionModeCallback implements ActionMode.Callback {
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            mode.getMenuInflater().inflate(R.menu.menu_action_mode, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            menu.findItem(R.id.action_delete).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            return true;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            switch (item.getItemId()){
+                case R.id.action_delete:
+                    deleteBooks();
+            }
+            return false;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            mAdapter.removeSelection();
+            setNullToActionMode();
+        }
     }
 }

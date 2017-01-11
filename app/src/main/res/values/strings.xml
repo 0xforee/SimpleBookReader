@@ -11,4 +11,7 @@
     <string name="search_title">搜索</string>
     <string name="search_hint">搜索小说</string>
     <string name="action_about">关于</string>
+
+    <!-- Action Mode Menu Items -->
+    <string name="delete">删除</string>
 </resources>
