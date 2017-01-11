@@ -80,7 +80,7 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                syncNovelInfo();
+                //syncNovelInfo();
             }
         }, 300);
     }

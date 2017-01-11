@@ -33,6 +33,7 @@ public class SearchResultsActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private BookListAdapter mAdapter;
     private List<Book> bookList = new ArrayList<>();
+    Toolbar toolbar;
     private Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -49,6 +50,9 @@ public class SearchResultsActivity extends AppCompatActivity {
     }
 
     private void setUpLayoutViews() {
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         mRecyclerView = (RecyclerView) findViewById(R.id.rv_book_list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());

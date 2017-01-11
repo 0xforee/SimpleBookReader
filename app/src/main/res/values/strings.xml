@@ -14,4 +14,6 @@
 
     <!-- Action Mode Menu Items -->
     <string name="delete">删除</string>
+    <string name="bt_add">加入书架</string>
+    <string name="bt_read">开始阅读</string>
 </resources>
