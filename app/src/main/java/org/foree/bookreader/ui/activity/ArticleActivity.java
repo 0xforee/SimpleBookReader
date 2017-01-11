@@ -137,8 +137,8 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
         popupWindow.setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
         popupWindow.setHeight(dp.heightPixels / 4 * 3);
 
-        popupWindow.showAtLocation(rootView, Gravity.BOTTOM, 0 ,0);
         popupWindow.setOutsideTouchable(true);
+        popupWindow.showAtLocation(rootView, Gravity.BOTTOM, 0 ,0);
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.rv_item_list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
