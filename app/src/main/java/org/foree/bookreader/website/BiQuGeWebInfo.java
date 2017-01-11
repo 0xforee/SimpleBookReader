@@ -55,7 +55,7 @@ public class BiQuGeWebInfo extends WebInfo {
         Book book = new Book();
         Chapter newestChapter = new Chapter();
 
-        Elements updates = doc.select("[property~=og:novel*]");
+        Elements updates = doc.select("[property~=og:*]");
         for(Element update: updates){
             Log.i(TAG, update.toString());
             switch (update.attr("property")){
@@ -71,6 +71,15 @@ public class BiQuGeWebInfo extends WebInfo {
                 case "og:novel:read_url":
                     book.setBookUrl(update.attr("content"));
                     break;
+                case "og:description":
+                    String description = update.attr("content");
+                    if ( !description.isEmpty()){
+                        book.setDescription(description.split("各位书友")[0]);
+                    }
+                    break;
+                case "og:image":
+                    // book cover
+                    break;
                 case "og:novel:update_time":
                     book.setUpdateTime(update.attr("content"));
                     break;
@@ -80,6 +89,7 @@ public class BiQuGeWebInfo extends WebInfo {
                 case "og:novel:latest_chapter_url":
                     newestChapter.setChapterUrl(update.attr("content"));
                     break;
+
             }
         }
         book.setNewestChapter(newestChapter);

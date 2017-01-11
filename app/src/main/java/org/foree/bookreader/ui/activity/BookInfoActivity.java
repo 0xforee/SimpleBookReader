@@ -6,6 +6,7 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
@@ -23,8 +24,7 @@ import org.foree.bookreader.website.WebInfo;
  */
 
 public class BookInfoActivity extends AppCompatActivity{
-    private TextView tvNovelName;
-    private TextView tvNovelAuthor;
+    private TextView tvNovelName, tvNovelAuthor, tvNovelDescription;
     private Button bt;
     private ListView lv;
     private String bookUrl;
@@ -58,6 +58,7 @@ public class BookInfoActivity extends AppCompatActivity{
         bookDao  = new BookDao(this);
         tvNovelName = (TextView) findViewById(R.id.tv_novel_name);
         tvNovelAuthor = (TextView) findViewById(R.id.tv_novel_author);
+        tvNovelDescription = (TextView) findViewById(R.id.tv_description);
         bt = (Button) findViewById(R.id.bt_add);
         lv = (ListView) findViewById(R.id.lv_chapter_list);
 
@@ -80,6 +81,7 @@ public class BookInfoActivity extends AppCompatActivity{
                         book = data;
                         tvNovelName.setText(data.getBookName());
                         tvNovelAuthor.setText(data.getAuthor());
+                        tvNovelDescription.setText(Html.fromHtml(data.getDescription()));
                         bt.setClickable(true);
                     }
                 },0);

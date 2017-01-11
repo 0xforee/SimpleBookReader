@@ -12,21 +12,23 @@ public class Book {
     private String author;
     private String bookUrl;
     private List<Chapter> chapterList;
+    private String description;
     private Chapter newestChapter;
 
     public Book() {
     }
 
     public Book(String bookName, String bookUrl) {
-        this(bookName, bookUrl, "", "", "");
+        this(bookName, bookUrl, "", "", "", "");
     }
 
-    public Book(String bookName, String bookUrl, String updateTime, String category, String author) {
+    public Book(String bookName, String bookUrl, String updateTime, String category, String author, String description) {
         this.bookUrl = bookUrl;
         this.bookName = bookName;
         this.updateTime = updateTime;
         this.category = category;
         this.author = author;
+        this.description = description;
     }
 
     public String getBookName() {
@@ -51,6 +53,14 @@ public class Book {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getAuthor() {
