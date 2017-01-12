@@ -21,29 +21,29 @@ public class NetWorkApiHelper {
 
     public static NetWorkApiHelper newInstance() {
 
-        if ( INSTANCE == null)
+        if (INSTANCE == null)
             INSTANCE = new NetWorkApiHelper();
 
         return INSTANCE;
     }
 
-    public NetWorkApiHelper(){
+    public NetWorkApiHelper() {
         queue = Volley.newRequestQueue(BaseApplication.getInstance().getApplicationContext());
     }
 
-    public void getRequest(String requestUrl, final String charSet, Response.Listener<String> listener, Response.ErrorListener errorListener){
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, requestUrl, listener, errorListener){
-        @Override
-        protected Response<String> parseNetworkResponse(NetworkResponse response) {
-            String str = null;
-            try {
-                str = new String(response.data, charSet);
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+    public void getRequest(String requestUrl, final String charSet, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, requestUrl, listener, errorListener) {
+            @Override
+            protected Response<String> parseNetworkResponse(NetworkResponse response) {
+                String str = null;
+                try {
+                    str = new String(response.data, charSet);
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+                return Response.success(str,
+                        HttpHeaderParser.parseCacheHeaders(response));
             }
-            return Response.success(str,
-                    HttpHeaderParser.parseCacheHeaders(response));
-        }
         };
 
         queue.add(stringRequest);

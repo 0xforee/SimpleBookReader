@@ -17,26 +17,26 @@ import java.util.List;
 /**
  * Created by foree on 16-7-22.
  */
-public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.MyViewHolder>{
+public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.MyViewHolder> {
     private LayoutInflater mLayoutInflater;
     private List<Book> bookList;
     private SparseBooleanArray mSelectedItemsIds;
 
-    public BookListAdapter(Context context, List<Book> itemList){
+    public BookListAdapter(Context context, List<Book> itemList) {
         mLayoutInflater = LayoutInflater.from(context);
         bookList = itemList;
         mSelectedItemsIds = new SparseBooleanArray();
     }
 
-    public interface OnItemClickListener{
+    public interface OnItemClickListener {
         void onItemClick(View view, int position);
+
         void onItemLongClick(View view, int position);
     }
 
     private OnItemClickListener mOnItemClickListener;
 
-    public void setOnItemClickListener(OnItemClickListener mOnItemClickListener)
-    {
+    public void setOnItemClickListener(OnItemClickListener mOnItemClickListener) {
         this.mOnItemClickListener = mOnItemClickListener;
     }
 
@@ -49,27 +49,22 @@ public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.MyView
 
     @Override
     public void onBindViewHolder(final BookListAdapter.MyViewHolder holder, int position) {
-        if( bookList != null && !bookList.isEmpty())
+        if (bookList != null && !bookList.isEmpty())
             holder.tvBookName.setText(bookList.get(position).getBookName());
 
         // 如果设置了回调，则设置点击事件
-        if (mOnItemClickListener != null)
-        {
-            holder.itemView.setOnClickListener(new View.OnClickListener()
-            {
+        if (mOnItemClickListener != null) {
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View v)
-                {
+                public void onClick(View v) {
                     int pos = holder.getLayoutPosition();
                     mOnItemClickListener.onItemClick(holder.itemView, pos);
                 }
             });
 
-            holder.itemView.setOnLongClickListener(new View.OnLongClickListener()
-            {
+            holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
-                public boolean onLongClick(View v)
-                {
+                public boolean onLongClick(View v) {
                     int pos = holder.getLayoutPosition();
                     mOnItemClickListener.onItemLongClick(holder.itemView, pos);
                     return false;
@@ -81,44 +76,45 @@ public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.MyView
         holder.itemView.setBackgroundColor(mSelectedItemsIds.get(position) ? 0x9934B5E4 : Color.TRANSPARENT);
 
     }
+
     @Override
     public int getItemCount() {
-        return ( null != bookList ? bookList.size():0 );
+        return (null != bookList ? bookList.size() : 0);
     }
 
-    public void toggleSelection(int position){
+    public void toggleSelection(int position) {
         selectView(position, !mSelectedItemsIds.get(position));
     }
 
-    private void selectView(int position, boolean value){
-        if (value){
+    private void selectView(int position, boolean value) {
+        if (value) {
             mSelectedItemsIds.put(position, value);
-        }else{
+        } else {
             mSelectedItemsIds.delete(position);
         }
 
         notifyDataSetChanged();
     }
 
-    public void removeSelection(){
+    public void removeSelection() {
         mSelectedItemsIds = new SparseBooleanArray();
         notifyDataSetChanged();
     }
 
-    public int getSelectedCount(){
+    public int getSelectedCount() {
         return mSelectedItemsIds.size();
     }
 
-    public SparseBooleanArray getSelectedItemsIds(){
+    public SparseBooleanArray getSelectedItemsIds() {
         return mSelectedItemsIds;
     }
 
-    class MyViewHolder extends RecyclerView.ViewHolder{
+    class MyViewHolder extends RecyclerView.ViewHolder {
         TextView tvBookName;
 
-        public MyViewHolder(View view){
+        public MyViewHolder(View view) {
             super(view);
-            tvBookName = (TextView)view.findViewById(R.id.tv_novel_name);
+            tvBookName = (TextView) view.findViewById(R.id.tv_novel_name);
         }
     }
 }

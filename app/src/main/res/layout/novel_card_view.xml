@@ -9,10 +9,10 @@
 
     <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/novel_card"
-        android:clickable="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
+        android:clickable="false"
         android:foreground="?attr/selectableItemBackground">
 
         <LinearLayout
@@ -40,8 +40,8 @@
                     android:id="@+id/tv_novel_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/md_black_1000"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Title" />
+                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                    android:textColor="@color/md_black_1000" />
 
                 <TextView
                     android:id="@+id/tv_novel_update_chapter"

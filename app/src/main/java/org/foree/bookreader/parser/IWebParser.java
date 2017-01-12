@@ -14,7 +14,10 @@ import java.util.List;
 
 public interface IWebParser {
     void searchBook(String keywords, NetCallback<List<Book>> netCallback);
+
     void getBookInfo(String bookUrl, NetCallback<Book> netCallback);
+
     void getChapterList(String bookUrl, NetCallback<List<Chapter>> netCallback);
+
     void getArticle(String chapterUrl, NetCallback<Article> netCallback);
 }

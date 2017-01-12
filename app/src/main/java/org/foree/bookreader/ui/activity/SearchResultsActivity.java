@@ -34,12 +34,13 @@ public class SearchResultsActivity extends AppCompatActivity {
     private BookListAdapter mAdapter;
     private List<Book> bookList = new ArrayList<>();
     Toolbar toolbar;
-    private Handler mHandler = new Handler(){
+    private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
         }
     };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,7 +65,7 @@ public class SearchResultsActivity extends AppCompatActivity {
             public void onItemClick(View view, int position) {
                 Intent intent = new Intent(SearchResultsActivity.this, BookInfoActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putString("book_url",bookList.get(position).getBookUrl());
+                bundle.putString("book_url", bookList.get(position).getBookUrl());
                 intent.putExtras(bundle);
 
                 startActivity(intent);
@@ -84,7 +85,7 @@ public class SearchResultsActivity extends AppCompatActivity {
     }
 
     private void handlerIntent(Intent intent) {
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())){
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             Log.d(TAG, "query keywords = " + query);
 
@@ -99,7 +100,7 @@ public class SearchResultsActivity extends AppCompatActivity {
                             bookList.addAll(data);
                             mAdapter.notifyDataSetChanged();
                         }
-                    },0);
+                    }, 0);
 
                 }
 

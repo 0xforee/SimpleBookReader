@@ -14,7 +14,7 @@ import java.io.File;
 /**
  * Created by foree on 16-7-19.
  */
-public class BaseApplication extends Application{
+public class BaseApplication extends Application {
     private static final String TAG = BaseApplication.class.getSimpleName();
     private static BaseApplication mInstance;
 
@@ -31,7 +31,7 @@ public class BaseApplication extends Application{
     }
 
     @Override
-    public void onCreate(){
+    public void onCreate() {
         super.onCreate();
         mInstance = this;
 
@@ -69,13 +69,13 @@ public class BaseApplication extends Application{
 
     }
 
-    public String getCacheDirString(){
+    public String getCacheDirString() {
         return myApplicationDirPath + File.separator + myApplicationCacheName;
     }
 
-    private void initWebSites(){
+    private void initWebSites() {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(BaseApplication.getInstance());
-        if(sp.getBoolean("first_run", true)) {
+        if (sp.getBoolean("first_run", true)) {
 
             sp.edit().putBoolean("first_run", false).apply();
         }

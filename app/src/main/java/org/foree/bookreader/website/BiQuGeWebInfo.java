@@ -21,7 +21,7 @@ import java.util.List;
 public class BiQuGeWebInfo extends WebInfo {
     private static final String TAG = BiQuGeWebInfo.class.getSimpleName();
 
-    public BiQuGeWebInfo(){
+    public BiQuGeWebInfo() {
         name = "笔趣阁";
         web_char = "utf-8";
         url = "http://www.biquge.com";
@@ -32,7 +32,7 @@ public class BiQuGeWebInfo extends WebInfo {
     List<Book> parseBookList(Document doc) {
         List<Book> bookList = new ArrayList<>();
         Elements resultList = doc.getElementsByClass("result-game-item");
-        for(Element result: resultList){
+        for (Element result : resultList) {
             Book book = new Book();
             //Log.d(TAG, result.toString());
             Elements titles = result.getElementsByClass("result-game-item-title-link");
@@ -56,9 +56,9 @@ public class BiQuGeWebInfo extends WebInfo {
         Chapter newestChapter = new Chapter();
 
         Elements updates = doc.select("[property~=og:*]");
-        for(Element update: updates){
+        for (Element update : updates) {
             Log.i(TAG, update.toString());
-            switch (update.attr("property")){
+            switch (update.attr("property")) {
                 case "og:novel:category":
                     book.setCategory(update.attr("content"));
                     break;
@@ -73,7 +73,7 @@ public class BiQuGeWebInfo extends WebInfo {
                     break;
                 case "og:description":
                     String description = update.attr("content");
-                    if ( !description.isEmpty()){
+                    if (!description.isEmpty()) {
                         book.setDescription(description.split("各位书友")[0]);
                     }
                     break;
@@ -99,7 +99,7 @@ public class BiQuGeWebInfo extends WebInfo {
         Elements elements_contents = doc.select("dd");
         Document contents = Jsoup.parse(elements_contents.toString());
         Elements elements_a = contents.getElementsByTag("a");
-        for(Element link: elements_a){
+        for (Element link : elements_a) {
             Chapter chapter = new Chapter();
 
             chapter.setChapterTitle(link.text());
@@ -122,7 +122,7 @@ public class BiQuGeWebInfo extends WebInfo {
         // convert http://m.bxwx9.org/0_168/2512063.html ==> 2512063
 
         String[] subString = url.split("/|\\.");
-        return Integer.parseInt(subString[subString.length-2]);
+        return Integer.parseInt(subString[subString.length - 2]);
     }
 
     @Override
@@ -141,7 +141,7 @@ public class BiQuGeWebInfo extends WebInfo {
 
         // get contents
         Element content = doc.getElementById("content");
-        if( content != null) {
+        if (content != null) {
             content.select("script").remove();
             Log.d(TAG, content.toString());
             article.setContents(content.toString());

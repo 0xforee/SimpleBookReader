@@ -15,7 +15,7 @@ import java.util.List;
  * Created by foree on 17-1-7.
  */
 
-public abstract class WebInfo implements IWebParser{
+public abstract class WebInfo implements IWebParser {
     private static final String TAG = WebInfo.class.getSimpleName();
 
     protected String name;
@@ -24,25 +24,28 @@ public abstract class WebInfo implements IWebParser{
     protected String searchApi;
 
     abstract List<Book> parseBookList(Document doc);
+
     abstract Book parseBookInfo(Document doc);
+
     abstract List<Chapter> parseChapterList(Document doc);
+
     abstract Article parseArticle(Document doc);
 
     @Override
     public void searchBook(final String keywords, final NetCallback<List<Book>> netCallback) {
-        new Thread(){
+        new Thread() {
             @Override
             public void run() {
                 super.run();
                 Document doc;
                 try {
                     doc = Jsoup.connect(searchApi + keywords).get();
-                    if( netCallback != null && doc != null){
+                    if (netCallback != null && doc != null) {
                         netCallback.onSuccess(parseBookList(doc));
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
-                    if( netCallback != null){
+                    if (netCallback != null) {
                         netCallback.onFail(e.toString());
                     }
                 }
@@ -52,19 +55,19 @@ public abstract class WebInfo implements IWebParser{
 
     @Override
     public void getBookInfo(final String bookUrl, final NetCallback<Book> netCallback) {
-        new Thread(){
+        new Thread() {
             @Override
             public void run() {
                 super.run();
                 Document doc;
                 try {
                     doc = Jsoup.connect(bookUrl).get();
-                    if( netCallback != null && doc != null){
+                    if (netCallback != null && doc != null) {
                         netCallback.onSuccess(parseBookInfo(doc));
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
-                    if( netCallback != null){
+                    if (netCallback != null) {
                         netCallback.onFail(e.toString());
                     }
                 }
@@ -75,19 +78,19 @@ public abstract class WebInfo implements IWebParser{
 
     @Override
     public void getChapterList(final String bookUrl, final NetCallback<List<Chapter>> netCallback) {
-        new Thread(){
+        new Thread() {
             @Override
             public void run() {
                 super.run();
                 Document doc;
                 try {
                     doc = Jsoup.connect(bookUrl).get();
-                    if( netCallback != null && doc != null){
+                    if (netCallback != null && doc != null) {
                         netCallback.onSuccess(parseChapterList(doc));
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
-                    if( netCallback != null){
+                    if (netCallback != null) {
                         netCallback.onFail(e.toString());
                     }
                 }
@@ -97,19 +100,19 @@ public abstract class WebInfo implements IWebParser{
 
     @Override
     public void getArticle(final String chapterUrl, final NetCallback<Article> netCallback) {
-        new Thread(){
+        new Thread() {
             @Override
             public void run() {
                 super.run();
                 Document doc;
                 try {
                     doc = Jsoup.connect(chapterUrl).get();
-                    if( netCallback != null && doc != null){
+                    if (netCallback != null && doc != null) {
                         netCallback.onSuccess(parseArticle(doc));
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
-                    if( netCallback != null){
+                    if (netCallback != null) {
                         netCallback.onFail(e.toString());
                     }
                 }

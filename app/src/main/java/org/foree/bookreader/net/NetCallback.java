@@ -6,5 +6,6 @@ package org.foree.bookreader.net;
  */
 public interface NetCallback<T> {
     void onSuccess(T data);
+
     void onFail(String msg);
 }

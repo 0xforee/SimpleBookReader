@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import org.foree.bookreader.R;
 
 import org.foree.bookreader.book.Chapter;
@@ -15,24 +16,24 @@ import java.util.List;
 /**
  * Created by foree on 16-7-22.
  */
-public class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.MyViewHolder>{
+public class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.MyViewHolder> {
     private LayoutInflater mLayoutInflater;
     private List<Chapter> chapterList;
 
-    public ItemListAdapter(Context context, List<Chapter> itemList){
+    public ItemListAdapter(Context context, List<Chapter> itemList) {
         mLayoutInflater = LayoutInflater.from(context);
         chapterList = itemList;
     }
 
-    public interface OnItemClickListener{
+    public interface OnItemClickListener {
         void onItemClick(View view, int position);
+
         void onItemLongClick(View view, int position);
     }
 
     private OnItemClickListener mOnItemClickListener;
 
-    public void setOnItemClickListener(OnItemClickListener mOnItemClickListener)
-    {
+    public void setOnItemClickListener(OnItemClickListener mOnItemClickListener) {
         this.mOnItemClickListener = mOnItemClickListener;
     }
 
@@ -45,27 +46,22 @@ public class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.MyView
 
     @Override
     public void onBindViewHolder(final ItemListAdapter.MyViewHolder holder, int position) {
-        if( chapterList != null && !chapterList.isEmpty())
+        if (chapterList != null && !chapterList.isEmpty())
             holder.tvTitle.setText(chapterList.get(position).getChapterTitle());
 
         // 如果设置了回调，则设置点击事件
-        if (mOnItemClickListener != null)
-        {
-            holder.itemView.setOnClickListener(new View.OnClickListener()
-            {
+        if (mOnItemClickListener != null) {
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View v)
-                {
+                public void onClick(View v) {
                     int pos = holder.getLayoutPosition();
                     mOnItemClickListener.onItemClick(holder.itemView, pos);
                 }
             });
 
-            holder.itemView.setOnLongClickListener(new View.OnLongClickListener()
-            {
+            holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
-                public boolean onLongClick(View v)
-                {
+                public boolean onLongClick(View v) {
                     int pos = holder.getLayoutPosition();
                     mOnItemClickListener.onItemLongClick(holder.itemView, pos);
                     return false;
@@ -73,17 +69,18 @@ public class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.MyView
             });
         }
     }
+
     @Override
     public int getItemCount() {
         return chapterList.size();
     }
 
-    class MyViewHolder extends RecyclerView.ViewHolder{
+    class MyViewHolder extends RecyclerView.ViewHolder {
         TextView tvTitle;
 
-        public MyViewHolder(View view){
+        public MyViewHolder(View view) {
             super(view);
-            tvTitle = (TextView)view.findViewById(R.id.tv_item_title);
+            tvTitle = (TextView) view.findViewById(R.id.tv_item_title);
         }
     }
 }

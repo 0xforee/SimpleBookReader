@@ -37,7 +37,7 @@ import org.foree.bookreader.ui.fragment.BookListAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BookShelfActivity extends AppCompatActivity implements RefreshService.StreamCallBack, SwipeRefreshLayout.OnRefreshListener{
+public class BookShelfActivity extends AppCompatActivity implements RefreshService.StreamCallBack, SwipeRefreshLayout.OnRefreshListener {
 
     private static final String TAG = BookShelfActivity.class.getSimpleName();
     private RefreshService.MyBinder mBinder;
@@ -47,11 +47,11 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
     private ServiceConnection mServiceConnect = new MyServiceConnection();
     private static final int MSG_UPDATE_NOVEL = 0;
 
-    Handler mHandler = new Handler(){
+    Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            switch (msg.what){
+            switch (msg.what) {
 
             }
         }
@@ -103,10 +103,10 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
     }
 
     private void syncNovelInfo() {
-        if( mRefreshService != null){
+        if (mRefreshService != null) {
             mSwipeRefreshLayout.setRefreshing(true);
             //mRefreshService.updateNovelInfo(2);
-        }else {
+        } else {
             mSwipeRefreshLayout.setRefreshing(false);
             Snackbar.make(mSwipeRefreshLayout, "出了什么问题，请稍后再试", Snackbar.LENGTH_SHORT).show();
         }
@@ -120,11 +120,11 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
                 mSwipeRefreshLayout.setRefreshing(false);
 
                 // refresh success, update text
-                if( book != null) {
+                if (book != null) {
                     refreshNovelViews(book);
                 }
             }
-        },15);
+        }, 15);
     }
 
     private void setUpLayoutViews() {
@@ -139,11 +139,11 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         //tvNovelAuthor = (TextView) findViewById(R.id.tv_novel_author);
-       // tvNovelCategory = (TextView) findViewById(R.id.tv_novel_category);
-       // tvNovelName = (TextView)findViewById(R.id.tv_novel_name);
-       // tvNovelStatus = (TextView)findViewById(R.id.tv_novel_status);
-        tvNovelUpdateTime = (TextView)findViewById(R.id.tv_novel_update_time);
-        tvNovelUpdateChapter = (TextView)findViewById(R.id.tv_novel_update_chapter);
+        // tvNovelCategory = (TextView) findViewById(R.id.tv_novel_category);
+        // tvNovelName = (TextView)findViewById(R.id.tv_novel_name);
+        // tvNovelStatus = (TextView)findViewById(R.id.tv_novel_status);
+        tvNovelUpdateTime = (TextView) findViewById(R.id.tv_novel_update_time);
+        tvNovelUpdateChapter = (TextView) findViewById(R.id.tv_novel_update_chapter);
 
 
         setUpRecyclerViewAdapter();
@@ -157,9 +157,9 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
         mAdapter.setOnItemClickListener(new BookListAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                if( mActionMode != null){
+                if (mActionMode != null) {
                     onListItemSelect(position);
-                }else {
+                } else {
                     Intent intent = new Intent(BookShelfActivity.this, ArticleActivity.class);
                     Bundle bundle = new Bundle();
                     bundle.putString("book_url", bookList.get(position).getBookUrl());
@@ -179,23 +179,23 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
     private void onListItemSelect(int position) {
         mAdapter.toggleSelection(position);
 
-        boolean hasCheckedItems = mAdapter.getSelectedCount() > 0 ;
+        boolean hasCheckedItems = mAdapter.getSelectedCount() > 0;
 
-        if( hasCheckedItems && mActionMode == null) {
+        if (hasCheckedItems && mActionMode == null) {
             mActionMode = this.startSupportActionMode(new ToolbarActionModeCallback());
-        }else if(!hasCheckedItems){
+        } else if (!hasCheckedItems) {
             mActionMode.finish();
         }
 
-        if( mActionMode != null){
+        if (mActionMode != null) {
             mActionMode.setTitle(String.valueOf(mAdapter.getSelectedCount() + "selected"));
         }
     }
 
-    private void deleteBooks(){
+    private void deleteBooks() {
         SparseBooleanArray selected = mAdapter.getSelectedItemsIds();
-        for( int i = (selected.size() -1); i >= 0; i--){
-            if(selected.valueAt(i)){
+        for (int i = (selected.size() - 1); i >= 0; i--) {
+            if (selected.valueAt(i)) {
                 bookDao.removeBookInfo(bookList.get(i).getBookUrl());
                 bookList.remove(i);
                 mAdapter.notifyDataSetChanged();
@@ -205,14 +205,14 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
         mActionMode.finish();
     }
 
-    private void setNullToActionMode(){
-        if( mActionMode != null)
+    private void setNullToActionMode() {
+        if (mActionMode != null)
             mActionMode = null;
     }
 
-    private void refreshNovelViews(Book book){
+    private void refreshNovelViews(Book book) {
 //        tvNovelUpdateChapter.setText(getString(R.string.update_chapter_string) + book.getNewestChapter().getChapterTitle());
- //       tvNovelUpdateTime.setText(getString(R.string.update_time_string) + book.getUpdateTime());
+        //       tvNovelUpdateTime.setText(getString(R.string.update_time_string) + book.getUpdateTime());
     }
 
     private class MyServiceConnection implements ServiceConnection {
@@ -239,7 +239,7 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
         inflater.inflate(R.menu.menu_main, menu);
 
         // Associate searchable configuration with searchView
-        SearchManager searchManager = (SearchManager)getSystemService(Context.SEARCH_SERVICE);
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
 
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
@@ -262,7 +262,7 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            switch (item.getItemId()){
+            switch (item.getItemId()) {
                 case R.id.action_delete:
                     deleteBooks();
             }

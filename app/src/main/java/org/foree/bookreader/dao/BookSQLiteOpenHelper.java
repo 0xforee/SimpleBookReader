@@ -9,7 +9,7 @@ import android.util.Log;
  * Created by foree on 2016/8/6.
  * 数据库创建升级的帮助类
  */
-public class BookSQLiteOpenHelper extends SQLiteOpenHelper{
+public class BookSQLiteOpenHelper extends SQLiteOpenHelper {
     private static final String TAG = BookSQLiteOpenHelper.class.getSimpleName();
     public static final int DB_VERSION = 1;
     public static final String DB_NAME = "bookreader.db";
@@ -29,7 +29,7 @@ public class BookSQLiteOpenHelper extends SQLiteOpenHelper{
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-        for ( int version = oldVersion +1; version <= newVersion; version++){
+        for (int version = oldVersion + 1; version <= newVersion; version++) {
             onUpgradeTo(db, version);
         }
     }

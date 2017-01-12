@@ -37,12 +37,12 @@ import java.util.List;
 /**
  * Created by foree on 16-7-21.
  */
-public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener{
+public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = ArticleActivity.class.getSimpleName();
-    TextView tvContent,tvTitle;
+    TextView tvContent, tvTitle;
     FloatingActionButton turnNightMode;
     SwipeRefreshLayout mSwipeRefreshLayout;
-    private Handler mHandler = new Handler(){
+    private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
@@ -65,7 +65,7 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
 
         bookUrl = getIntent().getExtras().getString("book_url");
 
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setUpLayoutViews();
 
@@ -103,9 +103,9 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
         super.onDestroy();
     }
 
-    private void setUpLayoutViews(){
-        tvContent = (TextView)findViewById(R.id.tv_content);
-        tvTitle = (TextView)findViewById(R.id.tv_title);
+    private void setUpLayoutViews() {
+        tvContent = (TextView) findViewById(R.id.tv_content);
+        tvTitle = (TextView) findViewById(R.id.tv_title);
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_ly);
         mSwipeRefreshLayout.setOnRefreshListener(this);
 
@@ -113,12 +113,12 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
 
 
         // get FloatActionButton
-        turnNightMode = (FloatingActionButton)findViewById(R.id.fab);
+        turnNightMode = (FloatingActionButton) findViewById(R.id.fab);
 
         turnNightMode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(popupWindow == null)
+                if (popupWindow == null)
                     showPopup();
                 else
                     popupWindow.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
@@ -126,7 +126,7 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
         });
     }
 
-    private void showPopup(){
+    private void showPopup() {
         View view = LayoutInflater.from(this).inflate(R.layout.popupwindow_layout, null);
 
         DisplayMetrics dp = new DisplayMetrics();
@@ -138,7 +138,7 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
         popupWindow.setHeight(dp.heightPixels / 4 * 3);
 
         popupWindow.setOutsideTouchable(true);
-        popupWindow.showAtLocation(rootView, Gravity.BOTTOM, 0 ,0);
+        popupWindow.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.rv_item_list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -169,7 +169,7 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
         });
     }
 
-    private void syncArticleContent(){
+    private void syncArticleContent() {
         mSwipeRefreshLayout.setRefreshing(true);
         WebInfo webInfo = new BiQuGeWebInfo();
         webInfo.getArticle(chapterUrl, new NetCallback<Article>() {
@@ -185,18 +185,18 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
         });
     }
 
-    private void updateUI(final Article article){
+    private void updateUI(final Article article) {
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 mSwipeRefreshLayout.setRefreshing(false);
-                if( article != null){
+                if (article != null) {
                     // use textView format
                     tvContent.setText(Html.fromHtml(article.getContents()));
                     tvTitle.setText(Html.fromHtml(article.getTitle()));
                     Snackbar.make(mSwipeRefreshLayout, R.string.load_success, Snackbar.LENGTH_SHORT).show();
-                }else{
-                    Snackbar.make(mSwipeRefreshLayout, R.string.load_fail , Snackbar.LENGTH_LONG).show();
+                } else {
+                    Snackbar.make(mSwipeRefreshLayout, R.string.load_fail, Snackbar.LENGTH_LONG).show();
                 }
             }
         }, 0);
@@ -209,13 +209,13 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
         syncArticleContent();
     }
 
-    private void openBook(String bookUrl){
+    private void openBook(String bookUrl) {
         //get all chapter
         Book book = bookDao.findBookInfoByUrl(bookUrl);
         // get chapterList
         chapterList = book.getChapterList();
         // check init
-        if ( book.getRecentChapterId() == -1){
+        if (book.getRecentChapterId() == -1) {
             // get first chapter id
             setChapterId(bookUrl, chapterList.get(0).getChapterId());
             // update book object recentChapterId
@@ -230,9 +230,9 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
         bookDao.updateRecentChapterId(bookUrl, newId);
     }
 
-    private void closeBook(){
+    private void closeBook() {
         // set ChapterId
-        if( recentChapterId != -1)
+        if (recentChapterId != -1)
             bookDao.updateRecentChapterId(bookUrl, recentChapterId);
     }
 }

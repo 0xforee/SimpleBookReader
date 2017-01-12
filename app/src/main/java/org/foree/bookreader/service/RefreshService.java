@@ -48,14 +48,15 @@ public class RefreshService extends Service {
     }
 
     Handler myHandler = new H();
-    private class H extends Handler{
+
+    private class H extends Handler {
         private static final int MSG_UPDATE_CHAPTER_NOTIFICATION = 0;
         private static final int MSG_DOWNLOAD_OK = 1;
         private static final int MSG_START_DOWNLOAD = 2;
 
         @Override
         public void handleMessage(Message msg) {
-            switch (msg.what){
+            switch (msg.what) {
                 case MSG_START_DOWNLOAD:
                 case MSG_UPDATE_CHAPTER_NOTIFICATION:
                     updateNotification(successCount++);
@@ -72,15 +73,16 @@ public class RefreshService extends Service {
     }
 
     public class MyBinder extends Binder {
-        public RefreshService getService(){
+        public RefreshService getService() {
             return RefreshService.this;
         }
     }
-    public void registerCallBack(StreamCallBack callback){
+
+    public void registerCallBack(StreamCallBack callback) {
         mCallBack = callback;
     }
 
-    public void unregisterCallBack(){
+    public void unregisterCallBack() {
         mCallBack = null;
     }
 
@@ -112,7 +114,7 @@ public class RefreshService extends Service {
         return mBinder;
     }
 
-    private void createNotification(int chapterCounts){
+    private void createNotification(int chapterCounts) {
         notification = new Notification(R.drawable.ic_launcher, "正在下载", System.currentTimeMillis());
         notification.flags = Notification.FLAG_ONGOING_EVENT;
 
@@ -129,14 +131,14 @@ public class RefreshService extends Service {
 
     private void updateNotification(int currentCount) {
         Log.d(TAG, "updateNotification: " + currentCount++);
-        contentView.setTextViewText(R.id.notificationPercent,currentCount + "/" + chapterList.size());
+        contentView.setTextViewText(R.id.notificationPercent, currentCount + "/" + chapterList.size());
         contentView.setProgressBar(R.id.notificationProgress, chapterList.size(), currentCount, false);
         notification.contentView = contentView;
         notificationManager.notify(R.layout.notification_download, notification);
     }
 
     // TODO:可能无法准确获取到是否完全下载完成
-    public void downloadNovel(List<Chapter> downloadList){
+    public void downloadNovel(List<Chapter> downloadList) {
         // downloadNovel
 
         chapterList = downloadList;
@@ -145,13 +147,13 @@ public class RefreshService extends Service {
         createNotification(chapterList.size());
 
         // download chapters
-        downloadThread = new Thread(){
+        downloadThread = new Thread() {
             @Override
             public void run() {
                 super.run();
                 Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
 
-                for(Chapter chapter: chapterList){
+                for (Chapter chapter : chapterList) {
                     downloadChapter(chapter);
                 }
 
@@ -172,7 +174,7 @@ public class RefreshService extends Service {
                 File chapterCache = new File(BaseApplication.getInstance().getCacheDirString()
                         + File.separator + FileUtils.encodeUrl(chapter.getChapterUrl()));
                 try {
-                    if( data != null)
+                    if (data != null)
                         FileUtils.writeFile(chapterCache, data.getContents());
                 } catch (IOException e) {
                     e.printStackTrace();

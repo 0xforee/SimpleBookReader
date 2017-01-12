@@ -5,13 +5,14 @@ import java.io.Serializable;
 /**
  * Created by foree on 16-7-26.
  */
-public class Chapter implements Serializable{
+public class Chapter implements Serializable {
     private String chapterTitle;
     private String chapterUrl;
     private String bookUrl;
     private int chapterId;
 
-    public Chapter(){}
+    public Chapter() {
+    }
 
     public Chapter(String chapterTitle, String chapterUrl) {
         this.chapterTitle = chapterTitle;

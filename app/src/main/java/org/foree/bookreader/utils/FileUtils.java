@@ -14,6 +14,7 @@ import java.io.IOException;
  */
 public class FileUtils {
     private static final String TAG = FileUtils.class.getSimpleName();
+
     //读取文件
     //TODO 添加文件为空的处理
     public static String readFile(File file) throws IOException {
@@ -49,7 +50,7 @@ public class FileUtils {
     }
 
     // url encode
-    public static String encodeUrl(String url){
+    public static String encodeUrl(String url) {
         return url.replaceAll("/", "_");
     }
 }

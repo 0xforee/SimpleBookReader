@@ -152,7 +152,7 @@ public class BookDao {
         return chapterList;
     }
 
-    public Book findBookInfoByUrl(String bookUrl){
+    public Book findBookInfoByUrl(String bookUrl) {
         Log.d(TAG, "get book info from db, bookUrl = " + bookUrl);
         Book book = new Book();
         Cursor cursor;
@@ -181,14 +181,14 @@ public class BookDao {
         return book;
     }
 
-    public void updateRecentChapterId(String bookUrl, int recentChapterId){
+    public void updateRecentChapterId(String bookUrl, int recentChapterId) {
         Cursor cursor;
         SQLiteDatabase db = bookSQLiteOpenHelper.getWritableDatabase();
         db.beginTransaction();
 
         cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_BOOK_LIST, null,
                 "book_url=?", new String[]{bookUrl}, null, null, null);
-        if( cursor.getCount() != 0 ) {
+        if (cursor.getCount() != 0) {
             ContentValues contentValues = new ContentValues();
             contentValues.put("recent_chapter_id", recentChapterId);
             if (db.update(BookSQLiteOpenHelper.DB_TABLE_BOOK_LIST, contentValues,
@@ -204,7 +204,7 @@ public class BookDao {
 
     }
 
-    public String findChapterUrlById(int chapterId){
+    public String findChapterUrlById(int chapterId) {
         Cursor cursor;
         String chapterUrl = null;
         SQLiteDatabase db = bookSQLiteOpenHelper.getReadableDatabase();
@@ -212,7 +212,7 @@ public class BookDao {
 
         cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_CHAPTER_LIST, null,
                 "chapter_id=?", new String[]{chapterId + ""}, null, null, null);
-        if( cursor.getCount() != 0 && cursor.moveToFirst()) {
+        if (cursor.getCount() != 0 && cursor.moveToFirst()) {
             chapterUrl = cursor.getString(cursor.getColumnIndex("chapter_url"));
         }
 

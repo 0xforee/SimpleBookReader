@@ -23,7 +23,7 @@ import org.foree.bookreader.website.WebInfo;
  * Created by foree on 17-1-10.
  */
 
-public class BookInfoActivity extends AppCompatActivity{
+public class BookInfoActivity extends AppCompatActivity {
     private TextView tvNovelName, tvNovelAuthor, tvNovelDescription;
     private Button bt;
     private ListView lv;
@@ -31,12 +31,13 @@ public class BookInfoActivity extends AppCompatActivity{
     private BookDao bookDao;
     private Toolbar toolbar;
     private Book book;
-    private Handler mHandler = new Handler(){
+    private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
         }
     };
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,7 +56,7 @@ public class BookInfoActivity extends AppCompatActivity{
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        bookDao  = new BookDao(this);
+        bookDao = new BookDao(this);
         tvNovelName = (TextView) findViewById(R.id.tv_novel_name);
         tvNovelAuthor = (TextView) findViewById(R.id.tv_novel_author);
         tvNovelDescription = (TextView) findViewById(R.id.tv_description);
@@ -84,7 +85,7 @@ public class BookInfoActivity extends AppCompatActivity{
                         tvNovelDescription.setText(Html.fromHtml(data.getDescription()));
                         bt.setClickable(true);
                     }
-                },0);
+                }, 0);
 
 
             }
