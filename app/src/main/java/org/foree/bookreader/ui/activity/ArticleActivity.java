@@ -1,22 +1,30 @@
 package org.foree.bookreader.ui.activity;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.text.Layout;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -27,6 +35,8 @@ import org.foree.bookreader.book.Book;
 import org.foree.bookreader.book.Chapter;
 import org.foree.bookreader.dao.BookDao;
 import org.foree.bookreader.net.NetCallback;
+import org.foree.bookreader.pagination.Pagination;
+import org.foree.bookreader.ui.fragment.ArticleFragment;
 import org.foree.bookreader.ui.fragment.ItemListAdapter;
 import org.foree.bookreader.website.BiQuGeWebInfo;
 import org.foree.bookreader.website.WebInfo;
@@ -39,9 +49,7 @@ import java.util.List;
  */
 public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = ArticleActivity.class.getSimpleName();
-    TextView tvContent, tvTitle;
     FloatingActionButton turnNightMode;
-    SwipeRefreshLayout mSwipeRefreshLayout;
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -56,12 +64,19 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
     private PopupWindow popupWindow;
     private View rootView;
     private BookDao bookDao;
+
     private int recentChapterId = -1;
+
+    private ViewPager mViewPager;
+    private Pagination mPagination;
+    ArticlePageAdapter myPagerAdapter;
+    private TextView mTextView;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_article);
+        setContentView(R.layout.view_pager_layout);
 
         bookUrl = getIntent().getExtras().getString("book_url");
 
@@ -70,7 +85,31 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
         setUpLayoutViews();
 
         bookDao = new BookDao(this);
+        openBook(bookUrl);
 
+        mViewPager = (ViewPager) findViewById(R.id.book_pager);
+
+        mTextView = (TextView) findViewById(R.id.book_content);
+        mTextView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                // Removing layout listener to avoid multiple calls
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+                    mTextView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                } else {
+                    mTextView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                }
+
+                mPagination = new Pagination(
+                        mTextView.getWidth(),
+                        mTextView.getHeight(),
+                        mTextView.getPaint(),
+                        mTextView.getLineSpacingMultiplier(),
+                        mTextView.getLineSpacingExtra(),
+                        mTextView.getIncludeFontPadding());
+
+            }
+        });
 
         /*turnNightMode.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,10 +130,19 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
             }
         });
 */
-        openBook(bookUrl);
 
         syncArticleContent();
 
+    }
+
+    private void paginateInit(String contents) {
+        mPagination.clear();
+        mPagination.splitPage(contents);
+
+        myPagerAdapter = new ArticlePageAdapter();
+        mViewPager.setAdapter(myPagerAdapter);
+
+        myPagerAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -104,11 +152,6 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
     }
 
     private void setUpLayoutViews() {
-        tvContent = (TextView) findViewById(R.id.tv_content);
-        tvTitle = (TextView) findViewById(R.id.tv_title);
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_ly);
-        mSwipeRefreshLayout.setOnRefreshListener(this);
-
         rootView = LayoutInflater.from(this).inflate(R.layout.activity_article, null);
 
 
@@ -170,7 +213,6 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
     }
 
     private void syncArticleContent() {
-        mSwipeRefreshLayout.setRefreshing(true);
         WebInfo webInfo = new BiQuGeWebInfo();
         webInfo.getArticle(chapterUrl, new NetCallback<Article>() {
             @Override
@@ -189,14 +231,9 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                mSwipeRefreshLayout.setRefreshing(false);
                 if (article != null) {
                     // use textView format
-                    tvContent.setText(Html.fromHtml(article.getContents()));
-                    tvTitle.setText(Html.fromHtml(article.getTitle()));
-                    Snackbar.make(mSwipeRefreshLayout, R.string.load_success, Snackbar.LENGTH_SHORT).show();
-                } else {
-                    Snackbar.make(mSwipeRefreshLayout, R.string.load_fail, Snackbar.LENGTH_LONG).show();
+                    paginateInit(article.getContents());
                 }
             }
         }, 0);
@@ -235,4 +272,23 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
         if (recentChapterId != -1)
             bookDao.updateRecentChapterId(bookUrl, recentChapterId);
     }
+
+    private class ArticlePageAdapter extends FragmentPagerAdapter {
+
+        public ArticlePageAdapter() {
+            super(getSupportFragmentManager());
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return ArticleFragment.newInstance(mPagination.get(position).toString());
+        }
+
+        @Override
+        public int getCount() {
+            return mPagination != null ? mPagination.size() : 0;
+        }
+    }
+
+
 }

@@ -17,4 +17,7 @@
     <string name="bt_add">加入书架</string>
     <string name="bt_read">开始阅读</string>
     <string name="contents">目录</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
