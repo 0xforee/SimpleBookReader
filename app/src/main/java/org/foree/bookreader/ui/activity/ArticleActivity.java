@@ -6,20 +6,14 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
-import android.text.Layout;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,16 +24,13 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import org.foree.bookreader.R;
-import org.foree.bookreader.book.Article;
 import org.foree.bookreader.book.Book;
 import org.foree.bookreader.book.Chapter;
 import org.foree.bookreader.dao.BookDao;
-import org.foree.bookreader.net.NetCallback;
-import org.foree.bookreader.pagination.Pagination;
+import org.foree.bookreader.pagination.PaginationStrategy;
+import org.foree.bookreader.ui.adapter.ArticlePagerAdapter;
 import org.foree.bookreader.ui.fragment.ArticleFragment;
 import org.foree.bookreader.ui.fragment.ItemListAdapter;
-import org.foree.bookreader.website.BiQuGeWebInfo;
-import org.foree.bookreader.website.WebInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +38,7 @@ import java.util.List;
 /**
  * Created by foree on 16-7-21.
  */
-public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
+public class ArticleActivity extends AppCompatActivity implements ArticlePagerAdapter.UnlimitedPager {
     private static final String TAG = ArticleActivity.class.getSimpleName();
     FloatingActionButton turnNightMode;
     private Handler mHandler = new Handler() {
@@ -68,9 +59,27 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
     private int recentChapterId = -1;
 
     private ViewPager mViewPager;
-    private Pagination mPagination;
-    ArticlePageAdapter myPagerAdapter;
+    private ArticlePagerAdapter articlePagerAdapter;
     private TextView mTextView;
+
+    private PaginationStrategy mPaginationStrategy;
+    private ArticlePagerAdapter.UnlimitedPager unlimitedPager;
+
+    private boolean initFinished = false;
+
+    private int mOffset = -1;
+    private String mInitString = "正在加载...";
+
+    private String mPreviousContents = mInitString;
+    private String mCurrentContents = mInitString;
+    private String mNextContents = mInitString;
+
+    private final ArticleFragment[] sFragments = new ArticleFragment[] {
+            ArticleFragment.newInstance(mInitString),
+            ArticleFragment.newInstance(mInitString),
+            ArticleFragment.newInstance(mInitString)
+    };
+    private int mPageIndex = 0;
 
 
     @Override
@@ -87,29 +96,7 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
         bookDao = new BookDao(this);
         openBook(bookUrl);
 
-        mViewPager = (ViewPager) findViewById(R.id.book_pager);
-
-        mTextView = (TextView) findViewById(R.id.book_content);
-        mTextView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                // Removing layout listener to avoid multiple calls
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-                    mTextView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                } else {
-                    mTextView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                }
-
-                mPagination = new Pagination(
-                        mTextView.getWidth(),
-                        mTextView.getHeight(),
-                        mTextView.getPaint(),
-                        mTextView.getLineSpacingMultiplier(),
-                        mTextView.getLineSpacingExtra(),
-                        mTextView.getIncludeFontPadding());
-
-            }
-        });
+        initTextView();
 
         /*turnNightMode.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -131,18 +118,91 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
         });
 */
 
-        syncArticleContent();
+    }
+
+    private void initTextView() {
+        unlimitedPager = this;
+
+        mTextView = (TextView) findViewById(R.id.book_content);
+        mTextView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                // Removing layout listener to avoid multiple calls
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+                    mTextView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                } else {
+                    mTextView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                }
+
+                if( mPaginationStrategy == null) {
+                    mPaginationStrategy = new PaginationStrategy(
+                            getApplicationContext(),
+                            mTextView.getWidth(),
+                            mTextView.getHeight(),
+                            mTextView.getPaint(),
+                            mTextView.getLineSpacingMultiplier(),
+                            mTextView.getLineSpacingExtra(),
+                            mTextView.getIncludeFontPadding());
+                }
+                if( !initFinished ) {
+
+                    mViewPager = (ViewPager) findViewById(R.id.book_pager);
+                    articlePagerAdapter = new ArticlePagerAdapter(mViewPager, getSupportFragmentManager());
+                    articlePagerAdapter.setPage(unlimitedPager);
+                    mViewPager.setAdapter(articlePagerAdapter);
+                    initFinished = true;
+                }
+
+            }
+        });
+    }
+
+    @Override
+    public void onRefreshPage() {
+        Log.d(TAG, "onRefreshPage");
+        if (mPaginationStrategy != null) {
+            // 准备好数据
+            if (mOffset < 0) {
+                Log.d(TAG, "向左");
+
+            } else {
+                Log.d(TAG, "向右");
+            }
+
+            mPreviousContents = mPaginationStrategy.getContents(chapterUrl, mOffset, mPageIndex);
+            mCurrentContents = mPaginationStrategy.getContents(chapterUrl, mOffset, mPageIndex + 1);
+            mNextContents = mPaginationStrategy.getContents(chapterUrl, mOffset, mPageIndex + 2);
+
+            Log.d(TAG, "pageIndex = " + mPageIndex);
+            Log.d(TAG, "mPreviousContent = " + mPreviousContents);
+            Log.d(TAG, "mCurrentContents = " + mCurrentContents);
+            Log.d(TAG, "mNextContents = " + mNextContents);
+
+            resetPage();
+
+        }
+    }
+
+    private void resetPage(){
+        if( mPreviousContents != null)
+            sFragments[0].setText(mPreviousContents);
+        if( mCurrentContents != null)
+            sFragments[1].setText(mCurrentContents);
+        if( mNextContents != null)
+            sFragments[2].setText(mNextContents);
+    }
+
+    @Override
+    public void onDataChanged(int offset) {
+        Log.d(TAG,"onDataChanged");
+        mPageIndex += offset;
+        mOffset = offset;
 
     }
 
-    private void paginateInit(String contents) {
-        mPagination.clear();
-        mPagination.splitPage(contents);
-
-        myPagerAdapter = new ArticlePageAdapter();
-        mViewPager.setAdapter(myPagerAdapter);
-
-        myPagerAdapter.notifyDataSetChanged();
+    @Override
+    public Fragment getItem(int position) {
+        return sFragments[position];
     }
 
     @Override
@@ -199,7 +259,6 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
             @Override
             public void onItemClick(View view, int position) {
                 chapterUrl = chapterList.get(position).getChapterUrl();
-                syncArticleContent();
                 recentChapterId = chapterList.get(position).getChapterId();
                 popupWindow.dismiss();
 
@@ -210,40 +269,6 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
 
             }
         });
-    }
-
-    private void syncArticleContent() {
-        WebInfo webInfo = new BiQuGeWebInfo();
-        webInfo.getArticle(chapterUrl, new NetCallback<Article>() {
-            @Override
-            public void onSuccess(Article data) {
-                updateUI(data);
-            }
-
-            @Override
-            public void onFail(String msg) {
-
-            }
-        });
-    }
-
-    private void updateUI(final Article article) {
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (article != null) {
-                    // use textView format
-                    paginateInit(article.getContents());
-                }
-            }
-        }, 0);
-
-
-    }
-
-    @Override
-    public void onRefresh() {
-        syncArticleContent();
     }
 
     private void openBook(String bookUrl) {
@@ -271,23 +296,6 @@ public class ArticleActivity extends AppCompatActivity implements SwipeRefreshLa
         // set ChapterId
         if (recentChapterId != -1)
             bookDao.updateRecentChapterId(bookUrl, recentChapterId);
-    }
-
-    private class ArticlePageAdapter extends FragmentPagerAdapter {
-
-        public ArticlePageAdapter() {
-            super(getSupportFragmentManager());
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            return ArticleFragment.newInstance(mPagination.get(position).toString());
-        }
-
-        @Override
-        public int getCount() {
-            return mPagination != null ? mPagination.size() : 0;
-        }
     }
 
 
