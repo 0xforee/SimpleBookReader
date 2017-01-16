@@ -135,9 +135,12 @@ public class BiQuGeWebInfo extends WebInfo {
         Article article = new Article();
 
         // get article title
-        Element title = doc.getElementsByTag("h1").get(0);
-        Log.d(TAG, "Title" + title.toString());
-        article.setTitle(title.toString());
+        Elements titles = doc.getElementsByTag("h1");
+        if( titles != null ){
+            Log.d(TAG, "Title" + titles.get(0).toString());
+            article.setTitle(titles.get(0).toString());
+        }
+
 
         // get contents
         Element content = doc.getElementById("content");
