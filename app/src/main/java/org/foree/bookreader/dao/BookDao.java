@@ -223,4 +223,58 @@ public class BookDao {
 
         return chapterUrl;
     }
+
+    private int findIdByChapterUrl(String chapterUrl) {
+        Cursor cursor;
+        int ChapterId=0;
+        SQLiteDatabase db = bookSQLiteOpenHelper.getReadableDatabase();
+        db.beginTransaction();
+
+        cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_CHAPTER_LIST, null,
+                "chapter_url=?", new String[]{chapterUrl}, null, null, null);
+        if (cursor.getCount() != 0 && cursor.moveToFirst()) {
+            ChapterId = cursor.getInt(cursor.getColumnIndex("chapter_id"));
+        }
+
+        cursor.close();
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        db.close();
+
+        return ChapterId;
+    }
+
+    public String getNextChapterUrlByUrl(int flag, String url){
+
+        int chapterId = findIdByChapterUrl(url);
+
+        Cursor cursor;
+        String chapterUrl;
+        SQLiteDatabase db = bookSQLiteOpenHelper.getReadableDatabase();
+        db.beginTransaction();
+        String selection = null;
+        if (flag > 0){
+            // 获取下一章url
+            selection = "chapter_id > ?";
+        }else{
+            // 获取上一章url
+            selection = "chapter_id < ?";
+        }
+
+        cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_CHAPTER_LIST, new String[]{"chapter_url"},
+                selection, new String[]{chapterId + ""}, null, null, "chapter_id desc");
+        if (cursor.getCount() != 0 && cursor.moveToFirst()) {
+            chapterUrl = cursor.getString(cursor.getColumnIndex("chapter_url"));
+        }else{
+            // 没有上一章或者没有下一章
+            chapterUrl = "";
+        }
+
+        cursor.close();
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        db.close();
+
+        return chapterUrl;
+    }
 }
