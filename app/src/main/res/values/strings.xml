@@ -12,6 +12,9 @@
     <string name="search_hint">搜索小说</string>
     <string name="action_about">关于</string>
 
+    <!-- Article loading text -->
+    <string name="loading">正在加载</string>
+
     <!-- Action Mode Menu Items -->
     <string name="delete">删除</string>
     <string name="bt_add">加入书架</string>

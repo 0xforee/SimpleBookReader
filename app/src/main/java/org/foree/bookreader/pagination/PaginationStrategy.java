@@ -1,11 +1,16 @@
 package org.foree.bookreader.pagination;
 
 import android.content.Context;
+import android.support.v4.app.Fragment;
 import android.text.TextPaint;
+import android.util.Log;
 
+import org.foree.bookreader.R;
 import org.foree.bookreader.book.Article;
 import org.foree.bookreader.dao.BookDao;
 import org.foree.bookreader.net.NetCallback;
+import org.foree.bookreader.ui.adapter.ArticlePagerAdapter;
+import org.foree.bookreader.ui.fragment.ArticleFragment;
 import org.foree.bookreader.website.BiQuGeWebInfo;
 import org.foree.bookreader.website.WebInfo;
 
@@ -15,8 +20,8 @@ import org.foree.bookreader.website.WebInfo;
  * 和偏移量获取Pagination数据
  */
 
-public class PaginationStrategy {
-    private Pagination mPagination, mNextPagination, mPrePagination;
+public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
+    private final static String TAG = PaginationStrategy.class.getSimpleName();
 
     private int mWidth;
     private int mHeight;
@@ -26,6 +31,18 @@ public class PaginationStrategy {
     private boolean mIncludePad;
     private Context mContext;
     private BookDao bookDao;
+    private String initString;
+
+    private ArticleFragment[] sFragments;
+
+    private String chapterUrl;
+
+    private Pagination mPagination, mNextPagination, mPrePagination;
+
+    private int mOffset = -1;
+    private String mPreviousContents, mCurrentContents, mNextContents;
+
+    private int mPageIndex = 0;
 
     public PaginationStrategy(Context context, int mWidth, int mHeight, TextPaint mPaint, float mSpacingMult, float mSpacingAdd, boolean mIncludePad) {
         this.mContext = context;
@@ -38,9 +55,67 @@ public class PaginationStrategy {
 
         bookDao = new BookDao(mContext);
 
+        initString = mContext.getString(R.string.loading);
+
+        sFragments = new ArticleFragment[] {
+                ArticleFragment.newInstance(initString),
+                ArticleFragment.newInstance(initString),
+                ArticleFragment.newInstance(initString)
+        };
+
     }
 
-    public String getContents(String chapterUrl, int flag, int pageIndex) {
+    public void setChapterUrl(String chapterUrl) {
+        this.chapterUrl = chapterUrl;
+    }
+
+    @Override
+    public void onRefreshPage() {
+        Log.d(TAG, "onRefreshPage");
+            // 准备好数据
+            if (mOffset < 0) {
+                Log.d(TAG, "向左");
+
+            } else {
+                Log.d(TAG, "向右");
+            }
+
+            mPreviousContents = getContents(mOffset, mPageIndex);
+            mCurrentContents = getContents(mOffset, mPageIndex + 1);
+            mNextContents = getContents(mOffset, mPageIndex + 2);
+
+            Log.d(TAG, "chapterUrl = " + chapterUrl);
+            Log.d(TAG, "pageIndex = " + mPageIndex);
+            Log.d(TAG, "mPreviousContent = " + mPreviousContents);
+            Log.d(TAG, "mCurrentContents = " + mCurrentContents);
+            Log.d(TAG, "mNextContents = " + mNextContents);
+
+            resetPage();
+
+    }
+
+
+    private void resetPage(){
+        sFragments[0].setText(mPreviousContents);
+        sFragments[1].setText(mCurrentContents);
+        sFragments[2].setText(mNextContents);
+    }
+
+    @Override
+    public void onDataChanged(int offset) {
+        Log.d(TAG,"onDataChanged");
+        mPageIndex += offset;
+        mOffset = offset;
+
+    }
+
+    @Override
+    public Fragment getItem(int position) {
+        return sFragments[position];
+    }
+
+    private String getContents(int flag, int pageIndex) {
+        String results;
 
         if (mPagination == null) {
             mPagination = new Pagination(
@@ -67,35 +142,30 @@ public class PaginationStrategy {
         }
 
 
-        // 1. 分章
-        if (flag > 0) {
-            // 右滑情况
-            if ((pageIndex + 1) > mPagination.size()) {
-                // 分章
-                getNextPagination(chapterUrl, flag);
-                pageIndex = 0;
+            // 右滑分章
+        if (flag > 0 && (pageIndex + 1) > mPagination.size()) {
+            // 分章
+            getNextPagination(flag);
+            pageIndex = 0;
 
-                return mNextPagination.get(pageIndex);
+            results = mNextPagination.get(pageIndex);
 
-            }
+            // 左滑分章
+        } else if (flag < 0 && pageIndex < 0) {
+            getPrePagination(flag);
+            pageIndex = mPrePagination.size() - 1;
 
-        } else if (flag < 0) {
-            // 左滑情况
-            if (pageIndex < 0) {
-                // 分章
-                getPrePagination(chapterUrl, flag);
-                pageIndex = mPrePagination.size() - 1;
+            results = mPrePagination.get(pageIndex);
 
-                return mPrePagination.get(pageIndex);
-
-            }
+        } else {
+            // 2. 分页情况
+            results = mPagination.get(pageIndex);
         }
 
-        // 2. 分页情况
-        return mPagination.get(pageIndex);
+        return results != null ? results : initString;
     }
 
-    private void getPrePagination(String chapterUrl, int flag) {
+    private void getPrePagination(int flag) {
         // 当前章节 chapterUrl
         String preChapterUrl = bookDao.getNextChapterUrlByUrl(flag, chapterUrl);
         mPrePagination = new Pagination(
@@ -124,7 +194,7 @@ public class PaginationStrategy {
 
     }
 
-    private void getNextPagination(String chapterUrl, int flag) {
+    private void getNextPagination(int flag) {
         // 当前章节 chapterUrl
         String nextChapterUrl = bookDao.getNextChapterUrlByUrl(flag, chapterUrl);
         mNextPagination = new Pagination(
