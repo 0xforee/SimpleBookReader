@@ -64,8 +64,8 @@ public class Pagination {
         return mPages.size();
     }
 
-    public CharSequence get(int index) {
-        return (index >= 0 && index < mPages.size()) ? mPages.get(index) : null;
+    public String get(int index) {
+        return (index >= 0 && index < mPages.size()) ? mPages.get(index).toString() : null;
     }
 
     public void clear(){
