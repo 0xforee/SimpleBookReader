@@ -32,7 +32,7 @@ import org.foree.bookreader.R;
 import org.foree.bookreader.book.Book;
 import org.foree.bookreader.dao.BookDao;
 import org.foree.bookreader.service.RefreshService;
-import org.foree.bookreader.ui.fragment.BookListAdapter;
+import org.foree.bookreader.ui.adapter.BookListAdapter;
 
 import java.util.ArrayList;
 import java.util.List;

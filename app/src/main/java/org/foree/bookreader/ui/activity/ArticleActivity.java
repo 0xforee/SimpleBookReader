@@ -30,7 +30,7 @@ import org.foree.bookreader.dao.BookDao;
 import org.foree.bookreader.pagination.PaginationStrategy;
 import org.foree.bookreader.ui.adapter.ArticlePagerAdapter;
 import org.foree.bookreader.ui.fragment.ArticleFragment;
-import org.foree.bookreader.ui.fragment.ItemListAdapter;
+import org.foree.bookreader.ui.adapter.ItemListAdapter;
 
 import java.util.ArrayList;
 import java.util.List;

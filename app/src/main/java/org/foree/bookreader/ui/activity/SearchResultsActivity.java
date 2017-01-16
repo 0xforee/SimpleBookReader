@@ -4,7 +4,6 @@ import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -13,15 +12,11 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
-import android.widget.TextView;
 
 import org.foree.bookreader.R;
 import org.foree.bookreader.book.Book;
 import org.foree.bookreader.net.NetCallback;
-import org.foree.bookreader.ui.fragment.BookListAdapter;
+import org.foree.bookreader.ui.adapter.BookListAdapter;
 import org.foree.bookreader.website.BiQuGeWebInfo;
 import org.foree.bookreader.website.WebInfo;
 

@@ -1,4 +1,4 @@
-package org.foree.bookreader.ui.fragment;
+package org.foree.bookreader.ui.adapter;
 
 import android.content.Context;
 import android.graphics.Color;
