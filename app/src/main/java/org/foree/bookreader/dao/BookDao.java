@@ -252,17 +252,21 @@ public class BookDao {
         String chapterUrl;
         SQLiteDatabase db = bookSQLiteOpenHelper.getReadableDatabase();
         db.beginTransaction();
+
         String selection = null;
+        String orderBy = null;
         if (flag > 0){
             // 获取下一章url
             selection = "chapter_id > ?";
+            orderBy = "chapter_id asc";
         }else{
             // 获取上一章url
             selection = "chapter_id < ?";
+            orderBy = "chapter_id desc";
         }
 
         cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_CHAPTER_LIST, new String[]{"chapter_url"},
-                selection, new String[]{chapterId + ""}, null, null, "chapter_id asc");
+                selection, new String[]{chapterId + ""}, null, null, orderBy);
         if (cursor.getCount() != 0 && cursor.moveToFirst()) {
             chapterUrl = cursor.getString(cursor.getColumnIndex("chapter_url"));
         }else{

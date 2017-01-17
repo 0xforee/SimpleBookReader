@@ -2,6 +2,7 @@ package org.foree.bookreader;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
+import android.util.Log;
 
 import org.foree.bookreader.book.Book;
 import org.foree.bookreader.dao.BookDao;
@@ -15,6 +16,7 @@ import java.util.List;
  * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
  */
 public class ApplicationTest extends ApplicationTestCase<Application> {
+    private static final String TAG = ApplicationTest.class.getSimpleName();
     public ApplicationTest() {
         super(Application.class);
 
@@ -53,5 +55,13 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
             }
         });
+    }
+
+    public void testGetChapterByUrl(){
+        BookDao bookDao = new BookDao(getContext());
+        String bookUrl = "http://www.biquge.com/0_168/1214382.html";
+        String nextChapterUrl = bookDao.getNextChapterUrlByUrl(-1, bookUrl);
+
+        Log.d(TAG, "nextChapterUrl = " + nextChapterUrl);
     }
 }
