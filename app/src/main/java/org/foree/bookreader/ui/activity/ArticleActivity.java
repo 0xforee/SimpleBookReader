@@ -134,7 +134,7 @@ public class ArticleActivity extends AppCompatActivity {
                     mTextView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 }
 
-                if( mPaginationStrategy == null) {
+                if (mPaginationStrategy == null) {
                     mPaginationStrategy = new PaginationStrategy(
                             getApplicationContext(),
                             mTextView.getWidth(),
@@ -145,10 +145,9 @@ public class ArticleActivity extends AppCompatActivity {
                             mTextView.getIncludeFontPadding());
 
 
-                    mPaginationStrategy.setChapterUrl(chapterUrl);
                 }
-                if( !initFinished ) {
-
+                if (!initFinished) {
+                    mPaginationStrategy.setChapterUrl(chapterUrl);
                     mViewPager = (ViewPager) findViewById(R.id.book_pager);
                     articlePagerAdapter = new ArticlePagerAdapter(mViewPager, getSupportFragmentManager());
                     articlePagerAdapter.setPage(mPaginationStrategy);
