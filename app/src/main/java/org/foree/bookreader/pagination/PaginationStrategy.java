@@ -93,9 +93,9 @@ public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
 
         Log.d(TAG, "mChapterUrl = " + mChapterUrl);
         Log.d(TAG, "pageIndex = " + mPageIndex);
-        Log.d(TAG, "mPreviousContent = " + mPreviousContents);
-        Log.d(TAG, "mCurrentContents = " + mCurrentContents);
-        Log.d(TAG, "mNextContents = " + mNextContents);
+        Log.d(TAG, "mPreviousContent = " + mPreviousContents.substring(0, 4));
+        Log.d(TAG, "mCurrentContents = " + mCurrentContents.substring(0, 4));
+        Log.d(TAG, "mNextContents = " + mNextContents.substring(0, 4));
 
         resetPage();
 
@@ -120,63 +120,81 @@ public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
     public Fragment getItem(int position) {
         return sFragments[position];
     }
-
     private String getContents(int flag, int pageIndex) {
         String results;
 
-        // 右滑分章
-        if (flag > 0 && pageIndex >= mPagination.size()) {
-            // 基点没有变化，只获取下一章内容
-            if (pageIndex == mPagination.size()) {
-                getNextPagination(flag);
+        // 右滑
+        if (flag > 0 ) {
+            // 1. 分章
+            if(pageIndex >= mPagination.size()) {
+                // 基点没有变化，只获取下一章内容
+                if (pageIndex == mPagination.size()) {
+                    getNextPagination(flag);
 
-                results = mNextPagination.get(mPagination.size() - pageIndex);
-            } else if ((pageIndex - 1) == mPagination.size()) {
-                // 基点变化，切换基点到下一章
-                mPrePagination = mPagination;
-                mPagination = mNextPagination;
-                mChapterUrl = mNextChapterUrl;
-                getNextPagination(flag);
+                    results = mNextPagination.get(mPagination.size() - pageIndex);
+                } else if (pageIndex == (mPagination.size()+1) ) {
+                    // 基点变化，切换基点到下一章
+                    mPrePagination.switchTo(mPagination);
+                    mPagination.switchTo(mNextPagination);
+                    mChapterUrl = mNextChapterUrl;
 
-                // 确定此时索引
-                mPageIndex = mPrePagination.size() - pageIndex;
+                    getNextPagination(flag);
 
-                results = mPagination.get(mPageIndex + 2);
-            } else {
-                // 不应该有这种情况
-                Log.e(TAG, "error");
-                results = "error";
+                    // 确定此时索引
+                    mPageIndex = mPrePagination.size() - pageIndex;
+
+                    results = mPagination.get(mPageIndex + 2);
+                } else {
+                    // 不应该有这种情况
+                    Log.e(TAG, "error");
+                    results = "右滑error";
+                }
+            }else{
+                // 2. 分页情况
+                results = mPagination.get(pageIndex);
             }
 
             // 左滑分章
-        } else if (flag < 0 && pageIndex < 0) {
-            // 基点没有变化，只是获取上一章
-            if (pageIndex == -1) {
-                getPrePagination(flag);
-                pageIndex = mPrePagination.size() - 1;
+        } else if (flag < 0) {
+            if (pageIndex < 0) {
+                // 初始化，index == -1
+                // 基点没有变化，只是获取上一章
+                if (pageIndex == -1) {
+                    getPrePagination(flag);
+                    pageIndex = mPrePagination.size() - 1;
 
-                results = mPrePagination.get(pageIndex);
-            } else if (pageIndex == -2) {
-                // 基点变化，切换到上一章
-                mNextPagination = mPagination;
-                mPagination = mPrePagination;
-                // 获取更前一章的内容
-                mChapterUrl = mPreChapterUrl;
-                getPrePagination(flag);
+                    results = mPrePagination.get(pageIndex);
+                } else if (pageIndex == -2) {
+                    // 基点变化，切换到上一章
+                    mNextPagination.switchTo(mPagination);
+                    mPagination.switchTo(mPrePagination);
+                    // 获取更前一章的内容
+                    mChapterUrl = mPreChapterUrl;
+                    getPrePagination(flag);
 
-                // 确定此时此刻的索引
-                mPageIndex = mPagination.size() - 2;
+                    // 确定此时此刻的索引
+                    mPageIndex = mPagination.size() - 2;
 
-                results = mPagination.get(mPageIndex);
+                    results = mPagination.get(mPageIndex);
+                } else if (pageIndex == mPagination.size()) {
+                    // 基点没有变化，只获取下一章内容
+                    getNextPagination(flag);
+
+                    results = mNextPagination.get(mPagination.size() - pageIndex);
+
+                } else {
+                    // 不应该有其他情况
+                    Log.e(TAG, "error");
+                    results = "左滑error";
+                }
             } else {
-                // 不应该有其他情况
-                Log.e(TAG, "error");
-                results = "error";
+                // 初始化 pageindex = 0 and 1 的情况
+                // 2. 分页情况
+                results = mPagination.get(pageIndex);
             }
-
-        } else {
-            // 2. 分页情况
-            results = mPagination.get(pageIndex);
+        }else{
+            // 不可能情况，flag != 0，< 0表示左滑，>0表示右滑
+            results = "翻页error";
         }
 
         return results != null ? results : initString;
@@ -191,6 +209,7 @@ public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
             webInfo.getArticle(mPreChapterUrl, new NetCallback<Article>() {
                 @Override
                 public void onSuccess(Article data) {
+                    mPrePagination.clear();
                     mPrePagination.splitPage(data.getContents());
                 }
 
@@ -212,6 +231,7 @@ public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
             webInfo.getArticle(mNextChapterUrl, new NetCallback<Article>() {
                 @Override
                 public void onSuccess(Article data) {
+                    mNextPagination.clear();
                     mNextPagination.splitPage(data.getContents());
                 }
 
@@ -283,7 +303,8 @@ public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
             }
         });
 
-
+        getPrePagination(-1);
+        getNextPagination(1);
         mFullRefresh = false;
 
     }

@@ -71,4 +71,13 @@ public class Pagination {
     public void clear(){
         mPages.clear();
     }
+
+    public List<CharSequence> getPages() {
+        return mPages;
+    }
+
+    public void switchTo(Pagination other) {
+        mPages.clear();
+        mPages.addAll(other.getPages());
+    }
 }
