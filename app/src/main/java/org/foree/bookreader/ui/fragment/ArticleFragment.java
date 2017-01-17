@@ -36,6 +36,7 @@ public class ArticleFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.module_text_view, null);
         tvContents = (TextView) view.findViewById(R.id.book_content);
+        setText(getArguments().getString(ARG_CONTENT));
 
         return view;
     }
