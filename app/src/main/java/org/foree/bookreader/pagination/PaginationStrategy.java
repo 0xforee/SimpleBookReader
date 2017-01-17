@@ -35,7 +35,7 @@ public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
 
     private ArticleFragment[] sFragments;
 
-    private String chapterUrl;
+    private String mPreChapterUrl, mChapterUrl, mNextChapterUrl;
 
     private Pagination mPagination, mNextPagination, mPrePagination;
 
@@ -66,7 +66,7 @@ public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
     }
 
     public void setChapterUrl(String chapterUrl) {
-        this.chapterUrl = chapterUrl;
+        this.mChapterUrl = chapterUrl;
     }
 
     @Override
@@ -84,7 +84,7 @@ public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
             mCurrentContents = getContents(mOffset, mPageIndex + 1);
             mNextContents = getContents(mOffset, mPageIndex + 2);
 
-            Log.d(TAG, "chapterUrl = " + chapterUrl);
+            Log.d(TAG, "mChapterUrl = " + mChapterUrl);
             Log.d(TAG, "pageIndex = " + mPageIndex);
             Log.d(TAG, "mPreviousContent = " + mPreviousContents);
             Log.d(TAG, "mCurrentContents = " + mCurrentContents);
@@ -125,9 +125,10 @@ public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
                     mSpacingMult,
                     mSpacingAdd,
                     mIncludePad);
+        }
 
             WebInfo webInfo = new BiQuGeWebInfo();
-            webInfo.getArticle(chapterUrl, new NetCallback<Article>() {
+            webInfo.getArticle(mChapterUrl, new NetCallback<Article>() {
                 @Override
                 public void onSuccess(Article data) {
                     mPagination.clear();
@@ -139,23 +140,58 @@ public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
 
                 }
             });
-        }
+
 
 
             // 右滑分章
-        if (flag > 0 && (pageIndex + 1) > mPagination.size()) {
-            // 分章
-            getNextPagination(flag);
-            pageIndex = 0;
+        if (flag > 0 && pageIndex >= mPagination.size()) {
+            // 基点没有变化，只获取下一章内容
+            if (pageIndex == mPagination.size()) {
+                getNextPagination(flag);
 
-            results = mNextPagination.get(pageIndex);
+                results = mNextPagination.get(mPagination.size() - pageIndex);
+            } else if( (pageIndex-1) == mPagination.size() ){
+                // 基点变化，切换基点到下一章
+                mPrePagination = mPagination;
+                mPagination = mNextPagination;
+                mChapterUrl = mNextChapterUrl;
+                getNextPagination(flag);
+
+                // 确定此时索引
+                mPageIndex = mPrePagination.size() - pageIndex;
+
+                results = mPagination.get(mPageIndex + 2);
+            } else {
+                // 不应该有这种情况
+                Log.e(TAG, "error");
+                results = "error";
+            }
 
             // 左滑分章
         } else if (flag < 0 && pageIndex < 0) {
-            getPrePagination(flag);
-            pageIndex = mPrePagination.size() - 1;
+            // 基点没有变化，只是获取上一章
+            if (pageIndex == -1) {
+                getPrePagination(flag);
+                pageIndex = mPrePagination.size() - 1;
 
-            results = mPrePagination.get(pageIndex);
+                results = mPrePagination.get(pageIndex);
+            } else if (pageIndex == -2){
+                // 基点变化，切换到上一章
+                mNextPagination = mPagination;
+                mPagination = mPrePagination;
+                // 获取更前一章的内容
+                mChapterUrl = mPreChapterUrl;
+                getPrePagination(flag);
+
+                // 确定此时此刻的索引
+                mPageIndex = mPagination.size() -2;
+
+                results = mPagination.get(mPageIndex);
+            } else{
+                // 不应该有其他情况
+                Log.e(TAG, "error");
+                results = "error";
+            }
 
         } else {
             // 2. 分页情况
@@ -166,8 +202,8 @@ public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
     }
 
     private void getPrePagination(int flag) {
-        // 当前章节 chapterUrl
-        String preChapterUrl = bookDao.getNextChapterUrlByUrl(flag, chapterUrl);
+        // 当前章节 mChapterUrl
+        mPreChapterUrl = bookDao.getNextChapterUrlByUrl(flag, mChapterUrl);
         mPrePagination = new Pagination(
                 mWidth,
                 mHeight,
@@ -177,8 +213,8 @@ public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
                 mIncludePad);
 
         WebInfo webInfo = new BiQuGeWebInfo();
-        if (preChapterUrl != null && !preChapterUrl.isEmpty()) {
-            webInfo.getArticle(preChapterUrl, new NetCallback<Article>() {
+        if (mPreChapterUrl != null && !mPreChapterUrl.isEmpty()) {
+            webInfo.getArticle(mPreChapterUrl, new NetCallback<Article>() {
                 @Override
                 public void onSuccess(Article data) {
                     mPrePagination.splitPage(data.getContents());
@@ -195,8 +231,8 @@ public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
     }
 
     private void getNextPagination(int flag) {
-        // 当前章节 chapterUrl
-        String nextChapterUrl = bookDao.getNextChapterUrlByUrl(flag, chapterUrl);
+        // 当前章节 mChapterUrl
+        mNextChapterUrl = bookDao.getNextChapterUrlByUrl(flag, mChapterUrl);
         mNextPagination = new Pagination(
                 mWidth,
                 mHeight,
@@ -206,8 +242,8 @@ public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
                 mIncludePad);
 
         WebInfo webInfo = new BiQuGeWebInfo();
-        if (nextChapterUrl != null && !nextChapterUrl.isEmpty()) {
-            webInfo.getArticle(nextChapterUrl, new NetCallback<Article>() {
+        if (mNextChapterUrl != null && !mNextChapterUrl.isEmpty()) {
+            webInfo.getArticle(mNextChapterUrl, new NetCallback<Article>() {
                 @Override
                 public void onSuccess(Article data) {
                     mNextPagination.splitPage(data.getContents());
@@ -220,6 +256,12 @@ public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
             });
         }
 
+    }
+
+    public void reset(String chapterUrl){
+        mOffset = -1;
+        mPageIndex = 0;
+        mChapterUrl = chapterUrl;
 
     }
 }

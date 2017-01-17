@@ -6,14 +6,12 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,7 +27,6 @@ import org.foree.bookreader.book.Chapter;
 import org.foree.bookreader.dao.BookDao;
 import org.foree.bookreader.pagination.PaginationStrategy;
 import org.foree.bookreader.ui.adapter.ArticlePagerAdapter;
-import org.foree.bookreader.ui.fragment.ArticleFragment;
 import org.foree.bookreader.ui.adapter.ItemListAdapter;
 
 import java.util.ArrayList;
@@ -48,15 +45,14 @@ public class ArticleActivity extends AppCompatActivity {
         }
     };
     String chapterUrl, bookUrl;
-    private RecyclerView mRecyclerView;
-    private ItemListAdapter mAdapter;
+
     private List<Chapter> chapterList = new ArrayList<>();
-    private PopupWindow popupWindow;
-    private View rootView;
+
     private BookDao bookDao;
 
     private int recentChapterId = -1;
 
+    // view pager
     private ViewPager mViewPager;
     private ArticlePagerAdapter articlePagerAdapter;
     private TextView mTextView;
@@ -65,25 +61,25 @@ public class ArticleActivity extends AppCompatActivity {
 
     private boolean initFinished = false;
 
-
-
+    // popWindow
+    private PopupWindow popupWindow;
+    private View rootView;
+    private RecyclerView mRecyclerView;
+    private ItemListAdapter mAdapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.view_pager_layout);
 
+        // get chapterUrl and recentId
+        bookDao = new BookDao(this);
         bookUrl = getIntent().getExtras().getString("book_url");
+        openBook(bookUrl);
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setUpLayoutViews();
-
-        bookDao = new BookDao(this);
-        openBook(bookUrl);
-
-
-
         initTextView();
 
         /*turnNightMode.setOnClickListener(new View.OnClickListener() {
@@ -106,6 +102,24 @@ public class ArticleActivity extends AppCompatActivity {
         });
 */
 
+    }
+
+    private void setUpLayoutViews() {
+
+        rootView = LayoutInflater.from(this).inflate(R.layout.activity_article, null);
+
+        // get FloatActionButton
+        turnNightMode = (FloatingActionButton) findViewById(R.id.fab);
+
+        turnNightMode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (popupWindow == null)
+                    showPopup();
+                else
+                    popupWindow.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
+            }
+        });
     }
 
     private void initTextView() {
@@ -146,29 +160,10 @@ public class ArticleActivity extends AppCompatActivity {
         });
     }
 
-
     @Override
     protected void onDestroy() {
         closeBook();
         super.onDestroy();
-    }
-
-    private void setUpLayoutViews() {
-        rootView = LayoutInflater.from(this).inflate(R.layout.activity_article, null);
-
-
-        // get FloatActionButton
-        turnNightMode = (FloatingActionButton) findViewById(R.id.fab);
-
-        turnNightMode.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (popupWindow == null)
-                    showPopup();
-                else
-                    popupWindow.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
-            }
-        });
     }
 
     private void showPopup() {
@@ -202,6 +197,7 @@ public class ArticleActivity extends AppCompatActivity {
             public void onItemClick(View view, int position) {
                 chapterUrl = chapterList.get(position).getChapterUrl();
                 recentChapterId = chapterList.get(position).getChapterId();
+                mPaginationStrategy.reset(chapterUrl);
                 popupWindow.dismiss();
 
             }

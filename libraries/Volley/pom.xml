@@ -8,7 +8,7 @@
   <packaging>jar</packaging>
 
   <name>volley</name>
-  <chapterUrl>http://android.com</chapterUrl>
+  <mChapterUrl>http://android.com</mChapterUrl>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
