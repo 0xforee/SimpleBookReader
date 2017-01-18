@@ -226,7 +226,7 @@ public class BookDao {
 
     private int findIdByChapterUrl(String chapterUrl) {
         Cursor cursor;
-        int ChapterId=0;
+        int ChapterId = 0;
         SQLiteDatabase db = bookSQLiteOpenHelper.getReadableDatabase();
         db.beginTransaction();
 
@@ -244,7 +244,7 @@ public class BookDao {
         return ChapterId;
     }
 
-    public String getNextChapterUrlByUrl(int flag, String url){
+    public String getNextChapterUrlByUrl(int flag, String url) {
 
         int chapterId = findIdByChapterUrl(url);
 
@@ -255,11 +255,11 @@ public class BookDao {
 
         String selection = null;
         String orderBy = null;
-        if (flag > 0){
+        if (flag > 0) {
             // 获取下一章url
             selection = "chapter_id > ?";
             orderBy = "chapter_id asc";
-        }else{
+        } else {
             // 获取上一章url
             selection = "chapter_id < ?";
             orderBy = "chapter_id desc";
@@ -269,7 +269,7 @@ public class BookDao {
                 selection, new String[]{chapterId + ""}, null, null, orderBy);
         if (cursor.getCount() != 0 && cursor.moveToFirst()) {
             chapterUrl = cursor.getString(cursor.getColumnIndex("chapter_url"));
-        }else{
+        } else {
             // 没有上一章或者没有下一章
             chapterUrl = "";
         }

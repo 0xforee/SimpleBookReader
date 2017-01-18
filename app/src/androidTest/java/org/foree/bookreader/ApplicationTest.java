@@ -17,12 +17,13 @@ import java.util.List;
  */
 public class ApplicationTest extends ApplicationTestCase<Application> {
     private static final String TAG = ApplicationTest.class.getSimpleName();
+
     public ApplicationTest() {
         super(Application.class);
 
     }
 
-    public void testAddBookUnique(){
+    public void testAddBookUnique() {
         BookDao bookDao = new BookDao(getContext());
 
         // 测试book_url是不是unique
@@ -31,18 +32,18 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         bookDao.addBookInfo(book);
         bookDao.addBookInfo(book1);
 
-        List<Book> bookList =  bookDao.findAllBookList();
+        List<Book> bookList = bookDao.findAllBookList();
         assertEquals(bookList.size(), 4);
     }
 
-    public void testRemoveBook(){
+    public void testRemoveBook() {
         BookDao bookDao = new BookDao(getContext());
 
         String book_url = "http://m.bxwx9.org/b/98/98289/";
         bookDao.removeBookInfo(book_url);
     }
 
-    public void testParseBookInfo(){
+    public void testParseBookInfo() {
         WebInfo webInfo = new BiQuGeWebInfo();
         webInfo.getBookInfo("http://www.biquge.com/0_168/", new NetCallback<Book>() {
             @Override
@@ -57,7 +58,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         });
     }
 
-    public void testGetChapterByUrl(){
+    public void testGetChapterByUrl() {
         BookDao bookDao = new BookDao(getContext());
         String bookUrl = "http://www.biquge.com/0_168/1214382.html";
         String nextChapterUrl = bookDao.getNextChapterUrlByUrl(-1, bookUrl);

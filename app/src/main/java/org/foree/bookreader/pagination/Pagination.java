@@ -68,7 +68,7 @@ public class Pagination {
         return (index >= 0 && index < mPages.size()) ? mPages.get(index).toString() : null;
     }
 
-    public void clear(){
+    public void clear() {
         mPages.clear();
     }
 

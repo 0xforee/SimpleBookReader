@@ -120,19 +120,20 @@ public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
     public Fragment getItem(int position) {
         return sFragments[position];
     }
+
     private String getContents(int flag, int pageIndex) {
         String results;
 
         // 右滑
-        if (flag > 0 ) {
+        if (flag > 0) {
             // 1. 分章
-            if(pageIndex >= mPagination.size()) {
+            if (pageIndex >= mPagination.size()) {
                 // 基点没有变化，只获取下一章内容
                 if (pageIndex == mPagination.size()) {
                     getNextPagination(flag);
 
                     results = mNextPagination.get(mPagination.size() - pageIndex);
-                } else if (pageIndex == (mPagination.size()+1) ) {
+                } else if (pageIndex == (mPagination.size() + 1)) {
                     // 基点变化，切换基点到下一章
                     mPrePagination.switchTo(mPagination);
                     mPagination.switchTo(mNextPagination);
@@ -149,7 +150,7 @@ public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
                     Log.e(TAG, "error");
                     results = "右滑error";
                 }
-            }else{
+            } else {
                 // 2. 分页情况
                 results = mPagination.get(pageIndex);
             }
@@ -192,7 +193,7 @@ public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
                 // 2. 分页情况
                 results = mPagination.get(pageIndex);
             }
-        }else{
+        } else {
             // 不可能情况，flag != 0，< 0表示左滑，>0表示右滑
             results = "翻页error";
         }

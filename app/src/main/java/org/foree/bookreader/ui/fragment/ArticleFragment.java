@@ -31,6 +31,7 @@ public class ArticleFragment extends Fragment {
             tvContents.setText(Html.fromHtml(contents));
         }
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

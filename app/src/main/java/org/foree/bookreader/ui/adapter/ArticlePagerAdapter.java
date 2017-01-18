@@ -16,7 +16,9 @@ public class ArticlePagerAdapter extends FragmentPagerAdapter {
 
     public interface UnlimitedPager {
         public void onRefreshPage();
+
         public void onDataChanged(int offset);
+
         public Fragment getItem(int position);
     }
 

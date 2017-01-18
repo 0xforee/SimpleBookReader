@@ -32,8 +32,8 @@ public class PageTextView extends TextView {
         init();
     }
 
-    private void init(){
-        if ( mTextPaint == null){
+    private void init() {
+        if (mTextPaint == null) {
             mTextPaint = new TextPaint();
         }
     }
@@ -45,7 +45,7 @@ public class PageTextView extends TextView {
 
         mTextPaint.setTextSize(50);
         mTextPaint.clearShadowLayer();
-        StaticLayout mStaticLayout = new StaticLayout(TEXT, mTextPaint, canvas.getWidth(), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f,false);
+        StaticLayout mStaticLayout = new StaticLayout(TEXT, mTextPaint, canvas.getWidth(), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
         mStaticLayout.draw(canvas);
         //canvas.drawText(TEXT, 0, Math.abs(fontMetrics.top), mTextPaint);
 
