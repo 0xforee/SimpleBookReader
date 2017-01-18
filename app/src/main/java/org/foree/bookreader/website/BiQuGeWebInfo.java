@@ -11,7 +11,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -51,7 +50,7 @@ public class BiQuGeWebInfo extends WebInfo {
     }
 
     @Override
-    Book parseBookInfo(Document doc) {
+    Book parseBookInfo(String bookUrl, Document doc) {
         Book book = new Book();
         Chapter newestChapter = new Chapter();
 
@@ -67,9 +66,6 @@ public class BiQuGeWebInfo extends WebInfo {
                     break;
                 case "og:novel:book_name":
                     book.setBookName(update.attr("content"));
-                    break;
-                case "og:novel:read_url":
-                    book.setBookUrl(update.attr("content"));
                     break;
                 case "og:description":
                     String description = update.attr("content");
@@ -93,7 +89,7 @@ public class BiQuGeWebInfo extends WebInfo {
             }
         }
         book.setNewestChapter(newestChapter);
-
+        book.setBookUrl(bookUrl);
         // ChapterList
         List<Chapter> chapters = new ArrayList<>();
         Elements elements_contents = doc.select("dd");
@@ -105,7 +101,7 @@ public class BiQuGeWebInfo extends WebInfo {
             chapter.setChapterTitle(link.text());
             chapter.setChapterUrl(url + link.attr("href"));
             // set bookUrl
-            chapter.setBookUrl(book.getBookUrl());
+            chapter.setBookUrl(bookUrl);
             // set chapterId for sort
             chapter.setChapterId(getChapterId(link.attr("href")));
 
@@ -118,20 +114,13 @@ public class BiQuGeWebInfo extends WebInfo {
         return book;
     }
 
-    private int getChapterId(String url) {
-        // convert http://m.bxwx9.org/0_168/2512063.html ==> 2512063
-
-        String[] subString = url.split("/|\\.");
-        return Integer.parseInt(subString[subString.length - 2]);
-    }
-
     @Override
-    List<Chapter> parseChapterList(Document doc) {
+    List<Chapter> parseChapterList(String bookUrl, Document doc) {
         return null;
     }
 
     @Override
-    Article parseArticle(Document doc) {
+    Article parseArticle(String chapterUrl, Document doc) {
         Article article = new Article();
 
         // get article title

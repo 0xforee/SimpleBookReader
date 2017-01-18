@@ -25,11 +25,11 @@ public abstract class WebInfo implements IWebParser {
 
     abstract List<Book> parseBookList(Document doc);
 
-    abstract Book parseBookInfo(Document doc);
+    abstract Book parseBookInfo(String bookUrl, Document doc);
 
-    abstract List<Chapter> parseChapterList(Document doc);
+    abstract List<Chapter> parseChapterList(String bookUrl, Document doc);
 
-    abstract Article parseArticle(Document doc);
+    abstract Article parseArticle(String chapterUrl, Document doc);
 
     @Override
     public void searchBook(final String keywords, final NetCallback<List<Book>> netCallback) {
@@ -63,7 +63,7 @@ public abstract class WebInfo implements IWebParser {
                 try {
                     doc = Jsoup.connect(bookUrl).get();
                     if (netCallback != null && doc != null) {
-                        netCallback.onSuccess(parseBookInfo(doc));
+                        netCallback.onSuccess(parseBookInfo(bookUrl, doc));
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -86,7 +86,7 @@ public abstract class WebInfo implements IWebParser {
                 try {
                     doc = Jsoup.connect(bookUrl).get();
                     if (netCallback != null && doc != null) {
-                        netCallback.onSuccess(parseChapterList(doc));
+                        netCallback.onSuccess(parseChapterList(bookUrl, doc));
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -108,7 +108,7 @@ public abstract class WebInfo implements IWebParser {
                 try {
                     doc = Jsoup.connect(chapterUrl).get();
                     if (netCallback != null && doc != null) {
-                        netCallback.onSuccess(parseArticle(doc));
+                        netCallback.onSuccess(parseArticle(chapterUrl, doc));
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -118,5 +118,12 @@ public abstract class WebInfo implements IWebParser {
                 }
             }
         }.start();
+    }
+
+    int getChapterId(String url) {
+        // convert http://m.bxwx9.org/0_168/2512063.html ==> 2512063
+
+        String[] subString = url.split("/|\\.");
+        return Integer.parseInt(subString[subString.length - 2]);
     }
 }

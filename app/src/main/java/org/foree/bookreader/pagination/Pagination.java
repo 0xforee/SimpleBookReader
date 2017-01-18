@@ -20,13 +20,13 @@ public class Pagination {
     private final TextPaint mPaint;
     private final List<CharSequence> mPages;
 
-    public Pagination(int pageW, int pageH, TextPaint paint, float spacingMult, float spacingAdd, boolean inclidePad) {
+    public Pagination(int pageW, int pageH, TextPaint paint, float spacingMult, float spacingAdd, boolean includePad) {
         this.mWidth = pageW;
         this.mHeight = pageH;
         this.mPaint = paint;
         this.mSpacingMult = spacingMult;
         this.mSpacingAdd = spacingAdd;
-        this.mIncludePad = inclidePad;
+        this.mIncludePad = includePad;
         this.mPages = new ArrayList<CharSequence>();
 
     }
@@ -72,7 +72,7 @@ public class Pagination {
         mPages.clear();
     }
 
-    public List<CharSequence> getPages() {
+    private List<CharSequence> getPages() {
         return mPages;
     }
 
