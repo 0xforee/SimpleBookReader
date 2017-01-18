@@ -11,8 +11,8 @@ import org.foree.bookreader.dao.BookDao;
 import org.foree.bookreader.net.NetCallback;
 import org.foree.bookreader.ui.adapter.ArticlePagerAdapter;
 import org.foree.bookreader.ui.fragment.ArticleFragment;
-import org.foree.bookreader.website.BiQuGeWebInfo;
 import org.foree.bookreader.website.WebInfo;
+import org.foree.bookreader.website.WebInfoManager;
 
 /**
  * Created by foree on 17-1-16.
@@ -31,6 +31,7 @@ public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
     private boolean mIncludePad;
     private Context mContext;
     private BookDao bookDao;
+    private WebInfo webInfo;
     private String initString;
 
     private ArticleFragment[] sFragments;
@@ -64,6 +65,8 @@ public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
                 ArticleFragment.newInstance(initString),
                 ArticleFragment.newInstance(initString)
         };
+
+        webInfo = WebInfoManager.getWebInfo();
 
     }
 
@@ -205,7 +208,6 @@ public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
         // 当前章节 mChapterUrl
         mPreChapterUrl = bookDao.getNextChapterUrlByUrl(flag, mChapterUrl);
 
-        WebInfo webInfo = new BiQuGeWebInfo();
         if (mPreChapterUrl != null && !mPreChapterUrl.isEmpty()) {
             webInfo.getArticle(mPreChapterUrl, new NetCallback<Article>() {
                 @Override
@@ -227,7 +229,6 @@ public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
         // 当前章节 mChapterUrl
         mNextChapterUrl = bookDao.getNextChapterUrlByUrl(flag, mChapterUrl);
 
-        WebInfo webInfo = new BiQuGeWebInfo();
         if (mNextChapterUrl != null && !mNextChapterUrl.isEmpty()) {
             webInfo.getArticle(mNextChapterUrl, new NetCallback<Article>() {
                 @Override
@@ -291,7 +292,6 @@ public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
         mNextPagination.clear();
 
         // 获取当前章节，只在reset的时候进行
-        WebInfo webInfo = new BiQuGeWebInfo();
         webInfo.getArticle(mChapterUrl, new NetCallback<Article>() {
             @Override
             public void onSuccess(Article data) {
