@@ -2,12 +2,9 @@ package org.foree.bookreader;
 
 import android.util.Log;
 
-import org.foree.bookreader.book.Article;
 import org.foree.bookreader.book.Book;
 import org.foree.bookreader.book.Chapter;
-import org.foree.bookreader.net.NetCallback;
-import org.foree.bookreader.website.BQGMWebInfo;
-import org.foree.bookreader.website.WebInfo;
+import org.foree.bookreader.parser.AbsWebParser;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -15,6 +12,8 @@ import org.jsoup.select.Elements;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.junit.Assert.*;
 
@@ -153,6 +152,16 @@ public class ExampleUnitTest {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void getWebParser() {
+        String url = "http://www.biquge.com/0_168/2494428.html";
+
+        if (url.contains("http://") && url.length() > 7 ){
+            System.out.println(url.indexOf("/", 7));
+            System.out.println(url.substring(0,url.indexOf("/", 7)));
         }
     }
 
