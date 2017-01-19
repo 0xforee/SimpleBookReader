@@ -21,11 +21,24 @@ import java.util.List;
 public class BQGMWebParser extends AbsWebParser {
     private final static String TAG = BQGMWebParser.class.getSimpleName();
 
-    public BQGMWebParser() {
-        name = "笔趣阁";
-        web_char = "utf-8";
-        url = "http://m.biquge.com";
-        searchApi = "http://zhannei.baidu.com/cse/search?s=287293036948159515&q=";
+    @Override
+    String getHostName() {
+        return "笔趣阁移动版";
+    }
+
+    @Override
+    String getWebChar() {
+        return "utf-8";
+    }
+
+    @Override
+    String getHostUrl() {
+        return "http://m.biquge.com";
+    }
+
+    @Override
+    String getSearchApi() {
+        return "http://zhannei.baidu.com/cse/search?s=287293036948159515&q=";
     }
 
     @Override
@@ -83,7 +96,7 @@ public class BQGMWebParser extends AbsWebParser {
                                 Elements newest_ele = otherInfo.getElementsByTag("a");
                                 if (newest_ele != null && !newest_ele.isEmpty()) {
                                     newestChapter.setChapterTitle(otherInfo.text().split("：")[1]);
-                                    newestChapter.setChapterUrl(url + newest_ele.get(0).attr("href"));
+                                    newestChapter.setChapterUrl(getHostUrl() + newest_ele.get(0).attr("href"));
                                     newestChapter.setChapterId(getChapterId(newest_ele.get(0).attr("href")));
                                     newestChapter.setBookUrl(bookUrl);
                                 }
@@ -114,7 +127,7 @@ public class BQGMWebParser extends AbsWebParser {
         for (Element infoNode : chapterElements) {
             if (infoNode.toString().contains("完整目录")) {
                 if (infoNode.child(0) != null) {
-                    chapterListUrl = url + infoNode.child(0).attr("href");
+                    chapterListUrl = getHostUrl() + infoNode.child(0).attr("href");
                     Log.d(TAG, "chapterListUrl = " + chapterListUrl);
                 }
             }
@@ -134,9 +147,9 @@ public class BQGMWebParser extends AbsWebParser {
                         if (chapterLink != null) {
                             chapter.setBookUrl(bookUrl);
                             chapter.setChapterTitle(chapterLink.text());
-                            chapter.setChapterUrl(url + chapterLink.attr("href"));
+                            chapter.setChapterUrl(getHostUrl() + chapterLink.attr("href"));
                             chapter.setChapterId(getChapterId(chapterLink.attr("href")));
-                            Log.d(TAG, url + chapterLink.attr("href"));
+                            Log.d(TAG, getHostUrl() + chapterLink.attr("href"));
                             Log.d(TAG, chapterLink.text());
                         }
                     }

@@ -20,11 +20,24 @@ import java.util.List;
 public class BiQuGeWebParser extends AbsWebParser {
     private static final String TAG = BiQuGeWebParser.class.getSimpleName();
 
-    public BiQuGeWebParser() {
-        name = "笔趣阁";
-        web_char = "utf-8";
-        url = "http://www.biquge.com";
-        searchApi = "http://zhannei.baidu.com/cse/search?s=287293036948159515&q=";
+    @Override
+    String getHostName() {
+        return "笔趣阁";
+    }
+
+    @Override
+    String getWebChar() {
+        return "utf-8";
+    }
+
+    @Override
+    String getHostUrl() {
+        return "http://www.biquge.com";
+    }
+
+    @Override
+    String getSearchApi() {
+        return "http://zhannei.baidu.com/cse/search?s=287293036948159515&q=";
     }
 
     @Override
@@ -99,7 +112,7 @@ public class BiQuGeWebParser extends AbsWebParser {
             Chapter chapter = new Chapter();
 
             chapter.setChapterTitle(link.text());
-            chapter.setChapterUrl(url + link.attr("href"));
+            chapter.setChapterUrl(getHostUrl() + link.attr("href"));
             // set bookUrl
             chapter.setBookUrl(bookUrl);
             // set chapterId for sort

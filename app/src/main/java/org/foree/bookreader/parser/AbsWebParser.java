@@ -17,11 +17,37 @@ import java.util.List;
 public abstract class AbsWebParser implements IWebParser {
     private static final String TAG = AbsWebParser.class.getSimpleName();
 
-    protected String name;
-    protected String web_char;
-    protected String url;
-    protected String searchApi;
+    // webParser base info
+    /**
+     * 获取目标网站名称
+     *
+     * @return 网站名称
+     */
+    abstract String getHostName();
 
+    /**
+     * 获取解析网站的网页编码
+     *
+     * @return 网页编码
+     */
+    abstract String getWebChar();
+
+    /**
+     * 获取目标网站地址
+     *
+     * @return 网页主机host地址
+     */
+    abstract String getHostUrl();
+
+    /**
+     * 获取搜索api用于传入搜索关键字
+     *
+     * @return 搜索api
+     */
+    abstract String getSearchApi();
+
+
+    // parse api
     abstract List<Book> parseBookList(Document doc);
 
     abstract Book parseBookInfo(String bookUrl, Document doc);
@@ -38,7 +64,7 @@ public abstract class AbsWebParser implements IWebParser {
                 super.run();
                 Document doc;
                 try {
-                    doc = Jsoup.connect(searchApi + keywords).get();
+                    doc = Jsoup.connect(getSearchApi() + keywords).get();
                     if (netCallback != null && doc != null) {
                         netCallback.onSuccess(parseBookList(doc));
                     }
