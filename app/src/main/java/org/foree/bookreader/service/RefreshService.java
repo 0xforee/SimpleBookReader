@@ -167,7 +167,7 @@ public class RefreshService extends Service {
 
     // sync data from server
     private void downloadChapter(final Chapter chapter) {
-        AbsWebParser absWebParser = WebParserManager.getAbsWebParser();
+        AbsWebParser absWebParser = WebParserManager.getInstance().getWebParser(chapter.getChapterUrl());
         absWebParser.getArticle(chapter.getChapterUrl(), new NetCallback<Article>() {
             @Override
             public void onSuccess(Article data) {

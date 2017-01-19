@@ -32,14 +32,6 @@ public class WebParserManager {
 
     }
 
-    public static AbsWebParser getAbsWebParser() {
-        if (absWebParser == null) {
-            absWebParser = new BiQuGeWebParser();
-        }
-
-        return absWebParser;
-    }
-
     public AbsWebParser getWebParser(String url) {
         // parse host url
         if (url.contains("http://") && url.length() > 7) {

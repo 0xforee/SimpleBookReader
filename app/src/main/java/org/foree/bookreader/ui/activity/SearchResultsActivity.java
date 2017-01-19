@@ -84,7 +84,7 @@ public class SearchResultsActivity extends AppCompatActivity {
             String query = intent.getStringExtra(SearchManager.QUERY);
             Log.d(TAG, "query keywords = " + query);
 
-            AbsWebParser webinfo = WebParserManager.getAbsWebParser();
+            AbsWebParser webinfo = WebParserManager.getInstance().getWebParser(query);
             webinfo.searchBook(query, new NetCallback<List<Book>>() {
                 @Override
                 public void onSuccess(final List<Book> data) {

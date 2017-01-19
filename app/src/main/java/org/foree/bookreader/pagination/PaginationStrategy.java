@@ -66,8 +66,6 @@ public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
                 ArticleFragment.newInstance(initString)
         };
 
-        absWebParser = WebParserManager.getAbsWebParser();
-
     }
 
     public void setChapterUrl(String chapterUrl) {
@@ -209,6 +207,8 @@ public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
         mPreChapterUrl = bookDao.getNextChapterUrlByUrl(flag, mChapterUrl);
 
         if (mPreChapterUrl != null && !mPreChapterUrl.isEmpty()) {
+            absWebParser = WebParserManager.getInstance().getWebParser(mChapterUrl);
+
             absWebParser.getArticle(mPreChapterUrl, new NetCallback<Article>() {
                 @Override
                 public void onSuccess(Article data) {
@@ -230,6 +230,8 @@ public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
         mNextChapterUrl = bookDao.getNextChapterUrlByUrl(flag, mChapterUrl);
 
         if (mNextChapterUrl != null && !mNextChapterUrl.isEmpty()) {
+            absWebParser = WebParserManager.getInstance().getWebParser(mChapterUrl);
+
             absWebParser.getArticle(mNextChapterUrl, new NetCallback<Article>() {
                 @Override
                 public void onSuccess(Article data) {
@@ -292,6 +294,7 @@ public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
         mNextPagination.clear();
 
         // 获取当前章节，只在reset的时候进行
+        absWebParser = WebParserManager.getInstance().getWebParser(mChapterUrl);
         absWebParser.getArticle(mChapterUrl, new NetCallback<Article>() {
             @Override
             public void onSuccess(Article data) {

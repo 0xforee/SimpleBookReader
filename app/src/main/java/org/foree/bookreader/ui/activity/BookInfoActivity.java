@@ -72,7 +72,7 @@ public class BookInfoActivity extends AppCompatActivity {
     }
 
     private void setupView() {
-        AbsWebParser webinfo = WebParserManager.getAbsWebParser();
+        AbsWebParser webinfo = WebParserManager.getInstance().getWebParser(bookUrl);
         webinfo.getBookInfo(bookUrl, new NetCallback<Book>() {
             @Override
             public void onSuccess(final Book data) {
