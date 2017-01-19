@@ -22,9 +22,8 @@ import org.foree.bookreader.book.Chapter;
 import org.foree.bookreader.dao.BookDao;
 import org.foree.bookreader.net.NetCallback;
 import org.foree.bookreader.utils.FileUtils;
-import org.foree.bookreader.website.BiQuGeWebInfo;
-import org.foree.bookreader.website.WebInfo;
-import org.foree.bookreader.website.WebInfoManager;
+import org.foree.bookreader.parser.AbsWebParser;
+import org.foree.bookreader.parser.WebParserManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -168,8 +167,8 @@ public class RefreshService extends Service {
 
     // sync data from server
     private void downloadChapter(final Chapter chapter) {
-        WebInfo webInfo = WebInfoManager.getWebInfo();
-        webInfo.getArticle(chapter.getChapterUrl(), new NetCallback<Article>() {
+        AbsWebParser absWebParser = WebParserManager.getAbsWebParser();
+        absWebParser.getArticle(chapter.getChapterUrl(), new NetCallback<Article>() {
             @Override
             public void onSuccess(Article data) {
                 File chapterCache = new File(BaseApplication.getInstance().getCacheDirString()

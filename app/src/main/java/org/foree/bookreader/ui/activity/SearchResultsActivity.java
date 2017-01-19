@@ -17,9 +17,8 @@ import org.foree.bookreader.R;
 import org.foree.bookreader.book.Book;
 import org.foree.bookreader.net.NetCallback;
 import org.foree.bookreader.ui.adapter.BookListAdapter;
-import org.foree.bookreader.website.BiQuGeWebInfo;
-import org.foree.bookreader.website.WebInfo;
-import org.foree.bookreader.website.WebInfoManager;
+import org.foree.bookreader.parser.AbsWebParser;
+import org.foree.bookreader.parser.WebParserManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,7 +84,7 @@ public class SearchResultsActivity extends AppCompatActivity {
             String query = intent.getStringExtra(SearchManager.QUERY);
             Log.d(TAG, "query keywords = " + query);
 
-            WebInfo webinfo = WebInfoManager.getWebInfo();
+            AbsWebParser webinfo = WebParserManager.getAbsWebParser();
             webinfo.searchBook(query, new NetCallback<List<Book>>() {
                 @Override
                 public void onSuccess(final List<Book> data) {

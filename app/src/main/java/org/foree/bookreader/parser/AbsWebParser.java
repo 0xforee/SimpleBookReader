@@ -1,10 +1,9 @@
-package org.foree.bookreader.website;
+package org.foree.bookreader.parser;
 
 import org.foree.bookreader.book.Article;
 import org.foree.bookreader.book.Book;
 import org.foree.bookreader.book.Chapter;
 import org.foree.bookreader.net.NetCallback;
-import org.foree.bookreader.parser.IWebParser;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -15,8 +14,8 @@ import java.util.List;
  * Created by foree on 17-1-7.
  */
 
-public abstract class WebInfo implements IWebParser {
-    private static final String TAG = WebInfo.class.getSimpleName();
+public abstract class AbsWebParser implements IWebParser {
+    private static final String TAG = AbsWebParser.class.getSimpleName();
 
     protected String name;
     protected String web_char;

@@ -1,4 +1,4 @@
-package org.foree.bookreader.website;
+package org.foree.bookreader.parser;
 
 import android.util.Log;
 
@@ -18,10 +18,10 @@ import java.util.List;
  * Created by foree on 17-1-18.
  */
 
-public class BQGMWebInfo extends WebInfo {
-    private final static String TAG = BQGMWebInfo.class.getSimpleName();
+public class BQGMWebParser extends AbsWebParser {
+    private final static String TAG = BQGMWebParser.class.getSimpleName();
 
-    public BQGMWebInfo() {
+    public BQGMWebParser() {
         name = "笔趣阁";
         web_char = "utf-8";
         url = "http://m.biquge.com";
@@ -39,11 +39,11 @@ public class BQGMWebInfo extends WebInfo {
             //Log.d(TAG, titles.toString());
             Element title = titles.get(0);
 
-            Log.d(TAG, title.attr("href").replace("www","m"));
+            Log.d(TAG, title.attr("href").replace("www", "m"));
             Log.d(TAG, title.attr("title"));
 
             book.setBookName(title.attr("title"));
-            book.setBookUrl(title.attr("href").replace("www","m"));
+            book.setBookUrl(title.attr("href").replace("www", "m"));
             bookList.add(book);
 
         }

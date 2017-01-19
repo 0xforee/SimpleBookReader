@@ -16,9 +16,8 @@ import org.foree.bookreader.R;
 import org.foree.bookreader.book.Book;
 import org.foree.bookreader.dao.BookDao;
 import org.foree.bookreader.net.NetCallback;
-import org.foree.bookreader.website.BiQuGeWebInfo;
-import org.foree.bookreader.website.WebInfo;
-import org.foree.bookreader.website.WebInfoManager;
+import org.foree.bookreader.parser.AbsWebParser;
+import org.foree.bookreader.parser.WebParserManager;
 
 /**
  * Created by foree on 17-1-10.
@@ -73,7 +72,7 @@ public class BookInfoActivity extends AppCompatActivity {
     }
 
     private void setupView() {
-        WebInfo webinfo = WebInfoManager.getWebInfo();
+        AbsWebParser webinfo = WebParserManager.getAbsWebParser();
         webinfo.getBookInfo(bookUrl, new NetCallback<Book>() {
             @Override
             public void onSuccess(final Book data) {

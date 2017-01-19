@@ -1,4 +1,4 @@
-package org.foree.bookreader.website;
+package org.foree.bookreader.parser;
 
 import android.util.Log;
 
@@ -17,10 +17,10 @@ import java.util.List;
  * Created by foree on 17-1-7.
  */
 
-public class BiQuGeWebInfo extends WebInfo {
-    private static final String TAG = BiQuGeWebInfo.class.getSimpleName();
+public class BiQuGeWebParser extends AbsWebParser {
+    private static final String TAG = BiQuGeWebParser.class.getSimpleName();
 
-    public BiQuGeWebInfo() {
+    public BiQuGeWebParser() {
         name = "笔趣阁";
         web_char = "utf-8";
         url = "http://www.biquge.com";
