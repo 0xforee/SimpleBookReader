@@ -27,6 +27,8 @@ public class WebParserManager {
 
     private WebParserManager() {
         mParserMap = new HashMap<>();
+        mParserMap.put("http://www.biquge.com", new BiQuGeWebParser());
+        mParserMap.put("http://m.biquge.com", new BQGMWebParser());
 
     }
 
@@ -39,11 +41,20 @@ public class WebParserManager {
     }
 
     public AbsWebParser getWebParser(String url) {
-        return mParserMap.get(url);
+        // parse host url
+        if (url.contains("http://") && url.length() > 7) {
+            String keyUrl = url.substring(0, url.indexOf("/", 7));
+            return mParserMap.get(keyUrl);
+        } else {
+            return new NullWebParser();
+        }
     }
 
     public void registerParser(String url, AbsWebParser parser) {
-        mParserMap.put(url, parser);
+        if (!url.startsWith("http://"))
+            throw new RuntimeException("Url Must be start With \"http://\"");
+        else
+            mParserMap.put(url, parser);
     }
 
     public void unRegisterParser(String url) {
