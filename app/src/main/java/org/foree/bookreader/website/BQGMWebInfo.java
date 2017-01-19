@@ -30,7 +30,24 @@ public class BQGMWebInfo extends WebInfo {
 
     @Override
     List<Book> parseBookList(Document doc) {
-        return null;
+        List<Book> bookList = new ArrayList<>();
+        Elements resultList = doc.getElementsByClass("result-game-item");
+        for (Element result : resultList) {
+            Book book = new Book();
+            //Log.d(TAG, result.toString());
+            Elements titles = result.getElementsByClass("result-game-item-title-link");
+            //Log.d(TAG, titles.toString());
+            Element title = titles.get(0);
+
+            Log.d(TAG, title.attr("href").replace("www","m"));
+            Log.d(TAG, title.attr("title"));
+
+            book.setBookName(title.attr("title"));
+            book.setBookUrl(title.attr("href").replace("www","m"));
+            bookList.add(book);
+
+        }
+        return bookList;
     }
 
     @Override
@@ -43,7 +60,7 @@ public class BQGMWebInfo extends WebInfo {
             Element bookInfo = updates.get(0);
             Elements bookNames = bookInfo.getElementsByTag("h2");
             if (bookNames != null && !bookNames.isEmpty()) {
-                book.setBookName(bookNames.get(0).toString());
+                book.setBookName(bookNames.get(0).text());
             }
 
             Elements bookOthers = bookInfo.getElementsByTag("p");
@@ -98,6 +115,7 @@ public class BQGMWebInfo extends WebInfo {
             if (infoNode.toString().contains("完整目录")) {
                 if (infoNode.child(0) != null) {
                     chapterListUrl = url + infoNode.child(0).attr("href");
+                    Log.d(TAG, "chapterListUrl = " + chapterListUrl);
                 }
             }
         }
@@ -118,8 +136,8 @@ public class BQGMWebInfo extends WebInfo {
                             chapter.setChapterTitle(chapterLink.text());
                             chapter.setChapterUrl(url + chapterLink.attr("href"));
                             chapter.setChapterId(getChapterId(chapterLink.attr("href")));
-                            //Log.d(TAG, url + chapterLink.attr("href"));
-                            //Log.d(TAG, chapterLink.text());
+                            Log.d(TAG, url + chapterLink.attr("href"));
+                            Log.d(TAG, chapterLink.text());
                         }
                     }
                 }
