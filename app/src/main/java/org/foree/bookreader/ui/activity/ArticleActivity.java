@@ -55,7 +55,7 @@ public class ArticleActivity extends AppCompatActivity {
     // view pager
     private ViewPager mViewPager;
     private ArticlePagerAdapter articlePagerAdapter;
-    private TextView mTextView;
+    private TextView mTextView, mTvError, mTvLoading;
 
     private PaginationStrategy mPaginationStrategy;
 
@@ -66,6 +66,12 @@ public class ArticleActivity extends AppCompatActivity {
     private View rootView;
     private RecyclerView mRecyclerView;
     private ItemListAdapter mAdapter;
+
+    // loading state
+    private static final int STATE_FAILED = -1;
+    private static final int STATE_LOADING = 0;
+    private static final int STATE_SUCCESS = 1;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -102,9 +108,16 @@ public class ArticleActivity extends AppCompatActivity {
         });
 */
 
+        notifyState(STATE_LOADING);
     }
 
     private void setUpLayoutViews() {
+        //init textView
+        mTvError = (TextView) findViewById(R.id.load_fail);
+        mTvLoading = (TextView) findViewById(R.id.loading);
+
+        mViewPager = (ViewPager) findViewById(R.id.book_pager);
+        articlePagerAdapter = new ArticlePagerAdapter(mViewPager, getSupportFragmentManager());
 
         rootView = LayoutInflater.from(this).inflate(R.layout.activity_article, null);
 
@@ -120,6 +133,25 @@ public class ArticleActivity extends AppCompatActivity {
                     popupWindow.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
             }
         });
+    }
+
+    private void notifyState(int state) {
+        switch (state){
+            case STATE_FAILED:
+                mViewPager.setVisibility(View.GONE);
+                mTvLoading.setVisibility(View.GONE);
+                mTvError.setVisibility(View.VISIBLE);
+                break;
+            case STATE_LOADING:
+                mTvLoading.setVisibility(View.VISIBLE);
+                mViewPager.setVisibility(View.GONE);
+                break;
+            case STATE_SUCCESS:
+                mTvLoading.setVisibility(View.GONE);
+                mTvError.setVisibility(View.GONE);
+                mViewPager.setVisibility(View.VISIBLE);
+                break;
+        }
     }
 
     private void initTextView() {
@@ -148,8 +180,7 @@ public class ArticleActivity extends AppCompatActivity {
                 }
                 if (!initFinished) {
                     mPaginationStrategy.setChapterUrl(chapterUrl);
-                    mViewPager = (ViewPager) findViewById(R.id.book_pager);
-                    articlePagerAdapter = new ArticlePagerAdapter(mViewPager, getSupportFragmentManager());
+
                     articlePagerAdapter.setPage(mPaginationStrategy);
                     mViewPager.setAdapter(articlePagerAdapter);
                     initFinished = true;
