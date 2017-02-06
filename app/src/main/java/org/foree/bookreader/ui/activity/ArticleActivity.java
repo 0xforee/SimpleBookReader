@@ -25,6 +25,8 @@ import org.foree.bookreader.R;
 import org.foree.bookreader.book.Book;
 import org.foree.bookreader.book.Chapter;
 import org.foree.bookreader.dao.BookDao;
+import org.foree.bookreader.data.cache.PaginationCache;
+import org.foree.bookreader.pagination.PaginationArgs;
 import org.foree.bookreader.pagination.PaginationStrategy;
 import org.foree.bookreader.ui.adapter.ArticlePagerAdapter;
 import org.foree.bookreader.ui.adapter.ItemListAdapter;
@@ -136,7 +138,7 @@ public class ArticleActivity extends AppCompatActivity {
     }
 
     private void notifyState(int state) {
-        switch (state){
+        switch (state) {
             case STATE_FAILED:
                 mViewPager.setVisibility(View.GONE);
                 mTvLoading.setVisibility(View.GONE);
@@ -167,14 +169,16 @@ public class ArticleActivity extends AppCompatActivity {
                 }
 
                 if (mPaginationStrategy == null) {
-                    mPaginationStrategy = new PaginationStrategy(
-                            getApplicationContext(),
-                            mTextView.getWidth(),
+                    // init pagination args
+                    PaginationArgs paginationArgs = new PaginationArgs(mTextView.getWidth(),
                             mTextView.getHeight(),
-                            mTextView.getPaint(),
                             mTextView.getLineSpacingMultiplier(),
                             mTextView.getLineSpacingExtra(),
+                            mTextView.getPaint(),
                             mTextView.getIncludeFontPadding());
+                    PaginationCache.getInstance().init(paginationArgs);
+
+                    mPaginationStrategy = new PaginationStrategy(getApplicationContext(), paginationArgs);
 
 
                 }

@@ -23,12 +23,7 @@ import org.foree.bookreader.parser.WebParserManager;
 public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
     private final static String TAG = PaginationStrategy.class.getSimpleName();
 
-    private int mWidth;
-    private int mHeight;
-    private float mSpacingMult;
-    private float mSpacingAdd;
-    private TextPaint mPaint;
-    private boolean mIncludePad;
+    private PaginationArgs paginationArgs;
     private Context mContext;
     private BookDao bookDao;
     private AbsWebParser absWebParser;
@@ -47,14 +42,10 @@ public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
 
     private boolean mFullRefresh = true;
 
-    public PaginationStrategy(Context context, int mWidth, int mHeight, TextPaint mPaint, float mSpacingMult, float mSpacingAdd, boolean mIncludePad) {
-        this.mContext = context;
-        this.mWidth = mWidth;
-        this.mHeight = mHeight;
-        this.mSpacingMult = mSpacingMult;
-        this.mSpacingAdd = mSpacingAdd;
-        this.mPaint = mPaint;
-        this.mIncludePad = mIncludePad;
+    public PaginationStrategy(Context context, PaginationArgs paginationArgs) {
+
+        mContext = context;
+        this.paginationArgs = paginationArgs;
 
         bookDao = new BookDao(mContext);
 
@@ -260,33 +251,15 @@ public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
 
     private void initPagination() {
         if (mPagination == null) {
-            mPagination = new Pagination(
-                    mWidth,
-                    mHeight,
-                    mPaint,
-                    mSpacingMult,
-                    mSpacingAdd,
-                    mIncludePad);
+            mPagination = new Pagination(paginationArgs);
         }
 
         if (mPrePagination == null) {
-            mPrePagination = new Pagination(
-                    mWidth,
-                    mHeight,
-                    mPaint,
-                    mSpacingMult,
-                    mSpacingAdd,
-                    mIncludePad);
+            mPrePagination = new Pagination(paginationArgs);
         }
 
         if (mNextPagination == null) {
-            mNextPagination = new Pagination(
-                    mWidth,
-                    mHeight,
-                    mPaint,
-                    mSpacingMult,
-                    mSpacingAdd,
-                    mIncludePad);
+            mNextPagination = new Pagination(paginationArgs);
         }
 
         mPagination.clear();

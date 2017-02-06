@@ -12,40 +12,37 @@ import java.util.List;
  */
 
 public class Pagination {
-    private final boolean mIncludePad;
-    private final int mWidth;
-    private final int mHeight;
-    private final float mSpacingMult;
-    private final float mSpacingAdd;
-    private final TextPaint mPaint;
+
+    private PaginationArgs paginationArgs;
+
     private final List<CharSequence> mPages;
 
-    public Pagination(int pageW, int pageH, TextPaint paint, float spacingMult, float spacingAdd, boolean includePad) {
-        this.mWidth = pageW;
-        this.mHeight = pageH;
-        this.mPaint = paint;
-        this.mSpacingMult = spacingMult;
-        this.mSpacingAdd = spacingAdd;
-        this.mIncludePad = includePad;
-        this.mPages = new ArrayList<CharSequence>();
-
+    public Pagination(PaginationArgs paginationArgs) {
+        this.paginationArgs = paginationArgs;
+        this.mPages = new ArrayList<>();
     }
 
     public void splitPage(CharSequence contents) {
 
-        final StaticLayout layout = new StaticLayout(contents, mPaint, mWidth, Layout.Alignment.ALIGN_NORMAL, mSpacingMult, mSpacingAdd, mIncludePad);
+        final StaticLayout layout = new StaticLayout(contents,
+                paginationArgs.getmPaint(),
+                paginationArgs.getmWidth(),
+                Layout.Alignment.ALIGN_NORMAL,
+                paginationArgs.getmSpacingMult(),
+                paginationArgs.getmSpacingAdd(),
+                paginationArgs.ismIncludePad());
 
         final int lines = layout.getLineCount();
         final CharSequence text = layout.getText();
         int startOffset = 0;
-        int height = mHeight;
+        int height = paginationArgs.getmHeight();
 
         for (int i = 0; i < lines; i++) {
             if (height < layout.getLineBottom(i)) {
                 // When the splitPage height has been exceeded
                 addPage(text.subSequence(startOffset, layout.getLineStart(i)));
                 startOffset = layout.getLineStart(i);
-                height = layout.getLineTop(i) + mHeight;
+                height = layout.getLineTop(i) + paginationArgs.getmHeight();
             }
 
             if (i == lines - 1) {
