@@ -29,9 +29,10 @@ public class PaginationLoader {
 
     public void init(PaginationArgs paginationArgs) {
         this.paginationArgs = paginationArgs;
-
-        mRequestQueue = new RequestQueue();
-        mRequestQueue.start();
+        if (mRequestQueue == null) {
+            mRequestQueue = new RequestQueue();
+            mRequestQueue.start();
+        }
     }
 
     public void setArticleCache(ArticleCache articleCache) {

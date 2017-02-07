@@ -45,12 +45,7 @@ import java.util.List;
 public class ArticleActivity extends AppCompatActivity {
     private static final String TAG = ArticleActivity.class.getSimpleName();
     FloatingActionButton turnNightMode;
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-        }
-    };
+
     String chapterUrl, bookUrl;
 
     private List<Chapter> chapterList = new ArrayList<>();
@@ -93,6 +88,8 @@ public class ArticleActivity extends AppCompatActivity {
         setUpLayoutViews();
         initTextView();
 
+        notifyState(PaginationState.STATE_LOADING);
+
         /*turnNightMode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -113,7 +110,6 @@ public class ArticleActivity extends AppCompatActivity {
         });
 */
 
-        notifyState(PaginationState.STATE_LOADING);
     }
 
     private void setUpLayoutViews() {
@@ -152,27 +148,18 @@ public class ArticleActivity extends AppCompatActivity {
                     mTextView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 }
 
-                if (mPaginationSwitch == null) {
-                    // init pagination args
-                    PaginationArgs paginationArgs = new PaginationArgs(mTextView.getWidth(),
-                            mTextView.getHeight(),
-                            mTextView.getLineSpacingMultiplier(),
-                            mTextView.getLineSpacingExtra(),
-                            mTextView.getPaint(),
-                            mTextView.getIncludeFontPadding());
-                    PaginationLoader.getInstance().init(paginationArgs);
+                // init PaginationLoader
+                PaginationLoader.getInstance().init(new PaginationArgs(mTextView.getWidth(),
+                        mTextView.getHeight(),
+                        mTextView.getLineSpacingMultiplier(),
+                        mTextView.getLineSpacingExtra(),
+                        mTextView.getPaint(),
+                        mTextView.getIncludeFontPadding()));
 
-                    mPaginationSwitch = new PaginationSwitch(getApplicationContext());
-
-
-                }
-                if (!initFinished) {
-                    mPaginationSwitch.setChapterUrl(chapterUrl);
-
-                    articlePagerAdapter.setPage(mPaginationSwitch);
-                    mViewPager.setAdapter(articlePagerAdapter);
-                    initFinished = true;
-                }
+                mPaginationSwitch = new PaginationSwitch(getApplicationContext());
+                mPaginationSwitch.setChapterUrl(chapterUrl);
+                articlePagerAdapter.setPage(mPaginationSwitch);
+                mViewPager.setAdapter(articlePagerAdapter);
 
             }
         });
@@ -198,8 +185,8 @@ public class ArticleActivity extends AppCompatActivity {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(PaginationState state) {
         notifyState(state.getState());
-        Log.d("EventBus", "articleActivity");
-        mPaginationSwitch.onRefreshPage();
+        Log.d("EventBus", "notifyState");
+        //mPaginationSwitch.onRefreshPage();
     }
 
     @Override

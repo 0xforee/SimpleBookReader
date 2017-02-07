@@ -25,8 +25,13 @@ public class ArticleFragment extends Fragment {
         return fragment;
     }
 
+    public ArticleFragment() {
+
+    }
+
     public void setText(String contents) {
-        getArguments().putString(ARG_CONTENT, contents);
+        if (getArguments() != null)
+            getArguments().putString(ARG_CONTENT, contents);
         if (tvContents != null) {
             tvContents.setText(Html.fromHtml(contents));
         }
@@ -37,7 +42,9 @@ public class ArticleFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.module_text_view, null);
         tvContents = (TextView) view.findViewById(R.id.book_content);
-        setText(getArguments().getString(ARG_CONTENT));
+        if (getArguments() != null) {
+            setText(getArguments().getString(ARG_CONTENT));
+        }
 
         return view;
     }

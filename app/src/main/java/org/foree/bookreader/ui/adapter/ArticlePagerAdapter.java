@@ -48,6 +48,9 @@ public class ArticlePagerAdapter extends FragmentPagerAdapter {
         return 3;
     }
 
+    // 每次切换的时候都会调用（系统会调用setCurrentItem来切换页面，所以手动调用setCurrentItem也会调用这个函数）
+    // 启动时依次调用 0 0 0，向左滑动时，系统会依次调用position 1 0 0,向右 1 2 2
+    // 启动依次调用setPage,onDataChange,onRefreshPage，切换依次调用onDataChange,onRefreshPage
     @Override
     public void setPrimaryItem(ViewGroup container, int position, Object object) {
         super.setPrimaryItem(container, position, object);
@@ -55,17 +58,19 @@ public class ArticlePagerAdapter extends FragmentPagerAdapter {
         if (position == 1) {
             if (mIsChanged) {
                 if (mPager != null) {
+                    // 更新左右页面的内容
                     mPager.onRefreshPage();
                 }
                 mIsChanged = false;
             }
         } else {
             if (mPager != null) {
+                // 用于左右滑动的偏移量
                 mPager.onDataChanged(position - 1);
                 mIsChanged = true;
             }
 
-            // 用于始终固定页面到1
+            // setCurrentItem用于切换到指定页面，false表示立即切换，无动画效果
             mViewPager.setCurrentItem(1, false);
         }
     }

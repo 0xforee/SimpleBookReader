@@ -19,7 +19,6 @@ public class PaginationSwitch implements ArticlePagerAdapter.UnlimitedPager {
 
     private Context mContext;
     private BookDao bookDao;
-    private String initString = "";
 
     private ArticleFragment[] sFragments;
 
@@ -30,7 +29,7 @@ public class PaginationSwitch implements ArticlePagerAdapter.UnlimitedPager {
     private int mOffset = -1;
     private String mPreviousContents, mCurrentContents, mNextContents;
 
-    private int mPageIndex = 0;
+    private int mFirstPageIndex = 0;
 
     private boolean mFullRefresh = true;
 
@@ -41,9 +40,9 @@ public class PaginationSwitch implements ArticlePagerAdapter.UnlimitedPager {
         bookDao = new BookDao(mContext);
 
         sFragments = new ArticleFragment[]{
-                ArticleFragment.newInstance(initString),
-                ArticleFragment.newInstance(initString),
-                ArticleFragment.newInstance(initString)
+                new ArticleFragment(),
+                new ArticleFragment(),
+                new ArticleFragment()
         };
 
     }
@@ -68,17 +67,16 @@ public class PaginationSwitch implements ArticlePagerAdapter.UnlimitedPager {
             initPagination();
         }
 
-        mPreviousContents = getContents(mOffset, mPageIndex);
-        mCurrentContents = getContents(mOffset, mPageIndex + 1);
-        mNextContents = getContents(mOffset, mPageIndex + 2);
+        mPreviousContents = getContents(mOffset, mFirstPageIndex);
+        mCurrentContents = getContents(mOffset, mFirstPageIndex + 1);
+        mNextContents = getContents(mOffset, mFirstPageIndex + 2);
 
         Log.d(TAG, "mChapterUrl = " + mChapterUrl);
-        Log.d(TAG, "pageIndex = " + mPageIndex);
+        Log.d(TAG, "pageIndex = " + mFirstPageIndex);
 
         resetPage();
 
     }
-
 
     private void resetPage() {
         sFragments[0].setText(mPreviousContents);
@@ -89,7 +87,7 @@ public class PaginationSwitch implements ArticlePagerAdapter.UnlimitedPager {
     @Override
     public void onDataChanged(int offset) {
         Log.d(TAG, "onDataChanged");
-        mPageIndex += offset;
+        mFirstPageIndex += offset;
         mOffset = offset;
 
     }
@@ -120,9 +118,9 @@ public class PaginationSwitch implements ArticlePagerAdapter.UnlimitedPager {
                     getNextPagination(flag);
 
                     // 确定此时索引
-                    mPageIndex = mPrePagination.size() - pageIndex;
+                    mFirstPageIndex = mPrePagination.size() - pageIndex;
 
-                    results = mPagination.get(mPageIndex + 2);
+                    results = mPagination.get(mFirstPageIndex + 2);
                 } else {
                     // 不应该有这种情况
                     Log.e(TAG, "error");
@@ -152,9 +150,9 @@ public class PaginationSwitch implements ArticlePagerAdapter.UnlimitedPager {
                     getPrePagination(flag);
 
                     // 确定此时此刻的索引
-                    mPageIndex = mPagination.size() - 2;
+                    mFirstPageIndex = mPagination.size() - 2;
 
-                    results = mPagination.get(mPageIndex);
+                    results = mPagination.get(mFirstPageIndex);
                 } else if (pageIndex == mPagination.size()) {
                     // 基点没有变化，只获取下一章内容
                     getNextPagination(flag);
@@ -176,7 +174,7 @@ public class PaginationSwitch implements ArticlePagerAdapter.UnlimitedPager {
             results = "翻页error";
         }
 
-        return results != null ? results : initString;
+        return results != null ? results : "";
     }
 
     private void getPrePagination(int flag) {
@@ -195,10 +193,11 @@ public class PaginationSwitch implements ArticlePagerAdapter.UnlimitedPager {
 
     }
 
+    // 章节列表切换章节，reset相关index
     public void reset(String chapterUrl) {
 
         mOffset = -1;
-        mPageIndex = -1;
+        mFirstPageIndex = -1;
         mChapterUrl = chapterUrl;
         mFullRefresh = true;
 
