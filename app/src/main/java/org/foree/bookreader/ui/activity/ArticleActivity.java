@@ -12,6 +12,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,11 +26,15 @@ import org.foree.bookreader.R;
 import org.foree.bookreader.book.Book;
 import org.foree.bookreader.book.Chapter;
 import org.foree.bookreader.dao.BookDao;
+import org.foree.bookreader.data.event.PaginationState;
 import org.foree.bookreader.pagination.PaginationArgs;
 import org.foree.bookreader.pagination.PaginationLoader;
 import org.foree.bookreader.pagination.PaginationSwitch;
 import org.foree.bookreader.ui.adapter.ArticlePagerAdapter;
 import org.foree.bookreader.ui.adapter.ItemListAdapter;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,16 +74,14 @@ public class ArticleActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private ItemListAdapter mAdapter;
 
-    // loading state
-    private static final int STATE_FAILED = -1;
-    private static final int STATE_LOADING = 0;
-    private static final int STATE_SUCCESS = 1;
-
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.view_pager_layout);
+
+        // register EventBus
+        EventBus.getDefault().register(this);
 
         // get chapterUrl and recentId
         bookDao = new BookDao(this);
@@ -110,7 +113,7 @@ public class ArticleActivity extends AppCompatActivity {
         });
 */
 
-        notifyState(STATE_FAILED);
+        notifyState(PaginationState.STATE_LOADING);
     }
 
     private void setUpLayoutViews() {
@@ -135,23 +138,6 @@ public class ArticleActivity extends AppCompatActivity {
                     popupWindow.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
             }
         });
-    }
-
-    private void notifyState(int state) {
-        switch (state) {
-            case STATE_FAILED:
-                mTvLoading.setVisibility(View.GONE);
-                mTvError.setVisibility(View.VISIBLE);
-                break;
-            case STATE_LOADING:
-                mTvLoading.setVisibility(View.VISIBLE);
-                mViewPager.setVisibility(View.GONE);
-                break;
-            case STATE_SUCCESS:
-                mTvLoading.setVisibility(View.GONE);
-                mTvError.setVisibility(View.GONE);
-                break;
-        }
     }
 
     private void initTextView() {
@@ -192,9 +178,34 @@ public class ArticleActivity extends AppCompatActivity {
         });
     }
 
+    private void notifyState(int state) {
+        switch (state) {
+            case PaginationState.STATE_FAILED:
+                mTvLoading.setVisibility(View.GONE);
+                mTvError.setVisibility(View.VISIBLE);
+                break;
+            case PaginationState.STATE_LOADING:
+                mTvLoading.setVisibility(View.VISIBLE);
+                mViewPager.setVisibility(View.INVISIBLE);
+                break;
+            case PaginationState.STATE_SUCCESS:
+                mTvLoading.setVisibility(View.GONE);
+                mTvError.setVisibility(View.GONE);
+                break;
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(PaginationState state) {
+        notifyState(state.getState());
+        Log.d("EventBus", "articleActivity");
+        mPaginationSwitch.onRefreshPage();
+    }
+
     @Override
     protected void onDestroy() {
         closeBook();
+        EventBus.getDefault().unregister(this);
         super.onDestroy();
     }
 

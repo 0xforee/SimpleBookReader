@@ -4,7 +4,6 @@ import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 
-import org.foree.bookreader.R;
 import org.foree.bookreader.dao.BookDao;
 import org.foree.bookreader.ui.adapter.ArticlePagerAdapter;
 import org.foree.bookreader.ui.fragment.ArticleFragment;
@@ -20,7 +19,7 @@ public class PaginationSwitch implements ArticlePagerAdapter.UnlimitedPager {
 
     private Context mContext;
     private BookDao bookDao;
-    private String initString;
+    private String initString = "";
 
     private ArticleFragment[] sFragments;
 
@@ -40,8 +39,6 @@ public class PaginationSwitch implements ArticlePagerAdapter.UnlimitedPager {
         mContext = context;
 
         bookDao = new BookDao(mContext);
-
-        initString = mContext.getString(R.string.loading);
 
         sFragments = new ArticleFragment[]{
                 ArticleFragment.newInstance(initString),
@@ -77,9 +74,6 @@ public class PaginationSwitch implements ArticlePagerAdapter.UnlimitedPager {
 
         Log.d(TAG, "mChapterUrl = " + mChapterUrl);
         Log.d(TAG, "pageIndex = " + mPageIndex);
-        Log.d(TAG, "mPreviousContent = " + mPreviousContents.substring(0, 4));
-        Log.d(TAG, "mCurrentContents = " + mCurrentContents.substring(0, 4));
-        Log.d(TAG, "mNextContents = " + mNextContents.substring(0, 4));
 
         resetPage();
 
@@ -189,7 +183,7 @@ public class PaginationSwitch implements ArticlePagerAdapter.UnlimitedPager {
         // 当前章节 mChapterUrl
         mPreChapterUrl = bookDao.getNextChapterUrlByUrl(flag, mChapterUrl);
 
-        mPrePagination = PaginationLoader.getInstance().getPagnation(mPreChapterUrl);
+        mPrePagination = PaginationLoader.getInstance().getPagination(mPreChapterUrl);
 
     }
 
@@ -197,7 +191,7 @@ public class PaginationSwitch implements ArticlePagerAdapter.UnlimitedPager {
         // 当前章节 mChapterUrl
         mNextChapterUrl = bookDao.getNextChapterUrlByUrl(flag, mChapterUrl);
 
-        mNextPagination = PaginationLoader.getInstance().getPagnation(mNextChapterUrl);
+        mNextPagination = PaginationLoader.getInstance().getPagination(mNextChapterUrl);
 
     }
 
@@ -212,7 +206,7 @@ public class PaginationSwitch implements ArticlePagerAdapter.UnlimitedPager {
     }
 
     private void initPagination() {
-        mPagination = PaginationLoader.getInstance().getPagnation(mChapterUrl);
+        mPagination = PaginationLoader.getInstance().getPagination(mChapterUrl);
 
         getPrePagination(-1);
         getNextPagination(1);

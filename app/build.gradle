@@ -37,6 +37,7 @@ dependencies {
     }
     compile project(path: ':libraries:Volley')
     compile 'com.android.support:support-v4:23.4.0'
+    compile 'org.greenrobot:eventbus:3.0.0'
     compile 'com.android.support:appcompat-v7:23.4.0'
     compile 'com.getui:sdk:2.9.0.0'
     compile 'com.android.support:design:23.4.0'

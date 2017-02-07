@@ -38,7 +38,7 @@ public class PaginationLoader {
         this.articleCache = articleCache;
     }
 
-    public Pagination getPagnation(String url) {
+    public Pagination getPagination(String url) {
         Pagination pagination = new Pagination(paginationArgs);
 
         ArticleRequest articleRequest = new ArticleRequest(pagination, url);

@@ -1,9 +1,11 @@
 package org.foree.bookreader.pagination;
 
 import org.foree.bookreader.book.Article;
+import org.foree.bookreader.data.event.PaginationState;
 import org.foree.bookreader.net.NetCallback;
 import org.foree.bookreader.parser.AbsWebParser;
 import org.foree.bookreader.parser.WebParserManager;
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.concurrent.PriorityBlockingQueue;
 
@@ -34,6 +36,7 @@ public class RequestDispatcher extends Thread {
                             pagination.clear();
                             pagination.splitPage(data.getContents());
                             request.setPagination(pagination);
+                            EventBus.getDefault().post(new PaginationState(PaginationState.STATE_SUCCESS));
                         }
 
                         @Override
