@@ -8,8 +8,11 @@ import org.foree.bookreader.data.cache.DoubleCache;
  */
 
 public class PaginationLoader {
+    private PaginationArgs paginationArgs;
+    private RequestQueue mRequestQueue;
 
     private static PaginationLoader mInstance;
+
     private ArticleCache articleCache = new DoubleCache();
 
     public static PaginationLoader getInstance() {
@@ -24,11 +27,25 @@ public class PaginationLoader {
         return mInstance;
     }
 
-    public void init() {
+    public void init(PaginationArgs paginationArgs) {
+        this.paginationArgs = paginationArgs;
 
+        mRequestQueue = new RequestQueue();
+        mRequestQueue.start();
     }
 
     public void setArticleCache(ArticleCache articleCache) {
         this.articleCache = articleCache;
+    }
+
+    public Pagination getPagnation(String url) {
+        Pagination pagination = new Pagination(paginationArgs);
+
+        ArticleRequest articleRequest = new ArticleRequest(pagination, url);
+
+        mRequestQueue.add(articleRequest);
+
+        return pagination;
+
     }
 }

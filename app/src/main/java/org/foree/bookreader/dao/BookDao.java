@@ -244,6 +244,12 @@ public class BookDao {
         return ChapterId;
     }
 
+    /**
+     * TODO: 根据指定url和偏移量获取目标url
+     * @param flag 偏移量
+     * @param url 指定url
+     * @return 目标url
+     */
     public String getNextChapterUrlByUrl(int flag, String url) {
 
         int chapterId = findIdByChapterUrl(url);
