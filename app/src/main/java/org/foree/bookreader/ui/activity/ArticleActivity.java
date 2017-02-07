@@ -27,7 +27,7 @@ import org.foree.bookreader.book.Chapter;
 import org.foree.bookreader.dao.BookDao;
 import org.foree.bookreader.pagination.PaginationArgs;
 import org.foree.bookreader.pagination.PaginationLoader;
-import org.foree.bookreader.pagination.PaginationStrategy;
+import org.foree.bookreader.pagination.PaginationSwitch;
 import org.foree.bookreader.ui.adapter.ArticlePagerAdapter;
 import org.foree.bookreader.ui.adapter.ItemListAdapter;
 
@@ -59,7 +59,7 @@ public class ArticleActivity extends AppCompatActivity {
     private ArticlePagerAdapter articlePagerAdapter;
     private TextView mTextView, mTvError, mTvLoading;
 
-    private PaginationStrategy mPaginationStrategy;
+    private PaginationSwitch mPaginationSwitch;
 
     private boolean initFinished = false;
 
@@ -110,7 +110,7 @@ public class ArticleActivity extends AppCompatActivity {
         });
 */
 
-        notifyState(STATE_LOADING);
+        notifyState(STATE_FAILED);
     }
 
     private void setUpLayoutViews() {
@@ -140,7 +140,6 @@ public class ArticleActivity extends AppCompatActivity {
     private void notifyState(int state) {
         switch (state) {
             case STATE_FAILED:
-                mViewPager.setVisibility(View.GONE);
                 mTvLoading.setVisibility(View.GONE);
                 mTvError.setVisibility(View.VISIBLE);
                 break;
@@ -151,7 +150,6 @@ public class ArticleActivity extends AppCompatActivity {
             case STATE_SUCCESS:
                 mTvLoading.setVisibility(View.GONE);
                 mTvError.setVisibility(View.GONE);
-                mViewPager.setVisibility(View.VISIBLE);
                 break;
         }
     }
@@ -168,7 +166,7 @@ public class ArticleActivity extends AppCompatActivity {
                     mTextView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 }
 
-                if (mPaginationStrategy == null) {
+                if (mPaginationSwitch == null) {
                     // init pagination args
                     PaginationArgs paginationArgs = new PaginationArgs(mTextView.getWidth(),
                             mTextView.getHeight(),
@@ -178,14 +176,14 @@ public class ArticleActivity extends AppCompatActivity {
                             mTextView.getIncludeFontPadding());
                     PaginationLoader.getInstance().init(paginationArgs);
 
-                    mPaginationStrategy = new PaginationStrategy(getApplicationContext());
+                    mPaginationSwitch = new PaginationSwitch(getApplicationContext());
 
 
                 }
                 if (!initFinished) {
-                    mPaginationStrategy.setChapterUrl(chapterUrl);
+                    mPaginationSwitch.setChapterUrl(chapterUrl);
 
-                    articlePagerAdapter.setPage(mPaginationStrategy);
+                    articlePagerAdapter.setPage(mPaginationSwitch);
                     mViewPager.setAdapter(articlePagerAdapter);
                     initFinished = true;
                 }
@@ -231,7 +229,7 @@ public class ArticleActivity extends AppCompatActivity {
             public void onItemClick(View view, int position) {
                 chapterUrl = chapterList.get(position).getChapterUrl();
                 recentChapterId = chapterList.get(position).getChapterId();
-                mPaginationStrategy.reset(chapterUrl);
+                mPaginationSwitch.reset(chapterUrl);
                 popupWindow.dismiss();
 
             }

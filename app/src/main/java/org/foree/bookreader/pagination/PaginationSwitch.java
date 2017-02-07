@@ -15,8 +15,8 @@ import org.foree.bookreader.ui.fragment.ArticleFragment;
  * 和偏移量获取Pagination数据
  */
 
-public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
-    private final static String TAG = PaginationStrategy.class.getSimpleName();
+public class PaginationSwitch implements ArticlePagerAdapter.UnlimitedPager {
+    private final static String TAG = PaginationSwitch.class.getSimpleName();
 
     private Context mContext;
     private BookDao bookDao;
@@ -35,7 +35,7 @@ public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
 
     private boolean mFullRefresh = true;
 
-    public PaginationStrategy(Context context) {
+    public PaginationSwitch(Context context) {
 
         mContext = context;
 
