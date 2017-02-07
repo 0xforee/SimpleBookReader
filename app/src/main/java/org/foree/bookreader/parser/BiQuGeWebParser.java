@@ -138,7 +138,7 @@ public class BiQuGeWebParser extends AbsWebParser {
 
         // get article title
         Elements titles = doc.getElementsByTag("h1");
-        if (titles != null) {
+        if (titles != null && titles.get(0) != null) {
             Log.d(TAG, "Title" + titles.get(0).toString());
             article.setTitle(titles.get(0).toString());
         }
