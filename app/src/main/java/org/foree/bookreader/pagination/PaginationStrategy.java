@@ -2,17 +2,12 @@ package org.foree.bookreader.pagination;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
-import android.text.TextPaint;
 import android.util.Log;
 
 import org.foree.bookreader.R;
-import org.foree.bookreader.book.Article;
 import org.foree.bookreader.dao.BookDao;
-import org.foree.bookreader.net.NetCallback;
 import org.foree.bookreader.ui.adapter.ArticlePagerAdapter;
 import org.foree.bookreader.ui.fragment.ArticleFragment;
-import org.foree.bookreader.parser.AbsWebParser;
-import org.foree.bookreader.parser.WebParserManager;
 
 /**
  * Created by foree on 17-1-16.
@@ -23,10 +18,8 @@ import org.foree.bookreader.parser.WebParserManager;
 public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
     private final static String TAG = PaginationStrategy.class.getSimpleName();
 
-    private PaginationArgs paginationArgs;
     private Context mContext;
     private BookDao bookDao;
-    private AbsWebParser absWebParser;
     private String initString;
 
     private ArticleFragment[] sFragments;
@@ -42,10 +35,9 @@ public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
 
     private boolean mFullRefresh = true;
 
-    public PaginationStrategy(Context context, PaginationArgs paginationArgs) {
+    public PaginationStrategy(Context context) {
 
         mContext = context;
-        this.paginationArgs = paginationArgs;
 
         bookDao = new BookDao(mContext);
 
@@ -197,22 +189,7 @@ public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
         // 当前章节 mChapterUrl
         mPreChapterUrl = bookDao.getNextChapterUrlByUrl(flag, mChapterUrl);
 
-        if (mPreChapterUrl != null && !mPreChapterUrl.isEmpty()) {
-            absWebParser = WebParserManager.getInstance().getWebParser(mChapterUrl);
-
-            absWebParser.getArticle(mPreChapterUrl, new NetCallback<Article>() {
-                @Override
-                public void onSuccess(Article data) {
-                    mPrePagination.clear();
-                    mPrePagination.splitPage(data.getContents());
-                }
-
-                @Override
-                public void onFail(String msg) {
-
-                }
-            });
-        }
+        mPrePagination = PaginationLoader.getInstance().getPagnation(mPreChapterUrl);
 
     }
 
@@ -220,22 +197,7 @@ public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
         // 当前章节 mChapterUrl
         mNextChapterUrl = bookDao.getNextChapterUrlByUrl(flag, mChapterUrl);
 
-        if (mNextChapterUrl != null && !mNextChapterUrl.isEmpty()) {
-            absWebParser = WebParserManager.getInstance().getWebParser(mChapterUrl);
-
-            absWebParser.getArticle(mNextChapterUrl, new NetCallback<Article>() {
-                @Override
-                public void onSuccess(Article data) {
-                    mNextPagination.clear();
-                    mNextPagination.splitPage(data.getContents());
-                }
-
-                @Override
-                public void onFail(String msg) {
-
-                }
-            });
-        }
+        mNextPagination = PaginationLoader.getInstance().getPagnation(mNextChapterUrl);
 
     }
 
@@ -250,35 +212,7 @@ public class PaginationStrategy implements ArticlePagerAdapter.UnlimitedPager {
     }
 
     private void initPagination() {
-        if (mPagination == null) {
-            mPagination = new Pagination(paginationArgs);
-        }
-
-        if (mPrePagination == null) {
-            mPrePagination = new Pagination(paginationArgs);
-        }
-
-        if (mNextPagination == null) {
-            mNextPagination = new Pagination(paginationArgs);
-        }
-
-        mPagination.clear();
-        mPrePagination.clear();
-        mNextPagination.clear();
-
-        // 获取当前章节，只在reset的时候进行
-        absWebParser = WebParserManager.getInstance().getWebParser(mChapterUrl);
-        absWebParser.getArticle(mChapterUrl, new NetCallback<Article>() {
-            @Override
-            public void onSuccess(Article data) {
-                mPagination.splitPage(data.getContents());
-            }
-
-            @Override
-            public void onFail(String msg) {
-
-            }
-        });
+        mPagination = PaginationLoader.getInstance().getPagnation(mChapterUrl);
 
         getPrePagination(-1);
         getNextPagination(1);

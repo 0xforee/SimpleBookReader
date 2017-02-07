@@ -25,8 +25,8 @@ import org.foree.bookreader.R;
 import org.foree.bookreader.book.Book;
 import org.foree.bookreader.book.Chapter;
 import org.foree.bookreader.dao.BookDao;
-import org.foree.bookreader.data.cache.PaginationCache;
 import org.foree.bookreader.pagination.PaginationArgs;
+import org.foree.bookreader.pagination.PaginationLoader;
 import org.foree.bookreader.pagination.PaginationStrategy;
 import org.foree.bookreader.ui.adapter.ArticlePagerAdapter;
 import org.foree.bookreader.ui.adapter.ItemListAdapter;
@@ -176,9 +176,9 @@ public class ArticleActivity extends AppCompatActivity {
                             mTextView.getLineSpacingExtra(),
                             mTextView.getPaint(),
                             mTextView.getIncludeFontPadding());
-                    PaginationCache.getInstance().init(paginationArgs);
+                    PaginationLoader.getInstance().init(paginationArgs);
 
-                    mPaginationStrategy = new PaginationStrategy(getApplicationContext(), paginationArgs);
+                    mPaginationStrategy = new PaginationStrategy(getApplicationContext());
 
 
                 }
