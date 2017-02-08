@@ -4,25 +4,21 @@ package org.foree.bookreader.pagination;
  * Created by foree on 17-2-7.
  */
 
-public class ArticleRequest implements Comparable{
-    private Pagination pagination;
+public class ArticleRequest implements Comparable {
     private String url;
+    private PaginationArgs paginationArgs;
 
-    public ArticleRequest(Pagination pagination, String url) {
-        this.pagination = pagination;
+    public ArticleRequest(String url, PaginationArgs paginationArgs) {
         this.url = url;
-    }
-
-    public Pagination getPagination() {
-        return pagination;
+        this.paginationArgs = paginationArgs;
     }
 
     public String getUrl() {
         return url;
     }
 
-    public void setPagination(Pagination newValue) {
-        this.pagination = newValue;
+    public PaginationArgs getPaginationArgs() {
+        return paginationArgs;
     }
 
     @Override

@@ -3,8 +3,6 @@ package org.foree.bookreader.pagination;
 import org.foree.bookreader.data.cache.ArticleCache;
 import org.foree.bookreader.data.cache.DoubleCache;
 import org.foree.bookreader.data.cache.PaginationCache;
-import org.foree.bookreader.data.event.PaginationState;
-import org.greenrobot.eventbus.EventBus;
 
 /**
  * Created by foree on 17-2-6.
@@ -44,20 +42,8 @@ public class PaginationLoader {
         this.articleCache = articleCache;
     }
 
-    public Pagination getPagination(String url) {
-
-        Pagination pagination = PaginationCache.getInstance().get(url);
-
-        if (pagination == null) {
-            pagination = new Pagination(paginationArgs);
-            ArticleRequest articleRequest = new ArticleRequest(pagination, url);
-
-            mRequestQueue.add(articleRequest);
-        }else {
-            EventBus.getDefault().post(new PaginationState(PaginationState.STATE_SUCCESS, url));
-        }
-
-        return pagination;
+    public void loadPagination(String url) {
+        mRequestQueue.add(new ArticleRequest(url, paginationArgs));
 
     }
 }

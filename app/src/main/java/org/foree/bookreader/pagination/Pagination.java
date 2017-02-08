@@ -15,7 +15,7 @@ public class Pagination {
 
     private PaginationArgs paginationArgs;
 
-    private final List<CharSequence> mPages;
+    private final ArrayList<CharSequence> mPages;
 
     public Pagination(PaginationArgs paginationArgs) {
         this.paginationArgs = paginationArgs;
@@ -69,7 +69,7 @@ public class Pagination {
         mPages.clear();
     }
 
-    private List<CharSequence> getPages() {
+    public ArrayList<CharSequence> getPages() {
         return mPages;
     }
 

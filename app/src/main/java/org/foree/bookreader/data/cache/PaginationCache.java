@@ -29,7 +29,7 @@ public class PaginationCache {
     public void init(PaginationArgs paginationArgs) {
         this.paginationArgs = paginationArgs;
         if (mPaginationCache == null)
-            mPaginationCache = new HashMap<>(10);
+            mPaginationCache = new HashMap<>();
     }
 
     public void put(String key, Pagination pagination) {

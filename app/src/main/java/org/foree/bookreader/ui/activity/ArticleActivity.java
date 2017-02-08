@@ -2,8 +2,6 @@ package org.foree.bookreader.ui.activity;
 
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewPager;
@@ -26,12 +24,11 @@ import org.foree.bookreader.R;
 import org.foree.bookreader.book.Book;
 import org.foree.bookreader.book.Chapter;
 import org.foree.bookreader.dao.BookDao;
-import org.foree.bookreader.data.event.PaginationState;
+import org.foree.bookreader.data.event.PaginationEvent;
 import org.foree.bookreader.pagination.PaginationArgs;
 import org.foree.bookreader.pagination.PaginationLoader;
-import org.foree.bookreader.pagination.PaginationSwitch;
-import org.foree.bookreader.ui.adapter.ArticlePagerAdapter;
 import org.foree.bookreader.ui.adapter.ItemListAdapter;
+import org.foree.bookreader.ui.adapter.PageAdapter;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -56,12 +53,8 @@ public class ArticleActivity extends AppCompatActivity {
 
     // view pager
     private ViewPager mViewPager;
-    private ArticlePagerAdapter articlePagerAdapter;
+    private PageAdapter pageAdapter;
     private TextView mTextView, mTvError, mTvLoading;
-
-    private PaginationSwitch mPaginationSwitch;
-
-    private boolean initFinished = false;
 
     // popWindow
     private PopupWindow popupWindow;
@@ -88,7 +81,7 @@ public class ArticleActivity extends AppCompatActivity {
         setUpLayoutViews();
         initTextView();
 
-        notifyState(PaginationState.STATE_LOADING);
+        notifyState(PaginationEvent.STATE_LOADING);
 
         /*turnNightMode.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -118,7 +111,7 @@ public class ArticleActivity extends AppCompatActivity {
         mTvLoading = (TextView) findViewById(R.id.loading);
 
         mViewPager = (ViewPager) findViewById(R.id.book_pager);
-        articlePagerAdapter = new ArticlePagerAdapter(mViewPager, getSupportFragmentManager());
+        pageAdapter = new PageAdapter(getSupportFragmentManager());
 
         rootView = LayoutInflater.from(this).inflate(R.layout.activity_article, null);
 
@@ -134,6 +127,8 @@ public class ArticleActivity extends AppCompatActivity {
                     popupWindow.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
             }
         });
+
+        mViewPager.setAdapter(pageAdapter);
     }
 
     private void initTextView() {
@@ -156,10 +151,7 @@ public class ArticleActivity extends AppCompatActivity {
                         mTextView.getPaint(),
                         mTextView.getIncludeFontPadding()));
 
-                mPaginationSwitch = new PaginationSwitch(getApplicationContext());
-                mPaginationSwitch.setChapterUrl(chapterUrl);
-                articlePagerAdapter.setPage(mPaginationSwitch);
-                mViewPager.setAdapter(articlePagerAdapter);
+                PaginationLoader.getInstance().loadPagination(chapterUrl);
 
             }
         });
@@ -167,15 +159,15 @@ public class ArticleActivity extends AppCompatActivity {
 
     private void notifyState(int state) {
         switch (state) {
-            case PaginationState.STATE_FAILED:
+            case PaginationEvent.STATE_FAILED:
                 mTvLoading.setVisibility(View.GONE);
                 mTvError.setVisibility(View.VISIBLE);
                 break;
-            case PaginationState.STATE_LOADING:
+            case PaginationEvent.STATE_LOADING:
                 mTvLoading.setVisibility(View.VISIBLE);
                 mViewPager.setVisibility(View.INVISIBLE);
                 break;
-            case PaginationState.STATE_SUCCESS:
+            case PaginationEvent.STATE_SUCCESS:
                 mTvLoading.setVisibility(View.GONE);
                 mTvError.setVisibility(View.GONE);
                 mViewPager.setVisibility(View.VISIBLE);
@@ -184,11 +176,14 @@ public class ArticleActivity extends AppCompatActivity {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(PaginationState state) {
-        notifyState(state.getState());
+    public void onEventMainThread(PaginationEvent pageEvent) {
+        notifyState(pageEvent.getState());
         Log.d("EventBus", "notifyState");
-        if (state.getUrl().equals(chapterUrl))
-            mPaginationSwitch.onRefreshPage();
+        if (pageEvent.getUrl().equals(chapterUrl))
+            if( pageEvent.getPagination() != null) {
+                pageAdapter.setPages(pageEvent.getPagination().getPages());
+                mViewPager.setCurrentItem(0,false);
+            }
     }
 
     @Override
@@ -229,9 +224,9 @@ public class ArticleActivity extends AppCompatActivity {
             public void onItemClick(View view, int position) {
                 chapterUrl = chapterList.get(position).getChapterUrl();
                 recentChapterId = chapterList.get(position).getChapterId();
-                mPaginationSwitch.reset(chapterUrl);
                 popupWindow.dismiss();
 
+                switchChapter();
             }
 
             @Override
@@ -239,6 +234,11 @@ public class ArticleActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void switchChapter() {
+        notifyState(PaginationEvent.STATE_LOADING);
+        PaginationLoader.getInstance().loadPagination(chapterUrl);
     }
 
     private void openBook(String bookUrl) {
