@@ -1,6 +1,7 @@
 package org.foree.bookreader.pagination;
 
 import org.foree.bookreader.book.Article;
+import org.foree.bookreader.data.cache.PaginationCache;
 import org.foree.bookreader.data.event.PaginationState;
 import org.foree.bookreader.net.NetCallback;
 import org.foree.bookreader.parser.AbsWebParser;
@@ -25,7 +26,7 @@ public class RequestDispatcher extends Thread {
         while (!this.isInterrupted()) {
             try {
                 final ArticleRequest request = mPriorityQueue.take();
-                String url = request.getUrl();
+                final String url = request.getUrl();
                 final Pagination pagination = request.getPagination();
 
                 if (url != null && !url.isEmpty()) {
@@ -36,7 +37,8 @@ public class RequestDispatcher extends Thread {
                             pagination.clear();
                             pagination.splitPage(data.getContents());
                             request.setPagination(pagination);
-                            EventBus.getDefault().post(new PaginationState(PaginationState.STATE_SUCCESS));
+                            PaginationCache.getInstance().put(url, pagination);
+                            EventBus.getDefault().post(new PaginationState(PaginationState.STATE_SUCCESS, url));
                         }
 
                         @Override

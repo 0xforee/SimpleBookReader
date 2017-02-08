@@ -178,6 +178,7 @@ public class ArticleActivity extends AppCompatActivity {
             case PaginationState.STATE_SUCCESS:
                 mTvLoading.setVisibility(View.GONE);
                 mTvError.setVisibility(View.GONE);
+                mViewPager.setVisibility(View.VISIBLE);
                 break;
         }
     }
@@ -186,7 +187,8 @@ public class ArticleActivity extends AppCompatActivity {
     public void onEventMainThread(PaginationState state) {
         notifyState(state.getState());
         Log.d("EventBus", "notifyState");
-        //mPaginationSwitch.onRefreshPage();
+        if (state.getUrl().equals(chapterUrl))
+            mPaginationSwitch.onRefreshPage();
     }
 
     @Override

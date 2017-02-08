@@ -28,23 +28,18 @@ public class PaginationCache {
 
     public void init(PaginationArgs paginationArgs) {
         this.paginationArgs = paginationArgs;
-
-        mPaginationCache = new HashMap<>();
+        if (mPaginationCache == null)
+            mPaginationCache = new HashMap<>(10);
     }
 
-    private void put(String key, Pagination pagination) {
+    public void put(String key, Pagination pagination) {
         if (!mPaginationCache.containsKey(key)) {
             mPaginationCache.put(key, pagination);
         }
     }
 
-    private Pagination get(String key) {
-        Pagination pagination = mPaginationCache.get(key);
+    public Pagination get(String key) {
+        return mPaginationCache.get(key);
 
-        if (pagination == null) {
-            pagination = new Pagination(paginationArgs);
-        }
-
-        return pagination;
     }
 }
