@@ -142,7 +142,7 @@ public class ReadViewPager extends ViewPager {
         this.onPageAreaClickListener = onPageAreaClickListener;
     }
 
-    interface onPageAreaClickListener {
+    public interface onPageAreaClickListener {
         void onMediumAreaClick();
 
         void onPreChapterClick();

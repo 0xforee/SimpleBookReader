@@ -1,10 +1,11 @@
 package org.foree.bookreader.ui.activity;
 
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -40,7 +41,7 @@ import java.util.List;
 /**
  * Created by foree on 16-7-21.
  */
-public class ArticleActivity extends AppCompatActivity {
+public class ArticleActivity extends AppCompatActivity implements ReadViewPager.onPageAreaClickListener{
     private static final String TAG = ArticleActivity.class.getSimpleName();
     FloatingActionButton turnNightMode;
 
@@ -58,7 +59,7 @@ public class ArticleActivity extends AppCompatActivity {
     private TextView mTextView, mTvError, mTvLoading;
 
     // popWindow
-    private PopupWindow popupWindow;
+    private PopupWindow popupWindow, readPopMenu;
     private View rootView;
     private RecyclerView mRecyclerView;
     private ItemListAdapter mAdapter;
@@ -81,28 +82,11 @@ public class ArticleActivity extends AppCompatActivity {
 
         setUpLayoutViews();
         initTextView();
+        setUpReadPopMenu();
 
+        mViewPager.setOnPageAreaClickListener(this);
+        
         notifyState(PaginationEvent.STATE_LOADING);
-
-        /*turnNightMode.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(turnFlag) {
-                    // night Mode
-                    tvContent.setTextColor(getResources().getColor(R.color.nightTextColor));
-                    tvTitle.setTextColor(getResources().getColor(R.color.nightTextColor));
-                    mSwipeRefreshLayout.setBackgroundColor(getResources().getColor(R.color.nightBackground));
-                    turnFlag = false;
-                }else{
-                    // day Mode
-                    tvContent.setTextColor(getResources().getColor(R.color.dayTextColor));
-                    tvTitle.setTextColor(getResources().getColor(R.color.dayTextColor));
-                    mSwipeRefreshLayout.setBackgroundColor(getResources().getColor(R.color.dayBackground));
-                    turnFlag = true;
-                }
-            }
-        });
-*/
 
     }
 
@@ -192,6 +176,38 @@ public class ArticleActivity extends AppCompatActivity {
         closeBook();
         EventBus.getDefault().unregister(this);
         super.onDestroy();
+    }
+    private void setUpReadPopMenu() {
+        // 弹出一个popupMenu
+        View view = LayoutInflater.from(this).inflate(R.layout.popupmenu_read_menu, null);
+
+        DisplayMetrics dp = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dp);
+
+        readPopMenu = new PopupWindow(this);
+        readPopMenu.setContentView(view);
+        readPopMenu.setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
+        readPopMenu.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+        readPopMenu.setFocusable(true);
+        readPopMenu.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+
+        readPopMenu.setOutsideTouchable(true);
+
+    }
+
+    @Override
+    public void onMediumAreaClick() {
+        readPopMenu.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
+    }
+
+    @Override
+    public void onPreChapterClick() {
+
+    }
+
+    @Override
+    public void onNextChapterClick() {
+
     }
 
     private void showPopup() {

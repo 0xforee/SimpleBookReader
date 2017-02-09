@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:background="@android:color/darker_gray"
+        android:alpha="255"
+        android:layout_height="1dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/ReadPopupMenuItemTextView"
+            android:id="@+id/content"
+            android:drawableTop="@mipmap/ic_catalog_day"
+            android:text="@string/content" />
+
+        <TextView
+            style="@style/ReadPopupMenuItemTextView"
+            android:id="@+id/progress"
+            android:drawableTop="@mipmap/ic_progress_day"
+            android:text="@string/progress" />
+
+        <TextView
+            style="@style/ReadPopupMenuItemTextView"
+            android:id="@+id/font"
+            android:drawableTop="@mipmap/ic_textsize_day"
+            android:text="@string/font" />
+
+        <TextView
+            style="@style/ReadPopupMenuItemTextView"
+            android:id="@+id/brightness"
+            android:drawableTop="@mipmap/ic_brightness_day"
+            android:text="@string/brightness" />
+
+    </LinearLayout>
+</LinearLayout>
