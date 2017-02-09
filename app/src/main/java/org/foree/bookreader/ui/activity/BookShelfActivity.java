@@ -86,6 +86,19 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume");
+
+        // refresh booklist
+        bookList.clear();
+        bookList.addAll(bookDao.findAllBookList());
+        if (mAdapter != null) {
+            mAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         mRefreshService.unregisterCallBack();
         unbindService(mServiceConnect);
