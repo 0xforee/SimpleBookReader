@@ -209,12 +209,14 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
 
     @Override
     public void onPreChapterClick() {
-
+        chapterUrl = bookDao.getNextChapterUrlByUrl(-1, chapterUrl);
+        switchChapter();
     }
 
     @Override
     public void onNextChapterClick() {
-
+        chapterUrl = bookDao.getNextChapterUrlByUrl(1, chapterUrl);
+        switchChapter();
     }
 
     private void showPopup() {
