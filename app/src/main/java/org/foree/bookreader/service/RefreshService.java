@@ -16,10 +16,10 @@ import android.widget.RemoteViews;
 
 import org.foree.bookreader.R;
 import org.foree.bookreader.base.BaseApplication;
-import org.foree.bookreader.book.Article;
-import org.foree.bookreader.book.Book;
-import org.foree.bookreader.book.Chapter;
-import org.foree.bookreader.dao.BookDao;
+import org.foree.bookreader.data.book.Article;
+import org.foree.bookreader.data.book.Book;
+import org.foree.bookreader.data.book.Chapter;
+import org.foree.bookreader.data.dao.BookDao;
 import org.foree.bookreader.net.NetCallback;
 import org.foree.bookreader.utils.FileUtils;
 import org.foree.bookreader.parser.AbsWebParser;

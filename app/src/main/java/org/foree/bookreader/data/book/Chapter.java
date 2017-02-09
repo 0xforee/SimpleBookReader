@@ -1,4 +1,4 @@
-package org.foree.bookreader.book;
+package org.foree.bookreader.data.book;
 
 import java.io.Serializable;
 

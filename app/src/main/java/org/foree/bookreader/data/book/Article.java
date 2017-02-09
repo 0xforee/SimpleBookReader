@@ -1,4 +1,4 @@
-package org.foree.bookreader.book;
+package org.foree.bookreader.data.book;
 
 /**
  * Created by foree on 17-1-7.

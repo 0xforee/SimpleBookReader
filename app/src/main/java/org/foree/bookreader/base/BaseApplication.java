@@ -6,8 +6,7 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import org.foree.bookreader.book.Book;
-import org.foree.bookreader.dao.BookDao;
+import org.foree.bookreader.data.book.Book;
 
 import java.io.File;
 

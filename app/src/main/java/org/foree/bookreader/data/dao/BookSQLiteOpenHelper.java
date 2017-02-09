@@ -1,4 +1,4 @@
-package org.foree.bookreader.dao;
+package org.foree.bookreader.data.dao;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

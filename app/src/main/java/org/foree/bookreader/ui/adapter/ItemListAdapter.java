@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import org.foree.bookreader.R;
 
-import org.foree.bookreader.book.Chapter;
+import org.foree.bookreader.data.book.Chapter;
 
 import java.util.List;
 

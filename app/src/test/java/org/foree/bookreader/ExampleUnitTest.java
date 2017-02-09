@@ -2,9 +2,8 @@ package org.foree.bookreader;
 
 import android.util.Log;
 
-import org.foree.bookreader.book.Book;
-import org.foree.bookreader.book.Chapter;
-import org.foree.bookreader.parser.AbsWebParser;
+import org.foree.bookreader.data.book.Book;
+import org.foree.bookreader.data.book.Chapter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -12,8 +11,6 @@ import org.jsoup.select.Elements;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static org.junit.Assert.*;
 

@@ -1,4 +1,4 @@
-package org.foree.bookreader.ui.activity;
+package org.foree.bookreader.ui.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;

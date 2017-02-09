@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.foree.bookreader.R;
-import org.foree.bookreader.book.Book;
+import org.foree.bookreader.data.book.Book;
 
 import java.util.List;
 

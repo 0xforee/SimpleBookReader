@@ -1,4 +1,4 @@
-package org.foree.bookreader.dao;
+package org.foree.bookreader.data.dao;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -6,8 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import org.foree.bookreader.book.Book;
-import org.foree.bookreader.book.Chapter;
+import org.foree.bookreader.data.book.Book;
+import org.foree.bookreader.data.book.Chapter;
 
 import java.util.ArrayList;
 import java.util.List;

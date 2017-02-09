@@ -13,8 +13,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import org.foree.bookreader.R;
-import org.foree.bookreader.book.Book;
-import org.foree.bookreader.dao.BookDao;
+import org.foree.bookreader.data.book.Book;
+import org.foree.bookreader.data.dao.BookDao;
 import org.foree.bookreader.net.NetCallback;
 import org.foree.bookreader.parser.AbsWebParser;
 import org.foree.bookreader.parser.WebParserManager;

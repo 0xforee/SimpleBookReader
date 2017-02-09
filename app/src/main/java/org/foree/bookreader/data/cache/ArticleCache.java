@@ -1,6 +1,6 @@
 package org.foree.bookreader.data.cache;
 
-import org.foree.bookreader.book.Article;
+import org.foree.bookreader.data.book.Article;
 
 /**
  * Created by foree on 17-2-6.

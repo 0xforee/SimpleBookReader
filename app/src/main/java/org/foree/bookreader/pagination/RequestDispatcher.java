@@ -1,6 +1,6 @@
 package org.foree.bookreader.pagination;
 
-import org.foree.bookreader.book.Article;
+import org.foree.bookreader.data.book.Article;
 import org.foree.bookreader.data.cache.PaginationCache;
 import org.foree.bookreader.data.event.PaginationEvent;
 import org.foree.bookreader.net.NetCallback;

@@ -28,8 +28,8 @@ import android.view.View;
 import com.igexin.sdk.PushManager;
 
 import org.foree.bookreader.R;
-import org.foree.bookreader.book.Book;
-import org.foree.bookreader.dao.BookDao;
+import org.foree.bookreader.data.book.Book;
+import org.foree.bookreader.data.dao.BookDao;
 import org.foree.bookreader.service.RefreshService;
 import org.foree.bookreader.ui.adapter.BookListAdapter;
 

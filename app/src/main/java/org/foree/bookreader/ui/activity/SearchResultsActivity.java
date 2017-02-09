@@ -14,7 +14,7 @@ import android.util.Log;
 import android.view.View;
 
 import org.foree.bookreader.R;
-import org.foree.bookreader.book.Book;
+import org.foree.bookreader.data.book.Book;
 import org.foree.bookreader.net.NetCallback;
 import org.foree.bookreader.parser.BiQuGeWebParser;
 import org.foree.bookreader.ui.adapter.SearchListAdapter;
