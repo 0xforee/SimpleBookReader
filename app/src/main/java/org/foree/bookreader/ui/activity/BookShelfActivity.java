@@ -199,8 +199,8 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
         SparseBooleanArray selected = mAdapter.getSelectedItemsIds();
         for (int i = (selected.size() - 1); i >= 0; i--) {
             if (selected.valueAt(i)) {
-                bookDao.removeBookInfo(bookList.get(i).getBookUrl());
-                bookList.remove(i);
+                bookDao.removeBookInfo(bookList.get(selected.keyAt(i)).getBookUrl());
+                bookList.remove(selected.keyAt(i));
                 mAdapter.notifyDataSetChanged();
             }
         }
