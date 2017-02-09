@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">小说追更</string>
+    <string name="app_name">追书</string>
     <string name="app_dir_name">bookReader</string>
     <string name="update_time_string">更新时间：</string>
     <string name="update_chapter_string">最新章节：</string>
