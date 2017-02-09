@@ -29,6 +29,7 @@ import org.foree.bookreader.pagination.PaginationArgs;
 import org.foree.bookreader.pagination.PaginationLoader;
 import org.foree.bookreader.ui.adapter.ItemListAdapter;
 import org.foree.bookreader.ui.adapter.PageAdapter;
+import org.foree.bookreader.ui.view.ReadViewPager;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -52,7 +53,7 @@ public class ArticleActivity extends AppCompatActivity {
     private int recentChapterId = -1;
 
     // view pager
-    private ViewPager mViewPager;
+    private ReadViewPager mViewPager;
     private PageAdapter pageAdapter;
     private TextView mTextView, mTvError, mTvLoading;
 
@@ -110,7 +111,7 @@ public class ArticleActivity extends AppCompatActivity {
         mTvError = (TextView) findViewById(R.id.load_fail);
         mTvLoading = (TextView) findViewById(R.id.loading);
 
-        mViewPager = (ViewPager) findViewById(R.id.book_pager);
+        mViewPager = (ReadViewPager) findViewById(R.id.book_pager);
         pageAdapter = new PageAdapter(getSupportFragmentManager());
 
         rootView = LayoutInflater.from(this).inflate(R.layout.activity_article, null);
