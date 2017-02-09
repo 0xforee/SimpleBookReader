@@ -120,8 +120,8 @@ public class ReadViewPager extends ViewPager {
     }
 
     private boolean isMenuArea(MotionEvent event) {
-        // 取3分屏幕的中间区域
-        if (event.getX() > displayWidth / 3 && event.getX() < displayWidth * 2 / 3) {
+        // 取横5分竖3分屏幕的区域
+        if (event.getX() > displayWidth * 2 / 5 && event.getX() < displayWidth * 3 / 5) {
             if (event.getY() > displayHeight / 3 && event.getY() < displayHeight * 2 / 3) {
                 return true;
             }
