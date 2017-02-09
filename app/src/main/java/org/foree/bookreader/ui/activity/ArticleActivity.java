@@ -43,7 +43,6 @@ import java.util.List;
  */
 public class ArticleActivity extends AppCompatActivity implements ReadViewPager.onPageAreaClickListener{
     private static final String TAG = ArticleActivity.class.getSimpleName();
-    FloatingActionButton turnNightMode;
 
     String chapterUrl, bookUrl;
 
@@ -63,6 +62,9 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
     private View rootView;
     private RecyclerView mRecyclerView;
     private ItemListAdapter mAdapter;
+
+    // readPopMenu
+    private TextView tvContent, tvProgress, tvFont, tvBrightness;
 
 
     @Override
@@ -85,7 +87,7 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
         setUpReadPopMenu();
 
         mViewPager.setOnPageAreaClickListener(this);
-        
+
         notifyState(PaginationEvent.STATE_LOADING);
 
     }
@@ -99,20 +101,6 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
         pageAdapter = new PageAdapter(getSupportFragmentManager());
 
         rootView = LayoutInflater.from(this).inflate(R.layout.activity_article, null);
-
-        // get FloatActionButton
-        turnNightMode = (FloatingActionButton) findViewById(R.id.fab);
-
-        turnNightMode.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (popupWindow == null)
-                    showPopup();
-                else
-                    popupWindow.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
-            }
-        });
-
         mViewPager.setAdapter(pageAdapter);
     }
 
@@ -193,6 +181,25 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
 
         readPopMenu.setOutsideTouchable(true);
 
+        tvContent = (TextView) view.findViewById(R.id.content);
+        tvProgress = (TextView) view.findViewById(R.id.progress);
+        tvFont = (TextView) view.findViewById(R.id.font);
+        tvBrightness = (TextView) view.findViewById(R.id.brightness);
+
+
+        tvContent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if( readPopMenu.isShowing()){
+                    readPopMenu.dismiss();
+                }
+                if (popupWindow == null)
+                    showPopup();
+                else
+                    popupWindow.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
+            }
+        });
+
     }
 
     @Override
@@ -220,8 +227,9 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
         popupWindow.setContentView(view);
         popupWindow.setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
         popupWindow.setHeight(dp.heightPixels / 4 * 3);
-
+        popupWindow.setFocusable(true);
         popupWindow.setOutsideTouchable(true);
+        popupWindow.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
         popupWindow.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.rv_item_list);
