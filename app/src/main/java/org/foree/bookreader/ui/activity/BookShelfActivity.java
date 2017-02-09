@@ -14,7 +14,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -24,7 +24,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 
 import com.igexin.sdk.PushManager;
 
@@ -62,7 +61,6 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
     private List<Book> bookList = new ArrayList<>();
 
     SwipeRefreshLayout mSwipeRefreshLayout;
-    TextView tvNovelAuthor, tvNovelName, tvNovelCategory, tvNovelStatus, tvNovelUpdateTime, tvNovelUpdateChapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,8 +70,6 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
         setUpLayoutViews();
 
         PushManager.getInstance().initialize(this.getApplicationContext());
-
-        bookDao = new BookDao(this);
 
         // start refresh service
         Intent intent = new Intent(this, RefreshService.class);
@@ -135,24 +131,18 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
         mSwipeRefreshLayout.setOnRefreshListener(this);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.rv_book_list);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-
-        //tvNovelAuthor = (TextView) findViewById(R.id.tv_novel_author);
-        // tvNovelCategory = (TextView) findViewById(R.id.tv_novel_category);
-        // tvNovelName = (TextView)findViewById(R.id.tv_novel_name);
-        // tvNovelStatus = (TextView)findViewById(R.id.tv_novel_status);
-        tvNovelUpdateTime = (TextView) findViewById(R.id.tv_novel_update_time);
-        tvNovelUpdateChapter = (TextView) findViewById(R.id.tv_novel_update_chapter);
-
 
         setUpRecyclerViewAdapter();
     }
 
     private void setUpRecyclerViewAdapter() {
-        BookDao bookDao = new BookDao(this);
+        bookDao = new BookDao(this);
+
         bookList = bookDao.findAllBookList();
         mAdapter = new BookListAdapter(this, bookList);
+
+        mRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(mAdapter);
         mAdapter.setOnItemClickListener(new BookListAdapter.OnItemClickListener() {
             @Override
@@ -211,8 +201,7 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
     }
 
     private void refreshNovelViews(Book book) {
-//        tvNovelUpdateChapter.setText(getString(R.string.update_chapter_string) + book.getNewestChapter().getChapterTitle());
-        //       tvNovelUpdateTime.setText(getString(R.string.update_time_string) + book.getUpdateTime());
+
     }
 
     private class MyServiceConnection implements ServiceConnection {

@@ -17,12 +17,12 @@ import java.util.List;
 /**
  * Created by foree on 16-7-22.
  */
-public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.MyViewHolder> {
+public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.MyViewHolder> {
     private LayoutInflater mLayoutInflater;
     private List<Book> bookList;
     private SparseBooleanArray mSelectedItemsIds;
 
-    public BookListAdapter(Context context, List<Book> itemList) {
+    public SearchListAdapter(Context context, List<Book> itemList) {
         mLayoutInflater = LayoutInflater.from(context);
         bookList = itemList;
         mSelectedItemsIds = new SparseBooleanArray();
@@ -41,14 +41,14 @@ public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.MyView
     }
 
     @Override
-    public BookListAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        MyViewHolder holder = new MyViewHolder(mLayoutInflater.inflate(R.layout.rv_book_shelf_item, parent, false));
+    public SearchListAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        MyViewHolder holder = new MyViewHolder(mLayoutInflater.inflate(R.layout.novel_card_view, parent, false));
 
         return holder;
     }
 
     @Override
-    public void onBindViewHolder(final BookListAdapter.MyViewHolder holder, int position) {
+    public void onBindViewHolder(final SearchListAdapter.MyViewHolder holder, int position) {
         if (bookList != null && !bookList.isEmpty())
             holder.tvBookName.setText(bookList.get(position).getBookName());
 

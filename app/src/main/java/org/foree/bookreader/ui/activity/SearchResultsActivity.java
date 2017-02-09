@@ -17,9 +17,8 @@ import org.foree.bookreader.R;
 import org.foree.bookreader.book.Book;
 import org.foree.bookreader.net.NetCallback;
 import org.foree.bookreader.parser.BiQuGeWebParser;
-import org.foree.bookreader.ui.adapter.BookListAdapter;
+import org.foree.bookreader.ui.adapter.SearchListAdapter;
 import org.foree.bookreader.parser.AbsWebParser;
-import org.foree.bookreader.parser.WebParserManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +26,7 @@ import java.util.List;
 public class SearchResultsActivity extends AppCompatActivity {
     private static final String TAG = SearchResultsActivity.class.getSimpleName();
     private RecyclerView mRecyclerView;
-    private BookListAdapter mAdapter;
+    private SearchListAdapter mAdapter;
     private List<Book> bookList = new ArrayList<>();
     Toolbar toolbar;
     private Handler mHandler = new Handler() {
@@ -54,9 +53,9 @@ public class SearchResultsActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        mAdapter = new BookListAdapter(this, bookList);
+        mAdapter = new SearchListAdapter(this, bookList);
         mRecyclerView.setAdapter(mAdapter);
-        mAdapter.setOnItemClickListener(new BookListAdapter.OnItemClickListener() {
+        mAdapter.setOnItemClickListener(new SearchListAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 Intent intent = new Intent(SearchResultsActivity.this, BookInfoActivity.class);
