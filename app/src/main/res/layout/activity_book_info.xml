@@ -21,6 +21,7 @@
             android:orientation="vertical">
 
             <LinearLayout
+                android:id="@+id/ll_book_info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -97,9 +98,15 @@
 
             <ListView
                 android:id="@+id/lv_chapter_list"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+            <ProgressBar
+                android:id="@+id/pb_progress"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
         </LinearLayout>
+
     </android.support.v4.widget.NestedScrollView>
 
 </LinearLayout>
