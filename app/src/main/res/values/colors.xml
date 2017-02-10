@@ -10,5 +10,8 @@
     <color name="nightTextColor">#424952</color>
     <color name="nightBackground">#080c10</color>
 
+    <!-- read page background -->
+    <color name="fugu_page_background">#F1E5C9</color>
+
 
 </resources>

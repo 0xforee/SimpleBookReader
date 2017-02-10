@@ -98,7 +98,7 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
         mViewPager = (ReadViewPager) findViewById(R.id.book_pager);
         pageAdapter = new PageAdapter(getSupportFragmentManager());
 
-        rootView = LayoutInflater.from(this).inflate(R.layout.activity_article, null);
+        rootView = LayoutInflater.from(this).inflate(R.layout.view_pager_layout, null);
         mViewPager.setAdapter(pageAdapter);
 
         mViewPager.setOnPageAreaClickListener(this);
