@@ -41,7 +41,7 @@ import java.util.List;
 /**
  * Created by foree on 16-7-21.
  */
-public class ArticleActivity extends AppCompatActivity implements ReadViewPager.onPageAreaClickListener{
+public class ArticleActivity extends AppCompatActivity implements ReadViewPager.onPageAreaClickListener {
     private static final String TAG = ArticleActivity.class.getSimpleName();
 
     String chapterUrl, bookUrl;
@@ -116,10 +116,14 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
                 } else {
                     mTextView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 }
-
+                int top = mTextView.getPaddingTop();
+                int bottom = mTextView.getPaddingBottom();
+                int left = mTextView.getPaddingLeft();
+                int right = mTextView.getPaddingRight();
                 // init PaginationLoader
-                PaginationLoader.getInstance().init(new PaginationArgs(mTextView.getWidth(),
-                        mTextView.getHeight(),
+                PaginationLoader.getInstance().init(new PaginationArgs(
+                        mTextView.getWidth() - left - right,
+                        mTextView.getHeight() - top - bottom,
                         mTextView.getLineSpacingMultiplier(),
                         mTextView.getLineSpacingExtra(),
                         mTextView.getPaint(),
@@ -154,9 +158,9 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
         notifyState(pageEvent.getState());
         Log.d("EventBus", "notifyState");
         if (pageEvent.getUrl().equals(chapterUrl))
-            if( pageEvent.getPagination() != null) {
+            if (pageEvent.getPagination() != null) {
                 pageAdapter.setPages(pageEvent.getPagination().getPages());
-                mViewPager.setCurrentItem(0,false);
+                mViewPager.setCurrentItem(0, false);
             }
     }
 
@@ -166,6 +170,7 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
         EventBus.getDefault().unregister(this);
         super.onDestroy();
     }
+
     private void setUpReadPopMenu() {
         // 弹出一个popupMenu
         View view = LayoutInflater.from(this).inflate(R.layout.popupmenu_read_menu, null);
@@ -191,7 +196,7 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
         tvContent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if( readPopMenu.isShowing()){
+                if (readPopMenu.isShowing()) {
                     readPopMenu.dismiss();
                 }
                 if (popupWindow == null)
@@ -277,7 +282,7 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
         // check init
         if (book.getRecentChapterId() == -1) {
             // get first chapter id
-            if( chapterList != null && !chapterList.isEmpty()) {
+            if (chapterList != null && !chapterList.isEmpty()) {
                 setChapterId(bookUrl, chapterList.get(0).getChapterId());
                 // update book object recentChapterId
                 book.setRecentChapterId(chapterList.get(0).getChapterId());

@@ -40,7 +40,7 @@ public class ArticleFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.module_text_view, null);
+        View view = inflater.inflate(R.layout.fragment_article, null);
         tvContents = (TextView) view.findViewById(R.id.book_content);
         if (getArguments() != null) {
             setText(getArguments().getString(ARG_CONTENT));
