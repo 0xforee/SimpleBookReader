@@ -88,6 +88,8 @@ public class BiQuGeWebParser extends AbsWebParser {
                     break;
                 case "og:image":
                     // book cover
+                    String bookCoverUrl = getHostUrl() + update.attr("content");
+                    book.setBookCoverUrl(bookCoverUrl);
                     break;
                 case "og:novel:update_time":
                     book.setUpdateTime(update.attr("content"));

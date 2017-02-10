@@ -7,6 +7,7 @@ import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.foree.bookreader.R;
@@ -17,12 +18,12 @@ import java.util.List;
 /**
  * Created by foree on 16-7-22.
  */
-public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.MyViewHolder> {
+public class BookShelfAdapter extends RecyclerView.Adapter<BookShelfAdapter.MyViewHolder> {
     private LayoutInflater mLayoutInflater;
     private List<Book> bookList;
     private SparseBooleanArray mSelectedItemsIds;
 
-    public BookListAdapter(Context context, List<Book> itemList) {
+    public BookShelfAdapter(Context context, List<Book> itemList) {
         mLayoutInflater = LayoutInflater.from(context);
         bookList = itemList;
         mSelectedItemsIds = new SparseBooleanArray();
@@ -41,14 +42,14 @@ public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.MyView
     }
 
     @Override
-    public BookListAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public BookShelfAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         MyViewHolder holder = new MyViewHolder(mLayoutInflater.inflate(R.layout.rv_book_shelf_item, parent, false));
 
         return holder;
     }
 
     @Override
-    public void onBindViewHolder(final BookListAdapter.MyViewHolder holder, int position) {
+    public void onBindViewHolder(final BookShelfAdapter.MyViewHolder holder, int position) {
         if (bookList != null && !bookList.isEmpty())
             holder.tvBookName.setText(bookList.get(position).getBookName());
 
@@ -111,10 +112,12 @@ public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.MyView
 
     class MyViewHolder extends RecyclerView.ViewHolder {
         TextView tvBookName;
+        ImageView imageView;
 
         public MyViewHolder(View view) {
             super(view);
             tvBookName = (TextView) view.findViewById(R.id.tv_novel_name);
+            imageView = (ImageView) view.findViewById(R.id.iv_novel_image);
         }
     }
 }

@@ -47,7 +47,8 @@ public class BookDao {
             String author = cursor.getString(cursor.getColumnIndex("author"));
             String description = cursor.getString(cursor.getColumnIndex("description"));
             int recentChapterId = cursor.getInt(cursor.getColumnIndex("recent_chapter_id"));
-            Book book = new Book(bookName, bookUrl, updateTime, category, author, description, recentChapterId);
+            String bookCoverUrl = cursor.getString(cursor.getColumnIndex("book_cover_url"));
+            Book book = new Book(bookName, bookUrl, updateTime, category, author, description, recentChapterId, bookCoverUrl);
             bookList.add(book);
         }
 
@@ -136,6 +137,7 @@ public class BookDao {
             book.setAuthor(cursor.getString(cursor.getColumnIndex("author")));
             book.setDescription(cursor.getString(cursor.getColumnIndex("description")));
             book.setRecentChapterId(cursor.getInt(cursor.getColumnIndex("recent_chapter_id")));
+            book.setBookCoverUrl(cursor.getString(cursor.getColumnIndex("book_cover_url")));
         }
 
         cursor.close();
@@ -161,6 +163,7 @@ public class BookDao {
         contentValues.put("author", book.getAuthor());
         contentValues.put("description", book.getDescription());
         contentValues.put("recent_chapter_id", -1);
+        contentValues.put("book_cover_url", book.getBookCoverUrl());
         if (db.insertWithOnConflict(BookSQLiteOpenHelper.DB_TABLE_BOOKS, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE) == -1) {
             Log.e(TAG, "Database insert id: " + book.getBookUrl() + " error");
         }

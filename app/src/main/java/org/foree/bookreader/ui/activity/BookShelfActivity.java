@@ -24,7 +24,7 @@ import com.igexin.sdk.PushManager;
 import org.foree.bookreader.R;
 import org.foree.bookreader.data.book.Book;
 import org.foree.bookreader.data.dao.BookDao;
-import org.foree.bookreader.ui.adapter.BookListAdapter;
+import org.foree.bookreader.ui.adapter.BookShelfAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +38,7 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
 
     Toolbar toolbar;
     private RecyclerView mRecyclerView;
-    private BookListAdapter mAdapter;
+    private BookShelfAdapter mAdapter;
     private List<Book> bookList = new ArrayList<>();
 
     SwipeRefreshLayout mSwipeRefreshLayout;
@@ -98,12 +98,12 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
         bookDao = new BookDao(this);
 
         bookList = bookDao.getAllBooks();
-        mAdapter = new BookListAdapter(this, bookList);
+        mAdapter = new BookShelfAdapter(this, bookList);
 
         mRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(mAdapter);
-        mAdapter.setOnItemClickListener(new BookListAdapter.OnItemClickListener() {
+        mAdapter.setOnItemClickListener(new BookShelfAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 if (mActionMode != null) {
