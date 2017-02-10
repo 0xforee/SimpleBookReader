@@ -9,17 +9,22 @@ import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
+
 import org.foree.bookreader.R;
+import org.foree.bookreader.base.BaseApplication;
 import org.foree.bookreader.data.book.Book;
 import org.foree.bookreader.data.dao.BookDao;
 import org.foree.bookreader.net.NetCallback;
 import org.foree.bookreader.parser.AbsWebParser;
 import org.foree.bookreader.parser.WebParserManager;
+import org.jsoup.Connection;
 
 /**
  * Created by foree on 17-1-10.
@@ -33,6 +38,7 @@ public class BookInfoActivity extends AppCompatActivity {
     private BookDao bookDao;
     private Toolbar toolbar;
     private Book book;
+    private ImageView imageView;
     private LinearLayout linearLayout;
 
     private static final int STATE_FAILED = -1;
@@ -75,6 +81,7 @@ public class BookInfoActivity extends AppCompatActivity {
         linearLayout = (LinearLayout)findViewById(R.id.ll_book_info);
         bt = (Button) findViewById(R.id.bt_add);
         lv = (ListView) findViewById(R.id.lv_chapter_list);
+        imageView = (ImageView) findViewById(R.id.iv_novel_image);
 
         bt.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -108,8 +115,8 @@ public class BookInfoActivity extends AppCompatActivity {
         }
     }
     private void setupView() {
-        AbsWebParser webinfo = WebParserManager.getInstance().getWebParser(bookUrl);
-        webinfo.getBookInfo(bookUrl, new NetCallback<Book>() {
+        AbsWebParser webInfo = WebParserManager.getInstance().getWebParser(bookUrl);
+        webInfo.getBookInfo(bookUrl, new NetCallback<Book>() {
             @Override
             public void onSuccess(final Book data) {
                 mHandler.postDelayed(new Runnable() {
@@ -119,6 +126,11 @@ public class BookInfoActivity extends AppCompatActivity {
                         tvNovelName.setText(data.getBookName());
                         tvNovelAuthor.setText(data.getAuthor());
                         tvNovelDescription.setText(Html.fromHtml(data.getDescription()));
+
+                        if(book.getBookCoverUrl()!=null){
+                            ImageLoader.getInstance().displayImage(book.getBookCoverUrl(), imageView,
+                                    BaseApplication.getInstance().getDisplayImageOptions());
+                        }
                         notifyUpdate(STATE_SUCCESS);
                     }
                 }, 0);

@@ -7,9 +7,13 @@ import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
+
 import org.foree.bookreader.R;
+import org.foree.bookreader.base.BaseApplication;
 import org.foree.bookreader.data.book.Book;
 
 import java.util.List;
@@ -75,6 +79,10 @@ public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.My
         // 设置选中的背景颜色
         holder.itemView.setBackgroundColor(mSelectedItemsIds.get(position) ? 0x9934B5E4 : Color.TRANSPARENT);
 
+        if(bookList.get(position).getBookCoverUrl() != null){
+            ImageLoader.getInstance().displayImage(bookList.get(position).getBookCoverUrl(), holder.imageView,
+                    BaseApplication.getInstance().getDisplayImageOptions());
+        }
     }
 
     @Override
@@ -111,10 +119,12 @@ public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.My
 
     class MyViewHolder extends RecyclerView.ViewHolder {
         TextView tvBookName;
+        ImageView imageView;
 
         public MyViewHolder(View view) {
             super(view);
             tvBookName = (TextView) view.findViewById(R.id.tv_novel_name);
+            imageView = (ImageView) view.findViewById(R.id.iv_novel_image);
         }
     }
 }

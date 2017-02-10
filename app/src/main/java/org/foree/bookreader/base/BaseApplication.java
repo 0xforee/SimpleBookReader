@@ -6,6 +6,11 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+
+import org.foree.bookreader.R;
 import org.foree.bookreader.data.book.Book;
 
 import java.io.File;
@@ -24,6 +29,7 @@ public class BaseApplication extends Application {
     public static final String myApplicationConfigsName = "configs";
     // 应用程序缓存目录名
     public static final String myApplicationCacheName = "cache";
+    public DisplayImageOptions options;
 
     public static synchronized BaseApplication getInstance() {
         return mInstance;
@@ -36,6 +42,29 @@ public class BaseApplication extends Application {
 
         initApplicationDir();
         initWebSites();
+        initImageLoader();
+
+    }
+
+    private void initImageLoader() {
+        ImageLoaderConfiguration config = ImageLoaderConfiguration.createDefault(this);
+
+        ImageLoader.getInstance().init(config);
+
+    }
+
+    public DisplayImageOptions getDisplayImageOptions(){
+        if(options == null) {
+            // init displayOptions
+            options = new DisplayImageOptions.Builder()
+                    .showImageOnLoading(R.drawable.book_cover)
+                    .showImageOnFail(R.drawable.book_cover)
+                    .showImageForEmptyUri(R.drawable.book_cover)
+                    .cacheInMemory(true)
+                    .cacheOnDisk(true)
+                    .build();
+        }
+        return options;
     }
 
     public void initApplicationDir() {

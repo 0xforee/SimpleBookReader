@@ -277,9 +277,11 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
         // check init
         if (book.getRecentChapterId() == -1) {
             // get first chapter id
-            setChapterId(bookUrl, chapterList.get(0).getChapterId());
-            // update book object recentChapterId
-            book.setRecentChapterId(chapterList.get(0).getChapterId());
+            if( chapterList != null && !chapterList.isEmpty()) {
+                setChapterId(bookUrl, chapterList.get(0).getChapterId());
+                // update book object recentChapterId
+                book.setRecentChapterId(chapterList.get(0).getChapterId());
+            }
         }
 
         // open by chapter id
