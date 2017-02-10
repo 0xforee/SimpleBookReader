@@ -32,7 +32,7 @@
             android:layout_height="match_parent"
             android:visibility="invisible">
 
-            <include layout="@layout/module_text_view" />
+            <include layout="@layout/fragment_article"/>
         </FrameLayout>
 
     </RelativeLayout>
