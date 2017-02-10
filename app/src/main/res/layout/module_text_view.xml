@@ -4,7 +4,7 @@
     android:id="@+id/book_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="18dp"
+    android:layout_margin="@dimen/read_page_margin"
     android:lineSpacingExtra="6dp"
     android:textColor="@color/md_black_1000"
     android:textSize="17sp" />

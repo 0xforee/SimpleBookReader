@@ -159,6 +159,7 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
         Log.d("EventBus", "notifyState");
         if (pageEvent.getUrl().equals(chapterUrl))
             if (pageEvent.getPagination() != null) {
+                pageAdapter.setTitle(bookDao.getChapterName(pageEvent.getUrl()));
                 pageAdapter.setPages(pageEvent.getPagination().getPages());
                 mViewPager.setCurrentItem(0, false);
             }

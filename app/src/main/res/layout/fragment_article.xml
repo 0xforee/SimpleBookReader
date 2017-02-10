@@ -5,6 +5,13 @@
     android:background="@color/fugu_page_background"
     android:orientation="vertical">
 
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/read_page_margin"
+        android:layout_marginTop="@dimen/read_page_margin" />
+
     <include layout="@layout/module_text_view" />
 
 </LinearLayout>

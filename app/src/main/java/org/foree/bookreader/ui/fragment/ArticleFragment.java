@@ -11,13 +11,15 @@ import org.foree.bookreader.R;
 
 public class ArticleFragment extends Fragment {
     private static final String ARG_CONTENT = "contents";
+    private static final String ARG_TITLE = "title";
 
-    private TextView tvContents;
+    private TextView tvContents, tvTitle;
 
-    public static ArticleFragment newInstance(String contents) {
+    public static ArticleFragment newInstance(String title, String contents) {
         ArticleFragment fragment = new ArticleFragment();
         Bundle args = new Bundle();
         args.putString(ARG_CONTENT, contents);
+        args.putString(ARG_TITLE, title);
         fragment.setArguments(args);
         return fragment;
     }
@@ -26,11 +28,16 @@ public class ArticleFragment extends Fragment {
 
     }
 
-    public void setText(String contents) {
-        if (getArguments() != null)
+    public void setText(String title, String contents) {
+        if (getArguments() != null) {
             getArguments().putString(ARG_CONTENT, contents);
+        }
         if (tvContents != null) {
             tvContents.setText(contents);
+        }
+
+        if(tvTitle != null){
+            tvTitle.setText(title);
         }
     }
 
@@ -39,8 +46,10 @@ public class ArticleFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_article, null);
         tvContents = (TextView) view.findViewById(R.id.book_content);
+        tvTitle = (TextView) view.findViewById(R.id.tv_title);
         if (getArguments() != null) {
-            setText(getArguments().getString(ARG_CONTENT));
+            setText(getArguments().getString(ARG_TITLE),
+                    getArguments().getString(ARG_CONTENT));
         }
 
         return view;

@@ -332,4 +332,24 @@ public class BookDao {
 
         return chapterUrl;
     }
+
+    public String getChapterName(String chapterUrl){
+        String chapterName = null;
+        Cursor cursor;
+        SQLiteDatabase db = bookSQLiteOpenHelper.getReadableDatabase();
+        db.beginTransaction();
+
+        cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_CHAPTERS, null,
+                "chapter_url=?", new String[]{chapterUrl}, null, null, null);
+        if (cursor.getCount() != 0 && cursor.moveToFirst()) {
+            chapterName = cursor.getString(cursor.getColumnIndex("chapter_title"));
+        }
+
+        cursor.close();
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        db.close();
+
+        return chapterName;
+    }
 }

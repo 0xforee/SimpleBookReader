@@ -14,6 +14,7 @@ import java.util.ArrayList;
 
 public class PageAdapter extends FragmentStatePagerAdapter {
     private ArrayList<CharSequence> mPages;
+    private String title;
 
     public PageAdapter(FragmentManager fm) {
         super(fm);
@@ -22,7 +23,7 @@ public class PageAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        return ArticleFragment.newInstance(mPages.get(position).toString());
+        return ArticleFragment.newInstance(title, mPages.get(position).toString());
     }
 
     @Override
@@ -34,6 +35,10 @@ public class PageAdapter extends FragmentStatePagerAdapter {
         mPages.clear();
         mPages.addAll(pages);
         notifyDataSetChanged();
+    }
+
+    public void setTitle(String title){
+        this.title = title;
     }
 
 }
