@@ -216,14 +216,16 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
 
     @Override
     public void onPreChapterClick() {
-        chapterUrl = bookDao.getChapterUrl(-1, chapterUrl);
-        switchChapter();
+        String newChapterUrl = bookDao.getChapterUrl(-1, chapterUrl);
+        if (newChapterUrl != null)
+            switchChapter(newChapterUrl);
     }
 
     @Override
     public void onNextChapterClick() {
-        chapterUrl = bookDao.getChapterUrl(1, chapterUrl);
-        switchChapter();
+        String newChapterUrl = bookDao.getChapterUrl(1, chapterUrl);
+        if (newChapterUrl != null)
+            switchChapter(newChapterUrl);
     }
 
     private void showPopup() {
@@ -260,7 +262,7 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
                 recentChapterId = chapterList.get(position).getChapterId();
                 popupWindow.dismiss();
 
-                switchChapter();
+                switchChapter(chapterUrl);
             }
 
             @Override
@@ -270,7 +272,8 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
         });
     }
 
-    private void switchChapter() {
+    private void switchChapter(String newChapterUrl) {
+        chapterUrl = newChapterUrl;
         notifyState(PaginationEvent.STATE_LOADING);
         PaginationLoader.getInstance().loadPagination(chapterUrl);
     }

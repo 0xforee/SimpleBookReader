@@ -292,48 +292,51 @@ public class BookDao {
         String selection = null;
         String orderBy = null;
 
-        int chapterId = getChapterId(url);
+        if (url != null) {
 
-        SQLiteDatabase db = bookSQLiteOpenHelper.getReadableDatabase();
-        db.beginTransaction();
+            int chapterId = getChapterId(url);
 
-        // 限定条件加入bookUrl限定
-        cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_CHAPTERS, new String[]{"book_url"},
-                "chapter_url=?", new String[]{url}, null, null, null);
-        if (cursor.getCount() != 0 && cursor.moveToFirst()) {
-            bookUrl = cursor.getString(cursor.getColumnIndex("book_url"));
-        }
+            SQLiteDatabase db = bookSQLiteOpenHelper.getReadableDatabase();
+            db.beginTransaction();
 
-        if (bookUrl != null) {
-            if (flag > 0) {
-                // 获取下一章url
-                selection = "book_url = ? and chapter_id > ?";
-                orderBy = "chapter_id asc";
-            } else {
-                // 获取上一章url
-                selection = "book_url = ? and chapter_id < ?";
-                orderBy = "chapter_id desc";
-            }
-
-            cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_CHAPTERS, new String[]{"chapter_url"},
-                    selection, new String[]{bookUrl, chapterId + ""}, null, null, orderBy);
+            // 限定条件加入bookUrl限定
+            cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_CHAPTERS, new String[]{"book_url"},
+                    "chapter_url=?", new String[]{url}, null, null, null);
             if (cursor.getCount() != 0 && cursor.moveToFirst()) {
-                chapterUrl = cursor.getString(cursor.getColumnIndex("chapter_url"));
-            } else {
-                // 没有上一章或者没有下一章
-                chapterUrl = null;
+                bookUrl = cursor.getString(cursor.getColumnIndex("book_url"));
             }
-        }
 
-        cursor.close();
-        db.setTransactionSuccessful();
-        db.endTransaction();
-        db.close();
+            if (bookUrl != null) {
+                if (flag > 0) {
+                    // 获取下一章url
+                    selection = "book_url = ? and chapter_id > ?";
+                    orderBy = "chapter_id asc";
+                } else {
+                    // 获取上一章url
+                    selection = "book_url = ? and chapter_id < ?";
+                    orderBy = "chapter_id desc";
+                }
+
+                cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_CHAPTERS, new String[]{"chapter_url"},
+                        selection, new String[]{bookUrl, chapterId + ""}, null, null, orderBy);
+                if (cursor.getCount() != 0 && cursor.moveToFirst()) {
+                    chapterUrl = cursor.getString(cursor.getColumnIndex("chapter_url"));
+                } else {
+                    // 没有上一章或者没有下一章
+                    chapterUrl = null;
+                }
+            }
+
+            cursor.close();
+            db.setTransactionSuccessful();
+            db.endTransaction();
+            db.close();
+        }
 
         return chapterUrl;
     }
 
-    public String getChapterName(String chapterUrl){
+    public String getChapterName(String chapterUrl) {
         String chapterName = null;
         Cursor cursor;
         SQLiteDatabase db = bookSQLiteOpenHelper.getReadableDatabase();
