@@ -231,7 +231,7 @@ public class BookDao {
      * @param chapterUrl 章节地址
      * @return chapterId
      */
-    private int getChapterId(String chapterUrl) {
+    public int getChapterId(String chapterUrl) {
         Cursor cursor;
         int chapterId = 0;
         SQLiteDatabase db = bookSQLiteOpenHelper.getReadableDatabase();

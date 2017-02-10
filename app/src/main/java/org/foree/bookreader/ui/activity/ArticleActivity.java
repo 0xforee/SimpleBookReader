@@ -44,13 +44,15 @@ import java.util.List;
 public class ArticleActivity extends AppCompatActivity implements ReadViewPager.onPageAreaClickListener {
     private static final String TAG = ArticleActivity.class.getSimpleName();
 
-    String chapterUrl, bookUrl;
+    String chapterUrl, bookUrl, newChapterUrl;
 
     private List<Chapter> chapterList = new ArrayList<>();
 
     private BookDao bookDao;
 
     private int recentChapterId = -1;
+
+    private boolean slipLeft = false;
 
     // view pager
     private ReadViewPager mViewPager;
@@ -161,7 +163,10 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
             if (pageEvent.getPagination() != null) {
                 pageAdapter.setTitle(bookDao.getChapterName(pageEvent.getUrl()));
                 pageAdapter.setPages(pageEvent.getPagination().getPages());
-                mViewPager.setCurrentItem(0, false);
+                if (slipLeft)
+                    mViewPager.setCurrentItem(pageEvent.getPagination().getPages().size() - 1, false);
+                else
+                    mViewPager.setCurrentItem(0, false);
             }
     }
 
@@ -216,16 +221,20 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
 
     @Override
     public void onPreChapterClick() {
-        String newChapterUrl = bookDao.getChapterUrl(-1, chapterUrl);
-        if (newChapterUrl != null)
+        newChapterUrl = bookDao.getChapterUrl(-1, chapterUrl);
+        if (newChapterUrl != null) {
             switchChapter(newChapterUrl);
+            slipLeft = true;
+        }
     }
 
     @Override
     public void onNextChapterClick() {
-        String newChapterUrl = bookDao.getChapterUrl(1, chapterUrl);
-        if (newChapterUrl != null)
+        newChapterUrl = bookDao.getChapterUrl(1, chapterUrl);
+        if (newChapterUrl != null) {
             switchChapter(newChapterUrl);
+            slipLeft = false;
+        }
     }
 
     private void showPopup() {
@@ -258,11 +267,8 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
         mAdapter.setOnItemClickListener(new ItemListAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                chapterUrl = chapterList.get(position).getChapterUrl();
-                recentChapterId = chapterList.get(position).getChapterId();
                 popupWindow.dismiss();
-
-                switchChapter(chapterUrl);
+                switchChapter(chapterList.get(position).getChapterUrl());
             }
 
             @Override
@@ -273,7 +279,7 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
     }
 
     private void switchChapter(String newChapterUrl) {
-        chapterUrl = newChapterUrl;
+        updateChapterUrl(newChapterUrl);
         notifyState(PaginationEvent.STATE_LOADING);
         PaginationLoader.getInstance().loadPagination(chapterUrl);
     }
@@ -294,7 +300,7 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
         }
 
         // open by chapter id
-        chapterUrl = bookDao.getChapterUrl(book.getRecentChapterId());
+        updateChapterUrl(bookDao.getChapterUrl(book.getRecentChapterId()));
     }
 
     private void setChapterId(String bookUrl, int newId) {
@@ -307,5 +313,8 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
             bookDao.updateRecentChapterId(bookUrl, recentChapterId);
     }
 
-
+    private void updateChapterUrl(String newUrl){
+        recentChapterId = bookDao.getChapterId(newUrl);
+        chapterUrl = newUrl;
+    }
 }
