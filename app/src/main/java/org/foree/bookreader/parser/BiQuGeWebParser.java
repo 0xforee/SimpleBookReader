@@ -1,5 +1,6 @@
 package org.foree.bookreader.parser;
 
+import android.text.Html;
 import android.util.Log;
 
 import org.foree.bookreader.data.book.Article;
@@ -151,7 +152,7 @@ public class BiQuGeWebParser extends AbsWebParser {
         if (content != null) {
             content.select("script").remove();
             Log.d(TAG, content.toString());
-            article.setContents(content.toString());
+            article.setContents(Html.fromHtml(content.toString()).toString());
         }
 
         return article;
