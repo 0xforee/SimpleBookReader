@@ -86,8 +86,6 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
         initTextView();
         setUpReadPopMenu();
 
-        mViewPager.setOnPageAreaClickListener(this);
-
         notifyState(PaginationEvent.STATE_LOADING);
 
     }
@@ -102,6 +100,9 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
 
         rootView = LayoutInflater.from(this).inflate(R.layout.activity_article, null);
         mViewPager.setAdapter(pageAdapter);
+
+        mViewPager.setOnPageAreaClickListener(this);
+
     }
 
     private void initTextView() {
@@ -209,13 +210,13 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
 
     @Override
     public void onPreChapterClick() {
-        chapterUrl = bookDao.getNextChapterUrlByUrl(-1, chapterUrl);
+        chapterUrl = bookDao.getChapterUrl(-1, chapterUrl);
         switchChapter();
     }
 
     @Override
     public void onNextChapterClick() {
-        chapterUrl = bookDao.getNextChapterUrlByUrl(1, chapterUrl);
+        chapterUrl = bookDao.getChapterUrl(1, chapterUrl);
         switchChapter();
     }
 
@@ -270,9 +271,9 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
 
     private void openBook(String bookUrl) {
         //get all chapter
-        Book book = bookDao.findBookInfoByUrl(bookUrl);
+        Book book = bookDao.getBook(bookUrl);
         // get chapterList
-        chapterList = book.getChapterList();
+        chapterList = book.getChapters();
         // check init
         if (book.getRecentChapterId() == -1) {
             // get first chapter id
@@ -282,7 +283,7 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
         }
 
         // open by chapter id
-        chapterUrl = bookDao.findChapterUrlById(book.getRecentChapterId());
+        chapterUrl = bookDao.getChapterUrl(book.getRecentChapterId());
     }
 
     private void setChapterId(String bookUrl, int newId) {

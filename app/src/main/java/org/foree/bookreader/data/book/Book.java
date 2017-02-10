@@ -11,7 +11,7 @@ public class Book {
     private String category;
     private String author;
     private String bookUrl;
-    private List<Chapter> chapterList;
+    private List<Chapter> chapters;
     private String description;
     private Chapter newestChapter;
     // recentChapterId默认为-1，在openBook时检查病初始化
@@ -74,12 +74,12 @@ public class Book {
         this.author = author;
     }
 
-    public List<Chapter> getChapterList() {
-        return chapterList;
+    public List<Chapter> getChapters() {
+        return chapters;
     }
 
-    public void setChapterList(List<Chapter> chapterList) {
-        this.chapterList = chapterList;
+    public void setChapters(List<Chapter> chapterList) {
+        this.chapters = chapterList;
     }
 
     public Chapter getNewestChapter() {

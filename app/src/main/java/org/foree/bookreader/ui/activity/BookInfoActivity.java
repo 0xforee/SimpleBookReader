@@ -79,7 +79,7 @@ public class BookInfoActivity extends AppCompatActivity {
         bt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                bookDao.addBookInfo(book);
+                bookDao.addBook(book);
 
                 // update bt_add
                 bt.setBackgroundColor(getResources().getColor(R.color.material_drawer_dark_hint_text));

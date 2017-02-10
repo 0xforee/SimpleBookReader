@@ -92,7 +92,7 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
 
         // refresh booklist
         bookList.clear();
-        bookList.addAll(bookDao.findAllBookList());
+        bookList.addAll(bookDao.getAllBooks());
         if (mAdapter != null) {
             mAdapter.notifyDataSetChanged();
         }
@@ -151,7 +151,7 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
     private void setUpRecyclerViewAdapter() {
         bookDao = new BookDao(this);
 
-        bookList = bookDao.findAllBookList();
+        bookList = bookDao.getAllBooks();
         mAdapter = new BookListAdapter(this, bookList);
 
         mRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
@@ -199,7 +199,7 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
         SparseBooleanArray selected = mAdapter.getSelectedItemsIds();
         for (int i = (selected.size() - 1); i >= 0; i--) {
             if (selected.valueAt(i)) {
-                bookDao.removeBookInfo(bookList.get(selected.keyAt(i)).getBookUrl());
+                bookDao.removeBook(bookList.get(selected.keyAt(i)).getBookUrl());
                 bookList.remove(selected.keyAt(i));
                 mAdapter.notifyDataSetChanged();
             }

@@ -160,7 +160,7 @@ public class BQGMWebParser extends AbsWebParser {
             Log.e(TAG, e.toString());
         }
 
-        book.setChapterList(chapterList);
+        book.setChapters(chapterList);
 
         return book;
     }

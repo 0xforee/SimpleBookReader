@@ -8,6 +8,7 @@ import android.util.Log;
 
 import org.foree.bookreader.data.book.Book;
 import org.foree.bookreader.data.book.Chapter;
+import org.foree.bookreader.ui.activity.BookShelfActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,13 +26,18 @@ public class BookDao {
         bookSQLiteOpenHelper = new BookSQLiteOpenHelper(context);
     }
 
-    public List<Book> findAllBookList() {
+    /**
+     * 获取本地所有书
+     *
+     * @return bookList
+     */
+    public List<Book> getAllBooks() {
         Cursor cursor;
         List<Book> bookList = new ArrayList<>();
         SQLiteDatabase db = bookSQLiteOpenHelper.getReadableDatabase();
         db.beginTransaction();
 
-        cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_BOOK_LIST, null,
+        cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_BOOKS, null,
                 null, null, null, null, null);
         while (cursor.moveToNext()) {
             String bookName = cursor.getString(cursor.getColumnIndex("book_name"));
@@ -52,69 +58,30 @@ public class BookDao {
         return bookList;
     }
 
-    public void addBookInfo(Book book) {
-        SQLiteDatabase db = bookSQLiteOpenHelper.getWritableDatabase();
-        db.beginTransaction();
-        ContentValues contentValues = new ContentValues();
-
-        // 内容不重复
-        contentValues.put("book_url", book.getBookUrl());
-        contentValues.put("book_name", book.getBookName());
-        contentValues.put("update_time", book.getUpdateTime());
-        contentValues.put("category", book.getCategory());
-        contentValues.put("author", book.getAuthor());
-        contentValues.put("description", book.getDescription());
-        contentValues.put("recent_chapter_id", -1);
-        if (db.insertWithOnConflict(BookSQLiteOpenHelper.DB_TABLE_BOOK_LIST, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE) == -1) {
-            Log.e(TAG, "Database insert id: " + book.getBookUrl() + " error");
-        }
-
-        db.setTransactionSuccessful();
-        db.endTransaction();
-        db.close();
-
-        // insert chapter list
-        insertChapterList(book.getChapterList());
-    }
-
-    public void removeBookInfo(String book_url) {
-        SQLiteDatabase db = bookSQLiteOpenHelper.getWritableDatabase();
-        Cursor cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_BOOK_LIST, null,
-                "book_url=?", new String[]{book_url}, null, null, null);
-        if (cursor.getCount() != 0) {
-            if (db.delete(BookSQLiteOpenHelper.DB_TABLE_BOOK_LIST, "book_url=?", new String[]{book_url}) == -1) {
-                Log.e(TAG, "delete book_url:" + book_url + " error");
-            }
-        }
-
-        cursor.close();
-        db.close();
-    }
-
-    public void insertChapterList(List<Chapter> chapterList) {
+    private void insertChapters(List<Chapter> chapterList) {
         synchronized (this) {
             int tmp = 1;
             Log.d(TAG, "insert chapterList.size= " + chapterList.size() + " to db");
             // 拆分itemList，dataBase 一次事务只能插入1000条数据
             while (chapterList.size() > (1000 * tmp)) {
-                insertInternal(chapterList.subList(1000 * (tmp - 1), 1000 * tmp));
+                insertChaptersInternal(chapterList.subList(1000 * (tmp - 1), 1000 * tmp));
                 tmp++;
             }
-            insertInternal(chapterList.subList(1000 * (tmp - 1), chapterList.size()));
+            insertChaptersInternal(chapterList.subList(1000 * (tmp - 1), chapterList.size()));
         }
     }
 
-    private void insertInternal(List<Chapter> subItemList) {
+    private void insertChaptersInternal(List<Chapter> subList) {
         synchronized (this) {
             SQLiteDatabase db = bookSQLiteOpenHelper.getWritableDatabase();
             db.beginTransaction();
             ContentValues contentValues = new ContentValues();
-            for (Chapter chapter : subItemList) {
+            for (Chapter chapter : subList) {
                 contentValues.put("chapter_title", chapter.getChapterTitle());
                 contentValues.put("chapter_url", chapter.getChapterUrl());
                 contentValues.put("chapter_id", chapter.getChapterId());
                 contentValues.put("book_url", chapter.getBookUrl());
-                if (db.insertWithOnConflict(BookSQLiteOpenHelper.DB_TABLE_CHAPTER_LIST, null,
+                if (db.insertWithOnConflict(BookSQLiteOpenHelper.DB_TABLE_CHAPTERS, null,
                         contentValues, SQLiteDatabase.CONFLICT_REPLACE) == -1) {
                     Log.e(TAG, "Database insert chapter_url: " + chapter.getChapterUrl() + " error");
                 }
@@ -126,7 +93,7 @@ public class BookDao {
         }
     }
 
-    public List<Chapter> findChapterListByBookUrl(String bookUrl) {
+    private List<Chapter> getChapters(String bookUrl) {
         Log.d(TAG, "get chapterList from db, bookUrl = " + bookUrl);
         Cursor cursor;
         List<Chapter> chapterList = new ArrayList<>();
@@ -134,7 +101,7 @@ public class BookDao {
         db.beginTransaction();
 
         // chapter_id sort by desc or asc
-        cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_CHAPTER_LIST, null,
+        cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_CHAPTERS, null,
                 "book_url=?", new String[]{bookUrl}, null, null, "chapter_id asc");
         while (cursor.moveToNext()) {
             String title = cursor.getString(cursor.getColumnIndex("chapter_title"));
@@ -152,14 +119,14 @@ public class BookDao {
         return chapterList;
     }
 
-    public Book findBookInfoByUrl(String bookUrl) {
+    public Book getBook(String bookUrl) {
         Log.d(TAG, "get book info from db, bookUrl = " + bookUrl);
         Book book = new Book();
         Cursor cursor;
         SQLiteDatabase db = bookSQLiteOpenHelper.getReadableDatabase();
         db.beginTransaction();
 
-        cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_BOOK_LIST, null,
+        cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_BOOKS, null,
                 "book_url=?", new String[]{bookUrl}, null, null, null);
         if (cursor.getCount() != 0 && cursor.moveToFirst()) {
             book.setBookName(cursor.getString(cursor.getColumnIndex("book_name")));
@@ -176,9 +143,59 @@ public class BookDao {
         db.endTransaction();
         db.close();
 
-        book.setChapterList(findChapterListByBookUrl(bookUrl));
+        book.setChapters(getChapters(bookUrl));
 
         return book;
+    }
+
+    public void addBook(Book book) {
+        SQLiteDatabase db = bookSQLiteOpenHelper.getWritableDatabase();
+        db.beginTransaction();
+        ContentValues contentValues = new ContentValues();
+
+        // 内容不重复
+        contentValues.put("book_url", book.getBookUrl());
+        contentValues.put("book_name", book.getBookName());
+        contentValues.put("update_time", book.getUpdateTime());
+        contentValues.put("category", book.getCategory());
+        contentValues.put("author", book.getAuthor());
+        contentValues.put("description", book.getDescription());
+        contentValues.put("recent_chapter_id", -1);
+        if (db.insertWithOnConflict(BookSQLiteOpenHelper.DB_TABLE_BOOKS, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE) == -1) {
+            Log.e(TAG, "Database insert id: " + book.getBookUrl() + " error");
+        }
+
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        db.close();
+
+        // insert chapters
+        insertChapters(book.getChapters());
+    }
+
+    public void removeBook(String book_url) {
+        SQLiteDatabase db = bookSQLiteOpenHelper.getWritableDatabase();
+        Cursor cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_BOOKS, null,
+                "book_url=?", new String[]{book_url}, null, null, null);
+
+        // remove bookInfo
+        if (cursor.getCount() != 0) {
+            if (db.delete(BookSQLiteOpenHelper.DB_TABLE_BOOKS, "book_url=?", new String[]{book_url}) == -1) {
+                Log.e(TAG, "delete book_url:" + book_url + " error");
+            } else {
+                // remove chapters
+                cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_CHAPTERS, null,
+                        "book_url=?", new String[]{book_url}, null, null, null);
+                if (cursor.getCount() != 0) {
+                    if (db.delete(BookSQLiteOpenHelper.DB_TABLE_CHAPTERS, "book_url=?", new String[]{book_url}) == -1) {
+                        Log.e(TAG, "delete book's " + book_url + "chapters error");
+                    }
+                }
+            }
+        }
+
+        cursor.close();
+        db.close();
     }
 
     public void updateRecentChapterId(String bookUrl, int recentChapterId) {
@@ -186,12 +203,12 @@ public class BookDao {
         SQLiteDatabase db = bookSQLiteOpenHelper.getWritableDatabase();
         db.beginTransaction();
 
-        cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_BOOK_LIST, null,
+        cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_BOOKS, null,
                 "book_url=?", new String[]{bookUrl}, null, null, null);
         if (cursor.getCount() != 0) {
             ContentValues contentValues = new ContentValues();
             contentValues.put("recent_chapter_id", recentChapterId);
-            if (db.update(BookSQLiteOpenHelper.DB_TABLE_BOOK_LIST, contentValues,
+            if (db.update(BookSQLiteOpenHelper.DB_TABLE_BOOKS, contentValues,
                     "book_url=?", new String[]{bookUrl}) == -1) {
                 Log.e(TAG, "Database insert book_url: " + bookUrl + " error");
             }
@@ -204,13 +221,46 @@ public class BookDao {
 
     }
 
-    public String findChapterUrlById(int chapterId) {
+
+    /**
+     * 根据chapterUrl获取chapterId
+     *
+     * @param chapterUrl 章节地址
+     * @return chapterId
+     */
+    private int getChapterId(String chapterUrl) {
+        Cursor cursor;
+        int chapterId = 0;
+        SQLiteDatabase db = bookSQLiteOpenHelper.getReadableDatabase();
+        db.beginTransaction();
+
+        cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_CHAPTERS, null,
+                "chapter_url=?", new String[]{chapterUrl}, null, null, null);
+        if (cursor.getCount() != 0 && cursor.moveToFirst()) {
+            chapterId = cursor.getInt(cursor.getColumnIndex("chapter_id"));
+        }
+
+        cursor.close();
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        db.close();
+
+        return chapterId;
+    }
+
+    /**
+     * 根据chapterId获取chapterUrl
+     *
+     * @param chapterId 根据chapterUrl解析出来的chapterId
+     * @return chapterUrl
+     */
+    public String getChapterUrl(int chapterId) {
         Cursor cursor;
         String chapterUrl = null;
         SQLiteDatabase db = bookSQLiteOpenHelper.getReadableDatabase();
         db.beginTransaction();
 
-        cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_CHAPTER_LIST, null,
+        cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_CHAPTERS, null,
                 "chapter_id=?", new String[]{chapterId + ""}, null, null, null);
         if (cursor.getCount() != 0 && cursor.moveToFirst()) {
             chapterUrl = cursor.getString(cursor.getColumnIndex("chapter_url"));
@@ -224,60 +274,52 @@ public class BookDao {
         return chapterUrl;
     }
 
-    private int findIdByChapterUrl(String chapterUrl) {
-        Cursor cursor;
-        int ChapterId = 0;
-        SQLiteDatabase db = bookSQLiteOpenHelper.getReadableDatabase();
-        db.beginTransaction();
-
-        cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_CHAPTER_LIST, null,
-                "chapter_url=?", new String[]{chapterUrl}, null, null, null);
-        if (cursor.getCount() != 0 && cursor.moveToFirst()) {
-            ChapterId = cursor.getInt(cursor.getColumnIndex("chapter_id"));
-        }
-
-        cursor.close();
-        db.setTransactionSuccessful();
-        db.endTransaction();
-        db.close();
-
-        return ChapterId;
-    }
-
     /**
      * TODO: 根据指定url和偏移量获取目标url
-     * @param flag 偏移量
-     * @param url 指定url
-     * @return 目标url
+     *
+     * @param flag 偏移量，-1=上一章，1=后一章
+     * @param url  指定url
+     * @return 有则返回目标url，没有返回null
      */
-    public String getNextChapterUrlByUrl(int flag, String url) {
-
-        int chapterId = findIdByChapterUrl(url);
+    public String getChapterUrl(int flag, String url) {
 
         Cursor cursor;
-        String chapterUrl;
+        String chapterUrl = null;
+        String bookUrl = null;
+        String selection = null;
+        String orderBy = null;
+
+        int chapterId = getChapterId(url);
+
         SQLiteDatabase db = bookSQLiteOpenHelper.getReadableDatabase();
         db.beginTransaction();
 
-        String selection = null;
-        String orderBy = null;
-        if (flag > 0) {
-            // 获取下一章url
-            selection = "chapter_id > ?";
-            orderBy = "chapter_id asc";
-        } else {
-            // 获取上一章url
-            selection = "chapter_id < ?";
-            orderBy = "chapter_id desc";
+        // 限定条件加入bookUrl限定
+        cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_CHAPTERS, new String[]{"book_url"},
+                "chapter_url=?", new String[]{url}, null, null, null);
+        if (cursor.getCount() != 0 && cursor.moveToFirst()) {
+            bookUrl = cursor.getString(cursor.getColumnIndex("book_url"));
         }
 
-        cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_CHAPTER_LIST, new String[]{"chapter_url"},
-                selection, new String[]{chapterId + ""}, null, null, orderBy);
-        if (cursor.getCount() != 0 && cursor.moveToFirst()) {
-            chapterUrl = cursor.getString(cursor.getColumnIndex("chapter_url"));
-        } else {
-            // 没有上一章或者没有下一章
-            chapterUrl = "";
+        if (bookUrl != null) {
+            if (flag > 0) {
+                // 获取下一章url
+                selection = "book_url = ? and chapter_id > ?";
+                orderBy = "chapter_id asc";
+            } else {
+                // 获取上一章url
+                selection = "book_url = ? and chapter_id < ?";
+                orderBy = "chapter_id desc";
+            }
+
+            cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_CHAPTERS, new String[]{"chapter_url"},
+                    selection, new String[]{bookUrl, chapterId + ""}, null, null, orderBy);
+            if (cursor.getCount() != 0 && cursor.moveToFirst()) {
+                chapterUrl = cursor.getString(cursor.getColumnIndex("chapter_url"));
+            } else {
+                // 没有上一章或者没有下一章
+                chapterUrl = null;
+            }
         }
 
         cursor.close();

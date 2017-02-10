@@ -29,10 +29,10 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         // 测试book_url是不是unique
         Book book = new Book("hahah1", "http://m.bxwx9.org/b/98/98289/");
         Book book1 = new Book("hahahh2", "http://m.bxwx9.org/b/98/98289/");
-        bookDao.addBookInfo(book);
-        bookDao.addBookInfo(book1);
+        bookDao.addBook(book);
+        bookDao.addBook(book1);
 
-        List<Book> bookList = bookDao.findAllBookList();
+        List<Book> bookList = bookDao.getAllBooks();
         assertEquals(bookList.size(), 4);
     }
 
@@ -40,7 +40,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         BookDao bookDao = new BookDao(getContext());
 
         String book_url = "http://m.bxwx9.org/b/98/98289/";
-        bookDao.removeBookInfo(book_url);
+        bookDao.removeBook(book_url);
     }
 
     public void testParseBookInfo() {
@@ -61,8 +61,8 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
     public void testGetChapterByUrl() {
         BookDao bookDao = new BookDao(getContext());
-        String bookUrl = "http://www.biquge.com/0_168/1214382.html";
-        String nextChapterUrl = bookDao.getNextChapterUrlByUrl(-1, bookUrl);
+        String chapterUrl = "http://www.biquge.com/14_14929/8194590.html";
+        String nextChapterUrl = bookDao.getChapterUrl(-1, chapterUrl);
 
         Log.d(TAG, "nextChapterUrl = " + nextChapterUrl);
     }

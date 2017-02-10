@@ -122,7 +122,7 @@ public class BiQuGeWebParser extends AbsWebParser {
             //Log.i("HH", link.attr("href"));
             chapters.add(chapter);
         }
-        book.setChapterList(chapters);
+        book.setChapters(chapters);
 
         return book;
     }
