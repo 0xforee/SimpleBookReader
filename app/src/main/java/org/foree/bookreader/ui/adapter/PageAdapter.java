@@ -13,7 +13,7 @@ import java.util.ArrayList;
  */
 
 public class PageAdapter extends FragmentStatePagerAdapter {
-    private ArrayList<CharSequence> mPages;
+    private ArrayList<String> mPages;
     private String title;
 
     public PageAdapter(FragmentManager fm) {
@@ -23,7 +23,7 @@ public class PageAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        return ArticleFragment.newInstance(title, mPages.get(position).toString());
+        return ArticleFragment.newInstance(title, mPages.get(position));
     }
 
     @Override
@@ -36,7 +36,7 @@ public class PageAdapter extends FragmentStatePagerAdapter {
         return mPages.size();
     }
 
-    public void setPages(ArrayList<CharSequence> pages) {
+    public void setPages(ArrayList<String> pages) {
         mPages.clear();
         mPages.addAll(pages);
         notifyDataSetChanged();

@@ -15,7 +15,7 @@ public class Pagination {
 
     private PaginationArgs paginationArgs;
 
-    private final ArrayList<CharSequence> mPages;
+    private final ArrayList<String> mPages;
 
     public Pagination(PaginationArgs paginationArgs) {
         this.paginationArgs = paginationArgs;
@@ -40,20 +40,20 @@ public class Pagination {
         for (int i = 0; i < lines; i++) {
             if (height < layout.getLineBottom(i)) {
                 // When the splitPage height has been exceeded
-                addPage(text.subSequence(startOffset, layout.getLineStart(i)));
+                addPage(text.subSequence(startOffset, layout.getLineStart(i)).toString().trim());
                 startOffset = layout.getLineStart(i);
                 height = layout.getLineTop(i) + paginationArgs.getmHeight();
             }
 
             if (i == lines - 1) {
                 // Put the rest of the text into the last page
-                addPage(text.subSequence(startOffset, layout.getLineEnd(i)));
+                addPage(text.subSequence(startOffset, layout.getLineEnd(i)).toString().trim());
                 return;
             }
         }
     }
 
-    private void addPage(CharSequence text) {
+    private void addPage(String text) {
         mPages.add(text);
     }
 
@@ -62,14 +62,14 @@ public class Pagination {
     }
 
     public String get(int index) {
-        return (index >= 0 && index < mPages.size()) ? mPages.get(index).toString() : null;
+        return (index >= 0 && index < mPages.size()) ? mPages.get(index) : null;
     }
 
     public void clear() {
         mPages.clear();
     }
 
-    public ArrayList<CharSequence> getPages() {
+    public ArrayList<String> getPages() {
         return mPages;
     }
 
