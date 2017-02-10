@@ -27,6 +27,11 @@ public class PageAdapter extends FragmentStatePagerAdapter {
     }
 
     @Override
+    public int getItemPosition(Object object) {
+        return POSITION_NONE;
+    }
+
+    @Override
     public int getCount() {
         return mPages.size();
     }
@@ -37,7 +42,7 @@ public class PageAdapter extends FragmentStatePagerAdapter {
         notifyDataSetChanged();
     }
 
-    public void setTitle(String title){
+    public void setTitle(String title) {
         this.title = title;
     }
 
