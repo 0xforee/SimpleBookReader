@@ -1,15 +1,9 @@
 package org.foree.bookreader.ui.activity;
 
 import android.app.SearchManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.Message;
-import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -30,31 +24,18 @@ import com.igexin.sdk.PushManager;
 import org.foree.bookreader.R;
 import org.foree.bookreader.data.book.Book;
 import org.foree.bookreader.data.dao.BookDao;
-import org.foree.bookreader.service.RefreshService;
 import org.foree.bookreader.ui.adapter.BookListAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class BookShelfActivity extends AppCompatActivity implements RefreshService.StreamCallBack, SwipeRefreshLayout.OnRefreshListener {
+public class BookShelfActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
     private static final String TAG = BookShelfActivity.class.getSimpleName();
-    private RefreshService.MyBinder mBinder;
-    private RefreshService mRefreshService;
+
     private ActionMode mActionMode;
     private BookDao bookDao;
-    private ServiceConnection mServiceConnect = new MyServiceConnection();
-    private static final int MSG_UPDATE_NOVEL = 0;
 
-    Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-
-            }
-        }
-    };
     Toolbar toolbar;
     private RecyclerView mRecyclerView;
     private BookListAdapter mAdapter;
@@ -71,18 +52,6 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
 
         PushManager.getInstance().initialize(this.getApplicationContext());
 
-        // start refresh service
-        Intent intent = new Intent(this, RefreshService.class);
-        startService(intent);
-        bindService(intent, mServiceConnect, BIND_AUTO_CREATE);
-
-        // start refresh
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                //syncNovelInfo();
-            }
-        }, 300);
     }
 
     @Override
@@ -100,8 +69,6 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
 
     @Override
     protected void onDestroy() {
-        mRefreshService.unregisterCallBack();
-        unbindService(mServiceConnect);
         super.onDestroy();
     }
 
@@ -112,28 +79,7 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
     }
 
     private void syncNovelInfo() {
-        if (mRefreshService != null) {
-            mSwipeRefreshLayout.setRefreshing(true);
-            //mRefreshService.updateNovelInfo(2);
-        } else {
-            mSwipeRefreshLayout.setRefreshing(false);
-            Snackbar.make(mSwipeRefreshLayout, "出了什么问题，请稍后再试", Snackbar.LENGTH_SHORT).show();
-        }
-    }
 
-    @Override
-    public void notifyUpdateCallBack(final Book book) {
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mSwipeRefreshLayout.setRefreshing(false);
-
-                // refresh success, update text
-                if (book != null) {
-                    refreshNovelViews(book);
-                }
-            }
-        }, 15);
     }
 
     private void setUpLayoutViews() {
@@ -208,33 +154,6 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
         mActionMode.finish();
     }
 
-    private void setNullToActionMode() {
-        if (mActionMode != null)
-            mActionMode = null;
-    }
-
-    private void refreshNovelViews(Book book) {
-
-    }
-
-    private class MyServiceConnection implements ServiceConnection {
-        private final String TAG = MyServiceConnection.class.getSimpleName();
-
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            Log.d(TAG, "onServiceConnected");
-            mBinder = (RefreshService.MyBinder) iBinder;
-            mRefreshService = mBinder.getService();
-            mRefreshService.registerCallBack(BookShelfActivity.this);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            Log.d(TAG, "onServiceDisconnected");
-
-        }
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -274,7 +193,8 @@ public class BookShelfActivity extends AppCompatActivity implements RefreshServi
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             mAdapter.removeSelection();
-            setNullToActionMode();
+            if (mActionMode != null)
+                mActionMode = null;
         }
     }
 }
