@@ -106,6 +106,13 @@ public class BiQuGeWebParser extends AbsWebParser {
         }
         book.setNewestChapter(newestChapter);
         book.setBookUrl(bookUrl);
+        book.setContentUrl(bookUrl);
+
+        return book;
+    }
+
+    @Override
+    List<Chapter> parseChapterList(String bookUrl, String contentUrl, Document doc) {
         // ChapterList
         List<Chapter> chapters = new ArrayList<>();
         Elements elements_contents = doc.select("dd");
@@ -125,14 +132,7 @@ public class BiQuGeWebParser extends AbsWebParser {
             //Log.i("HH", link.attr("href"));
             chapters.add(chapter);
         }
-        book.setChapters(chapters);
-
-        return book;
-    }
-
-    @Override
-    List<Chapter> parseChapterList(String bookUrl, Document doc) {
-        return null;
+        return chapters;
     }
 
     @Override

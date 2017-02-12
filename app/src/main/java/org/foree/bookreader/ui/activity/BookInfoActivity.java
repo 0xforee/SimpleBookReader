@@ -20,11 +20,15 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import org.foree.bookreader.R;
 import org.foree.bookreader.base.BaseApplication;
 import org.foree.bookreader.data.book.Book;
+import org.foree.bookreader.data.book.Chapter;
 import org.foree.bookreader.data.dao.BookDao;
 import org.foree.bookreader.net.NetCallback;
+import org.foree.bookreader.net.NetWorkApiHelper;
 import org.foree.bookreader.parser.AbsWebParser;
 import org.foree.bookreader.parser.WebParserManager;
 import org.jsoup.Connection;
+
+import java.util.List;
 
 /**
  * Created by foree on 17-1-10.
@@ -78,7 +82,7 @@ public class BookInfoActivity extends AppCompatActivity {
         tvNovelAuthor = (TextView) findViewById(R.id.tv_novel_author);
         tvNovelDescription = (TextView) findViewById(R.id.tv_description);
         progressBar = (ProgressBar) findViewById(R.id.pb_progress);
-        linearLayout = (LinearLayout)findViewById(R.id.ll_book_info);
+        linearLayout = (LinearLayout) findViewById(R.id.ll_book_info);
         bt = (Button) findViewById(R.id.bt_add);
         lv = (ListView) findViewById(R.id.lv_chapter_list);
         imageView = (ImageView) findViewById(R.id.iv_novel_image);
@@ -96,8 +100,8 @@ public class BookInfoActivity extends AppCompatActivity {
         });
     }
 
-    private void notifyUpdate(int state){
-        switch (state){
+    private void notifyUpdate(int state) {
+        switch (state) {
             case STATE_FAILED:
                 break;
             case STATE_LOADING:
@@ -114,26 +118,40 @@ public class BookInfoActivity extends AppCompatActivity {
 
         }
     }
+
     private void setupView() {
-        AbsWebParser webInfo = WebParserManager.getInstance().getWebParser(bookUrl);
+        final AbsWebParser webInfo = WebParserManager.getInstance().getWebParser(bookUrl);
         webInfo.getBookInfo(bookUrl, new NetCallback<Book>() {
             @Override
-            public void onSuccess(final Book data) {
-                mHandler.postDelayed(new Runnable() {
+            public void onSuccess(final Book data1) {
+                webInfo.getChapterList(bookUrl, data1.getContentUrl(), new NetCallback<List<Chapter>>() {
                     @Override
-                    public void run() {
-                        book = data;
-                        tvNovelName.setText(data.getBookName());
-                        tvNovelAuthor.setText(data.getAuthor());
-                        tvNovelDescription.setText(Html.fromHtml(data.getDescription()));
+                    public void onSuccess(final List<Chapter> data) {
+                        mHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                book = data1;
+                                book.setChapters(data);
+                                tvNovelName.setText(data1.getBookName());
+                                tvNovelAuthor.setText(data1.getAuthor());
+                                if (data1.getDescription() != null)
+                                    tvNovelDescription.setText(Html.fromHtml(data1.getDescription()));
 
-                        if(book.getBookCoverUrl()!=null){
-                            ImageLoader.getInstance().displayImage(book.getBookCoverUrl(), imageView,
-                                    BaseApplication.getInstance().getDisplayImageOptions());
-                        }
-                        notifyUpdate(STATE_SUCCESS);
+                                if (book.getBookCoverUrl() != null) {
+                                    ImageLoader.getInstance().displayImage(book.getBookCoverUrl(), imageView,
+                                            BaseApplication.getInstance().getDisplayImageOptions());
+                                }
+                                notifyUpdate(STATE_SUCCESS);
+                            }
+                        }, 0);
+
                     }
-                }, 0);
+
+                    @Override
+                    public void onFail(String msg) {
+
+                    }
+                });
 
 
             }

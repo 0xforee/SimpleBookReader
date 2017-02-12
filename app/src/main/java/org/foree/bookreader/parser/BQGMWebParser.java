@@ -1,5 +1,6 @@
 package org.foree.bookreader.parser;
 
+import android.text.Html;
 import android.util.Log;
 
 import org.foree.bookreader.data.book.Article;
@@ -120,7 +121,6 @@ public class BQGMWebParser extends AbsWebParser {
         }
 
         String chapterListUrl = null;
-        List<Chapter> chapterList = new ArrayList<>();
 
         // get chapterListUrl by book website
         Elements chapterElements = doc.getElementsByClass("intro");
@@ -133,10 +133,16 @@ public class BQGMWebParser extends AbsWebParser {
             }
         }
 
-        // get chapterList
-        try {
-            doc = Jsoup.connect(chapterListUrl).get();
-            if (doc != null) {
+        book.setContentUrl(chapterListUrl);
+
+        return book;
+    }
+
+    @Override
+    List<Chapter> parseChapterList(String bookUrl, String contentUrl, Document doc) {
+        List<Chapter> chapterList = new ArrayList<>();
+
+        if (doc != null) {
                 Elements chapters = doc.getElementsByClass("chapter");
                 if (chapters != null && !chapters.isEmpty()) {
                     Elements li = chapters.select("li");
@@ -152,23 +158,12 @@ public class BQGMWebParser extends AbsWebParser {
                             Log.d(TAG, getHostUrl() + chapterLink.attr("href"));
                             Log.d(TAG, chapterLink.text());
                         }
+                        chapterList.add(chapter);
                     }
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.e(TAG, e.toString());
-        }
 
-        book.setChapters(chapterList);
-
-        return book;
-    }
-
-    @Override
-    List<Chapter> parseChapterList(String bookUrl, Document doc) {
-
-        return null;
+        return chapterList;
     }
 
     @Override
@@ -187,7 +182,7 @@ public class BQGMWebParser extends AbsWebParser {
         Element contentElement = doc.getElementById("nr1");
         if (contentElement != null) {
             Log.d(TAG, contentElement.text());
-            article.setContents(contentElement.text());
+            article.setContents(Html.fromHtml(contentElement.toString()).toString());
         }
 
         return article;

@@ -52,7 +52,7 @@ public abstract class AbsWebParser implements IWebParser {
 
     abstract Book parseBookInfo(String bookUrl, Document doc);
 
-    abstract List<Chapter> parseChapterList(String bookUrl, Document doc);
+    abstract List<Chapter> parseChapterList(String bookUrl, String contentUrl, Document doc);
 
     abstract Article parseArticle(String chapterUrl, Document doc);
 
@@ -102,16 +102,16 @@ public abstract class AbsWebParser implements IWebParser {
     }
 
     @Override
-    public void getChapterList(final String bookUrl, final NetCallback<List<Chapter>> netCallback) {
+    public void getChapterList(final String bookUrl, final String contentUrl, final NetCallback<List<Chapter>> netCallback) {
         new Thread() {
             @Override
             public void run() {
                 super.run();
                 Document doc;
                 try {
-                    doc = Jsoup.connect(bookUrl).get();
+                    doc = Jsoup.connect(contentUrl).get();
                     if (netCallback != null && doc != null) {
-                        netCallback.onSuccess(parseChapterList(bookUrl, doc));
+                        netCallback.onSuccess(parseChapterList(bookUrl, contentUrl, doc));
                     }
                 } catch (IOException e) {
                     e.printStackTrace();

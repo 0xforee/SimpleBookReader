@@ -2,10 +2,10 @@ package org.foree.bookreader.ui.activity;
 
 import android.app.SearchManager;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,9 +16,9 @@ import android.view.View;
 import org.foree.bookreader.R;
 import org.foree.bookreader.data.book.Book;
 import org.foree.bookreader.net.NetCallback;
+import org.foree.bookreader.parser.AbsWebParser;
 import org.foree.bookreader.parser.BiQuGeWebParser;
 import org.foree.bookreader.ui.adapter.SearchListAdapter;
-import org.foree.bookreader.parser.AbsWebParser;
 
 import java.util.ArrayList;
 import java.util.List;

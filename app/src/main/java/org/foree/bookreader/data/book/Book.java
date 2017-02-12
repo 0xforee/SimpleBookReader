@@ -12,6 +12,9 @@ public class Book {
     private String author;
     private String bookUrl;
 
+    // set content url
+    private String contentUrl;
+
     private String bookCoverUrl;
     private List<Chapter> chapters;
     private String description;
@@ -23,10 +26,11 @@ public class Book {
     }
 
     public Book(String bookName, String bookUrl) {
-        this(bookName, bookUrl, "", "", "", "", -1, "");
+        this(bookName, bookUrl, "", "", "", "", -1, "", "");
     }
 
-    public Book(String bookName, String bookUrl, String updateTime, String category, String author, String description, int recentChapterId, String bookCoverUrl) {
+    public Book(String bookName, String bookUrl, String updateTime, String category, String author,
+                String description, int recentChapterId, String bookCoverUrl, String contentUrl) {
         this.bookUrl = bookUrl;
         this.bookName = bookName;
         this.updateTime = updateTime;
@@ -35,6 +39,7 @@ public class Book {
         this.description = description;
         this.recentChapterId = recentChapterId;
         this.bookCoverUrl = bookCoverUrl;
+        this.contentUrl = contentUrl;
     }
 
     public String getBookName() {
@@ -116,4 +121,13 @@ public class Book {
     public void setRecentChapterId(int recentChapterId) {
         this.recentChapterId = recentChapterId;
     }
+
+    public String getContentUrl() {
+        return contentUrl;
+    }
+
+    public void setContentUrl(String contentUrl) {
+        this.contentUrl = contentUrl;
+    }
+
 }

@@ -17,7 +17,7 @@ public interface IWebParser {
 
     void getBookInfo(String bookUrl, NetCallback<Book> netCallback);
 
-    void getChapterList(String bookUrl, NetCallback<List<Chapter>> netCallback);
+    void getChapterList(String bookUrl, String contentUrl, NetCallback<List<Chapter>> netCallback);
 
     void getArticle(String chapterUrl, NetCallback<Article> netCallback);
 }

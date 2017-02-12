@@ -61,6 +61,7 @@ public class BookSQLiteOpenHelper extends SQLiteOpenHelper {
         db.execSQL("create table books(" +
                 "id integer primary key autoincrement," +
                 "book_url varchar(255) unique," +
+                "content_url varchar(255)," +
                 "book_name varchar(255)," +
                 "book_cover_url varchar(255)," +
                 "update_time varchar(255)," +

@@ -43,7 +43,7 @@ public class NullWebParser extends AbsWebParser{
     }
 
     @Override
-    List<Chapter> parseChapterList(String bookUrl, Document doc) {
+    List<Chapter> parseChapterList(String bookUrl, String contentUrl, Document doc) {
         return null;
     }
 
