@@ -2,10 +2,10 @@ package org.foree.bookreader.pagination;
 
 import android.text.Layout;
 import android.text.StaticLayout;
-import android.text.TextPaint;
+
+import org.foree.bookreader.utils.StringUtils;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by foree on 17-1-12.
@@ -23,7 +23,7 @@ public class Pagination {
     }
 
     public void splitPage(CharSequence contents) {
-
+        contents = StringUtils.trim(contents.toString());
         final StaticLayout layout = new StaticLayout(contents,
                 paginationArgs.getmPaint(),
                 paginationArgs.getmWidth(),

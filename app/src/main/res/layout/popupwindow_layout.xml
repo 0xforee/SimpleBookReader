@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:background="@color/fugu_page_background"
     android:layout_height="match_parent"
+    android:background="@color/fugu_page_background"
     android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/md_grey_500" />
 
     <TextView
         android:id="@+id/tv_popup"
@@ -15,15 +20,15 @@
         android:textSize="20sp" />
 
     <TextView
-        android:background="@color/md_grey_500"
         android:layout_width="match_parent"
-        android:layout_height="1dp" />
+        android:layout_height="1dp"
+        android:background="@color/md_grey_500" />
 
     <ListView
         android:id="@+id/rv_item_list"
         android:layout_width="match_parent"
-        android:scrollbars="vertical"
+        android:layout_height="match_parent"
         android:fastScrollEnabled="true"
         android:scrollbarThumbVertical="@color/md_white_1000"
-        android:layout_height="match_parent" />
+        android:scrollbars="vertical" />
 </LinearLayout>

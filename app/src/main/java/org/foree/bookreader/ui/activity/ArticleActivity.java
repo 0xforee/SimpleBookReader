@@ -1,6 +1,7 @@
 package org.foree.bookreader.ui.activity;
 
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -83,7 +84,7 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
 
         setUpLayoutViews();
         initTextView();
-        setUpReadPopMenu();
+        setUpMenuPop();
 
         notifyState(PaginationEvent.STATE_LOADING);
 
@@ -174,7 +175,7 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
         super.onDestroy();
     }
 
-    private void setUpReadPopMenu() {
+    private void setUpMenuPop() {
         // 弹出一个popupMenu
         View view = LayoutInflater.from(this).inflate(R.layout.popupmenu_read_menu, null);
 
