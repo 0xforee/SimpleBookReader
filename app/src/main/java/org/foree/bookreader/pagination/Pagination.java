@@ -40,14 +40,14 @@ public class Pagination {
         for (int i = 0; i < lines; i++) {
             if (height < layout.getLineBottom(i)) {
                 // When the splitPage height has been exceeded
-                addPage(text.subSequence(startOffset, layout.getLineStart(i)).toString().trim());
+                addPage(StringUtils.trim(text.subSequence(startOffset, layout.getLineStart(i)).toString()));
                 startOffset = layout.getLineStart(i);
                 height = layout.getLineTop(i) + paginationArgs.getmHeight();
             }
 
             if (i == lines - 1) {
                 // Put the rest of the text into the last page
-                addPage(text.subSequence(startOffset, layout.getLineEnd(i)).toString().trim());
+                addPage(StringUtils.trim(text.subSequence(startOffset, layout.getLineEnd(i)).toString()));
                 return;
             }
         }

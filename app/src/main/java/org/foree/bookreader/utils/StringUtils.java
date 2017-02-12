@@ -6,19 +6,19 @@ package org.foree.bookreader.utils;
 
 public class StringUtils {
 
-    // 去掉文章开头结尾的non-breaking space和换行符
+    // 去掉文章开头结尾的non-breaking space和换行符，以及空格
     public static String trim(String string) {
         int start = 0, last = string.length() - 1;
         int end = last;
-        while ((start <= end) && ((string.charAt(start) <= '\u00A0'|| string.charAt(start) == '\n'))) {
+        while ((start <= end) && ((string.charAt(start) == '\n'))) {
             start++;
         }
-        while ((end >= start) && ((string.charAt(end) <= '\u00A0'|| string.charAt(end) == '\n'))) {
+        while ((end >= start) && ((string.charAt(end) == '\u00A0' || string.charAt(end) == ' ' || string.charAt(end) == '\n'))) {
             end--;
         }
         if (start == 0 && end == last) {
             return string;
         }
-        return string.substring(start, end - start + 1);
+        return string.substring(start, end + 1);
     }
 }
