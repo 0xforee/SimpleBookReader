@@ -27,7 +27,7 @@ public class WebParserManager {
 
     private WebParserManager() {
         mParserMap = new HashMap<>();
-        mParserMap.put("http://www.biquge.com", new BiQuGeWebParser());
+        mParserMap.put("http://www.biquge.cn", new BiQuGeWebParser());
         mParserMap.put("http://m.biquge.com", new BQGMWebParser());
 
     }

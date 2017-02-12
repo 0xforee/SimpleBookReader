@@ -33,12 +33,12 @@ public class BiQuGeWebParser extends AbsWebParser {
 
     @Override
     String getHostUrl() {
-        return "http://www.biquge.com";
+        return "http://www.biquge.cn";
     }
 
     @Override
     String getSearchApi() {
-        return "http://zhannei.baidu.com/cse/search?s=287293036948159515&q=";
+        return "http://zhannei.baidu.com/cse/search?s=11869390265411396408&ie=utf-8&q=";
     }
 
     @Override
@@ -89,7 +89,7 @@ public class BiQuGeWebParser extends AbsWebParser {
                     break;
                 case "og:image":
                     // book cover
-                    String bookCoverUrl = getHostUrl() + update.attr("content");
+                    String bookCoverUrl = update.attr("content");
                     book.setBookCoverUrl(bookCoverUrl);
                     break;
                 case "og:novel:update_time":
