@@ -6,9 +6,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -17,6 +14,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
@@ -27,9 +27,7 @@ import org.foree.bookreader.data.dao.BookDao;
 import org.foree.bookreader.data.event.PaginationEvent;
 import org.foree.bookreader.pagination.PaginationArgs;
 import org.foree.bookreader.pagination.PaginationLoader;
-import org.foree.bookreader.ui.adapter.ItemListAdapter;
 import org.foree.bookreader.ui.adapter.PageAdapter;
-import org.foree.bookreader.ui.view.DividerItemDecoration;
 import org.foree.bookreader.ui.view.ReadViewPager;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -60,12 +58,11 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
     private TextView mTextView, mTvError, mTvLoading;
 
     // popWindow
-    private PopupWindow popupWindow, readPopMenu;
+    private PopupWindow chapterListPop, menuPop;
     private View rootView;
-    private RecyclerView mRecyclerView;
-    private ItemListAdapter mAdapter;
+    private ListView chapterTitleListView;
 
-    // readPopMenu
+    // menuPop
     private TextView tvContent, tvProgress, tvFont, tvBrightness;
 
 
@@ -184,14 +181,14 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
         DisplayMetrics dp = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dp);
 
-        readPopMenu = new PopupWindow(this);
-        readPopMenu.setContentView(view);
-        readPopMenu.setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
-        readPopMenu.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-        readPopMenu.setFocusable(true);
-        readPopMenu.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+        menuPop = new PopupWindow(this);
+        menuPop.setContentView(view);
+        menuPop.setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
+        menuPop.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+        menuPop.setFocusable(true);
+        menuPop.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
 
-        readPopMenu.setOutsideTouchable(true);
+        menuPop.setOutsideTouchable(true);
 
         tvContent = (TextView) view.findViewById(R.id.content);
         tvProgress = (TextView) view.findViewById(R.id.progress);
@@ -202,13 +199,13 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
         tvContent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (readPopMenu.isShowing()) {
-                    readPopMenu.dismiss();
+                if (menuPop.isShowing()) {
+                    menuPop.dismiss();
                 }
-                if (popupWindow == null)
+                if (chapterListPop == null)
                     showPopup();
                 else
-                    popupWindow.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
+                    chapterListPop.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
             }
         });
 
@@ -216,7 +213,7 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
 
     @Override
     public void onMediumAreaClick() {
-        readPopMenu.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
+        menuPop.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
     }
 
     @Override
@@ -243,39 +240,38 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
         DisplayMetrics dp = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dp);
 
-        popupWindow = new PopupWindow(this);
-        popupWindow.setContentView(view);
-        popupWindow.setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
-        popupWindow.setHeight(dp.heightPixels / 4 * 3);
-        popupWindow.setFocusable(true);
-        popupWindow.setOutsideTouchable(true);
-        popupWindow.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-        popupWindow.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
+        chapterListPop = new PopupWindow(this);
+        chapterListPop.setContentView(view);
+        chapterListPop.setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
+        chapterListPop.setHeight(dp.heightPixels / 4 * 3);
+        chapterListPop.setFocusable(true);
+        chapterListPop.setOutsideTouchable(true);
+        chapterListPop.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+        chapterListPop.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
 
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.rv_item_list);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(this,
-                DividerItemDecoration.VERTICAL_LIST));
 
-        setUpRecyclerViewAdapter();
-    }
+        getChapterTitle();
+        chapterTitleListView = (ListView) view.findViewById(R.id.rv_item_list);
 
-    private void setUpRecyclerViewAdapter() {
-        mAdapter = new ItemListAdapter(this, chapterList);
-        mRecyclerView.setAdapter(mAdapter);
-        mAdapter.setOnItemClickListener(new ItemListAdapter.OnItemClickListener() {
+        chapterTitleListView.setAdapter(new ArrayAdapter<>(this, R.layout.item_list_holder, getChapterTitle()));
+
+        chapterTitleListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(View view, int position) {
-                popupWindow.dismiss();
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                chapterListPop.dismiss();
                 switchChapter(chapterList.get(position).getChapterUrl());
             }
-
-            @Override
-            public void onItemLongClick(View view, int position) {
-
-            }
         });
+    }
+
+    private List<String> getChapterTitle() {
+        List<String> chapterTitle = new ArrayList<>();
+
+        for(Chapter chapter: chapterList){
+            chapterTitle.add(chapter.getChapterTitle());
+        }
+
+        return chapterTitle;
     }
 
     private void switchChapter(String newChapterUrl) {

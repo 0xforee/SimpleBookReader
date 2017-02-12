@@ -19,8 +19,11 @@
         android:layout_width="match_parent"
         android:layout_height="1dp" />
 
-    <android.support.v7.widget.RecyclerView
+    <ListView
         android:id="@+id/rv_item_list"
         android:layout_width="match_parent"
+        android:scrollbars="vertical"
+        android:fastScrollEnabled="true"
+        android:scrollbarThumbVertical="@color/md_white_1000"
         android:layout_height="match_parent" />
 </LinearLayout>
