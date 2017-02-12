@@ -62,7 +62,7 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
     private PopupWindow chapterListPop, menuPop;
     private View rootView;
     private ListView chapterTitleListView;
-
+    private int chapterPostion;
     // menuPop
     private TextView tvContent, tvProgress, tvFont, tvBrightness;
 
@@ -250,12 +250,10 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
         chapterListPop.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
         chapterListPop.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
 
-
-        getChapterTitle();
         chapterTitleListView = (ListView) view.findViewById(R.id.rv_item_list);
 
         chapterTitleListView.setAdapter(new ArrayAdapter<>(this, R.layout.item_list_holder, getChapterTitle()));
-
+        chapterTitleListView.setSelection(chapterPostion);
         chapterTitleListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -268,8 +266,11 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
     private List<String> getChapterTitle() {
         List<String> chapterTitle = new ArrayList<>();
 
-        for(Chapter chapter: chapterList){
-            chapterTitle.add(chapter.getChapterTitle());
+        for(int i = 0; i < chapterList.size(); i++){
+            chapterTitle.add(chapterList.get(i).getChapterTitle());
+            if(chapterList.get(i).getChapterUrl().equals(chapterUrl)){
+                chapterPostion = i;
+            }
         }
 
         return chapterTitle;
