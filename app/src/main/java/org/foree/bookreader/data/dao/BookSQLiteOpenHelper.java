@@ -76,7 +76,7 @@ public class BookSQLiteOpenHelper extends SQLiteOpenHelper {
         );
 
         // 存放章节缓存
-        db.execSQL("create table" +DB_TABLE_CHAPTER_CONTENT +
+        db.execSQL("create table" + DB_TABLE_CHAPTER_CONTENT +
                 "(" +
                 "id integer primary key autoincrement," +
                 "chapter_url varchar(255) unique," +

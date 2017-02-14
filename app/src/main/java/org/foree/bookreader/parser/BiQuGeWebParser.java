@@ -139,11 +139,13 @@ public class BiQuGeWebParser extends AbsWebParser {
     Article parseArticle(String chapterUrl, Document doc) {
         Article article = new Article();
 
+        article.setUrl(chapterUrl);
+
         // get article title
         Elements titles = doc.getElementsByTag("h1");
         if (titles != null && titles.size() != 0) {
-            Log.d(TAG, "Title" + titles.get(0).toString());
-            article.setTitle(titles.get(0).toString());
+            Log.d(TAG, "Title" + titles.get(0).text());
+            article.setTitle(titles.get(0).text());
         }
 
 

@@ -4,26 +4,23 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
+import org.foree.bookreader.data.book.Article;
 import org.foree.bookreader.ui.fragment.ArticleFragment;
-
-import java.util.ArrayList;
 
 /**
  * Created by foree on 17-2-8.
  */
 
 public class PageAdapter extends FragmentStatePagerAdapter {
-    private ArrayList<String> mPages;
-    private String title;
+    private Article article;
 
     public PageAdapter(FragmentManager fm) {
         super(fm);
-        mPages = new ArrayList<>();
     }
 
     @Override
     public Fragment getItem(int position) {
-        return ArticleFragment.newInstance(title, mPages.get(position));
+        return ArticleFragment.newInstance(article.getTitle(), article.getPages().get(position));
     }
 
     @Override
@@ -33,17 +30,12 @@ public class PageAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public int getCount() {
-        return mPages.size();
+        return article != null ? article.getPages().size() : 0;
     }
 
-    public void setPages(ArrayList<String> pages) {
-        mPages.clear();
-        mPages.addAll(pages);
+    public void setArticle(Article article) {
+        this.article = article;
         notifyDataSetChanged();
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
 }

@@ -1,7 +1,6 @@
 package org.foree.bookreader.ui.activity;
 
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,6 +21,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import org.foree.bookreader.R;
+import org.foree.bookreader.data.book.Article;
 import org.foree.bookreader.data.book.Book;
 import org.foree.bookreader.data.book.Chapter;
 import org.foree.bookreader.data.dao.BookDao;
@@ -157,15 +157,16 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
     public void onEventMainThread(PaginationEvent pageEvent) {
         notifyState(pageEvent.getState());
         Log.d("EventBus", "notifyState");
-        if (pageEvent.getUrl().equals(chapterUrl))
-            if (pageEvent.getPagination() != null) {
-                pageAdapter.setTitle(bookDao.getChapterName(pageEvent.getUrl()));
-                pageAdapter.setPages(pageEvent.getPagination().getPages());
-                if (slipLeft)
-                    mViewPager.setCurrentItem(pageEvent.getPagination().getPages().size() - 1, false);
-                else
-                    mViewPager.setCurrentItem(0, false);
-            }
+        Article article = pageEvent.getArticle();
+        if (article != null) {
+            if (article.getUrl().equals(chapterUrl))
+                pageAdapter.setArticle(article);
+            if (slipLeft)
+                mViewPager.setCurrentItem(article.getPages().size() - 1, false);
+            else
+                mViewPager.setCurrentItem(0, false);
+
+        }
     }
 
     @Override
@@ -266,9 +267,9 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
     private List<String> getChapterTitle() {
         List<String> chapterTitle = new ArrayList<>();
 
-        for(int i = 0; i < chapterList.size(); i++){
+        for (int i = 0; i < chapterList.size(); i++) {
             chapterTitle.add(chapterList.get(i).getChapterTitle());
-            if(chapterList.get(i).getChapterUrl().equals(chapterUrl)){
+            if (chapterList.get(i).getChapterUrl().equals(chapterUrl)) {
                 chapterPostion = i;
             }
         }
@@ -311,7 +312,7 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
             bookDao.updateRecentChapterId(bookUrl, recentChapterId);
     }
 
-    private void updateChapterUrl(String newUrl){
+    private void updateChapterUrl(String newUrl) {
         recentChapterId = bookDao.getChapterId(newUrl);
         chapterUrl = newUrl;
     }

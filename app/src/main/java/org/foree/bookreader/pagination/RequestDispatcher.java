@@ -28,12 +28,12 @@ public class RequestDispatcher extends Thread {
                 ArticleRequest request = mPriorityQueue.take();
                 String url = request.getUrl();
 
-                Pagination pagination = PaginationCache.getInstance().get(url);
+                Article article = PaginationCache.getInstance().get(url);
 
-                if (pagination == null) {
+                if (article == null) {
                     downloadArticle(request, url);
                 } else {
-                    EventBus.getDefault().post(new PaginationEvent(pagination, PaginationEvent.STATE_SUCCESS, url));
+                    EventBus.getDefault().post(new PaginationEvent(article, PaginationEvent.STATE_SUCCESS));
                 }
 
             } catch (InterruptedException e) {
@@ -48,24 +48,22 @@ public class RequestDispatcher extends Thread {
             absWebParser.getArticle(url, new NetCallback<Article>() {
                 @Override
                 public void onSuccess(Article data) {
-                    Pagination pagination = new Pagination(request.getPaginationArgs());
                     if (data.getContents() != null) {
-                        pagination.clear();
-                        pagination.splitPage(data.getContents());
+                        PaginateCore.splitPage(request.getPaginationArgs(), data);
 
                         // put cache
-                        PaginationCache.getInstance().put(url, pagination);
+                        PaginationCache.getInstance().put(url, data);
 
                         // post
-                        EventBus.getDefault().post(new PaginationEvent(pagination, PaginationEvent.STATE_SUCCESS, url));
+                        EventBus.getDefault().post(new PaginationEvent(data, PaginationEvent.STATE_SUCCESS));
                     } else {
-                        EventBus.getDefault().post(new PaginationEvent(null, PaginationEvent.STATE_FAILED, url));
+                        EventBus.getDefault().post(new PaginationEvent(null, PaginationEvent.STATE_FAILED));
                     }
                 }
 
                 @Override
                 public void onFail(String msg) {
-                    EventBus.getDefault().post(new PaginationEvent(null, PaginationEvent.STATE_FAILED, url));
+                    EventBus.getDefault().post(new PaginationEvent(null, PaginationEvent.STATE_FAILED));
                 }
             });
         }

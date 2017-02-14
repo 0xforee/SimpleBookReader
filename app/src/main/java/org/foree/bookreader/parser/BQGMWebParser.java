@@ -6,12 +6,10 @@ import android.util.Log;
 import org.foree.bookreader.data.book.Article;
 import org.foree.bookreader.data.book.Book;
 import org.foree.bookreader.data.book.Chapter;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -143,25 +141,25 @@ public class BQGMWebParser extends AbsWebParser {
         List<Chapter> chapterList = new ArrayList<>();
 
         if (doc != null) {
-                Elements chapters = doc.getElementsByClass("chapter");
-                if (chapters != null && !chapters.isEmpty()) {
-                    Elements li = chapters.select("li");
-                    for (Element chapterNode : li) {
-                        Chapter chapter = new Chapter();
+            Elements chapters = doc.getElementsByClass("chapter");
+            if (chapters != null && !chapters.isEmpty()) {
+                Elements li = chapters.select("li");
+                for (Element chapterNode : li) {
+                    Chapter chapter = new Chapter();
 
-                        Element chapterLink = chapterNode.child(0);
-                        if (chapterLink != null) {
-                            chapter.setBookUrl(bookUrl);
-                            chapter.setChapterTitle(chapterLink.text());
-                            chapter.setChapterUrl(getHostUrl() + chapterLink.attr("href"));
-                            chapter.setChapterId(getChapterId(chapterLink.attr("href")));
-                            Log.d(TAG, getHostUrl() + chapterLink.attr("href"));
-                            Log.d(TAG, chapterLink.text());
-                        }
-                        chapterList.add(chapter);
+                    Element chapterLink = chapterNode.child(0);
+                    if (chapterLink != null) {
+                        chapter.setBookUrl(bookUrl);
+                        chapter.setChapterTitle(chapterLink.text());
+                        chapter.setChapterUrl(getHostUrl() + chapterLink.attr("href"));
+                        chapter.setChapterId(getChapterId(chapterLink.attr("href")));
+                        Log.d(TAG, getHostUrl() + chapterLink.attr("href"));
+                        Log.d(TAG, chapterLink.text());
                     }
+                    chapterList.add(chapter);
                 }
             }
+        }
 
         return chapterList;
     }
@@ -169,6 +167,9 @@ public class BQGMWebParser extends AbsWebParser {
     @Override
     Article parseArticle(String chapterUrl, Document doc) {
         Article article = new Article();
+
+        // set ulr
+        article.setUrl(chapterUrl);
 
         // get article title
         Element titleElement = doc.getElementById("nr_title");
