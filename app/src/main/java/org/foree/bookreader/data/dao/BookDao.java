@@ -357,4 +357,17 @@ public class BookDao {
 
         return chapterName;
     }
+
+    /**
+     * 从数据库中获取章节内容
+     * @param chapterUrl 根据chapterUrl提取
+     * @return
+     */
+    public String getChapterContent(String chapterUrl){
+        return null;
+    }
+
+    public void saveChapterContent(String chapterContent){
+
+    }
 }

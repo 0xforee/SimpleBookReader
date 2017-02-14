@@ -15,6 +15,7 @@ public class BookSQLiteOpenHelper extends SQLiteOpenHelper {
     public static final String DB_NAME = "bookreader.db";
     public static final String DB_TABLE_CHAPTERS = "chapters";
     public static final String DB_TABLE_BOOKS = "books";
+    public static final String DB_TABLE_CHAPTER_CONTENT = "chapter_content";
 
     public BookSQLiteOpenHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -47,7 +48,8 @@ public class BookSQLiteOpenHelper extends SQLiteOpenHelper {
     private void createEntriesTable(SQLiteDatabase db) {
         //章节有对应的book_url, chapter_url的md5为章节内容的缓存文件名称
         // chapter_id 用于章节排序和获取前后章节
-        db.execSQL("create table chapters(" +
+        db.execSQL("create table " + DB_TABLE_CHAPTERS +
+                "(" +
                 "id integer primary key autoincrement," +
                 "chapter_url varchar(255) unique," +
                 "chapter_id integer unique," +
@@ -58,7 +60,8 @@ public class BookSQLiteOpenHelper extends SQLiteOpenHelper {
                 ")"
         );
 
-        db.execSQL("create table books(" +
+        db.execSQL("create table " + DB_TABLE_BOOKS +
+                "(" +
                 "id integer primary key autoincrement," +
                 "book_url varchar(255) unique," +
                 "content_url varchar(255)," +
@@ -69,6 +72,15 @@ public class BookSQLiteOpenHelper extends SQLiteOpenHelper {
                 "category varchar(255)," +
                 "description varchar(255)," +
                 "author varchar(255)" +
+                ")"
+        );
+
+        // 存放章节缓存
+        db.execSQL("create table" +DB_TABLE_CHAPTER_CONTENT +
+                "(" +
+                "id integer primary key autoincrement," +
+                "chapter_url varchar(255) unique," +
+                "chapter_content varchar(255)" +
                 ")"
         );
     }
