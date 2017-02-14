@@ -67,11 +67,6 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
     // SwipeRefreshLayout onRefresh
     @Override
     public void onRefresh() {
@@ -89,7 +84,7 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.content_main);
         mSwipeRefreshLayout.setOnRefreshListener(this);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.rv_book_list);
+        mRecyclerView = (RecyclerView) findViewById(R.id.rv_book_shelf);
 
         setUpRecyclerViewAdapter();
     }

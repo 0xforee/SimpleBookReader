@@ -49,7 +49,7 @@ public class SearchResultsActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.rv_book_list);
+        mRecyclerView = (RecyclerView) findViewById(R.id.rv_book_shelf);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
