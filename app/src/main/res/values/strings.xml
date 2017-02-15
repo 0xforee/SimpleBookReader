@@ -10,7 +10,7 @@
     <string name="search_hint">搜索小说</string>
     <string name="action_about">关于</string>
 
-    <!-- Article loading text -->
+    <!-- Chapter loading text -->
     <string name="loading">正在加载 &#8230;</string>
     <string name="load_fail">加载失败，请检查网络连接</string>
 

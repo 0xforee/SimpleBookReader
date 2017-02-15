@@ -3,7 +3,7 @@ package org.foree.bookreader.pagination;
 import android.text.Layout;
 import android.text.StaticLayout;
 
-import org.foree.bookreader.data.book.Article;
+import org.foree.bookreader.data.book.Chapter;
 import org.foree.bookreader.utils.StringUtils;
 
 /**
@@ -13,12 +13,12 @@ import org.foree.bookreader.utils.StringUtils;
 
 public class PaginateCore {
 
-    public static void splitPage(PaginationArgs paginationArgs, Article article) {
+    public static void splitPage(PaginationArgs paginationArgs, Chapter chapter) {
         // 1st. format content first
-        article.setContents(StringUtils.trim(article.getContents()));
+        chapter.setContents(StringUtils.trim(chapter.getContents()));
 
         // 2nd. split Page
-        final StaticLayout layout = new StaticLayout(article.getContents(),
+        final StaticLayout layout = new StaticLayout(chapter.getContents(),
                 paginationArgs.getmPaint(),
                 paginationArgs.getmWidth(),
                 Layout.Alignment.ALIGN_NORMAL,
@@ -34,14 +34,14 @@ public class PaginateCore {
         for (int i = 0; i < lines; i++) {
             if (height < layout.getLineBottom(i)) {
                 // When the splitPage height has been exceeded
-                article.addPage(StringUtils.trim(text.subSequence(startOffset, layout.getLineStart(i)).toString()));
+                chapter.addPage(StringUtils.trim(text.subSequence(startOffset, layout.getLineStart(i)).toString()));
                 startOffset = layout.getLineStart(i);
                 height = layout.getLineTop(i) + paginationArgs.getmHeight();
             }
 
             if (i == lines - 1) {
                 // Put the rest of the text into the last page
-                article.addPage(StringUtils.trim(text.subSequence(startOffset, layout.getLineEnd(i)).toString()));
+                chapter.addPage(StringUtils.trim(text.subSequence(startOffset, layout.getLineEnd(i)).toString()));
                 return;
             }
         }

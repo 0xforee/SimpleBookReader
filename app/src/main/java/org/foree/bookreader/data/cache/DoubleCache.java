@@ -1,12 +1,12 @@
 package org.foree.bookreader.data.cache;
 
-import org.foree.bookreader.data.book.Article;
+import org.foree.bookreader.data.book.Chapter;
 
 /**
  * Created by foree on 17-2-6.
  */
 
-public class DoubleCache extends ArticleCache {
+public class DoubleCache extends ChapterCache {
     private MemoryCache memoryCache;
     private DiskCache diskCache;
 
@@ -16,20 +16,20 @@ public class DoubleCache extends ArticleCache {
     }
 
     @Override
-    public Article get(String chapterUrl) {
-        Article article = memoryCache.get(chapterUrl);
-        if (article == null) {
-            article = diskCache.get(chapterUrl);
-            if (article != null) {
-                memoryCache.put(chapterUrl, article);
+    public Chapter get(String chapterUrl) {
+        Chapter chapter = memoryCache.get(chapterUrl);
+        if (chapter == null) {
+            chapter = diskCache.get(chapterUrl);
+            if (chapter != null) {
+                memoryCache.put(chapterUrl, chapter);
             }
         }
-        return article;
+        return chapter;
     }
 
     @Override
-    public void put(String chapterUrl, Article article) {
-        memoryCache.put(chapterUrl, article);
-        diskCache.put(chapterUrl, article);
+    public void put(String chapterUrl, Chapter chapter) {
+        memoryCache.put(chapterUrl, chapter);
+        diskCache.put(chapterUrl, chapter);
     }
 }

@@ -1,6 +1,6 @@
 package org.foree.bookreader.pagination;
 
-import org.foree.bookreader.data.book.Article;
+import org.foree.bookreader.data.book.Chapter;
 import org.foree.bookreader.data.cache.PaginationCache;
 import org.foree.bookreader.data.event.PaginationEvent;
 import org.foree.bookreader.net.NetCallback;
@@ -15,9 +15,9 @@ import java.util.concurrent.PriorityBlockingQueue;
  */
 
 public class RequestDispatcher extends Thread {
-    private PriorityBlockingQueue<ArticleRequest> mPriorityQueue;
+    private PriorityBlockingQueue<ChapterRequest> mPriorityQueue;
 
-    public RequestDispatcher(PriorityBlockingQueue<ArticleRequest> priorityQueue) {
+    public RequestDispatcher(PriorityBlockingQueue<ChapterRequest> priorityQueue) {
         this.mPriorityQueue = priorityQueue;
     }
 
@@ -25,15 +25,15 @@ public class RequestDispatcher extends Thread {
     public void run() {
         while (!this.isInterrupted()) {
             try {
-                ArticleRequest request = mPriorityQueue.take();
+                ChapterRequest request = mPriorityQueue.take();
                 String url = request.getUrl();
 
-                Article article = PaginationCache.getInstance().get(url);
+                Chapter chapter = PaginationCache.getInstance().get(url);
 
-                if (article == null) {
-                    downloadArticle(request, url);
+                if (chapter == null) {
+                    downloadChapter(request, url);
                 } else {
-                    EventBus.getDefault().post(new PaginationEvent(article, PaginationEvent.STATE_SUCCESS));
+                    EventBus.getDefault().post(new PaginationEvent(chapter, PaginationEvent.STATE_SUCCESS));
                 }
 
             } catch (InterruptedException e) {
@@ -42,20 +42,20 @@ public class RequestDispatcher extends Thread {
         }
     }
 
-    private void downloadArticle(final ArticleRequest request, final String url) {
+    private void downloadChapter(final ChapterRequest request, final String url) {
         if (url != null && !url.isEmpty()) {
             AbsWebParser absWebParser = WebParserManager.getInstance().getWebParser(url);
-            absWebParser.getArticle(url, new NetCallback<Article>() {
+            absWebParser.getChapterContents(url, new NetCallback<Chapter>() {
                 @Override
-                public void onSuccess(Article data) {
-                    if (data.getContents() != null) {
-                        PaginateCore.splitPage(request.getPaginationArgs(), data);
+                public void onSuccess(Chapter chapter) {
+                    if (chapter.getContents() != null) {
+                        PaginateCore.splitPage(request.getPaginationArgs(), chapter);
 
                         // put cache
-                        PaginationCache.getInstance().put(url, data);
+                        PaginationCache.getInstance().put(url, chapter);
 
                         // post
-                        EventBus.getDefault().post(new PaginationEvent(data, PaginationEvent.STATE_SUCCESS));
+                        EventBus.getDefault().post(new PaginationEvent(chapter, PaginationEvent.STATE_SUCCESS));
                     } else {
                         EventBus.getDefault().post(new PaginationEvent(null, PaginationEvent.STATE_FAILED));
                     }

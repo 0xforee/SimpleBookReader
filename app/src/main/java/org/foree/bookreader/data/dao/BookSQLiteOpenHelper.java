@@ -15,7 +15,6 @@ public class BookSQLiteOpenHelper extends SQLiteOpenHelper {
     public static final String DB_NAME = "bookreader.db";
     public static final String DB_TABLE_CHAPTERS = "chapters";
     public static final String DB_TABLE_BOOKS = "books";
-    public static final String DB_TABLE_CHAPTER_CONTENT = "chapter_content";
 
     public BookSQLiteOpenHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -55,6 +54,7 @@ public class BookSQLiteOpenHelper extends SQLiteOpenHelper {
                 "chapter_id integer unique," +
                 "book_url varchar(255)," +
                 "chapter_title varchar(255)," +
+                "chapter_content varchar," +
                 "offline integer," +
                 "read integer" +
                 ")"
@@ -75,14 +75,6 @@ public class BookSQLiteOpenHelper extends SQLiteOpenHelper {
                 ")"
         );
 
-        // 存放章节缓存
-        db.execSQL("create table" + DB_TABLE_CHAPTER_CONTENT +
-                "(" +
-                "id integer primary key autoincrement," +
-                "chapter_url varchar(255) unique," +
-                "chapter_content varchar(255)" +
-                ")"
-        );
     }
 
 }

@@ -1,6 +1,6 @@
 package org.foree.bookreader.pagination;
 
-import org.foree.bookreader.data.cache.ArticleCache;
+import org.foree.bookreader.data.cache.ChapterCache;
 import org.foree.bookreader.data.cache.DoubleCache;
 import org.foree.bookreader.data.cache.PaginationCache;
 
@@ -14,7 +14,7 @@ public class PaginationLoader {
 
     private static PaginationLoader mInstance;
 
-    private ArticleCache articleCache = new DoubleCache();
+    private ChapterCache chapterCache = new DoubleCache();
 
     public static PaginationLoader getInstance() {
         if (mInstance == null) {
@@ -38,12 +38,12 @@ public class PaginationLoader {
         PaginationCache.getInstance().init(paginationArgs);
     }
 
-    public void setArticleCache(ArticleCache articleCache) {
-        this.articleCache = articleCache;
+    public void setChapterCache(ChapterCache chapterCache) {
+        this.chapterCache = chapterCache;
     }
 
     public void loadPagination(String url) {
-        mRequestQueue.add(new ArticleRequest(url, paginationArgs));
+        mRequestQueue.add(new ChapterRequest(url, paginationArgs));
 
     }
 }

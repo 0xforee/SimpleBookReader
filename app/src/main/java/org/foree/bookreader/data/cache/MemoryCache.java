@@ -2,24 +2,24 @@ package org.foree.bookreader.data.cache;
 
 import android.util.LruCache;
 
-import org.foree.bookreader.data.book.Article;
+import org.foree.bookreader.data.book.Chapter;
 
 /**
  * Created by foree on 17-2-6.
  */
 
-public class MemoryCache extends ArticleCache {
+public class MemoryCache extends ChapterCache {
     private static MemoryCache mInstance;
 
-    private LruCache<String, Article> mMemoryCache;
+    private LruCache<String, Chapter> mMemoryCache;
 
     private MemoryCache() {
         int memorySize = (int) Runtime.getRuntime().maxMemory() / 1024;
         int cacheSize = memorySize / 8;
 
-        mMemoryCache = new LruCache<String, Article>(cacheSize) {
+        mMemoryCache = new LruCache<String, Chapter>(cacheSize) {
             @Override
-            protected int sizeOf(String key, Article value) {
+            protected int sizeOf(String key, Chapter value) {
                 return value.getContents().length();
             }
         };
@@ -37,13 +37,13 @@ public class MemoryCache extends ArticleCache {
 
 
     @Override
-    public Article get(String chapterUrl) {
+    public Chapter get(String chapterUrl) {
         return mMemoryCache.get(chapterUrl);
     }
 
     @Override
-    public void put(String chapterUrl, Article article) {
+    public void put(String chapterUrl, Chapter chapter) {
         if (get(chapterUrl) == null)
-            mMemoryCache.put(chapterUrl, article);
+            mMemoryCache.put(chapterUrl, chapter);
     }
 }

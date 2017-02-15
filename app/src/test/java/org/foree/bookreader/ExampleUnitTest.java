@@ -128,12 +128,12 @@ public class ExampleUnitTest {
     }
 
     @Test
-    public void testParseArticle(){
+    public void testParseChapter(){
         Element doc;
         try {
             doc = Jsoup.connect("http://m.biquge.com/0_168/1214399.html").get();
             if (doc != null) {
-                // get article title
+                // get chapter title
                 Element titleElement = doc.getElementById("nr_title");
                 if (titleElement != null) {
                     System.out.println(titleElement.text());

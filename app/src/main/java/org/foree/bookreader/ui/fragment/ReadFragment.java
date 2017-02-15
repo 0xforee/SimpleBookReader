@@ -9,14 +9,14 @@ import android.widget.TextView;
 
 import org.foree.bookreader.R;
 
-public class ArticleFragment extends Fragment {
+public class ReadFragment extends Fragment {
     private static final String ARG_CONTENT = "contents";
     private static final String ARG_TITLE = "title";
 
     private TextView tvContents, tvTitle;
 
-    public static ArticleFragment newInstance(String title, String contents) {
-        ArticleFragment fragment = new ArticleFragment();
+    public static ReadFragment newInstance(String title, String contents) {
+        ReadFragment fragment = new ReadFragment();
         Bundle args = new Bundle();
         args.putString(ARG_CONTENT, contents);
         args.putString(ARG_TITLE, title);
@@ -24,7 +24,7 @@ public class ArticleFragment extends Fragment {
         return fragment;
     }
 
-    public ArticleFragment() {
+    public ReadFragment() {
 
     }
 
@@ -44,7 +44,7 @@ public class ArticleFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_article, null);
+        View view = inflater.inflate(R.layout.fragment_read, null);
         tvContents = (TextView) view.findViewById(R.id.book_content);
         tvTitle = (TextView) view.findViewById(R.id.tv_title);
         if (getArguments() != null) {

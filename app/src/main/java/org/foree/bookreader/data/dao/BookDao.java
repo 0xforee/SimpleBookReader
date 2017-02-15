@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import org.foree.bookreader.data.book.Article;
 import org.foree.bookreader.data.book.Book;
 import org.foree.bookreader.data.book.Chapter;
 
@@ -350,7 +349,7 @@ public class BookDao {
         SQLiteDatabase db = bookSQLiteOpenHelper.getReadableDatabase();
         db.beginTransaction();
 
-        cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_CHAPTER_CONTENT, null,
+        cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_CHAPTERS, null,
                 "chapter_url=?", new String[]{chapterUrl}, null, null, null);
         if (cursor.getCount() != 0 && cursor.moveToFirst()) {
             chapterContent = cursor.getString(cursor.getColumnIndex("chapter_content"));
@@ -364,16 +363,15 @@ public class BookDao {
         return chapterContent;
     }
 
-    public void saveChapterContent(Article article) {
+    public void saveChapterContent(Chapter chapter) {
         SQLiteDatabase db = bookSQLiteOpenHelper.getWritableDatabase();
         db.beginTransaction();
         ContentValues contentValues = new ContentValues();
 
         // 内容不重复
-        contentValues.put("chapter_url", article.getUrl());
-        contentValues.put("chapter_content", article.getContents());
-        if (db.insertWithOnConflict(BookSQLiteOpenHelper.DB_TABLE_CHAPTER_CONTENT, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE) == -1) {
-            Log.e(TAG, "Database insert id: " + article.getUrl() + " error");
+        contentValues.put("chapter_content", chapter.getContents());
+        if (db.insertWithOnConflict(BookSQLiteOpenHelper.DB_TABLE_CHAPTERS, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE) == -1) {
+            Log.e(TAG, "Database insert id: " + chapter.getChapterUrl() + " error");
         }
 
         db.setTransactionSuccessful();

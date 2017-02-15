@@ -1,6 +1,5 @@
 package org.foree.bookreader.parser;
 
-import org.foree.bookreader.data.book.Article;
 import org.foree.bookreader.data.book.Book;
 import org.foree.bookreader.data.book.Chapter;
 import org.foree.bookreader.net.NetCallback;
@@ -54,7 +53,7 @@ public abstract class AbsWebParser implements IWebParser {
 
     abstract List<Chapter> parseChapterList(String bookUrl, String contentUrl, Document doc);
 
-    abstract Article parseArticle(String chapterUrl, Document doc);
+    abstract Chapter parseChapterContents(String chapterUrl, Document doc);
 
     @Override
     public void searchBook(final String keywords, final NetCallback<List<Book>> netCallback) {
@@ -124,7 +123,7 @@ public abstract class AbsWebParser implements IWebParser {
     }
 
     @Override
-    public void getArticle(final String chapterUrl, final NetCallback<Article> netCallback) {
+    public void getChapterContents(final String chapterUrl, final NetCallback<Chapter> netCallback) {
         new Thread() {
             @Override
             public void run() {
@@ -133,7 +132,7 @@ public abstract class AbsWebParser implements IWebParser {
                 try {
                     doc = Jsoup.connect(chapterUrl).get();
                     if (netCallback != null && doc != null) {
-                        netCallback.onSuccess(parseArticle(chapterUrl, doc));
+                        netCallback.onSuccess(parseChapterContents(chapterUrl, doc));
                     }
                 } catch (IOException e) {
                     e.printStackTrace();

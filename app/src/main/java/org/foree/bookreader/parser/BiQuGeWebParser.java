@@ -3,7 +3,6 @@ package org.foree.bookreader.parser;
 import android.text.Html;
 import android.util.Log;
 
-import org.foree.bookreader.data.book.Article;
 import org.foree.bookreader.data.book.Book;
 import org.foree.bookreader.data.book.Chapter;
 import org.jsoup.Jsoup;
@@ -136,16 +135,16 @@ public class BiQuGeWebParser extends AbsWebParser {
     }
 
     @Override
-    Article parseArticle(String chapterUrl, Document doc) {
-        Article article = new Article();
+    Chapter parseChapterContents(String chapterUrl, Document doc) {
+        Chapter chapter = new Chapter();
 
-        article.setUrl(chapterUrl);
+        chapter.setChapterUrl(chapterUrl);
 
-        // get article title
+        // get chapter title
         Elements titles = doc.getElementsByTag("h1");
         if (titles != null && titles.size() != 0) {
             Log.d(TAG, "Title" + titles.get(0).text());
-            article.setTitle(titles.get(0).text());
+            chapter.setChapterTitle(titles.get(0).text());
         }
 
 
@@ -154,9 +153,9 @@ public class BiQuGeWebParser extends AbsWebParser {
         if (content != null) {
             content.select("script").remove();
             Log.d(TAG, content.toString());
-            article.setContents(Html.fromHtml(content.toString()).toString());
+            chapter.setContents(Html.fromHtml(content.toString()).toString());
         }
 
-        return article;
+        return chapter;
     }
 }

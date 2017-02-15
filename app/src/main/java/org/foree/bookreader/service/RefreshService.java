@@ -16,14 +16,13 @@ import android.widget.RemoteViews;
 
 import org.foree.bookreader.R;
 import org.foree.bookreader.base.BaseApplication;
-import org.foree.bookreader.data.book.Article;
 import org.foree.bookreader.data.book.Book;
 import org.foree.bookreader.data.book.Chapter;
 import org.foree.bookreader.data.dao.BookDao;
 import org.foree.bookreader.net.NetCallback;
-import org.foree.bookreader.utils.FileUtils;
 import org.foree.bookreader.parser.AbsWebParser;
 import org.foree.bookreader.parser.WebParserManager;
+import org.foree.bookreader.utils.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -168,9 +167,9 @@ public class RefreshService extends Service {
     // sync data from server
     private void downloadChapter(final Chapter chapter) {
         AbsWebParser absWebParser = WebParserManager.getInstance().getWebParser(chapter.getChapterUrl());
-        absWebParser.getArticle(chapter.getChapterUrl(), new NetCallback<Article>() {
+        absWebParser.getChapterContents(chapter.getChapterUrl(), new NetCallback<Chapter>() {
             @Override
-            public void onSuccess(Article data) {
+            public void onSuccess(Chapter data) {
                 File chapterCache = new File(BaseApplication.getInstance().getCacheDirString()
                         + File.separator + FileUtils.encodeUrl(chapter.getChapterUrl()));
                 try {

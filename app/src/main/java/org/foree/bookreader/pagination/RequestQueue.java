@@ -8,7 +8,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 
 public class RequestQueue {
 
-    private PriorityBlockingQueue<ArticleRequest> blockingQueue = new PriorityBlockingQueue<>();
+    private PriorityBlockingQueue<ChapterRequest> blockingQueue = new PriorityBlockingQueue<>();
 
     private int maxThreadCount = 5;
 
@@ -28,9 +28,9 @@ public class RequestQueue {
         }
     }
 
-    public void add(ArticleRequest articleRequest) {
-        if (!blockingQueue.contains(articleRequest)) {
-            blockingQueue.add(articleRequest);
+    public void add(ChapterRequest chapterRequest) {
+        if (!blockingQueue.contains(chapterRequest)) {
+            blockingQueue.add(chapterRequest);
         }
     }
 

@@ -1,6 +1,6 @@
 package org.foree.bookreader.data.event;
 
-import org.foree.bookreader.data.book.Article;
+import org.foree.bookreader.data.book.Chapter;
 
 /**
  * Created by foree on 17-2-7.
@@ -8,7 +8,7 @@ import org.foree.bookreader.data.book.Article;
 
 public class PaginationEvent {
 
-    private Article article;
+    private Chapter chapter;
     private int state;
 
     // loading state
@@ -16,8 +16,8 @@ public class PaginationEvent {
     public static final int STATE_LOADING = 0;
     public static final int STATE_SUCCESS = 1;
 
-    public PaginationEvent(Article article, int state) {
-        this.article = article;
+    public PaginationEvent(Chapter chapter, int state) {
+        this.chapter = chapter;
         this.state = state;
     }
 
@@ -25,7 +25,7 @@ public class PaginationEvent {
         return state;
     }
 
-    public Article getArticle() {
-        return article;
+    public Chapter getChapter() {
+        return chapter;
     }
 }

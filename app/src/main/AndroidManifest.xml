@@ -26,7 +26,7 @@
                 android:name="android.app.default_searchable"
                 android:value=".ui.activity.SearchResultsActivity" />
         </activity>
-        <activity android:name=".ui.activity.ArticleActivity" />
+        <activity android:name=".ui.activity.ReadActivity" />
 
         <!-- 配置第三方Receiver -->
         <receiver

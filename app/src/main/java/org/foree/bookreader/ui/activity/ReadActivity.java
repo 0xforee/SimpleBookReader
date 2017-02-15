@@ -21,7 +21,6 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import org.foree.bookreader.R;
-import org.foree.bookreader.data.book.Article;
 import org.foree.bookreader.data.book.Book;
 import org.foree.bookreader.data.book.Chapter;
 import org.foree.bookreader.data.dao.BookDao;
@@ -40,8 +39,8 @@ import java.util.List;
 /**
  * Created by foree on 16-7-21.
  */
-public class ArticleActivity extends AppCompatActivity implements ReadViewPager.onPageAreaClickListener {
-    private static final String TAG = ArticleActivity.class.getSimpleName();
+public class ReadActivity extends AppCompatActivity implements ReadViewPager.onPageAreaClickListener {
+    private static final String TAG = ReadActivity.class.getSimpleName();
 
     String chapterUrl, bookUrl, newChapterUrl;
 
@@ -157,12 +156,12 @@ public class ArticleActivity extends AppCompatActivity implements ReadViewPager.
     public void onEventMainThread(PaginationEvent pageEvent) {
         notifyState(pageEvent.getState());
         Log.d("EventBus", "notifyState");
-        Article article = pageEvent.getArticle();
-        if (article != null) {
-            if (article.getUrl().equals(chapterUrl))
-                pageAdapter.setArticle(article);
+        Chapter chapter = pageEvent.getChapter();
+        if (chapter != null) {
+            if (chapter.getChapterUrl().equals(chapterUrl))
+                pageAdapter.setChapter(chapter);
             if (slipLeft)
-                mViewPager.setCurrentItem(article.getPages().size() - 1, false);
+                mViewPager.setCurrentItem(chapter.getPages().size() - 1, false);
             else
                 mViewPager.setCurrentItem(0, false);
 

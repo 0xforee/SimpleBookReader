@@ -1,6 +1,7 @@
 package org.foree.bookreader.data.book;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  * Created by foree on 16-7-26.
@@ -10,6 +11,8 @@ public class Chapter implements Serializable {
     private String chapterUrl;
     private String bookUrl;
     private int chapterId;
+    private String contents;
+    private ArrayList<String> pages = new ArrayList<>();
 
     public Chapter() {
     }
@@ -57,4 +60,22 @@ public class Chapter implements Serializable {
     public void setChapterId(int chapterId) {
         this.chapterId = chapterId;
     }
+
+    public ArrayList<String> getPages() {
+        return pages;
+    }
+
+    public void addPage(String text) {
+        pages.add(text);
+    }
+
+    public String getContents() {
+        return contents;
+    }
+
+    public void setContents(String contents) {
+        this.contents = contents;
+    }
+
+
 }

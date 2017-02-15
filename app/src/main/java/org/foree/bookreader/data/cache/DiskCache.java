@@ -1,12 +1,12 @@
 package org.foree.bookreader.data.cache;
 
-import org.foree.bookreader.data.book.Article;
+import org.foree.bookreader.data.book.Chapter;
 
 /**
  * Created by foree on 17-2-6.
  */
 
-public class DiskCache extends ArticleCache {
+public class DiskCache extends ChapterCache {
     private static DiskCache mInstance;
 
     public static DiskCache getInstance() {
@@ -20,12 +20,12 @@ public class DiskCache extends ArticleCache {
     }
 
     @Override
-    public Article get(String chapterUrl) {
+    public Chapter get(String chapterUrl) {
         return null;
     }
 
     @Override
-    public void put(String chapterUrl, Article article) {
+    public void put(String chapterUrl, Chapter chapter) {
 
     }
 }

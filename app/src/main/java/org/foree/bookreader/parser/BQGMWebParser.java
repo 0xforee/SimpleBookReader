@@ -3,7 +3,6 @@ package org.foree.bookreader.parser;
 import android.text.Html;
 import android.util.Log;
 
-import org.foree.bookreader.data.book.Article;
 import org.foree.bookreader.data.book.Book;
 import org.foree.bookreader.data.book.Chapter;
 import org.jsoup.nodes.Document;
@@ -165,17 +164,17 @@ public class BQGMWebParser extends AbsWebParser {
     }
 
     @Override
-    Article parseArticle(String chapterUrl, Document doc) {
-        Article article = new Article();
+    Chapter parseChapterContents(String chapterUrl, Document doc) {
+        Chapter chapter = new Chapter();
 
         // set ulr
-        article.setUrl(chapterUrl);
+        chapter.setChapterUrl(chapterUrl);
 
-        // get article title
+        // get chapter title
         Element titleElement = doc.getElementById("nr_title");
         if (titleElement != null) {
             Log.d(TAG, "Title" + titleElement.text());
-            article.setTitle(titleElement.text());
+            chapter.setChapterTitle(titleElement.text());
         }
 
 
@@ -183,9 +182,9 @@ public class BQGMWebParser extends AbsWebParser {
         Element contentElement = doc.getElementById("nr1");
         if (contentElement != null) {
             Log.d(TAG, contentElement.text());
-            article.setContents(Html.fromHtml(contentElement.toString()).toString());
+            chapter.setContents(Html.fromHtml(contentElement.toString()).toString());
         }
 
-        return article;
+        return chapter;
     }
 }

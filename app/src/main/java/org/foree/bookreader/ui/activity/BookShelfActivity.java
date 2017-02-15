@@ -104,7 +104,7 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
                 if (mActionMode != null) {
                     onListItemSelect(position);
                 } else {
-                    Intent intent = new Intent(BookShelfActivity.this, ArticleActivity.class);
+                    Intent intent = new Intent(BookShelfActivity.this, ReadActivity.class);
                     Bundle bundle = new Bundle();
                     bundle.putString("book_url", bookList.get(position).getBookUrl());
                     intent.putExtras(bundle);

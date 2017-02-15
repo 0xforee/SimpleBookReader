@@ -1,6 +1,5 @@
 package org.foree.bookreader.parser;
 
-import org.foree.bookreader.data.book.Article;
 import org.foree.bookreader.data.book.Book;
 import org.foree.bookreader.data.book.Chapter;
 import org.jsoup.nodes.Document;
@@ -48,7 +47,7 @@ public class NullWebParser extends AbsWebParser{
     }
 
     @Override
-    Article parseArticle(String chapterUrl, Document doc) {
+    Chapter parseChapterContents(String chapterUrl, Document doc) {
         return null;
     }
 }

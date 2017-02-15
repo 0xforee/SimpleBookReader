@@ -1,6 +1,5 @@
 package org.foree.bookreader.parser;
 
-import org.foree.bookreader.data.book.Article;
 import org.foree.bookreader.data.book.Book;
 import org.foree.bookreader.data.book.Chapter;
 import org.foree.bookreader.net.NetCallback;
@@ -19,5 +18,5 @@ public interface IWebParser {
 
     void getChapterList(String bookUrl, String contentUrl, NetCallback<List<Chapter>> netCallback);
 
-    void getArticle(String chapterUrl, NetCallback<Article> netCallback);
+    void getChapterContents(String chapterUrl, NetCallback<Chapter> netCallback);
 }
