@@ -10,20 +10,14 @@ public class RequestQueue {
 
     private PriorityBlockingQueue<ChapterRequest> blockingQueue = new PriorityBlockingQueue<>();
 
-    private int maxThreadCount = 5;
+    private int maxThreadCount = Runtime.getRuntime().availableProcessors() + 1;
 
     private RequestDispatcher mDispatchers[];
 
-    public RequestQueue() {
+    private void dispatcher() {
         mDispatchers = new RequestDispatcher[maxThreadCount];
         for (int i = 0; i < maxThreadCount; i++) {
-            RequestDispatcher dispatcher = new RequestDispatcher(blockingQueue);
-            mDispatchers[i] = dispatcher;
-        }
-    }
-
-    public void dispatcher() {
-        for (int i = 0; i < maxThreadCount; i++) {
+            mDispatchers[i] = new RequestDispatcher(blockingQueue);
             mDispatchers[i].start();
         }
     }
@@ -39,12 +33,15 @@ public class RequestQueue {
         dispatcher();
     }
 
-    public void stop() {
-        for (int i = 0; i < maxThreadCount; i++) {
-            if (!mDispatchers[i].isInterrupted()) {
-                mDispatchers[i].interrupt();
+    private void stop() {
+        if (mDispatchers != null) {
+            for (RequestDispatcher dispatcher : mDispatchers) {
+                if (!dispatcher.isInterrupted()) {
+                    dispatcher.interrupt();
+                }
             }
         }
+
     }
 
 }

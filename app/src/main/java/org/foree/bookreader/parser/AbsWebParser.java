@@ -176,21 +176,21 @@ public abstract class AbsWebParser implements IWebParser {
                             chapterCache.put(url, chapter);
 
                             // post
-                            EventBus.getDefault().post(new PaginationEvent(chapter, PaginationEvent.STATE_SUCCESS));
+                            EventBus.getDefault().post(new PaginationEvent(chapter));
                         } else {
-                            EventBus.getDefault().post(new PaginationEvent(null, PaginationEvent.STATE_FAILED));
+                            EventBus.getDefault().post(new PaginationEvent(null));
                         }
                     }
 
                     @Override
                     public void onFail(String msg) {
-                        EventBus.getDefault().post(new PaginationEvent(null, PaginationEvent.STATE_FAILED));
+                        EventBus.getDefault().post(new PaginationEvent(null));
                     }
                 });
             }else{
                 PaginateCore.splitPage(request.getPaginationArgs(), chapter);
                 // post
-                EventBus.getDefault().post(new PaginationEvent(chapter, PaginationEvent.STATE_SUCCESS));
+                EventBus.getDefault().post(new PaginationEvent(chapter));
             }
         }
     }

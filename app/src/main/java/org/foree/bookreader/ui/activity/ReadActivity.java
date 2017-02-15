@@ -62,6 +62,12 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
     private View rootView;
     private ListView chapterTitleListView;
     private int chapterPostion;
+
+    // loading state
+    private static final int STATE_FAILED = -1;
+    private static final int STATE_LOADING = 0;
+    private static final int STATE_SUCCESS = 1;
+
     // menuPop
     private TextView tvContent, tvProgress, tvFont, tvBrightness;
 
@@ -85,7 +91,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
         initTextView();
         setUpMenuPop();
 
-        notifyState(PaginationEvent.STATE_LOADING);
+        notifyState(STATE_LOADING);
 
     }
 
@@ -136,15 +142,15 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
 
     private void notifyState(int state) {
         switch (state) {
-            case PaginationEvent.STATE_FAILED:
+            case STATE_FAILED:
                 mTvLoading.setVisibility(View.GONE);
                 mTvError.setVisibility(View.VISIBLE);
                 break;
-            case PaginationEvent.STATE_LOADING:
+            case STATE_LOADING:
                 mTvLoading.setVisibility(View.VISIBLE);
                 mViewPager.setVisibility(View.INVISIBLE);
                 break;
-            case PaginationEvent.STATE_SUCCESS:
+            case STATE_SUCCESS:
                 mTvLoading.setVisibility(View.GONE);
                 mTvError.setVisibility(View.GONE);
                 mViewPager.setVisibility(View.VISIBLE);
@@ -154,10 +160,10 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(PaginationEvent pageEvent) {
-        notifyState(pageEvent.getState());
         Log.d("EventBus", "notifyState");
         Chapter chapter = pageEvent.getChapter();
         if (chapter != null) {
+            notifyState(STATE_SUCCESS);
             if (chapter.getChapterUrl().equals(chapterUrl))
                 pageAdapter.setChapter(chapter);
             if (slipLeft)
@@ -165,6 +171,8 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
             else
                 mViewPager.setCurrentItem(0, false);
 
+        }else{
+            notifyState(STATE_FAILED);
         }
     }
 
@@ -278,7 +286,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
 
     private void switchChapter(String newChapterUrl) {
         updateChapterUrl(newChapterUrl);
-        notifyState(PaginationEvent.STATE_LOADING);
+        notifyState(STATE_LOADING);
         PaginationLoader.getInstance().loadPagination(chapterUrl);
     }
 

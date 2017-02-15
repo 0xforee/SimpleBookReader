@@ -9,20 +9,9 @@ import org.foree.bookreader.data.book.Chapter;
 public class PaginationEvent {
 
     private Chapter chapter;
-    private int state;
 
-    // loading state
-    public static final int STATE_FAILED = -1;
-    public static final int STATE_LOADING = 0;
-    public static final int STATE_SUCCESS = 1;
-
-    public PaginationEvent(Chapter chapter, int state) {
+    public PaginationEvent(Chapter chapter) {
         this.chapter = chapter;
-        this.state = state;
-    }
-
-    public int getState() {
-        return state;
     }
 
     public Chapter getChapter() {
