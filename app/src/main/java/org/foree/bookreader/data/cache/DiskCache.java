@@ -1,6 +1,8 @@
 package org.foree.bookreader.data.cache;
 
+import org.foree.bookreader.base.BaseApplication;
 import org.foree.bookreader.data.book.Chapter;
+import org.foree.bookreader.data.dao.BookDao;
 
 /**
  * Created by foree on 17-2-6.
@@ -21,11 +23,13 @@ public class DiskCache extends ChapterCache {
 
     @Override
     public Chapter get(String chapterUrl) {
-        return null;
+        BookDao bookDao = new BookDao(BaseApplication.getInstance());
+        return bookDao.getChapter(chapterUrl);
     }
 
     @Override
     public void put(String chapterUrl, Chapter chapter) {
-
+        BookDao bookDao = new BookDao(BaseApplication.getInstance());
+        bookDao.saveChapterContent(chapter);
     }
 }

@@ -2,7 +2,13 @@ package org.foree.bookreader.parser;
 
 import org.foree.bookreader.data.book.Book;
 import org.foree.bookreader.data.book.Chapter;
+import org.foree.bookreader.data.cache.ChapterCache;
+import org.foree.bookreader.data.event.PaginationEvent;
 import org.foree.bookreader.net.NetCallback;
+import org.foree.bookreader.pagination.ChapterRequest;
+import org.foree.bookreader.pagination.PaginateCore;
+import org.foree.bookreader.pagination.PaginationLoader;
+import org.greenrobot.eventbus.EventBus;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -17,6 +23,7 @@ public abstract class AbsWebParser implements IWebParser {
     private static final String TAG = AbsWebParser.class.getSimpleName();
 
     // webParser base info
+
     /**
      * 获取目标网站名称
      *
@@ -149,5 +156,42 @@ public abstract class AbsWebParser implements IWebParser {
 
         String[] subString = url.split("/|\\.");
         return Integer.parseInt(subString[subString.length - 2]);
+    }
+
+    public void downloadChapter(final ChapterRequest request, final String url) {
+        if (url != null && !url.isEmpty()) {
+            final ChapterCache chapterCache = PaginationLoader.getInstance().getChapterCache();
+            Chapter chapter = chapterCache.get(url);
+            if( chapter == null) {
+                getChapterContents(url, new NetCallback<Chapter>() {
+                    @Override
+                    public void onSuccess(Chapter chapter) {
+                        if (chapter.getContents() != null) {
+                            PaginateCore.splitPage(request.getPaginationArgs(), chapter);
+
+                            // put pagination cache
+                            //PaginationCache.getInstance().put(url, chapter);
+
+                            // put chapter cache
+                            chapterCache.put(url, chapter);
+
+                            // post
+                            EventBus.getDefault().post(new PaginationEvent(chapter, PaginationEvent.STATE_SUCCESS));
+                        } else {
+                            EventBus.getDefault().post(new PaginationEvent(null, PaginationEvent.STATE_FAILED));
+                        }
+                    }
+
+                    @Override
+                    public void onFail(String msg) {
+                        EventBus.getDefault().post(new PaginationEvent(null, PaginationEvent.STATE_FAILED));
+                    }
+                });
+            }else{
+                PaginateCore.splitPage(request.getPaginationArgs(), chapter);
+                // post
+                EventBus.getDefault().post(new PaginationEvent(chapter, PaginationEvent.STATE_SUCCESS));
+            }
+        }
     }
 }

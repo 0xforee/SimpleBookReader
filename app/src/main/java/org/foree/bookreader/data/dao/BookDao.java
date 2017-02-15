@@ -343,16 +343,24 @@ public class BookDao {
      * @param chapterUrl 根据chapterUrl提取
      * @return
      */
-    public String getChapterContent(String chapterUrl) {
+    public Chapter getChapter(String chapterUrl) {
+        Log.d(TAG, "getChapter " + chapterUrl + " from db");
         Cursor cursor;
-        String chapterContent = null;
+        Chapter chapter = new Chapter();
         SQLiteDatabase db = bookSQLiteOpenHelper.getReadableDatabase();
         db.beginTransaction();
 
         cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_CHAPTERS, null,
                 "chapter_url=?", new String[]{chapterUrl}, null, null, null);
         if (cursor.getCount() != 0 && cursor.moveToFirst()) {
-            chapterContent = cursor.getString(cursor.getColumnIndex("chapter_content"));
+            String contents = cursor.getString(cursor.getColumnIndex("chapter_content"));
+            if (contents == null || contents.isEmpty()) {
+                chapter = null;
+            } else {
+                chapter.setContents(contents);
+                chapter.setChapterUrl(chapterUrl);
+                chapter.setChapterTitle(cursor.getString(cursor.getColumnIndex("chapter_title")));
+            }
         }
 
         cursor.close();
@@ -360,17 +368,21 @@ public class BookDao {
         db.endTransaction();
         db.close();
 
-        return chapterContent;
+        return chapter;
     }
 
     public void saveChapterContent(Chapter chapter) {
+        Log.d(TAG, "save chapter " + chapter.getChapterUrl());
         SQLiteDatabase db = bookSQLiteOpenHelper.getWritableDatabase();
         db.beginTransaction();
         ContentValues contentValues = new ContentValues();
 
         // 内容不重复
         contentValues.put("chapter_content", chapter.getContents());
-        if (db.insertWithOnConflict(BookSQLiteOpenHelper.DB_TABLE_CHAPTERS, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE) == -1) {
+        if(db.update(BookSQLiteOpenHelper.DB_TABLE_CHAPTERS,
+                contentValues,
+                "chapter_url=?",
+                new String[]{chapter.getChapterUrl()}) == -1){
             Log.e(TAG, "Database insert id: " + chapter.getChapterUrl() + " error");
         }
 

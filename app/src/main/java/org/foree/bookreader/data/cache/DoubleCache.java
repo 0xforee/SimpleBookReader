@@ -10,7 +10,7 @@ public class DoubleCache extends ChapterCache {
     private MemoryCache memoryCache;
     private DiskCache diskCache;
 
-    public void DoubleCache() {
+    public DoubleCache() {
         memoryCache = MemoryCache.getInstance();
         diskCache = DiskCache.getInstance();
     }

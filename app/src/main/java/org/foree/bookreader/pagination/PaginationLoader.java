@@ -28,6 +28,10 @@ public class PaginationLoader {
         return mInstance;
     }
 
+    private PaginationLoader() {
+
+    }
+
     public void init(PaginationArgs paginationArgs) {
         this.paginationArgs = paginationArgs;
         if (mRequestQueue == null) {
@@ -45,5 +49,9 @@ public class PaginationLoader {
     public void loadPagination(String url) {
         mRequestQueue.add(new ChapterRequest(url, paginationArgs));
 
+    }
+
+    public ChapterCache getChapterCache() {
+        return chapterCache;
     }
 }

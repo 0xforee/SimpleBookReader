@@ -17,12 +17,7 @@ public class MemoryCache extends ChapterCache {
         int memorySize = (int) Runtime.getRuntime().maxMemory() / 1024;
         int cacheSize = memorySize / 8;
 
-        mMemoryCache = new LruCache<String, Chapter>(cacheSize) {
-            @Override
-            protected int sizeOf(String key, Chapter value) {
-                return value.getContents().length();
-            }
-        };
+        mMemoryCache = new LruCache<>(cacheSize);
     }
 
     public static MemoryCache getInstance() {
