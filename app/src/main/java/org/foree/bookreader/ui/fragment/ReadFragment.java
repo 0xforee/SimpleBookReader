@@ -36,7 +36,7 @@ public class ReadFragment extends Fragment {
             tvContents.setText(contents);
         }
 
-        if(tvTitle != null){
+        if (tvTitle != null) {
             tvTitle.setText(title);
         }
     }

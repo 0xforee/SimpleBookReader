@@ -55,13 +55,13 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
     // view pager
     private ReadViewPager mViewPager;
     private PageAdapter pageAdapter;
-    private TextView mTextView, mTvError, mTvLoading;
+    private TextView mTextView, mTvLoading;
 
     // popWindow
     private PopupWindow chapterListPop, menuPop;
     private View rootView;
     private ListView chapterTitleListView;
-    private int chapterPostion;
+    private int chapterPosition;
 
     // loading state
     private static final int STATE_FAILED = -1;
@@ -97,7 +97,6 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
 
     private void setUpLayoutViews() {
         //init textView
-        mTvError = (TextView) findViewById(R.id.load_fail);
         mTvLoading = (TextView) findViewById(R.id.loading);
 
         mViewPager = (ReadViewPager) findViewById(R.id.book_pager);
@@ -144,7 +143,11 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
         switch (state) {
             case STATE_FAILED:
                 mTvLoading.setVisibility(View.GONE);
-                mTvError.setVisibility(View.VISIBLE);
+                mViewPager.setVisibility(View.VISIBLE);
+                Chapter chapter = new Chapter();
+                chapter.addPage(getResources().getText(R.string.load_fail).toString());
+                pageAdapter.setChapter(chapter);
+                mViewPager.setCurrentItem(0, false);
                 break;
             case STATE_LOADING:
                 mTvLoading.setVisibility(View.VISIBLE);
@@ -152,7 +155,6 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
                 break;
             case STATE_SUCCESS:
                 mTvLoading.setVisibility(View.GONE);
-                mTvError.setVisibility(View.GONE);
                 mViewPager.setVisibility(View.VISIBLE);
                 break;
         }
@@ -261,7 +263,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
         chapterTitleListView = (ListView) view.findViewById(R.id.rv_item_list);
 
         chapterTitleListView.setAdapter(new ArrayAdapter<>(this, R.layout.item_list_holder, getChapterTitle()));
-        chapterTitleListView.setSelection(chapterPostion);
+        chapterTitleListView.setSelection(chapterPosition);
         chapterTitleListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -277,7 +279,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
         for (int i = 0; i < chapterList.size(); i++) {
             chapterTitle.add(chapterList.get(i).getChapterTitle());
             if (chapterList.get(i).getChapterUrl().equals(chapterUrl)) {
-                chapterPostion = i;
+                chapterPosition = i;
             }
         }
 
