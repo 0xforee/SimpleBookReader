@@ -18,6 +18,7 @@ public class PaginateCore {
         chapter.setContents(StringUtils.trim(chapter.getContents()));
 
         // 2nd. split Page
+        chapter.clearPages();
         final StaticLayout layout = new StaticLayout(chapter.getContents(),
                 paginationArgs.getmPaint(),
                 paginationArgs.getmWidth(),

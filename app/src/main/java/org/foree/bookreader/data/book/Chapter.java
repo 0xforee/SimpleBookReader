@@ -61,12 +61,20 @@ public class Chapter implements Serializable {
         this.chapterId = chapterId;
     }
 
-    public ArrayList<String> getPages() {
-        return pages;
-    }
-
     public void addPage(String text) {
         pages.add(text);
+    }
+
+    public String getPage(int index) {
+        return pages.get(index);
+    }
+
+    public void clearPages() {
+        pages.clear();
+    }
+
+    public int numberOfPages() {
+        return pages.size();
     }
 
     public String getContents() {

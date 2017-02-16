@@ -46,9 +46,8 @@ public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.My
 
     @Override
     public SearchListAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        MyViewHolder holder = new MyViewHolder(mLayoutInflater.inflate(R.layout.novel_card_view, parent, false));
+        return new MyViewHolder(mLayoutInflater.inflate(R.layout.novel_card_view, parent, false));
 
-        return holder;
     }
 
     @Override
@@ -79,7 +78,7 @@ public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.My
         // 设置选中的背景颜色
         holder.itemView.setBackgroundColor(mSelectedItemsIds.get(position) ? 0x9934B5E4 : Color.TRANSPARENT);
 
-        if(bookList.get(position).getBookCoverUrl() != null){
+        if (bookList.get(position).getBookCoverUrl() != null) {
             ImageLoader.getInstance().displayImage(bookList.get(position).getBookCoverUrl(), holder.imageView,
                     BaseApplication.getInstance().getDisplayImageOptions());
         }

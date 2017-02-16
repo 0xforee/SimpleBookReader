@@ -112,6 +112,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
     private void initTextView() {
         mTextView = (TextView) findViewById(R.id.book_content);
         mTextView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @SuppressWarnings("deprecation")
             @Override
             public void onGlobalLayout() {
                 // Removing layout listener to avoid multiple calls
@@ -169,7 +170,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
             if (chapter.getChapterUrl().equals(chapterUrl))
                 pageAdapter.setChapter(chapter);
             if (slipLeft)
-                mViewPager.setCurrentItem(chapter.getPages().size() - 1, false);
+                mViewPager.setCurrentItem(chapter.numberOfPages() - 1, false);
             else
                 mViewPager.setCurrentItem(0, false);
 

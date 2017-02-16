@@ -20,7 +20,7 @@ public class PageAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        return ReadFragment.newInstance(chapter.getChapterTitle(), chapter.getPages().get(position));
+        return ReadFragment.newInstance(chapter.getChapterTitle(), chapter.getPage(position));
     }
 
     @Override
@@ -30,7 +30,7 @@ public class PageAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public int getCount() {
-        return chapter != null ? chapter.getPages().size() : 0;
+        return chapter != null ? chapter.numberOfPages() : 0;
     }
 
     public void setChapter(Chapter chapter) {
