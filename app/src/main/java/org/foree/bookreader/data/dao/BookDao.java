@@ -341,7 +341,7 @@ public class BookDao {
      * 从数据库中获取章节内容
      *
      * @param chapterUrl 根据chapterUrl提取
-     * @return
+     * @return 章节对象
      */
     public Chapter getChapter(String chapterUrl) {
         Log.d(TAG, "getChapter " + chapterUrl + " from db");
@@ -379,10 +379,10 @@ public class BookDao {
 
         // 内容不重复
         contentValues.put("chapter_content", chapter.getContents());
-        if(db.update(BookSQLiteOpenHelper.DB_TABLE_CHAPTERS,
+        if (db.update(BookSQLiteOpenHelper.DB_TABLE_CHAPTERS,
                 contentValues,
                 "chapter_url=?",
-                new String[]{chapter.getChapterUrl()}) == -1){
+                new String[]{chapter.getChapterUrl()}) == -1) {
             Log.e(TAG, "Database insert id: " + chapter.getChapterUrl() + " error");
         }
 

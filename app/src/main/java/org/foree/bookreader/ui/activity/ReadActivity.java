@@ -58,7 +58,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
     private TextView mTextView, mTvLoading;
 
     // popWindow
-    private PopupWindow chapterListPop, menuPop;
+    private PopupWindow contentPop, menuPop;
     private View rootView;
     private ListView chapterTitleListView;
     private int chapterPosition;
@@ -214,10 +214,10 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
                 if (menuPop.isShowing()) {
                     menuPop.dismiss();
                 }
-                if (chapterListPop == null)
+                if (contentPop == null)
                     showPopup();
                 else
-                    chapterListPop.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
+                    contentPop.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
             }
         });
 
@@ -252,14 +252,14 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
         DisplayMetrics dp = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dp);
 
-        chapterListPop = new PopupWindow(this);
-        chapterListPop.setContentView(view);
-        chapterListPop.setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
-        chapterListPop.setHeight(dp.heightPixels / 4 * 3);
-        chapterListPop.setFocusable(true);
-        chapterListPop.setOutsideTouchable(true);
-        chapterListPop.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-        chapterListPop.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
+        contentPop = new PopupWindow(this);
+        contentPop.setContentView(view);
+        contentPop.setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
+        contentPop.setHeight(dp.heightPixels / 4 * 3);
+        contentPop.setFocusable(true);
+        contentPop.setOutsideTouchable(true);
+        contentPop.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+        contentPop.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
 
         chapterTitleListView = (ListView) view.findViewById(R.id.rv_item_list);
 
@@ -268,7 +268,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
         chapterTitleListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                chapterListPop.dismiss();
+                contentPop.dismiss();
                 switchChapter(chapterList.get(position).getChapterUrl());
             }
         });

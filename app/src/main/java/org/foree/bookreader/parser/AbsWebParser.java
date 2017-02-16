@@ -158,12 +158,12 @@ public abstract class AbsWebParser implements IWebParser {
         return Integer.parseInt(subString[subString.length - 2]);
     }
 
-    public void downloadChapter(final ChapterRequest request, final String url) {
-        if (url != null && !url.isEmpty()) {
+    public void downloadChapter(final ChapterRequest request) {
+        if (request.getUrl() != null && !request.getUrl().isEmpty()) {
             final ChapterCache chapterCache = PaginationLoader.getInstance().getChapterCache();
-            Chapter chapter = chapterCache.get(url);
+            Chapter chapter = chapterCache.get(request.getUrl());
             if( chapter == null) {
-                getChapterContents(url, new NetCallback<Chapter>() {
+                getChapterContents(request.getUrl(), new NetCallback<Chapter>() {
                     @Override
                     public void onSuccess(Chapter chapter) {
                         if (chapter.getContents() != null) {
@@ -173,7 +173,7 @@ public abstract class AbsWebParser implements IWebParser {
                             //PaginationCache.getInstance().put(url, chapter);
 
                             // put chapter cache
-                            chapterCache.put(url, chapter);
+                            chapterCache.put(request.getUrl(), chapter);
 
                             // post
                             EventBus.getDefault().post(new PaginationEvent(chapter));

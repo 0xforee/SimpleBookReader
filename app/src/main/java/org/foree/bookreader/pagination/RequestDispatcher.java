@@ -24,7 +24,7 @@ public class RequestDispatcher extends Thread {
 
                 AbsWebParser absWebParser = WebParserManager.getInstance().getWebParser(request.getUrl());
 
-                absWebParser.downloadChapter(request, request.getUrl());
+                absWebParser.downloadChapter(request);
 
             } catch (InterruptedException e) {
                 e.printStackTrace();
