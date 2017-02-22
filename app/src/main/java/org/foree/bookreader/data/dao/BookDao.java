@@ -59,7 +59,7 @@ public class BookDao {
         return bookList;
     }
 
-    private void insertChapters(List<Chapter> chapterList) {
+    public void insertChapters(List<Chapter> chapterList) {
         synchronized (this) {
             int tmp = 1;
             Log.d(TAG, "insert chapterList.size= " + chapterList.size() + " to db");
@@ -83,7 +83,7 @@ public class BookDao {
                 contentValues.put("chapter_id", chapter.getChapterId());
                 contentValues.put("book_url", chapter.getBookUrl());
                 if (db.insertWithOnConflict(BookSQLiteOpenHelper.DB_TABLE_CHAPTERS, null,
-                        contentValues, SQLiteDatabase.CONFLICT_REPLACE) == -1) {
+                        contentValues, SQLiteDatabase.CONFLICT_IGNORE) == -1) {
                     Log.e(TAG, "Database insert chapter_url: " + chapter.getChapterUrl() + " error");
                 }
             }

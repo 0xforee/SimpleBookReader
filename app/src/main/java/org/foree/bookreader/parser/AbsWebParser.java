@@ -143,6 +143,19 @@ public abstract class AbsWebParser implements IWebParser {
         }.start();
     }
 
+    public List<Chapter> getChapterList(final String bookUrl, final String contentUrl) {
+        Document doc;
+        try {
+            doc = Jsoup.connect(contentUrl).get();
+            if (doc != null) {
+                return parseChapterList(bookUrl, contentUrl, doc);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     @Override
     public void getChapterContents(final String chapterUrl, final NetCallback<Chapter> netCallback) {
         new Thread() {

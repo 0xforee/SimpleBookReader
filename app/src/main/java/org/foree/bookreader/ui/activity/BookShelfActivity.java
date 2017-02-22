@@ -24,6 +24,7 @@ import com.igexin.sdk.PushManager;
 
 import org.foree.bookreader.R;
 import org.foree.bookreader.data.book.Book;
+import org.foree.bookreader.data.book.Chapter;
 import org.foree.bookreader.data.dao.BookDao;
 import org.foree.bookreader.parser.AbsWebParser;
 import org.foree.bookreader.parser.WebParserManager;
@@ -32,6 +33,7 @@ import org.foree.bookreader.ui.adapter.BookShelfAdapter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -59,6 +61,10 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
 
         PushManager.getInstance().initialize(this.getApplicationContext());
 
+        if (!mSwipeRefreshLayout.isRefreshing()) {
+            mSwipeRefreshLayout.setRefreshing(true);
+            onRefresh();
+        }
     }
 
     @Override
@@ -71,11 +77,6 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
         bookList.addAll(bookDao.getAllBooks());
         if (mAdapter != null) {
             mAdapter.notifyDataSetChanged();
-        }
-
-        if (!mSwipeRefreshLayout.isRefreshing()) {
-            mSwipeRefreshLayout.setRefreshing(true);
-            onRefresh();
         }
 
     }
@@ -91,20 +92,36 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
         new Thread() {
             @Override
             public void run() {
-                int updatedNovelNum = 0;
-                if (bookList != null) {
-                    for (Book oldBook : bookList) {
-                        // 1. 获取最新信息
-                        AbsWebParser webParser = WebParserManager.getInstance().getWebParser(oldBook.getBookUrl());
-                        Book newBook = webParser.getBookInfo(oldBook.getBookUrl());
 
-                        if (newBook != null) {
-                            // 2. 判断是否更新
-                            if (isUpdated(oldBook.getUpdateTime(), newBook.getUpdateTime())) {
-                                updatedNovelNum += 1;
-                            }
+                // 新创建一个List，防止ConcurrentModificationException错误
+                List<Book> books = new ArrayList<>();
+                books.addAll(bookList);
+
+                int updatedNovelNum = 0;
+                for (final Book oldBook : books) {
+                    // 1. 获取最新信息
+                    final AbsWebParser webParser = WebParserManager.getInstance().getWebParser(oldBook.getBookUrl());
+                    Book newBook = webParser.getBookInfo(oldBook.getBookUrl());
+
+                    if (newBook != null) {
+                        // 2. 判断是否更新
+                        if (isUpdated(oldBook.getUpdateTime(), newBook.getUpdateTime())) {
+                            updatedNovelNum += 1;
+
+                            // 更新章节列表
+                            new Thread() {
+                                @Override
+                                public void run() {
+                                    super.run();
+                                    List<Chapter> chapters = webParser.getChapterList(oldBook.getBookUrl(), oldBook.getContentUrl());
+                                    if (chapters != null) {
+                                        bookDao.insertChapters(chapters);
+                                    }
+                                }
+                            };
                         }
                     }
+
 
                 }
 
