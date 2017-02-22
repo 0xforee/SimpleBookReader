@@ -4,6 +4,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -24,10 +25,16 @@ import com.igexin.sdk.PushManager;
 import org.foree.bookreader.R;
 import org.foree.bookreader.data.book.Book;
 import org.foree.bookreader.data.dao.BookDao;
+import org.foree.bookreader.parser.AbsWebParser;
+import org.foree.bookreader.parser.WebParserManager;
 import org.foree.bookreader.ui.adapter.BookShelfAdapter;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class BookShelfActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
@@ -65,6 +72,12 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
         if (mAdapter != null) {
             mAdapter.notifyDataSetChanged();
         }
+
+        if (!mSwipeRefreshLayout.isRefreshing()) {
+            mSwipeRefreshLayout.setRefreshing(true);
+            onRefresh();
+        }
+
     }
 
     // SwipeRefreshLayout onRefresh
@@ -73,8 +86,67 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
         syncNovelInfo();
     }
 
+    // 判断小说是否有更新
     private void syncNovelInfo() {
+        new Thread() {
+            @Override
+            public void run() {
+                int updatedNovelNum = 0;
+                if (bookList != null) {
+                    for (Book oldBook : bookList) {
+                        // 1. 获取最新信息
+                        AbsWebParser webParser = WebParserManager.getInstance().getWebParser(oldBook.getBookUrl());
+                        Book newBook = webParser.getBookInfo(oldBook.getBookUrl());
 
+                        if (newBook != null) {
+                            // 2. 判断是否更新
+                            if (isUpdated(oldBook.getUpdateTime(), newBook.getUpdateTime())) {
+                                updatedNovelNum += 1;
+                            }
+                        }
+                    }
+
+                }
+
+                // refresh false
+                mSwipeRefreshLayout.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (mSwipeRefreshLayout.isRefreshing())
+                            mSwipeRefreshLayout.setRefreshing(false);
+                    }
+                }, 500);
+
+                // update UI
+                if (updatedNovelNum > 0) {
+                    String message = updatedNovelNum + "本小说更新啦";
+                    Snackbar.make(mSwipeRefreshLayout, message, Snackbar.LENGTH_SHORT).show();
+                } else {
+                    String message = "未更新";
+                    Snackbar.make(mSwipeRefreshLayout, message, Snackbar.LENGTH_SHORT).show();
+
+                }
+
+            }
+        }.start();
+
+    }
+
+    private boolean isUpdated(String oldUpdateTime, String newUpdateTime) {
+        SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ENGLISH);
+        Log.d(TAG, oldUpdateTime);
+        Log.d(TAG, newUpdateTime);
+        try {
+            Date oldDate = simpleFormat.parse(oldUpdateTime);
+            Date newDate = simpleFormat.parse(newUpdateTime);
+
+            if (newDate.after(oldDate)) {
+                return true;
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     private void setUpLayoutViews() {

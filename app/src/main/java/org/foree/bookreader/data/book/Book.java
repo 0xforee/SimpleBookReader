@@ -7,6 +7,7 @@ import java.util.List;
  */
 public class Book {
     private String bookName;
+    // android sqlite中数据是弱类型，所以用String存取时间，然后再转格式
     private String updateTime;
     private String category;
     private String author;

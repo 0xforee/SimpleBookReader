@@ -107,6 +107,20 @@ public abstract class AbsWebParser implements IWebParser {
 
     }
 
+    public Book getBookInfo(final String bookUrl) {
+        Document doc;
+        Book book = null;
+        try {
+            doc = Jsoup.connect(bookUrl).get();
+            if (doc != null) {
+                book = parseBookInfo(bookUrl, doc);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return book;
+    }
+
     @Override
     public void getChapterList(final String bookUrl, final String contentUrl, final NetCallback<List<Chapter>> netCallback) {
         new Thread() {
@@ -162,7 +176,7 @@ public abstract class AbsWebParser implements IWebParser {
         if (request.getUrl() != null && !request.getUrl().isEmpty()) {
             final ChapterCache chapterCache = PaginationLoader.getInstance().getChapterCache();
             Chapter chapter = chapterCache.get(request.getUrl());
-            if( chapter == null) {
+            if (chapter == null) {
                 getChapterContents(request.getUrl(), new NetCallback<Chapter>() {
                     @Override
                     public void onSuccess(Chapter chapter) {
@@ -187,7 +201,7 @@ public abstract class AbsWebParser implements IWebParser {
                         EventBus.getDefault().post(new PaginationEvent(null));
                     }
                 });
-            }else{
+            } else {
                 PaginateCore.splitPage(request.getPaginationArgs(), chapter);
                 // post
                 EventBus.getDefault().post(new PaginationEvent(chapter));
