@@ -60,7 +60,7 @@ public class ReadViewPager extends ViewPager {
                         if (isPrePageArea(event)) {
                             if (getCurrentItem() > 0) {
                                 Log.d(TAG, "上一页");
-                                setCurrentItem(getCurrentItem() - 1);
+                                setCurrentItem(getCurrentItem() - 1, false);
                             } else {
                                 Log.d(TAG, "上一章");
                                 if (onPageAreaClickListener != null) {
@@ -71,7 +71,7 @@ public class ReadViewPager extends ViewPager {
                             if (getAdapter() != null)
                                 if (getCurrentItem() < getAdapter().getCount() - 1) {
                                     Log.d(TAG, "下一页");
-                                    setCurrentItem(getCurrentItem() + 1);
+                                    setCurrentItem(getCurrentItem() + 1, false);
                                 } else {
                                     // 切换下一章
                                     Log.d(TAG, "下一章");
