@@ -26,5 +26,6 @@
     <string name="bt_added">已在书架</string>
     <string name="bt_read">开始阅读</string>
     <string name="contents">目录</string>
+    <string name="separator">/</string>
 
 </resources>

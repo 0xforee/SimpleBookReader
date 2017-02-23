@@ -8,18 +8,19 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.foree.bookreader.R;
+import org.foree.bookreader.data.ReadPageData;
+
+import java.util.Calendar;
 
 public class ReadFragment extends Fragment {
-    private static final String ARG_CONTENT = "contents";
     private static final String ARG_TITLE = "title";
 
-    private TextView tvContents, tvTitle;
+    private TextView tvContents, tvTitle, tvTime, tvIndex, tvPageNum;
 
-    public static ReadFragment newInstance(String title, String contents) {
+    public static ReadFragment newInstance(ReadPageData readPageData) {
         ReadFragment fragment = new ReadFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_CONTENT, contents);
-        args.putString(ARG_TITLE, title);
+        args.putSerializable(ARG_TITLE, readPageData);
         fragment.setArguments(args);
         return fragment;
     }
@@ -28,17 +29,18 @@ public class ReadFragment extends Fragment {
 
     }
 
-    public void setText(String title, String contents) {
-        if (getArguments() != null) {
-            getArguments().putString(ARG_CONTENT, contents);
-        }
+    private void setData(ReadPageData readPageData) {
         if (tvContents != null) {
-            tvContents.setText(contents);
+            tvContents.setText(readPageData.getContents());
         }
 
         if (tvTitle != null) {
-            tvTitle.setText(title);
+            tvTitle.setText(readPageData.getTitle());
         }
+
+        tvTime.setText(getCurrentTime());
+        tvPageNum.setText(readPageData.getPageNum());
+        tvIndex.setText(readPageData.getIndex());
     }
 
     @Override
@@ -47,9 +49,11 @@ public class ReadFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_read, null);
         tvContents = (TextView) view.findViewById(R.id.book_content);
         tvTitle = (TextView) view.findViewById(R.id.tv_title);
+        tvTime = (TextView) view.findViewById(R.id.tv_time);
+        tvIndex = (TextView) view.findViewById(R.id.tv_index);
+        tvPageNum = (TextView) view.findViewById(R.id.tv_page_num);
         if (getArguments() != null) {
-            setText(getArguments().getString(ARG_TITLE),
-                    getArguments().getString(ARG_CONTENT));
+            setData((ReadPageData) getArguments().getSerializable(ARG_TITLE));
         }
 
         return view;
@@ -58,8 +62,18 @@ public class ReadFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        //tvContents.setText(Html.fromHtml(getArguments().getString(ARG_CONTENT)));
+        //tvContents.setData(Html.fromHtml(getArguments().getString(ARG_CONTENT)));
 
     }
 
+    private String getCurrentTime() {
+        Calendar car = Calendar.getInstance();
+        int hour = car.get(Calendar.HOUR_OF_DAY);
+        int min = car.get(Calendar.MINUTE);
+
+        if (min < 10)
+            return hour + ":0" + min;
+        else
+            return hour + ":" + min;
+    }
 }
