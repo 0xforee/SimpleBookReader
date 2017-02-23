@@ -101,7 +101,7 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
                 for (final Book oldBook : books) {
                     // 1. 获取最新信息
                     final AbsWebParser webParser = WebParserManager.getInstance().getWebParser(oldBook.getBookUrl());
-                    Book newBook = webParser.getBookInfo(oldBook.getBookUrl());
+                    final Book newBook = webParser.getBookInfo(oldBook.getBookUrl());
 
                     if (newBook != null) {
                         // 2. 判断是否更新
@@ -116,9 +116,10 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
                                     List<Chapter> chapters = webParser.getChapterList(oldBook.getBookUrl(), oldBook.getContentUrl());
                                     if (chapters != null) {
                                         bookDao.insertChapters(chapters);
+                                        bookDao.updateBookTime(newBook.getBookUrl(), newBook.getUpdateTime());
                                     }
                                 }
-                            };
+                            }.start();
                         }
                     }
 

@@ -120,6 +120,26 @@ public class BookDao {
         return chapterList;
     }
 
+    public void updateBookTime(String bookUrl, String updateTime) {
+        Log.d(TAG, "update book " + bookUrl + " Time " + updateTime);
+        SQLiteDatabase db = bookSQLiteOpenHelper.getWritableDatabase();
+        db.beginTransaction();
+        ContentValues contentValues = new ContentValues();
+
+        // 内容不重复
+        contentValues.put("update_time", updateTime);
+        if (db.update(BookSQLiteOpenHelper.DB_TABLE_BOOKS,
+                contentValues,
+                "book_url=?",
+                new String[]{bookUrl}) == -1) {
+            Log.e(TAG, "Database insert id: " + bookUrl + " error");
+        }
+
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        db.close();
+    }
+
     public Book getBook(String bookUrl) {
         Log.d(TAG, "get book info from db, bookUrl = " + bookUrl);
         Book book = new Book();
