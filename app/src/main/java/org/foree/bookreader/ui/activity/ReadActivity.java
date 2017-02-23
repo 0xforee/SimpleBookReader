@@ -198,7 +198,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
         menuPop.setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
         menuPop.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         menuPop.setFocusable(true);
-        menuPop.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+        menuPop.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.classical_page_background)));
 
         menuPop.setOutsideTouchable(true);
 
