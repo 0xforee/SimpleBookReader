@@ -49,6 +49,8 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
     private BookDao bookDao;
 
     private int recentChapterId = -1;
+    private String recentChapterUrl;
+    private int pageIndex;
 
     private boolean slipLeft = false;
 
@@ -169,12 +171,19 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
             notifyState(STATE_SUCCESS);
             if (chapter.getChapterUrl().equals(chapterUrl))
                 pageAdapter.setChapter(chapter);
-            if (slipLeft)
-                mViewPager.setCurrentItem(chapter.numberOfPages() - 1, false);
-            else
-                mViewPager.setCurrentItem(0, false);
 
-        }else{
+            // if open book ,load index page
+            if (chapter.getChapterUrl().equals(recentChapterUrl)) {
+                //Log.d(TAG, "slip to page " + pageIndex);
+                mViewPager.setCurrentItem(pageIndex, false);
+            } else {
+                if (slipLeft)
+                    mViewPager.setCurrentItem(chapter.numberOfPages() - 1, false);
+                else
+                    mViewPager.setCurrentItem(0, false);
+            }
+
+        } else {
             notifyState(STATE_FAILED);
         }
     }
@@ -220,7 +229,6 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
                     contentPop.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
             }
         });
-
     }
 
     @Override
@@ -307,9 +315,12 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
                 book.setRecentChapterId(chapterList.get(0).getChapterId());
             }
         }
-
+        recentChapterUrl = bookDao.getChapterUrl(book.getRecentChapterId());
         // open by chapter id
-        updateChapterUrl(bookDao.getChapterUrl(book.getRecentChapterId()));
+        updateChapterUrl(recentChapterUrl);
+
+        pageIndex = book.getPageIndex();
+        //Log.d(TAG, "open Book at position " + pageIndex);
     }
 
     private void setChapterId(String bookUrl, int newId) {
@@ -320,6 +331,9 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
         // set ChapterId
         if (recentChapterId != -1)
             bookDao.updateRecentChapterId(bookUrl, recentChapterId);
+
+        //Log.d(TAG, "closeBook: set position " + mViewPager.getCurrentItem() + "");
+        bookDao.updatePageIndex(bookUrl, mViewPager.getCurrentItem());
     }
 
     private void updateChapterUrl(String newUrl) {
