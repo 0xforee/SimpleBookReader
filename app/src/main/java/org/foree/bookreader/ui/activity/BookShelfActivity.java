@@ -26,17 +26,22 @@ import org.foree.bookreader.R;
 import org.foree.bookreader.data.book.Book;
 import org.foree.bookreader.data.book.Chapter;
 import org.foree.bookreader.data.dao.BookDao;
+import org.foree.bookreader.data.event.BookUpdateEvent;
 import org.foree.bookreader.parser.AbsWebParser;
 import org.foree.bookreader.parser.WebParserManager;
 import org.foree.bookreader.ui.adapter.BookShelfAdapter;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 public class BookShelfActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
@@ -50,6 +55,11 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
     private BookShelfAdapter mAdapter;
     private List<Book> bookList = new ArrayList<>();
 
+    private ThreadPoolExecutor executor;
+    private int updatedBookNum;
+    private int updatedNovelNum = 0;
+    private long startTime;
+
     SwipeRefreshLayout mSwipeRefreshLayout;
 
     @Override
@@ -57,9 +67,14 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_shelf);
 
+        EventBus.getDefault().register(this);
+
         setUpLayoutViews();
 
         PushManager.getInstance().initialize(this.getApplicationContext());
+
+        // init thread about
+        executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
         if (!mSwipeRefreshLayout.isRefreshing()) {
             mSwipeRefreshLayout.setRefreshing(true);
@@ -81,6 +96,13 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+        executor.shutdown();
+    }
+
     // SwipeRefreshLayout onRefresh
     @Override
     public void onRefresh() {
@@ -89,67 +111,68 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
 
     // 判断小说是否有更新
     private void syncNovelInfo() {
-        new Thread() {
-            @Override
-            public void run() {
-
-                long startTime = System.currentTimeMillis();
-                // 新创建一个List，防止ConcurrentModificationException错误
-                List<Book> books = new ArrayList<>();
-                books.addAll(bookList);
-
-                int updatedNovelNum = 0;
-                for (final Book oldBook : books) {
-                    // 1. 获取最新信息
-                    final AbsWebParser webParser = WebParserManager.getInstance().getWebParser(oldBook.getBookUrl());
-                    final Book newBook = webParser.getBookInfo(oldBook.getBookUrl());
-
-                    if (newBook != null) {
-                        // 2. 判断是否更新
-                        if (isUpdated(oldBook.getUpdateTime(), newBook.getUpdateTime())) {
-                            updatedNovelNum += 1;
-
-                            // 更新章节列表
-                            new Thread() {
-                                @Override
-                                public void run() {
-                                    super.run();
-                                    List<Chapter> chapters = webParser.getChapterList(oldBook.getBookUrl(), oldBook.getContentUrl());
-                                    if (chapters != null) {
-                                        bookDao.insertChapters(chapters);
-                                        bookDao.updateBookTime(newBook.getBookUrl(), newBook.getUpdateTime());
-                                    }
-                                }
-                            }.start();
-                        }
+        updatedBookNum = bookList.size();
+        startTime = System.currentTimeMillis();
+        // 获取更新
+        for (final Book oldBook : bookList) {
+            executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    AbsWebParser webParser = WebParserManager.getInstance().getWebParser(oldBook.getBookUrl());
+                    Book newBook = webParser.getBookInfo(oldBook.getBookUrl());
+                    if (isUpdated(oldBook.getUpdateTime(), newBook.getUpdateTime())) {
+                        // update chapters
+                        EventBus.getDefault().post(new BookUpdateEvent(newBook, true));
+                    } else {
+                        EventBus.getDefault().post(new BookUpdateEvent(newBook, false));
                     }
-
-
                 }
+            });
+        }
+    }
 
-                Log.d(TAG, "costs " + (System.currentTimeMillis() - startTime) + " ms to check update");
-
-                // refresh false
-                mSwipeRefreshLayout.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (mSwipeRefreshLayout.isRefreshing())
-                            mSwipeRefreshLayout.setRefreshing(false);
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(final BookUpdateEvent bookUpdateEvent) {
+        Log.d(TAG, "onEventMainThread " + bookUpdateEvent.getBook().getBookUrl());
+        // 若有更新，更新章节列表
+        if (bookUpdateEvent.isUpdateChapters()) {
+            executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    Book book = bookUpdateEvent.getBook();
+                    AbsWebParser webParser = WebParserManager.getInstance().getWebParser(book.getBookUrl());
+                    List<Chapter> chapters = webParser.getChapterList(book.getBookUrl(), book.getContentUrl());
+                    if (chapters != null) {
+                        bookDao.insertChapters(chapters);
+                        bookDao.updateBookTime(book.getBookUrl(), book.getUpdateTime());
                     }
-                }, 500);
-
-                // update UI
-                if (updatedNovelNum > 0) {
-                    String message = updatedNovelNum + "本小说更新啦";
-                    Snackbar.make(mSwipeRefreshLayout, message, Snackbar.LENGTH_SHORT).show();
-                } else {
-                    String message = "未更新";
-                    Snackbar.make(mSwipeRefreshLayout, message, Snackbar.LENGTH_SHORT).show();
-
                 }
+            });
+            updatedNovelNum++;
+        }
+        updatedBookNum--;
+        if (updatedBookNum == 0) {
+            Log.d(TAG, "costs " + (System.currentTimeMillis() - startTime) + " ms to check update");
+
+            // refresh false
+            mSwipeRefreshLayout.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (mSwipeRefreshLayout.isRefreshing())
+                        mSwipeRefreshLayout.setRefreshing(false);
+                }
+            }, 500);
+
+            // update UI
+            if (updatedNovelNum > 0) {
+                String message = updatedNovelNum + "本小说更新啦";
+                Snackbar.make(mSwipeRefreshLayout, message, Snackbar.LENGTH_SHORT).show();
+            } else {
+                String message = "未更新";
+                Snackbar.make(mSwipeRefreshLayout, message, Snackbar.LENGTH_SHORT).show();
 
             }
-        }.start();
+        }
 
     }
 
