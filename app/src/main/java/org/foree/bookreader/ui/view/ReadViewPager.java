@@ -18,6 +18,7 @@ import android.view.WindowManager;
 
 public class ReadViewPager extends ViewPager {
     private static final String TAG = ReadViewPager.class.getSimpleName();
+    private static final boolean DEBUG = false;
 
     private int displayWidth;
     private int displayHeight;
@@ -59,10 +60,10 @@ public class ReadViewPager extends ViewPager {
                     if (!isMenuArea(event)) {
                         if (isPrePageArea(event)) {
                             if (getCurrentItem() > 0) {
-                                Log.d(TAG, "上一页");
+                                if (DEBUG) Log.d(TAG, "上一页");
                                 setCurrentItem(getCurrentItem() - 1, false);
                             } else {
-                                Log.d(TAG, "上一章");
+                                if (DEBUG) Log.d(TAG, "上一章");
                                 if (onPageAreaClickListener != null) {
                                     onPageAreaClickListener.onPreChapterClick();
                                 }
@@ -70,18 +71,18 @@ public class ReadViewPager extends ViewPager {
                         } else {
                             if (getAdapter() != null)
                                 if (getCurrentItem() < getAdapter().getCount() - 1) {
-                                    Log.d(TAG, "下一页");
+                                    if (DEBUG) Log.d(TAG, "下一页");
                                     setCurrentItem(getCurrentItem() + 1, false);
                                 } else {
                                     // 切换下一章
-                                    Log.d(TAG, "下一章");
+                                    if (DEBUG) Log.d(TAG, "下一章");
                                     if (onPageAreaClickListener != null) {
                                         onPageAreaClickListener.onNextChapterClick();
                                     }
                                 }
                         }
                     } else {
-                        Log.d(TAG, "呼出菜单");
+                        if (DEBUG) Log.d(TAG, "呼出菜单");
                         if (onPageAreaClickListener != null) {
                             onPageAreaClickListener.onMediumAreaClick();
                         }
@@ -97,19 +98,19 @@ public class ReadViewPager extends ViewPager {
                         if (onPageAreaClickListener != null) {
                             onPageAreaClickListener.onPreChapterClick();
                         }
-                        Log.d(TAG, "滑动上一章");
+                        if (DEBUG) Log.d(TAG, "滑动上一章");
 
                     } else if (getCurrentItem() == getAdapter().getCount() - 1 && startX > event.getX()) {
                         scrolled = true;
                         if (onPageAreaClickListener != null) {
                             onPageAreaClickListener.onNextChapterClick();
                         }
-                        Log.d(TAG, "滑动下一章");
+                        if (DEBUG) Log.d(TAG, "滑动下一章");
                     }
                 }
                 break;
         }
-        Log.d(TAG, "x = " + event.getX() + ", y = " + event.getY());
+        if (DEBUG) Log.d(TAG, "x = " + event.getX() + ", y = " + event.getY());
 
         return true;
     }

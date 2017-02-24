@@ -70,7 +70,7 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(TAG, "onResume");
+        //Log.d(TAG, "onResume");
 
         // refresh booklist
         bookList.clear();
@@ -93,6 +93,7 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
             @Override
             public void run() {
 
+                long startTime = System.currentTimeMillis();
                 // 新创建一个List，防止ConcurrentModificationException错误
                 List<Book> books = new ArrayList<>();
                 books.addAll(bookList);
@@ -126,6 +127,8 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
 
                 }
 
+                Log.d(TAG, "costs " + (System.currentTimeMillis() - startTime) + " ms to check update");
+
                 // refresh false
                 mSwipeRefreshLayout.postDelayed(new Runnable() {
                     @Override
@@ -152,8 +155,6 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
 
     private boolean isUpdated(String oldUpdateTime, String newUpdateTime) {
         SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ENGLISH);
-        Log.d(TAG, oldUpdateTime);
-        Log.d(TAG, newUpdateTime);
         try {
             Date oldDate = simpleFormat.parse(oldUpdateTime);
             Date newDate = simpleFormat.parse(newUpdateTime);

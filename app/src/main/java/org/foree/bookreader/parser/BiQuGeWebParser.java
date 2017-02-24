@@ -19,6 +19,7 @@ import java.util.List;
 
 public class BiQuGeWebParser extends AbsWebParser {
     private static final String TAG = BiQuGeWebParser.class.getSimpleName();
+    private static boolean DEBUG = false;
 
     @Override
     String getHostName() {
@@ -69,7 +70,7 @@ public class BiQuGeWebParser extends AbsWebParser {
 
         Elements updates = doc.select("[property~=og:*]");
         for (Element update : updates) {
-            Log.i(TAG, update.toString());
+            if (DEBUG) Log.i(TAG, update.toString());
             switch (update.attr("property")) {
                 case "og:novel:category":
                     book.setCategory(update.attr("content"));
@@ -127,8 +128,8 @@ public class BiQuGeWebParser extends AbsWebParser {
             // set chapterId for sort
             chapter.setChapterId(getChapterId(link.attr("href")));
 
-            //Log.i("HH", link.text());
-            //Log.i("HH", link.attr("href"));
+            if (DEBUG) Log.d("HH", link.text());
+            if (DEBUG) Log.d("HH", link.attr("href"));
             chapters.add(chapter);
         }
         return chapters;
@@ -152,7 +153,7 @@ public class BiQuGeWebParser extends AbsWebParser {
         Element content = doc.getElementById("content");
         if (content != null) {
             content.select("script").remove();
-            Log.d(TAG, content.toString());
+            if (DEBUG) Log.d(TAG, content.toString());
             chapter.setContents(Html.fromHtml(content.toString()).toString());
         }
 
