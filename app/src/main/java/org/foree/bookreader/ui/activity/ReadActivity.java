@@ -1,6 +1,6 @@
 package org.foree.bookreader.ui.activity;
 
-import android.graphics.Color;
+import android.app.Dialog;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -60,7 +61,8 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
     private TextView mTextView, mTvLoading;
 
     // popWindow
-    private PopupWindow contentPop, menuPop;
+    private PopupWindow menuPop;
+    private Dialog contentDialog;
     private View rootView;
     private ListView chapterTitleListView;
     private int chapterPosition;
@@ -223,10 +225,11 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
                 if (menuPop.isShowing()) {
                     menuPop.dismiss();
                 }
-                if (contentPop == null)
-                    showPopup();
-                else
-                    contentPop.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
+                if (contentDialog == null) {
+                    showContentDialog();
+                } else {
+                    contentDialog.show();
+                }
             }
         });
     }
@@ -254,20 +257,29 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
         }
     }
 
-    private void showPopup() {
-        View view = LayoutInflater.from(this).inflate(R.layout.popupwindow_layout, null);
+    private void showContentDialog() {
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_content_layout, null);
 
         DisplayMetrics dp = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dp);
 
-        contentPop = new PopupWindow(this);
-        contentPop.setContentView(view);
-        contentPop.setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
-        contentPop.setHeight(dp.heightPixels / 4 * 3);
-        contentPop.setFocusable(true);
-        contentPop.setOutsideTouchable(true);
-        contentPop.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-        contentPop.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
+        contentDialog = new Dialog(this, R.style.contentDialogStyle);
+        contentDialog.setContentView(view);
+        contentDialog.setTitle(R.string.content);
+        Window dialogWindow = contentDialog.getWindow();
+        if (dialogWindow != null) {
+            WindowManager.LayoutParams lp = dialogWindow.getAttributes();
+            dialogWindow.setGravity(Gravity.BOTTOM);
+
+            lp.x = 0;
+            lp.y = 0;
+            lp.width = dp.widthPixels;
+            lp.height = dp.heightPixels / 5 * 4;
+
+            dialogWindow.setAttributes(lp);
+        }
+        contentDialog.setCanceledOnTouchOutside(true);
+        contentDialog.show();
 
         chapterTitleListView = (ListView) view.findViewById(R.id.rv_item_list);
 
@@ -276,7 +288,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
         chapterTitleListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                contentPop.dismiss();
+                contentDialog.dismiss();
                 switchChapter(chapterList.get(position).getChapterUrl());
             }
         });
