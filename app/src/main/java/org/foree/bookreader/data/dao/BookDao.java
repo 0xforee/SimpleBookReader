@@ -427,6 +427,7 @@ public class BookDao {
 
         // 内容不重复
         contentValues.put("chapter_content", chapter.getContents());
+        contentValues.put("offline", true);
         if (db.update(BookSQLiteOpenHelper.DB_TABLE_CHAPTERS,
                 contentValues,
                 "chapter_url=?",

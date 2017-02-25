@@ -143,7 +143,8 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
     // SwipeRefreshLayout onRefresh
     @Override
     public void onRefresh() {
-        syncNovelInfo();
+        if (!bookList.isEmpty())
+            syncNovelInfo();
     }
 
     // 判断小说是否有更新
