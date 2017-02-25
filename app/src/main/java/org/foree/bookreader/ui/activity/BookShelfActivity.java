@@ -30,16 +30,13 @@ import org.foree.bookreader.data.event.BookUpdateEvent;
 import org.foree.bookreader.parser.AbsWebParser;
 import org.foree.bookreader.parser.WebParserManager;
 import org.foree.bookreader.ui.adapter.BookShelfAdapter;
+import org.foree.bookreader.utils.DateUtils;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -100,6 +97,49 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
         syncThread.interrupt();
     }
 
+    private void setUpLayoutViews() {
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.content_main);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+
+        mRecyclerView = (RecyclerView) findViewById(R.id.rv_book_shelf);
+
+        setUpRecyclerViewAdapter();
+    }
+
+    private void setUpRecyclerViewAdapter() {
+        bookDao = new BookDao(this);
+
+        bookList = bookDao.getAllBooks();
+        mAdapter = new BookShelfAdapter(this, bookList);
+
+        mRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setAdapter(mAdapter);
+        mAdapter.setOnItemClickListener(new BookShelfAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                if (mActionMode != null) {
+                    onListItemSelect(position);
+                } else {
+                    Intent intent = new Intent(BookShelfActivity.this, ReadActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("book_url", bookList.get(position).getBookUrl());
+                    intent.putExtras(bundle);
+
+                    startActivity(intent);
+                }
+            }
+
+            @Override
+            public void onItemLongClick(View view, int position) {
+                onListItemSelect(position);
+            }
+        });
+    }
+
     // SwipeRefreshLayout onRefresh
     @Override
     public void onRefresh() {
@@ -130,7 +170,7 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
                             final AbsWebParser webParser = WebParserManager.getInstance().getWebParser(oldBook.getBookUrl());
                             final Book newBook = webParser.getBookInfo(oldBook.getBookUrl());
 
-                            if (isUpdated(oldBook.getUpdateTime(), newBook.getUpdateTime())) {
+                            if (DateUtils.isNewer(oldBook.getUpdateTime(), newBook.getUpdateTime())) {
                                 // update chapters
                                 tasks.add(new Callable<Boolean>() {
                                     @Override
@@ -154,6 +194,8 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
                     tasks.add(callable);
                 }
 
+
+                // results
                 try {
                     futures = executor.invokeAll(tasks);
                     // check update and notify state
@@ -207,66 +249,6 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
             Snackbar.make(mSwipeRefreshLayout, message, Snackbar.LENGTH_SHORT).show();
 
         }
-    }
-
-    private boolean isUpdated(String oldUpdateTime, String newUpdateTime) {
-        SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ENGLISH);
-        try {
-            //Log.d(TAG, oldUpdateTime);
-            //Log.d(TAG, newUpdateTime);
-            Date oldDate = simpleFormat.parse(oldUpdateTime);
-            Date newDate = simpleFormat.parse(newUpdateTime);
-
-            if (newDate.after(oldDate)) {
-                return true;
-            }
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    private void setUpLayoutViews() {
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.content_main);
-        mSwipeRefreshLayout.setOnRefreshListener(this);
-
-        mRecyclerView = (RecyclerView) findViewById(R.id.rv_book_shelf);
-
-        setUpRecyclerViewAdapter();
-    }
-
-    private void setUpRecyclerViewAdapter() {
-        bookDao = new BookDao(this);
-
-        bookList = bookDao.getAllBooks();
-        mAdapter = new BookShelfAdapter(this, bookList);
-
-        mRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.setAdapter(mAdapter);
-        mAdapter.setOnItemClickListener(new BookShelfAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                if (mActionMode != null) {
-                    onListItemSelect(position);
-                } else {
-                    Intent intent = new Intent(BookShelfActivity.this, ReadActivity.class);
-                    Bundle bundle = new Bundle();
-                    bundle.putString("book_url", bookList.get(position).getBookUrl());
-                    intent.putExtras(bundle);
-
-                    startActivity(intent);
-                }
-            }
-
-            @Override
-            public void onItemLongClick(View view, int position) {
-                onListItemSelect(position);
-            }
-        });
     }
 
     private void onListItemSelect(int position) {
