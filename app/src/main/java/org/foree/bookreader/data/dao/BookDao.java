@@ -31,33 +31,35 @@ public class BookDao {
      * @return bookList
      */
     public List<Book> getAllBooks() {
-        Cursor cursor;
-        List<Book> bookList = new ArrayList<>();
-        SQLiteDatabase db = bookSQLiteOpenHelper.getReadableDatabase();
-        db.beginTransaction();
+        synchronized (this) {
+            Cursor cursor;
+            List<Book> bookList = new ArrayList<>();
+            SQLiteDatabase db = bookSQLiteOpenHelper.getReadableDatabase();
+            db.beginTransaction();
 
-        cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_BOOKS, null,
-                null, null, null, null, null);
-        while (cursor.moveToNext()) {
-            String bookName = cursor.getString(cursor.getColumnIndex("book_name"));
-            String bookUrl = cursor.getString(cursor.getColumnIndex("book_url"));
-            String updateTime = cursor.getString(cursor.getColumnIndex("update_time"));
-            String category = cursor.getString(cursor.getColumnIndex("category"));
-            String author = cursor.getString(cursor.getColumnIndex("author"));
-            String description = cursor.getString(cursor.getColumnIndex("description"));
-            int recentChapterId = cursor.getInt(cursor.getColumnIndex("recent_chapter_id"));
-            int pageIndex = cursor.getInt(cursor.getColumnIndex("page_index"));
-            String bookCoverUrl = cursor.getString(cursor.getColumnIndex("book_cover_url"));
-            String contentUrl = cursor.getString(cursor.getColumnIndex("content_url"));
-            Book book = new Book(bookName, bookUrl, updateTime, category, author, description, pageIndex, recentChapterId, bookCoverUrl, contentUrl);
-            bookList.add(book);
+            cursor = db.query(BookSQLiteOpenHelper.DB_TABLE_BOOKS, null,
+                    null, null, null, null, null);
+            while (cursor.moveToNext()) {
+                String bookName = cursor.getString(cursor.getColumnIndex("book_name"));
+                String bookUrl = cursor.getString(cursor.getColumnIndex("book_url"));
+                String updateTime = cursor.getString(cursor.getColumnIndex("update_time"));
+                String category = cursor.getString(cursor.getColumnIndex("category"));
+                String author = cursor.getString(cursor.getColumnIndex("author"));
+                String description = cursor.getString(cursor.getColumnIndex("description"));
+                int recentChapterId = cursor.getInt(cursor.getColumnIndex("recent_chapter_id"));
+                int pageIndex = cursor.getInt(cursor.getColumnIndex("page_index"));
+                String bookCoverUrl = cursor.getString(cursor.getColumnIndex("book_cover_url"));
+                String contentUrl = cursor.getString(cursor.getColumnIndex("content_url"));
+                Book book = new Book(bookName, bookUrl, updateTime, category, author, description, pageIndex, recentChapterId, bookCoverUrl, contentUrl);
+                bookList.add(book);
+            }
+
+            cursor.close();
+            db.setTransactionSuccessful();
+            db.endTransaction();
+            db.close();
+            return bookList;
         }
-
-        cursor.close();
-        db.setTransactionSuccessful();
-        db.endTransaction();
-        db.close();
-        return bookList;
     }
 
     public void insertChapters(List<Chapter> chapterList) {
@@ -122,23 +124,25 @@ public class BookDao {
     }
 
     public void updateBookTime(String bookUrl, String updateTime) {
-        Log.d(TAG, "update book " + bookUrl + " Time " + updateTime);
-        SQLiteDatabase db = bookSQLiteOpenHelper.getWritableDatabase();
-        db.beginTransaction();
-        ContentValues contentValues = new ContentValues();
+        synchronized (this) {
+            Log.d(TAG, "update book " + bookUrl + " Time " + updateTime);
+            SQLiteDatabase db = bookSQLiteOpenHelper.getWritableDatabase();
+            db.beginTransaction();
+            ContentValues contentValues = new ContentValues();
 
-        // 内容不重复
-        contentValues.put("update_time", updateTime);
-        if (db.update(BookSQLiteOpenHelper.DB_TABLE_BOOKS,
-                contentValues,
-                "book_url=?",
-                new String[]{bookUrl}) == -1) {
-            Log.e(TAG, "Database insert id: " + bookUrl + " error");
+            // 内容不重复
+            contentValues.put("update_time", updateTime);
+            if (db.update(BookSQLiteOpenHelper.DB_TABLE_BOOKS,
+                    contentValues,
+                    "book_url=?",
+                    new String[]{bookUrl}) == -1) {
+                Log.e(TAG, "Database insert id: " + bookUrl + " error");
+            }
+
+            db.setTransactionSuccessful();
+            db.endTransaction();
+            db.close();
         }
-
-        db.setTransactionSuccessful();
-        db.endTransaction();
-        db.close();
     }
 
     public Book getBook(String bookUrl) {

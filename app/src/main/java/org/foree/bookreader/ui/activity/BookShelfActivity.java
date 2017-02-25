@@ -40,8 +40,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.Future;
 
 public class BookShelfActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
@@ -55,10 +58,7 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
     private BookShelfAdapter mAdapter;
     private List<Book> bookList = new ArrayList<>();
 
-    private ThreadPoolExecutor executor;
-    private int updatedBookNum;
-    private int updatedNovelNum = 0;
-    private long startTime;
+    private Thread syncThread;
 
     SwipeRefreshLayout mSwipeRefreshLayout;
 
@@ -72,9 +72,6 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
         setUpLayoutViews();
 
         PushManager.getInstance().initialize(this.getApplicationContext());
-
-        // init thread about
-        executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
         if (!mSwipeRefreshLayout.isRefreshing()) {
             mSwipeRefreshLayout.setRefreshing(true);
@@ -100,7 +97,7 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
-        executor.shutdown();
+        syncThread.interrupt();
     }
 
     // SwipeRefreshLayout onRefresh
@@ -111,74 +108,112 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
 
     // 判断小说是否有更新
     private void syncNovelInfo() {
-        updatedBookNum = bookList.size();
-        startTime = System.currentTimeMillis();
-        // 获取更新
-        for (final Book oldBook : bookList) {
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    AbsWebParser webParser = WebParserManager.getInstance().getWebParser(oldBook.getBookUrl());
-                    Book newBook = webParser.getBookInfo(oldBook.getBookUrl());
-                    if (isUpdated(oldBook.getUpdateTime(), newBook.getUpdateTime())) {
-                        // update chapters
-                        EventBus.getDefault().post(new BookUpdateEvent(newBook, true));
-                    } else {
-                        EventBus.getDefault().post(new BookUpdateEvent(newBook, false));
-                    }
+
+        syncThread = new Thread() {
+            @Override
+            public void run() {
+                long startTime = System.currentTimeMillis();
+                int updatedNum = 0;
+                List<Book> books = bookDao.getAllBooks();
+
+                // init thread about
+                ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+                final List<Callable<Boolean>> tasks = new ArrayList<>();
+                List<Future<Boolean>> futures;
+                // add task
+                for (final Book oldBook : books) {
+                    Callable<Boolean> callable = new Callable<Boolean>() {
+                        @Override
+                        public Boolean call() throws Exception {
+
+                            final AbsWebParser webParser = WebParserManager.getInstance().getWebParser(oldBook.getBookUrl());
+                            final Book newBook = webParser.getBookInfo(oldBook.getBookUrl());
+
+                            if (isUpdated(oldBook.getUpdateTime(), newBook.getUpdateTime())) {
+                                // update chapters
+                                tasks.add(new Callable<Boolean>() {
+                                    @Override
+                                    public Boolean call() throws Exception {
+                                        List<Chapter> chapters = webParser.getChapterList(newBook.getBookUrl(), newBook.getContentUrl());
+                                        if (chapters != null) {
+                                            bookDao.insertChapters(chapters);
+                                        }
+                                        return false;
+                                    }
+                                });
+
+                                bookDao.updateBookTime(newBook.getBookUrl(), newBook.getUpdateTime());
+
+                                return true;
+                            }
+                            return false;
+                        }
+                    };
+
+                    tasks.add(callable);
                 }
-            });
-        }
+
+                try {
+                    futures = executor.invokeAll(tasks);
+                    // check update and notify state
+                    for (Future<Boolean> future : futures) {
+                        if (future.get()) {
+                            updatedNum++;
+                        }
+                    }
+
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                executor.shutdown();
+
+                // notify update
+                EventBus.getDefault().post(new BookUpdateEvent(updatedNum));
+
+                Log.d(TAG, "costs " + (System.currentTimeMillis() - startTime) + " ms to check update, updated " + updatedNum);
+
+            }
+        };
+
+        syncThread.start();
+
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(final BookUpdateEvent bookUpdateEvent) {
-        Log.d(TAG, "onEventMainThread " + bookUpdateEvent.getBook().getBookUrl());
-        // 若有更新，更新章节列表
-        if (bookUpdateEvent.isUpdateChapters()) {
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    Book book = bookUpdateEvent.getBook();
-                    AbsWebParser webParser = WebParserManager.getInstance().getWebParser(book.getBookUrl());
-                    List<Chapter> chapters = webParser.getChapterList(book.getBookUrl(), book.getContentUrl());
-                    if (chapters != null) {
-                        bookDao.insertChapters(chapters);
-                        bookDao.updateBookTime(book.getBookUrl(), book.getUpdateTime());
-                    }
-                }
-            });
-            updatedNovelNum++;
-        }
-        updatedBookNum--;
-        if (updatedBookNum == 0) {
-            Log.d(TAG, "costs " + (System.currentTimeMillis() - startTime) + " ms to check update");
+        Log.d(TAG, "onEventMainThread " + bookUpdateEvent.getUpdatedNum());
 
-            // refresh false
-            mSwipeRefreshLayout.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (mSwipeRefreshLayout.isRefreshing())
-                        mSwipeRefreshLayout.setRefreshing(false);
-                }
-            }, 500);
+        int updatedNovelNum = bookUpdateEvent.getUpdatedNum();
 
-            // update UI
-            if (updatedNovelNum > 0) {
-                String message = updatedNovelNum + "本小说更新啦";
-                Snackbar.make(mSwipeRefreshLayout, message, Snackbar.LENGTH_SHORT).show();
-            } else {
-                String message = "未更新";
-                Snackbar.make(mSwipeRefreshLayout, message, Snackbar.LENGTH_SHORT).show();
-
+        // refresh false
+        mSwipeRefreshLayout.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (mSwipeRefreshLayout.isRefreshing())
+                    mSwipeRefreshLayout.setRefreshing(false);
             }
-        }
+        }, 500);
 
+        // update UI
+        if (updatedNovelNum > 0) {
+            String message = updatedNovelNum + "本小说更新啦";
+            Snackbar.make(mSwipeRefreshLayout, message, Snackbar.LENGTH_SHORT).show();
+        } else {
+            String message = "未更新";
+            Snackbar.make(mSwipeRefreshLayout, message, Snackbar.LENGTH_SHORT).show();
+
+        }
     }
 
     private boolean isUpdated(String oldUpdateTime, String newUpdateTime) {
         SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ENGLISH);
         try {
+            //Log.d(TAG, oldUpdateTime);
+            //Log.d(TAG, newUpdateTime);
             Date oldDate = simpleFormat.parse(oldUpdateTime);
             Date newDate = simpleFormat.parse(newUpdateTime);
 
