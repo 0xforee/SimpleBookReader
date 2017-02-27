@@ -29,6 +29,7 @@ import org.foree.bookreader.data.event.PaginationEvent;
 import org.foree.bookreader.pagination.PaginationArgs;
 import org.foree.bookreader.pagination.PaginationLoader;
 import org.foree.bookreader.ui.adapter.PageAdapter;
+import org.foree.bookreader.ui.adapter.ContentAdapter;
 import org.foree.bookreader.ui.view.ReadViewPager;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -282,8 +283,9 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
         contentDialog.show();
 
         chapterTitleListView = (ListView) view.findViewById(R.id.rv_item_list);
+        chapterTitleListView.setAdapter(new ContentAdapter(this, chapterList));
 
-        chapterTitleListView.setAdapter(new ArrayAdapter<>(this, R.layout.item_list_holder, getChapterTitle()));
+        //chapterTitleListView.setAdapter(new ArrayAdapter<>(this, R.layout.item_list_holder, getChapterTitle()));
         chapterTitleListView.setSelection(chapterPosition);
         chapterTitleListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

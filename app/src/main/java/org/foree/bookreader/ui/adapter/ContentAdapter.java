@@ -9,35 +9,40 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import org.foree.bookreader.R;
+import org.foree.bookreader.data.book.Chapter;
+
+import java.util.List;
 
 /**
  * Created by foree on 17-2-25.
  * 章节列表的ListView的Adapter
  */
 
-public class contentAdapter extends BaseAdapter {
+public class ContentAdapter extends BaseAdapter {
     private Context mContext;
     private LayoutInflater layoutInflater;
+    private List<Chapter> chapters;
 
-    public contentAdapter(Context context) {
+    public ContentAdapter(Context context, List<Chapter> chapters) {
         mContext = context;
+        this.chapters = chapters;
         layoutInflater = LayoutInflater.from(mContext);
 
     }
 
     @Override
     public int getCount() {
-        return 0;
+        return chapters != null ? chapters.size() : 0;
     }
 
     @Override
     public Object getItem(int position) {
-        return null;
+        return chapters.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-        return 0;
+        return position;
     }
 
     @Override
@@ -55,7 +60,7 @@ public class contentAdapter extends BaseAdapter {
 
         // set view
         viewHolder.checkBox.setSelected(true);
-        viewHolder.textView.setText("哈哈哈哈");
+        viewHolder.textView.setText(chapters.get(position).getChapterTitle());
 
         return convertView;
     }
@@ -69,4 +74,6 @@ public class contentAdapter extends BaseAdapter {
             textView = (TextView) view.findViewById(R.id.tv_chapter_title);
         }
     }
+
+
 }

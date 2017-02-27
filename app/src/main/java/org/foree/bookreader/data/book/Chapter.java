@@ -12,6 +12,7 @@ public class Chapter implements Serializable {
     private String bookUrl;
     private int chapterId;
     private String contents;
+    private boolean offline;
     private ArrayList<String> pages = new ArrayList<>();
 
     public Chapter() {
@@ -22,11 +23,12 @@ public class Chapter implements Serializable {
         this.chapterUrl = chapterUrl;
     }
 
-    public Chapter(String chapterTitle, String chapterUrl, String bookUrl, int chapterId) {
+    public Chapter(String chapterTitle, String chapterUrl, String bookUrl, int chapterId, boolean offline) {
         this.chapterTitle = chapterTitle;
         this.chapterUrl = chapterUrl;
         this.bookUrl = bookUrl;
         this.chapterId = chapterId;
+        this.offline = offline;
     }
 
     public String getChapterTitle() {
@@ -85,5 +87,11 @@ public class Chapter implements Serializable {
         this.contents = contents;
     }
 
+    public boolean isOffline() {
+        return offline;
+    }
 
+    public void setOffline(boolean offline) {
+        this.offline = offline;
+    }
 }

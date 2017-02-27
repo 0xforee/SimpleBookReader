@@ -110,8 +110,9 @@ public class BookDao {
         while (cursor.moveToNext()) {
             String title = cursor.getString(cursor.getColumnIndex("chapter_title"));
             String url = cursor.getString(cursor.getColumnIndex("chapter_url"));
+            boolean offline = cursor.getInt(cursor.getColumnIndex("offline")) == 1;
             int chapter_id = cursor.getInt(cursor.getColumnIndex("chapter_id"));
-            Chapter chapter = new Chapter(title, url, bookUrl, chapter_id);
+            Chapter chapter = new Chapter(title, url, bookUrl, chapter_id, offline);
             chapterList.add(chapter);
         }
 
