@@ -86,7 +86,7 @@ public class BookDao {
                 contentValues.put("chapter_id", chapter.getChapterId());
                 contentValues.put("book_url", chapter.getBookUrl());
                 if (db.insertWithOnConflict(BookSQLiteOpenHelper.DB_TABLE_CHAPTERS, null,
-                        contentValues, SQLiteDatabase.CONFLICT_IGNORE) == -1) {
+                        contentValues, SQLiteDatabase.CONFLICT_REPLACE) == -1) {
                     Log.e(TAG, "Database insert chapter_url: " + chapter.getChapterUrl() + " error");
                 }
             }
