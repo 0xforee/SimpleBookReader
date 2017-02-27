@@ -19,7 +19,7 @@
         android:layout_height="0dp"
         android:layout_margin="@dimen/read_page_margin"
         android:layout_weight="30"
-        android:lineSpacingExtra="6dp"
+        android:lineSpacingExtra="@dimen/read_line_spacing"
         android:textColor="@color/md_black_1000"
         android:textSize="17sp" />
 

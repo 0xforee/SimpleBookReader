@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.foree.bookreader.R;
-import org.foree.bookreader.data.ReadPageData;
+import org.foree.bookreader.data.ReadPageDataEvent;
 
 import java.util.Calendar;
 
@@ -17,10 +17,10 @@ public class ReadFragment extends Fragment {
 
     private TextView tvContents, tvTitle, tvTime, tvIndex, tvPageNum;
 
-    public static ReadFragment newInstance(ReadPageData readPageData) {
+    public static ReadFragment newInstance(ReadPageDataEvent readPageDataEvent) {
         ReadFragment fragment = new ReadFragment();
         Bundle args = new Bundle();
-        args.putSerializable(ARG_TITLE, readPageData);
+        args.putSerializable(ARG_TITLE, readPageDataEvent);
         fragment.setArguments(args);
         return fragment;
     }
@@ -29,18 +29,18 @@ public class ReadFragment extends Fragment {
 
     }
 
-    private void setData(ReadPageData readPageData) {
+    private void setData(ReadPageDataEvent readPageDataEvent) {
         if (tvContents != null) {
-            tvContents.setText(readPageData.getContents());
+            tvContents.setText(readPageDataEvent.getContents());
         }
 
         if (tvTitle != null) {
-            tvTitle.setText(readPageData.getTitle());
+            tvTitle.setText(readPageDataEvent.getTitle());
         }
 
         tvTime.setText(getCurrentTime());
-        tvPageNum.setText(readPageData.getPageNum());
-        tvIndex.setText(readPageData.getIndex());
+        tvPageNum.setText(readPageDataEvent.getPageNum());
+        tvIndex.setText(readPageDataEvent.getIndex());
     }
 
     @Override
@@ -53,7 +53,7 @@ public class ReadFragment extends Fragment {
         tvIndex = (TextView) view.findViewById(R.id.tv_index);
         tvPageNum = (TextView) view.findViewById(R.id.tv_page_num);
         if (getArguments() != null) {
-            setData((ReadPageData) getArguments().getSerializable(ARG_TITLE));
+            setData((ReadPageDataEvent) getArguments().getSerializable(ARG_TITLE));
         }
 
         return view;
