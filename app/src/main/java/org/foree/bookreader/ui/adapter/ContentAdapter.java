@@ -62,6 +62,13 @@ public class ContentAdapter extends BaseAdapter {
         viewHolder.checkBox.setSelected(true);
         viewHolder.textView.setText(chapters.get(position).getChapterTitle());
 
+        if(chapters.get(position).isOffline()){
+            viewHolder.textView.setTextColor(mContext.getResources().getColor(R.color.colorChapterOfflined));
+        }else{
+            viewHolder.textView.setTextColor(mContext.getResources().getColor(R.color.colorChapterUnlined));
+
+        }
+
         return convertView;
     }
 
