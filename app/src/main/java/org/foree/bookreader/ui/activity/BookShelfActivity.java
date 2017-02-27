@@ -161,6 +161,7 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
                 ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
                 final List<Callable<Boolean>> tasks = new ArrayList<>();
+                final List<Callable<Boolean>> chapterTasks = new ArrayList<>();
                 List<Future<Boolean>> futures;
                 // add task
                 for (final Book oldBook : books) {
@@ -173,7 +174,7 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
 
                             if (DateUtils.isNewer(oldBook.getUpdateTime(), newBook.getUpdateTime())) {
                                 // update chapters
-                                tasks.add(new Callable<Boolean>() {
+                                chapterTasks.add(new Callable<Boolean>() {
                                     @Override
                                     public Boolean call() throws Exception {
                                         List<Chapter> chapters = webParser.getChapterList(newBook.getBookUrl(), newBook.getContentUrl());
@@ -199,6 +200,7 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
                 // results
                 try {
                     futures = executor.invokeAll(tasks);
+                    executor.invokeAll(chapterTasks);
                     // check update and notify state
                     for (Future<Boolean> future : futures) {
                         if (future.get()) {
