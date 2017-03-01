@@ -12,9 +12,7 @@ import android.util.Log;
 public class BookSQLiteOpenHelper extends SQLiteOpenHelper {
     private static final String TAG = BookSQLiteOpenHelper.class.getSimpleName();
     public static final int DB_VERSION = 1;
-    public static final String DB_NAME = "bookreader.db";
-    public static final String DB_TABLE_CHAPTERS = "chapters";
-    public static final String DB_TABLE_BOOKS = "books";
+    public static final String DB_NAME = "bookReader.db";
 
     public BookSQLiteOpenHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -45,37 +43,33 @@ public class BookSQLiteOpenHelper extends SQLiteOpenHelper {
     }
 
     private void createEntriesTable(SQLiteDatabase db) {
+        db.execSQL("create table " + BookReaderContract.BooksEntry.TABLE_NAME + "(" +
+                BookReaderContract.BooksEntry._ID + " integer primary key," +
+                BookReaderContract.BooksEntry.COLUMN_NAME_BOOK_URL + " varchar unique," +
+                BookReaderContract.BooksEntry.COLUMN_NAME_CONTENT_URL + " varchar," +
+                BookReaderContract.BooksEntry.COLUMN_NAME_BOOK_NAME + " varchar," +
+                BookReaderContract.BooksEntry.COLUMN_NAME_COVER_URL + " varchar," +
+                BookReaderContract.BooksEntry.COLUMN_NAME_UPDATE_TIME + " varchar," +
+                BookReaderContract.BooksEntry.COLUMN_NAME_PAGE_INDEX + " integer," +
+                BookReaderContract.BooksEntry.COLUMN_NAME_RECENT_ID + " integer," +
+                BookReaderContract.BooksEntry.COLUMN_NAME_CATEGORY + " varchar," +
+                BookReaderContract.BooksEntry.COLUMN_NAME_DESCRIPTION + " varchar," +
+                BookReaderContract.BooksEntry.COLUMN_NAME_AUTHOR + " varchar" +
+                ")"
+        );
+
         //章节有对应的book_url, chapter_url的md5为章节内容的缓存文件名称
         // chapter_id 用于章节排序和获取前后章节
-        db.execSQL("create table " + DB_TABLE_CHAPTERS +
-                "(" +
-                "id integer primary key autoincrement," +
-                "chapter_url varchar(255) unique," +
-                "chapter_id integer unique," +
-                "book_url varchar(255)," +
-                "chapter_title varchar(255)," +
-                "chapter_content varchar," +
-                "offline integer," +
-                "read integer" +
+        db.execSQL("create table " + BookReaderContract.ChaptersEntry.TABLE_NAME + "(" +
+                BookReaderContract.ChaptersEntry._ID + " integer primary key," +
+                BookReaderContract.ChaptersEntry.COLUMN_NAME_CHAPTER_URL + " varchar unique," +
+                BookReaderContract.ChaptersEntry.COLUMN_NAME_CHAPTER_ID + " integer unique," +
+                BookReaderContract.ChaptersEntry.COLUMN_NAME_BOOK_URL + " varchar," +
+                BookReaderContract.ChaptersEntry.COLUMN_NAME_CHAPTER_TITLE + " varchar," +
+                BookReaderContract.ChaptersEntry.COLUMN_NAME_CHAPTER_CONTENT + " varchar," +
+                BookReaderContract.ChaptersEntry.COLUMN_NAME_CACHED + " integer" +
                 ")"
         );
-
-        db.execSQL("create table " + DB_TABLE_BOOKS +
-                "(" +
-                "id integer primary key autoincrement," +
-                "book_url varchar(255) unique," +
-                "content_url varchar(255)," +
-                "book_name varchar(255)," +
-                "book_cover_url varchar(255)," +
-                "update_time varchar(255)," +
-                "page_index integer(255)," +
-                "recent_chapter_id integer(255)," +
-                "category varchar(255)," +
-                "description varchar(255)," +
-                "author varchar(255)" +
-                ")"
-        );
-
     }
 
 }
