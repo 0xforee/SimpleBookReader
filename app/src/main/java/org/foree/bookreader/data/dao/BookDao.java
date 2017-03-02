@@ -79,23 +79,26 @@ public class BookDao {
     private void insertChaptersInternal(List<Chapter> subList) {
         synchronized (this) {
             SQLiteDatabase db = bookSQLiteOpenHelper.getWritableDatabase();
-            db.beginTransaction();
-            ContentValues contentValues = new ContentValues();
-            for (Chapter chapter : subList) {
-                contentValues.put(BookReaderContract.ChaptersEntry.COLUMN_NAME_CHAPTER_TITLE, chapter.getChapterTitle());
-                contentValues.put(BookReaderContract.ChaptersEntry.COLUMN_NAME_CHAPTER_URL, chapter.getChapterUrl());
-                contentValues.put(BookReaderContract.ChaptersEntry.COLUMN_NAME_CHAPTER_ID, chapter.getChapterId());
-                contentValues.put(BookReaderContract.ChaptersEntry.COLUMN_NAME_BOOK_URL, chapter.getBookUrl());
-                if (db.insertWithOnConflict(BookReaderContract.ChaptersEntry.TABLE_NAME, null,
-                        contentValues, SQLiteDatabase.CONFLICT_REPLACE) == -1) {
-                    Log.e(TAG, "Database insert chapter url: " + chapter.getChapterUrl() + " error");
+            try {
+                db.beginTransaction();
+                ContentValues contentValues = new ContentValues();
+                for (Chapter chapter : subList) {
+                    contentValues.put(BookReaderContract.ChaptersEntry.COLUMN_NAME_CHAPTER_TITLE, chapter.getChapterTitle());
+                    contentValues.put(BookReaderContract.ChaptersEntry.COLUMN_NAME_CHAPTER_URL, chapter.getChapterUrl());
+                    contentValues.put(BookReaderContract.ChaptersEntry.COLUMN_NAME_CHAPTER_ID, chapter.getChapterId());
+                    contentValues.put(BookReaderContract.ChaptersEntry.COLUMN_NAME_BOOK_URL, chapter.getBookUrl());
+                    db.insertWithOnConflict(BookReaderContract.ChaptersEntry.TABLE_NAME, null,
+                            contentValues, SQLiteDatabase.CONFLICT_IGNORE);
                 }
-            }
 
-            db.setTransactionSuccessful();
-            db.endTransaction();
-            db.close();
+                db.setTransactionSuccessful();
+
+            } finally {
+                db.endTransaction();
+                db.close();
+            }
         }
+
     }
 
     private List<Chapter> getChapters(String bookUrl) {
@@ -131,22 +134,27 @@ public class BookDao {
         synchronized (this) {
             Log.d(TAG, "update book " + bookUrl + " Time " + updateTime);
             SQLiteDatabase db = bookSQLiteOpenHelper.getWritableDatabase();
-            db.beginTransaction();
+
             ContentValues contentValues = new ContentValues();
             String selection = BookReaderContract.BooksEntry.COLUMN_NAME_BOOK_URL + "=?";
 
             // 内容不重复
             contentValues.put(BookReaderContract.BooksEntry.COLUMN_NAME_UPDATE_TIME, updateTime);
-            if (db.update(BookReaderContract.BooksEntry.TABLE_NAME,
-                    contentValues,
-                    selection,
-                    new String[]{bookUrl}) == -1) {
-                Log.e(TAG, "Database insert id: " + bookUrl + " error");
-            }
 
-            db.setTransactionSuccessful();
-            db.endTransaction();
-            db.close();
+            db.beginTransaction();
+            try {
+
+                db.update(BookReaderContract.BooksEntry.TABLE_NAME,
+                        contentValues,
+                        selection,
+                        new String[]{bookUrl});
+
+                db.setTransactionSuccessful();
+
+            } finally {
+                db.endTransaction();
+                db.close();
+            }
         }
     }
 
@@ -184,7 +192,6 @@ public class BookDao {
 
     public void addBook(Book book) {
         SQLiteDatabase db = bookSQLiteOpenHelper.getWritableDatabase();
-        db.beginTransaction();
         ContentValues contentValues = new ContentValues();
 
         // 内容不重复
@@ -198,13 +205,17 @@ public class BookDao {
         contentValues.put(BookReaderContract.BooksEntry.COLUMN_NAME_COVER_URL, book.getBookCoverUrl());
         contentValues.put(BookReaderContract.BooksEntry.COLUMN_NAME_CONTENT_URL, book.getContentUrl());
         contentValues.put(BookReaderContract.BooksEntry.COLUMN_NAME_PAGE_INDEX, 0);
-        if (db.insertWithOnConflict(BookReaderContract.BooksEntry.TABLE_NAME, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE) == -1) {
-            Log.e(TAG, "Database insert id: " + book.getBookUrl() + " error");
-        }
 
-        db.setTransactionSuccessful();
-        db.endTransaction();
-        db.close();
+        db.beginTransaction();
+
+        try {
+            db.insertWithOnConflict(BookReaderContract.BooksEntry.TABLE_NAME, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+            db.setTransactionSuccessful();
+
+        } finally {
+            db.endTransaction();
+            db.close();
+        }
 
         // insert chapters
         insertChapters(book.getChapters());
@@ -214,27 +225,28 @@ public class BookDao {
         String selection = BookReaderContract.BooksEntry.COLUMN_NAME_BOOK_URL + "=?";
 
         SQLiteDatabase db = bookSQLiteOpenHelper.getWritableDatabase();
+
         Cursor cursor = db.query(BookReaderContract.BooksEntry.TABLE_NAME, null,
                 selection, new String[]{book_url}, null, null, null);
 
         // remove bookInfo
         if (cursor.getCount() != 0) {
-            if (db.delete(BookReaderContract.BooksEntry.TABLE_NAME, selection, new String[]{book_url}) == -1) {
-                Log.e(TAG, "delete book url:" + book_url + " error");
-            } else {
+            try {
+                db.delete(BookReaderContract.BooksEntry.TABLE_NAME, selection, new String[]{book_url});
+
                 // remove chapters
                 cursor = db.query(BookReaderContract.ChaptersEntry.TABLE_NAME, null,
                         selection, new String[]{book_url}, null, null, null);
+
                 if (cursor.getCount() != 0) {
-                    if (db.delete(BookReaderContract.ChaptersEntry.TABLE_NAME, selection, new String[]{book_url}) == -1) {
-                        Log.e(TAG, "delete book's " + book_url + "chapters error");
-                    }
+                    db.delete(BookReaderContract.ChaptersEntry.TABLE_NAME, selection, new String[]{book_url});
                 }
+            } finally {
+                cursor.close();
+                db.close();
             }
         }
 
-        cursor.close();
-        db.close();
     }
 
     public void updateRecentChapterId(String bookUrl, int recentChapterId) {
@@ -249,16 +261,19 @@ public class BookDao {
         if (cursor.getCount() != 0) {
             ContentValues contentValues = new ContentValues();
             contentValues.put(BookReaderContract.BooksEntry.COLUMN_NAME_RECENT_ID, recentChapterId);
-            if (db.update(BookReaderContract.BooksEntry.TABLE_NAME, contentValues,
-                    selection, new String[]{bookUrl}) == -1) {
-                Log.e(TAG, "Database insert book url: " + bookUrl + " error");
+
+            try {
+                db.update(BookReaderContract.BooksEntry.TABLE_NAME, contentValues,
+                        selection, new String[]{bookUrl});
+                db.setTransactionSuccessful();
+
+            } finally {
+                cursor.close();
+                db.endTransaction();
+                db.close();
             }
         }
 
-        cursor.close();
-        db.setTransactionSuccessful();
-        db.endTransaction();
-        db.close();
 
     }
 
@@ -274,16 +289,17 @@ public class BookDao {
         if (cursor.getCount() != 0) {
             ContentValues contentValues = new ContentValues();
             contentValues.put(BookReaderContract.BooksEntry.COLUMN_NAME_PAGE_INDEX, pageIndex);
-            if (db.update(BookReaderContract.BooksEntry.TABLE_NAME, contentValues,
-                    selection, new String[]{bookUrl}) == -1) {
-                Log.e(TAG, "Database insert book url: " + bookUrl + " error");
+            try {
+                db.update(BookReaderContract.BooksEntry.TABLE_NAME, contentValues,
+                        selection, new String[]{bookUrl});
+                db.setTransactionSuccessful();
+            } finally {
+                cursor.close();
+
+                db.endTransaction();
+                db.close();
             }
         }
-
-        cursor.close();
-        db.setTransactionSuccessful();
-        db.endTransaction();
-        db.close();
     }
 
     /**
@@ -451,15 +467,18 @@ public class BookDao {
         // 内容不重复
         contentValues.put(BookReaderContract.ChaptersEntry.COLUMN_NAME_CHAPTER_CONTENT, chapter.getContents());
         contentValues.put(BookReaderContract.ChaptersEntry.COLUMN_NAME_CACHED, true);
-        if (db.update(BookReaderContract.ChaptersEntry.TABLE_NAME,
-                contentValues,
-                selection,
-                new String[]{chapter.getChapterUrl()}) == -1) {
-            Log.e(TAG, "Database insert id: " + chapter.getChapterUrl() + " error");
+
+        try {
+            db.update(BookReaderContract.ChaptersEntry.TABLE_NAME,
+                    contentValues,
+                    selection,
+                    new String[]{chapter.getChapterUrl()});
+            db.setTransactionSuccessful();
+
+        } finally {
+            db.endTransaction();
+            db.close();
         }
 
-        db.setTransactionSuccessful();
-        db.endTransaction();
-        db.close();
     }
 }
