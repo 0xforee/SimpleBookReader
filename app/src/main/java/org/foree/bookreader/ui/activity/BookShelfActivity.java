@@ -62,10 +62,7 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
 
         PushManager.getInstance().initialize(this.getApplicationContext());
 
-        if (!mSwipeRefreshLayout.isRefreshing()) {
-            mSwipeRefreshLayout.setRefreshing(true);
-            onRefresh();
-        }
+        syncNovelInfo();
     }
 
     @Override
@@ -73,20 +70,20 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
         super.onResume();
         //Log.d(TAG, "onResume");
 
-        // refresh booklist
+        // refresh book list
         bookList.clear();
         bookList.addAll(bookDao.getAllBooks());
         if (mAdapter != null) {
             mAdapter.notifyDataSetChanged();
         }
-
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
-        syncThread.interrupt();
+        if (syncThread != null && !syncThread.isInterrupted())
+            syncThread.interrupt();
     }
 
     private void setUpLayoutViews() {
@@ -135,17 +132,42 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
     // SwipeRefreshLayout onRefresh
     @Override
     public void onRefresh() {
-        if (!bookList.isEmpty())
-            syncNovelInfo();
+        syncNovelInfo();
     }
 
     // 判断小说是否有更新
     private void syncNovelInfo() {
+        if (!bookList.isEmpty()) {
+            // on activity create , set refresh true manually
+            if (!mSwipeRefreshLayout.isRefreshing()) {
+                mSwipeRefreshLayout.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mSwipeRefreshLayout.setRefreshing(true);
 
-        syncThread = new SyncBooksThread(bookDao);
+                    }
+                }, 500);
+            }
 
-        syncThread.start();
+            // if refresh start, get newer book info
+            syncThread = new SyncBooksThread(bookDao);
+            syncThread.start();
 
+        } else {
+            // bookList is empty, set refresh false
+            resetRefreshState();
+        }
+    }
+
+    private void resetRefreshState() {
+        if (mSwipeRefreshLayout.isRefreshing()) {
+            mSwipeRefreshLayout.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mSwipeRefreshLayout.setRefreshing(false);
+                }
+            }, 500);
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -154,14 +176,7 @@ public class BookShelfActivity extends AppCompatActivity implements SwipeRefresh
 
         int updatedNovelNum = bookUpdateEvent.getUpdatedNum();
 
-        // refresh false
-        mSwipeRefreshLayout.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (mSwipeRefreshLayout.isRefreshing())
-                    mSwipeRefreshLayout.setRefreshing(false);
-            }
-        }, 500);
+        resetRefreshState();
 
         // update UI
         if (updatedNovelNum > 0) {
