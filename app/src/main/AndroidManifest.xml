@@ -48,6 +48,11 @@
                 android:resource="@xml/searchable" />
         </activity>
         <activity android:name=".ui.activity.BookInfoActivity" />
+
+        <provider
+            android:name=".data.dao.BReaderProvider"
+            android:authorities="org.foree.bookreader.provider"
+            android:exported="false"/>
     </application>
 
 </manifest>

@@ -7,13 +7,13 @@ import android.provider.BaseColumns;
  * 数据库相关常量
  */
 
-public final class BookReaderContract {
+public final class BReaderContract {
 
-    private BookReaderContract() {
+    private BReaderContract() {
     }
 
     /* books table */
-    public static class BooksEntry implements BaseColumns {
+    public static class Books implements BaseColumns {
         public static final String TABLE_NAME = "books";
         public static final String COLUMN_NAME_BOOK_NAME = "book_name";
         public static final String COLUMN_NAME_BOOK_URL = "book_url";
@@ -27,7 +27,7 @@ public final class BookReaderContract {
         public static final String COLUMN_NAME_AUTHOR = "author";
     }
 
-    public static class ChaptersEntry implements BaseColumns {
+    public static class Chapters implements BaseColumns {
         public static final String TABLE_NAME = "chapters";
         public static final String COLUMN_NAME_CHAPTER_URL = "chapter_url";
         public static final String COLUMN_NAME_CHAPTER_ID = "chapter_id";

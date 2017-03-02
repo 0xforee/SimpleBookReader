@@ -43,31 +43,31 @@ public class BookSQLiteOpenHelper extends SQLiteOpenHelper {
     }
 
     private void createEntriesTable(SQLiteDatabase db) {
-        db.execSQL("create table " + BookReaderContract.BooksEntry.TABLE_NAME + "(" +
-                BookReaderContract.BooksEntry._ID + " integer primary key," +
-                BookReaderContract.BooksEntry.COLUMN_NAME_BOOK_URL + " varchar unique," +
-                BookReaderContract.BooksEntry.COLUMN_NAME_CONTENT_URL + " varchar," +
-                BookReaderContract.BooksEntry.COLUMN_NAME_BOOK_NAME + " varchar," +
-                BookReaderContract.BooksEntry.COLUMN_NAME_COVER_URL + " varchar," +
-                BookReaderContract.BooksEntry.COLUMN_NAME_UPDATE_TIME + " varchar," +
-                BookReaderContract.BooksEntry.COLUMN_NAME_PAGE_INDEX + " integer," +
-                BookReaderContract.BooksEntry.COLUMN_NAME_RECENT_ID + " integer," +
-                BookReaderContract.BooksEntry.COLUMN_NAME_CATEGORY + " varchar," +
-                BookReaderContract.BooksEntry.COLUMN_NAME_DESCRIPTION + " varchar," +
-                BookReaderContract.BooksEntry.COLUMN_NAME_AUTHOR + " varchar" +
+        db.execSQL("create table " + BReaderContract.Books.TABLE_NAME + "(" +
+                BReaderContract.Books._ID + " integer primary key," +
+                BReaderContract.Books.COLUMN_NAME_BOOK_URL + " varchar unique," +
+                BReaderContract.Books.COLUMN_NAME_CONTENT_URL + " varchar," +
+                BReaderContract.Books.COLUMN_NAME_BOOK_NAME + " varchar," +
+                BReaderContract.Books.COLUMN_NAME_COVER_URL + " varchar," +
+                BReaderContract.Books.COLUMN_NAME_UPDATE_TIME + " varchar," +
+                BReaderContract.Books.COLUMN_NAME_PAGE_INDEX + " integer," +
+                BReaderContract.Books.COLUMN_NAME_RECENT_ID + " integer," +
+                BReaderContract.Books.COLUMN_NAME_CATEGORY + " varchar," +
+                BReaderContract.Books.COLUMN_NAME_DESCRIPTION + " varchar," +
+                BReaderContract.Books.COLUMN_NAME_AUTHOR + " varchar" +
                 ")"
         );
 
         //章节有对应的book_url, chapter_url的md5为章节内容的缓存文件名称
         // chapter_id 用于章节排序和获取前后章节
-        db.execSQL("create table " + BookReaderContract.ChaptersEntry.TABLE_NAME + "(" +
-                BookReaderContract.ChaptersEntry._ID + " integer primary key," +
-                BookReaderContract.ChaptersEntry.COLUMN_NAME_CHAPTER_URL + " varchar unique," +
-                BookReaderContract.ChaptersEntry.COLUMN_NAME_CHAPTER_ID + " integer unique," +
-                BookReaderContract.ChaptersEntry.COLUMN_NAME_BOOK_URL + " varchar," +
-                BookReaderContract.ChaptersEntry.COLUMN_NAME_CHAPTER_TITLE + " varchar," +
-                BookReaderContract.ChaptersEntry.COLUMN_NAME_CHAPTER_CONTENT + " varchar," +
-                BookReaderContract.ChaptersEntry.COLUMN_NAME_CACHED + " integer" +
+        db.execSQL("create table " + BReaderContract.Chapters.TABLE_NAME + "(" +
+                BReaderContract.Chapters._ID + " integer primary key," +
+                BReaderContract.Chapters.COLUMN_NAME_CHAPTER_URL + " varchar unique," +
+                BReaderContract.Chapters.COLUMN_NAME_CHAPTER_ID + " integer unique," +
+                BReaderContract.Chapters.COLUMN_NAME_BOOK_URL + " varchar," +
+                BReaderContract.Chapters.COLUMN_NAME_CHAPTER_TITLE + " varchar," +
+                BReaderContract.Chapters.COLUMN_NAME_CHAPTER_CONTENT + " varchar," +
+                BReaderContract.Chapters.COLUMN_NAME_CACHED + " integer" +
                 ")"
         );
     }
