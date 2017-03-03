@@ -1,6 +1,7 @@
 package org.foree.bookreader.data.dao;
 
 import android.content.ContentProvider;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
@@ -8,26 +9,38 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
+
+import java.util.Arrays;
 
 /**
  * Created by foree on 17-3-2.
  */
 
 public class BReaderProvider extends ContentProvider {
+    private static final String TAG = BReaderProvider.class.getSimpleName();
 
     private BookDataBaseHelper mOpenHelper;
 
     private SQLiteDatabase db;
 
-    private static final String AUTHOR = "org.foree.bookreader.provider";
+    public static final String AUTHORITY = "org.foree.bookreader.provider";
+
+    public static final Uri CONTENT_URI_BOOKS = Uri.parse("content://" + AUTHORITY + BReaderContract.Books.TABLE_NAME);
+    public static final Uri CONTENT_URI_CHAPTERS = Uri.parse("content://" + AUTHORITY + BReaderContract.Chapters.TABLE_NAME);
 
     // create a uriMatcher object
     private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
+    // uriMatcher stuff
+    private static final int CODE_BOOKS = 1;
+    private static final int CODE_CHAPTERS = 2;
+
     static {
-        sUriMatcher.addURI(AUTHOR, BReaderContract.Books.TABLE_NAME, 1);
-        sUriMatcher.addURI(AUTHOR, BReaderContract.Chapters.TABLE_NAME, 2);
+        sUriMatcher.addURI(AUTHORITY, BReaderContract.Books.TABLE_NAME, CODE_BOOKS);
+        sUriMatcher.addURI(AUTHORITY, BReaderContract.Chapters.TABLE_NAME, CODE_CHAPTERS);
     }
 
     @Override
@@ -38,39 +51,91 @@ public class BReaderProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+    public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         db = mOpenHelper.getReadableDatabase();
+        return db.query(matchTable(uri), projection, selection, selectionArgs, null, null, sortOrder);
+    }
+
+    @Nullable
+    @Override
+    public String getType(@NonNull Uri uri) {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public Uri insert(@NonNull Uri uri, ContentValues values) {
+        db = mOpenHelper.getWritableDatabase();
+        long rowId = db.insert(matchTable(uri), null, values);
+        notifyChange(uri);
+        return ContentUris.withAppendedId(uri, rowId);
+    }
+
+    private void notifyChange(@NonNull Uri uri) {
+        getContext().getContentResolver().notifyChange(uri, null);
+    }
+
+    @Override
+    public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
+        db = mOpenHelper.getWritableDatabase();
+        int rowId = db.delete(matchTable(uri), selection, selectionArgs);
+        notifyChange(uri);
+        return rowId;
+    }
+
+    @Override
+    public int update(@NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+        db = mOpenHelper.getWritableDatabase();
+        int rowId = db.update(matchTable(uri), values, selection, selectionArgs);
+        notifyChange(uri);
+        return rowId;
+    }
+
+    @Override
+    public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
+        int result = bulkInsertInternal(uri, values);
+        notifyChange(uri);
+        return result;
+    }
+
+    private String matchTable(Uri uri) {
         switch (sUriMatcher.match(uri)) {
-
+            case CODE_BOOKS:
+                return BReaderContract.Books.TABLE_NAME;
+            case CODE_CHAPTERS:
+                return BReaderContract.Chapters.TABLE_NAME;
+            default:
+                throw new IllegalArgumentException("Unknown Uri: " + uri);
         }
-        return null;
     }
 
-    @Nullable
-    @Override
-    public String getType(Uri uri) {
-        return null;
+    // 使用事务加快大量数据插入速度
+    private int bulkInsertInternal(Uri uri, ContentValues[] contentValues) {
+        synchronized (this) {
+            int tmp = 1;
+            Log.d(TAG, "insert uri = " + uri.toString() + " " + contentValues.length + " items to db");
+            // 拆分itemList，dataBase 一次事务只能插入1000条数据
+            while (contentValues.length > (1000 * tmp)) {
+                insertWithTransaction(uri, Arrays.copyOfRange(contentValues, 1000 * (tmp - 1), 1000 * tmp));
+                tmp++;
+            }
+            insertWithTransaction(uri, Arrays.copyOfRange(contentValues, 1000 * (tmp - 1), contentValues.length));
+        }
+        return contentValues.length;
     }
 
-    @Nullable
-    @Override
-    public Uri insert(Uri uri, ContentValues values) {
-        return null;
-    }
-
-    @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
-        return 0;
-    }
-
-    @Override
-    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        return 0;
-    }
-
-    @Override
-    public int bulkInsert(Uri uri, ContentValues[] values) {
-        return super.bulkInsert(uri, values);
+    private void insertWithTransaction(Uri uri, ContentValues[] contentValues) {
+        db = mOpenHelper.getWritableDatabase();
+        db.beginTransaction();
+        for (ContentValues value : contentValues) {
+            // 内容不重复
+            if (ContentUris.parseId(insert(uri, value)) == -1) {
+                Log.e(TAG, "Database insert error");
+            }
+        }
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        db.close();
     }
 
     /**
