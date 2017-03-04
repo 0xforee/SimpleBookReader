@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
+import android.widget.CursorAdapter;
 import android.widget.TextView;
 
 import org.foree.bookreader.R;
@@ -17,60 +18,35 @@ import org.foree.bookreader.data.dao.BReaderContract;
  * 章节列表的ListView的Adapter
  */
 
-public class ContentAdapter extends BaseAdapter {
-    private Context mContext;
-    private LayoutInflater layoutInflater;
-    private Cursor cursor;
-
-    public ContentAdapter(Context context, Cursor cursor) {
-        mContext = context;
-        this.cursor = cursor;
-        layoutInflater = LayoutInflater.from(mContext);
-
+public class ContentAdapter extends CursorAdapter {
+    public ContentAdapter(Context context, Cursor c, int flags) {
+        super(context, c, flags);
     }
 
     @Override
-    public int getCount() {
-        return cursor != null ? cursor.getCount() : 0;
+    public View newView(Context context, Cursor cursor, ViewGroup parent) {
+        LayoutInflater layoutInflater = LayoutInflater.from(context);
+        View rootView = layoutInflater.inflate(R.layout.listview_content_item_holder, null);
+        ViewHolder viewHolder = new ViewHolder(rootView);
+        rootView.setTag(viewHolder);
+
+        return rootView;
     }
 
     @Override
-    public Object getItem(int position) {
-        return null;
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        // cache contentView
-        ViewHolder viewHolder;
-        if (convertView == null) {
-            convertView = layoutInflater.inflate(R.layout.listview_content_item_holder, null);
-            viewHolder = new ViewHolder(convertView);
-            convertView.setTag(viewHolder);
-
-        } else {
-            viewHolder = (ViewHolder) convertView.getTag();
-        }
-
-        cursor.moveToPosition(position);
+    public void bindView(View view, Context context, Cursor cursor) {
+        ViewHolder viewHolder = (ViewHolder) view.getTag();
 
         // set view
         viewHolder.checkBox.setSelected(true);
         viewHolder.textView.setText(cursor.getString(cursor.getColumnIndex(BReaderContract.Chapters.COLUMN_NAME_CHAPTER_TITLE)));
 
         if (cursor.getInt(cursor.getColumnIndex(BReaderContract.Chapters.COLUMN_NAME_CACHED)) == 1) {
-            viewHolder.textView.setTextColor(mContext.getResources().getColor(R.color.colorChapterOfflined));
+            viewHolder.textView.setTextColor(context.getResources().getColor(R.color.colorChapterOfflined));
         } else {
-            viewHolder.textView.setTextColor(mContext.getResources().getColor(R.color.colorChapterUnlined));
+            viewHolder.textView.setTextColor(context.getResources().getColor(R.color.colorChapterUnlined));
 
         }
-
-        return convertView;
     }
 
     private static class ViewHolder {

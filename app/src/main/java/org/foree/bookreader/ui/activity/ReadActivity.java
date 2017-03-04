@@ -236,6 +236,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
                 if (contentDialog == null) {
                     showContentDialog();
                 } else {
+                    getLoaderManager().restartLoader(0, null, ReadActivity.this);
                     contentDialog.show();
                 }
             }
@@ -290,6 +291,10 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
         contentDialog.show();
 
         chapterTitleListView = (ListView) view.findViewById(R.id.rv_item_list);
+
+        contentAdapter = new ContentAdapter(this, null, 0);
+        chapterTitleListView.setAdapter(contentAdapter);
+
         getLoaderManager().initLoader(0, null, this);
 
         //chapterTitleListView.setAdapter(new ArrayAdapter<>(this, R.layout.item_list_holder, getChapterTitle()));
@@ -353,6 +358,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
     public Loader onCreateLoader(int id, Bundle args) {
         Uri baseUri = BReaderProvider.CONTENT_URI_CHAPTERS;
         String[] projection = new String[]{
+                BReaderContract.Chapters._ID,
                 BReaderContract.Chapters.COLUMN_NAME_CHAPTER_URL,
                 BReaderContract.Chapters.COLUMN_NAME_CHAPTER_TITLE,
                 BReaderContract.Chapters.COLUMN_NAME_CACHED,
@@ -367,12 +373,13 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
 
     @Override
     public void onLoadFinished(Loader loader, Object data) {
-        contentAdapter = new ContentAdapter(this, (Cursor) data);
-        chapterTitleListView.setAdapter(contentAdapter);
+        Log.d(TAG, "onLoadFinished");
+        contentAdapter.swapCursor((Cursor) data);
 
     }
 
     @Override
     public void onLoaderReset(Loader loader) {
+        contentAdapter.swapCursor(null);
     }
 }

@@ -1,7 +1,11 @@
 package org.foree.bookreader.data.cache;
 
+import android.content.ContentValues;
+
 import org.foree.bookreader.base.BaseApplication;
 import org.foree.bookreader.data.book.Chapter;
+import org.foree.bookreader.data.dao.BReaderContract;
+import org.foree.bookreader.data.dao.BReaderProvider;
 import org.foree.bookreader.data.dao.BookDao;
 
 /**
@@ -29,7 +33,18 @@ public class DiskCache extends ChapterCache {
 
     @Override
     public void put(String chapterUrl, Chapter chapter) {
-        BookDao bookDao = new BookDao(BaseApplication.getInstance());
-        bookDao.saveChapterContent(chapter);
+        ContentValues contentValues = new ContentValues();
+
+        String selection = BReaderContract.Chapters.COLUMN_NAME_CHAPTER_URL + "=?";
+
+        // 内容不重复
+        contentValues.put(BReaderContract.Chapters.COLUMN_NAME_CHAPTER_CONTENT, chapter.getContents());
+        contentValues.put(BReaderContract.Chapters.COLUMN_NAME_CACHED, true);
+        BaseApplication.getInstance().getContentResolver().update(
+                BReaderProvider.CONTENT_URI_CHAPTERS,
+                contentValues,
+                selection,
+                new String[]{chapterUrl}
+        );
     }
 }
