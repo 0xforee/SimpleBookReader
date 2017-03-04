@@ -2,11 +2,10 @@ package org.foree.bookreader.ui.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.CheckBox;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
@@ -19,8 +18,11 @@ import org.foree.bookreader.data.dao.BReaderContract;
  */
 
 public class ContentAdapter extends CursorAdapter {
+    private int selectedPosition;
+
     public ContentAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
+        selectedPosition = 0;
     }
 
     @Override
@@ -38,7 +40,6 @@ public class ContentAdapter extends CursorAdapter {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
         // set view
-        viewHolder.checkBox.setSelected(true);
         viewHolder.textView.setText(cursor.getString(cursor.getColumnIndex(BReaderContract.Chapters.COLUMN_NAME_CHAPTER_TITLE)));
 
         if (cursor.getInt(cursor.getColumnIndex(BReaderContract.Chapters.COLUMN_NAME_CACHED)) == 1) {
@@ -47,17 +48,22 @@ public class ContentAdapter extends CursorAdapter {
             viewHolder.textView.setTextColor(context.getResources().getColor(R.color.colorChapterUnlined));
 
         }
+
+        // set current position color
+        if (selectedPosition == cursor.getPosition()) {
+            viewHolder.textView.setTextColor(context.getResources().getColor(R.color.colorPrimary));
+        }
     }
 
     private static class ViewHolder {
-        private CheckBox checkBox;
         private TextView textView;
 
         ViewHolder(View view) {
-            checkBox = (CheckBox) view.findViewById(R.id.cb_position);
             textView = (TextView) view.findViewById(R.id.tv_chapter_title);
         }
     }
 
-
+    public void setSelectedPosition(int position) {
+        selectedPosition = position;
+    }
 }

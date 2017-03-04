@@ -49,35 +49,25 @@ import java.util.List;
  */
 public class ReadActivity extends AppCompatActivity implements ReadViewPager.onPageAreaClickListener, LoaderManager.LoaderCallbacks {
     private static final String TAG = ReadActivity.class.getSimpleName();
-
+    // loading state
+    private static final int STATE_FAILED = -1;
+    private static final int STATE_LOADING = 0;
+    private static final int STATE_SUCCESS = 1;
     String chapterUrl, bookUrl;
-
     private List<Chapter> chapterList = new ArrayList<>();
-
     private BookDao bookDao;
-
     private int pageIndex;
-
     private boolean mSlipLeft = false;
-
     // view pager
     private ReadViewPager mViewPager;
     private PageAdapter pageAdapter;
     private TextView mTextView, mTvLoading;
-
     // popWindow
     private PopupWindow menuPop;
     private Dialog contentDialog;
     private View rootView;
     private ListView chapterTitleListView;
     private ContentAdapter contentAdapter;
-    private int chapterPosition;
-
-    // loading state
-    private static final int STATE_FAILED = -1;
-    private static final int STATE_LOADING = 0;
-    private static final int STATE_SUCCESS = 1;
-
     // menuPop
     private TextView tvContent, tvProgress, tvFont, tvBrightness;
 
@@ -90,7 +80,6 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
         // register EventBus
         EventBus.getDefault().register(this);
 
-        // get chapterUrl and recentId
         bookDao = new BookDao(this);
         bookUrl = getIntent().getExtras().getString("book_url");
         openBook(bookUrl);
@@ -235,9 +224,12 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
                 if (contentDialog == null) {
                     showContentDialog();
                 } else {
-                    getLoaderManager().restartLoader(0, null, ReadActivity.this);
                     contentDialog.show();
+                    getLoaderManager().restartLoader(0, null, ReadActivity.this);
                 }
+                chapterTitleListView.setSelection(getChapterPosition() - 2);
+                contentAdapter.notifyDataSetChanged();
+
             }
         });
     }
@@ -279,22 +271,22 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
             dialogWindow.setAttributes(lp);
         }
         contentDialog.setCanceledOnTouchOutside(true);
-        contentDialog.show();
 
         chapterTitleListView = (ListView) view.findViewById(R.id.rv_item_list);
 
         contentAdapter = new ContentAdapter(this, null, 0);
         chapterTitleListView.setAdapter(contentAdapter);
 
+        contentDialog.show();
+
         getLoaderManager().initLoader(0, null, this);
 
-        //chapterTitleListView.setAdapter(new ArrayAdapter<>(this, R.layout.item_list_holder, getChapterTitle()));
-        chapterTitleListView.setSelection(chapterPosition);
         chapterTitleListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 contentDialog.dismiss();
                 switchChapter(chapterList.get(position).getChapterUrl(), false);
+                contentAdapter.setSelectedPosition(position);
             }
         });
     }
@@ -307,15 +299,17 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
         }
     }
 
-    private boolean isSlipLeft(){
+    private boolean isSlipLeft() {
         return mSlipLeft;
     }
+
     private void openBook(String bookUrl) {
         //get all chapter
         Book book = bookDao.getBook(bookUrl);
         // get chapterList
         chapterList = book.getChapters();
 
+        // get chapterUrl
         updateChapterUrl(book.getRecentChapterUrl());
 
         pageIndex = book.getPageIndex();
@@ -350,12 +344,25 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
     @Override
     public void onLoadFinished(Loader loader, Object data) {
         Log.d(TAG, "onLoadFinished");
-        contentAdapter.swapCursor((Cursor) data);
+        contentAdapter.changeCursor((Cursor) data);
+
+        chapterTitleListView.setSelection(getChapterPosition() - 2);
+        contentAdapter.setSelectedPosition(getChapterPosition());
+        contentAdapter.notifyDataSetChanged();
 
     }
 
     @Override
     public void onLoaderReset(Loader loader) {
         contentAdapter.swapCursor(null);
+    }
+
+    private int getChapterPosition() {
+        for (int i = 0; i < chapterList.size(); i++) {
+            if (chapterList.get(i).getChapterUrl().equals(chapterUrl)) {
+                return i;
+            }
+        }
+        return 0;
     }
 }
