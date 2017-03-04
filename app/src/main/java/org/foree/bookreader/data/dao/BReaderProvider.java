@@ -28,8 +28,8 @@ public class BReaderProvider extends ContentProvider {
 
     public static final String AUTHORITY = "org.foree.bookreader.provider";
 
-    public static final Uri CONTENT_URI_BOOKS = Uri.parse("content://" + AUTHORITY + BReaderContract.Books.TABLE_NAME);
-    public static final Uri CONTENT_URI_CHAPTERS = Uri.parse("content://" + AUTHORITY + BReaderContract.Chapters.TABLE_NAME);
+    public static final Uri CONTENT_URI_BOOKS = Uri.parse("content://" + AUTHORITY + "/" + BReaderContract.Books.TABLE_NAME);
+    public static final Uri CONTENT_URI_CHAPTERS = Uri.parse("content://" + AUTHORITY + "/" + BReaderContract.Chapters.TABLE_NAME);
 
     // create a uriMatcher object
     private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);

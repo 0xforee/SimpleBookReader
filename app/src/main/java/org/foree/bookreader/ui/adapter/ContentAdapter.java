@@ -1,6 +1,7 @@
 package org.foree.bookreader.ui.adapter;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,9 +10,7 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import org.foree.bookreader.R;
-import org.foree.bookreader.data.book.Chapter;
-
-import java.util.List;
+import org.foree.bookreader.data.dao.BReaderContract;
 
 /**
  * Created by foree on 17-2-25.
@@ -21,23 +20,23 @@ import java.util.List;
 public class ContentAdapter extends BaseAdapter {
     private Context mContext;
     private LayoutInflater layoutInflater;
-    private List<Chapter> chapters;
+    private Cursor cursor;
 
-    public ContentAdapter(Context context, List<Chapter> chapters) {
+    public ContentAdapter(Context context, Cursor cursor) {
         mContext = context;
-        this.chapters = chapters;
+        this.cursor = cursor;
         layoutInflater = LayoutInflater.from(mContext);
 
     }
 
     @Override
     public int getCount() {
-        return chapters != null ? chapters.size() : 0;
+        return cursor != null ? cursor.getCount() : 0;
     }
 
     @Override
     public Object getItem(int position) {
-        return chapters.get(position);
+        return null;
     }
 
     @Override
@@ -58,13 +57,15 @@ public class ContentAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
+        cursor.moveToPosition(position);
+
         // set view
         viewHolder.checkBox.setSelected(true);
-        viewHolder.textView.setText(chapters.get(position).getChapterTitle());
+        viewHolder.textView.setText(cursor.getString(cursor.getColumnIndex(BReaderContract.Chapters.COLUMN_NAME_CHAPTER_TITLE)));
 
-        if(chapters.get(position).isOffline()){
+        if (cursor.getInt(cursor.getColumnIndex(BReaderContract.Chapters.COLUMN_NAME_CACHED)) == 1) {
             viewHolder.textView.setTextColor(mContext.getResources().getColor(R.color.colorChapterOfflined));
-        }else{
+        } else {
             viewHolder.textView.setTextColor(mContext.getResources().getColor(R.color.colorChapterUnlined));
 
         }

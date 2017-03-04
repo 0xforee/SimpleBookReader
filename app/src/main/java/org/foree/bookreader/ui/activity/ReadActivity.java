@@ -1,7 +1,12 @@
 package org.foree.bookreader.ui.activity;
 
 import android.app.Dialog;
+import android.app.LoaderManager;
+import android.content.CursorLoader;
+import android.content.Loader;
+import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -16,7 +21,6 @@ import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -24,12 +28,14 @@ import android.widget.TextView;
 import org.foree.bookreader.R;
 import org.foree.bookreader.data.book.Book;
 import org.foree.bookreader.data.book.Chapter;
+import org.foree.bookreader.data.dao.BReaderContract;
+import org.foree.bookreader.data.dao.BReaderProvider;
 import org.foree.bookreader.data.dao.BookDao;
 import org.foree.bookreader.data.event.PaginationEvent;
 import org.foree.bookreader.pagination.PaginationArgs;
 import org.foree.bookreader.pagination.PaginationLoader;
-import org.foree.bookreader.ui.adapter.PageAdapter;
 import org.foree.bookreader.ui.adapter.ContentAdapter;
+import org.foree.bookreader.ui.adapter.PageAdapter;
 import org.foree.bookreader.ui.view.ReadViewPager;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -41,7 +47,7 @@ import java.util.List;
 /**
  * Created by foree on 16-7-21.
  */
-public class ReadActivity extends AppCompatActivity implements ReadViewPager.onPageAreaClickListener {
+public class ReadActivity extends AppCompatActivity implements ReadViewPager.onPageAreaClickListener, LoaderManager.LoaderCallbacks {
     private static final String TAG = ReadActivity.class.getSimpleName();
 
     String chapterUrl, bookUrl, newChapterUrl;
@@ -66,6 +72,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
     private Dialog contentDialog;
     private View rootView;
     private ListView chapterTitleListView;
+    private ContentAdapter contentAdapter;
     private int chapterPosition;
 
     // loading state
@@ -283,7 +290,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
         contentDialog.show();
 
         chapterTitleListView = (ListView) view.findViewById(R.id.rv_item_list);
-        chapterTitleListView.setAdapter(new ContentAdapter(this, chapterList));
+        getLoaderManager().initLoader(0, null, this);
 
         //chapterTitleListView.setAdapter(new ArrayAdapter<>(this, R.layout.item_list_holder, getChapterTitle()));
         chapterTitleListView.setSelection(chapterPosition);
@@ -294,19 +301,6 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
                 switchChapter(chapterList.get(position).getChapterUrl());
             }
         });
-    }
-
-    private List<String> getChapterTitle() {
-        List<String> chapterTitle = new ArrayList<>();
-
-        for (int i = 0; i < chapterList.size(); i++) {
-            chapterTitle.add(chapterList.get(i).getChapterTitle());
-            if (chapterList.get(i).getChapterUrl().equals(chapterUrl)) {
-                chapterPosition = i;
-            }
-        }
-
-        return chapterTitle;
     }
 
     private void switchChapter(String newChapterUrl) {
@@ -353,5 +347,32 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
     private void updateChapterUrl(String newUrl) {
         recentChapterId = bookDao.getChapterId(newUrl);
         chapterUrl = newUrl;
+    }
+
+    @Override
+    public Loader onCreateLoader(int id, Bundle args) {
+        Uri baseUri = BReaderProvider.CONTENT_URI_CHAPTERS;
+        String[] projection = new String[]{
+                BReaderContract.Chapters.COLUMN_NAME_CHAPTER_URL,
+                BReaderContract.Chapters.COLUMN_NAME_CHAPTER_TITLE,
+                BReaderContract.Chapters.COLUMN_NAME_CACHED,
+                BReaderContract.Chapters.COLUMN_NAME_CHAPTER_ID
+        };
+        String selection = BReaderContract.Chapters.COLUMN_NAME_BOOK_URL + "=?";
+        String[] selectionArgs = new String[]{bookUrl};
+        String orderBy = BReaderContract.Chapters.COLUMN_NAME_CHAPTER_ID + " asc";
+
+        return new CursorLoader(this, baseUri, projection, selection, selectionArgs, orderBy);
+    }
+
+    @Override
+    public void onLoadFinished(Loader loader, Object data) {
+        contentAdapter = new ContentAdapter(this, (Cursor) data);
+        chapterTitleListView.setAdapter(contentAdapter);
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader loader) {
     }
 }
