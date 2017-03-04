@@ -45,35 +45,37 @@ public class SyncBooksThread extends Thread {
         List<Future<Boolean>> futures;
         // add task
         for (final Book oldBook : books) {
-            Callable<Boolean> callable = new Callable<Boolean>() {
-                @Override
-                public Boolean call() throws Exception {
+            if (oldBook != null) {
+                Callable<Boolean> callable = new Callable<Boolean>() {
+                    @Override
+                    public Boolean call() throws Exception {
 
-                    final AbsWebParser webParser = WebParserManager.getInstance().getWebParser(oldBook.getBookUrl());
-                    final Book newBook = webParser.getBookInfo(oldBook.getBookUrl());
+                        final AbsWebParser webParser = WebParserManager.getInstance().getWebParser(oldBook.getBookUrl());
+                        final Book newBook = webParser.getBookInfo(oldBook.getBookUrl());
 
-                    if (DateUtils.isNewer(oldBook.getUpdateTime(), newBook.getUpdateTime())) {
-                        // update chapters
-                        chapterTasks.add(new Callable<Boolean>() {
-                            @Override
-                            public Boolean call() throws Exception {
-                                List<Chapter> chapters = webParser.getChapterList(newBook.getBookUrl(), newBook.getContentUrl());
-                                if (chapters != null) {
-                                    bookDao.insertChapters(chapters);
+                        if (DateUtils.isNewer(oldBook.getUpdateTime(), newBook.getUpdateTime())) {
+                            // update chapters
+                            chapterTasks.add(new Callable<Boolean>() {
+                                @Override
+                                public Boolean call() throws Exception {
+                                    List<Chapter> chapters = webParser.getChapterList(newBook.getBookUrl(), newBook.getContentUrl());
+                                    if (chapters != null) {
+                                        bookDao.insertChapters(chapters);
+                                    }
+                                    return false;
                                 }
-                                return false;
-                            }
-                        });
+                            });
 
-                        bookDao.updateBookTime(newBook.getBookUrl(), newBook.getUpdateTime());
+                            bookDao.updateBookTime(newBook.getBookUrl(), newBook.getUpdateTime());
 
-                        return true;
+                            return true;
+                        }
+                        return false;
                     }
-                    return false;
-                }
-            };
+                };
 
-            tasks.add(callable);
+                tasks.add(callable);
+            }
         }
 
 
