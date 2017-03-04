@@ -182,7 +182,7 @@ public class BReaderProvider extends ContentProvider {
                     BReaderContract.Books.COLUMN_NAME_COVER_URL + " varchar," +
                     BReaderContract.Books.COLUMN_NAME_UPDATE_TIME + " varchar," +
                     BReaderContract.Books.COLUMN_NAME_PAGE_INDEX + " integer," +
-                    BReaderContract.Books.COLUMN_NAME_RECENT_ID + " integer," +
+                    BReaderContract.Books.COLUMN_NAME_RECENT_CHAPTER_URL + " varchar," +
                     BReaderContract.Books.COLUMN_NAME_CATEGORY + " varchar," +
                     BReaderContract.Books.COLUMN_NAME_DESCRIPTION + " varchar," +
                     BReaderContract.Books.COLUMN_NAME_AUTHOR + " varchar" +

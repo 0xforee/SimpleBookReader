@@ -56,8 +56,6 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
 
     private BookDao bookDao;
 
-    private int recentChapterId = -1;
-    private String recentChapterUrl;
     private int pageIndex;
 
     private boolean slipLeft = false;
@@ -179,14 +177,15 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
         Chapter chapter = pageEvent.getChapter();
         if (chapter != null) {
             notifyState(STATE_SUCCESS);
-            if (chapter.getChapterUrl().equals(chapterUrl))
-                pageAdapter.setChapter(chapter);
+
+            pageAdapter.setChapter(chapter);
 
             // if open book ,load index page
-            if (chapter.getChapterUrl().equals(recentChapterUrl)) {
+            if (chapter.getChapterUrl().equals(chapterUrl)) {
                 //Log.d(TAG, "slip to page " + pageIndex);
                 mViewPager.setCurrentItem(pageIndex, false);
             } else {
+                updateChapterUrl(chapter.getChapterUrl());
                 if (slipLeft)
                     mViewPager.setCurrentItem(chapter.numberOfPages() - 1, false);
                 else
@@ -303,15 +302,15 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 contentDialog.dismiss();
+                slipLeft = false;
                 switchChapter(chapterList.get(position).getChapterUrl());
             }
         });
     }
 
     private void switchChapter(String newChapterUrl) {
-        updateChapterUrl(newChapterUrl);
         notifyState(STATE_LOADING);
-        PaginationLoader.getInstance().loadPagination(chapterUrl);
+        PaginationLoader.getInstance().loadPagination(newChapterUrl);
     }
 
     private void openBook(String bookUrl) {
@@ -319,38 +318,18 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
         Book book = bookDao.getBook(bookUrl);
         // get chapterList
         chapterList = book.getChapters();
-        // check init
-        if (book.getRecentChapterId() == -1) {
-            // get first chapter id
-            if (chapterList != null && !chapterList.isEmpty()) {
-                setChapterId(bookUrl, chapterList.get(0).getChapterId());
-                // update book object recentChapterId
-                book.setRecentChapterId(chapterList.get(0).getChapterId());
-            }
-        }
-        recentChapterUrl = bookDao.getChapterUrl(book.getRecentChapterId());
-        // open by chapter id
-        updateChapterUrl(recentChapterUrl);
+
+        updateChapterUrl(book.getRecentChapterUrl());
 
         pageIndex = book.getPageIndex();
         //Log.d(TAG, "open Book at position " + pageIndex);
     }
 
-    private void setChapterId(String bookUrl, int newId) {
-        bookDao.updateRecentChapterId(bookUrl, newId);
-    }
-
     private void closeBook() {
-        // set ChapterId
-        if (recentChapterId != -1)
-            bookDao.updateRecentChapterId(bookUrl, recentChapterId);
-
-        //Log.d(TAG, "closeBook: set position " + mViewPager.getCurrentItem() + "");
-        bookDao.updatePageIndex(bookUrl, mViewPager.getCurrentItem());
+        bookDao.updateBookState(bookUrl, chapterUrl, mViewPager.getCurrentItem());
     }
 
     private void updateChapterUrl(String newUrl) {
-        recentChapterId = bookDao.getChapterId(newUrl);
         chapterUrl = newUrl;
     }
 

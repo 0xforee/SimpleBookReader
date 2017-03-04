@@ -46,7 +46,7 @@ public class BookDao {
                 String category = cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_CATEGORY));
                 String author = cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_AUTHOR));
                 String description = cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_DESCRIPTION));
-                int recentChapterId = cursor.getInt(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_RECENT_ID));
+                String recentChapterId = cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_RECENT_CHAPTER_URL));
                 int pageIndex = cursor.getInt(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_PAGE_INDEX));
                 String bookCoverUrl = cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_COVER_URL));
                 String contentUrl = cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_CONTENT_URL));
@@ -62,7 +62,6 @@ public class BookDao {
         }
     }
 
-    // TODO:需要处理章节更新时会覆盖掉原有的缓存内容的问题
     public void insertChapters(List<Chapter> chapterList) {
         synchronized (this) {
             int tmp = 1;
@@ -121,7 +120,6 @@ public class BookDao {
             Chapter chapter = new Chapter(title, url, bookUrl, chapter_id, offline);
             chapterList.add(chapter);
         }
-
         cursor.close();
         db.setTransactionSuccessful();
         db.endTransaction();
@@ -175,7 +173,7 @@ public class BookDao {
             book.setCategory(cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_CATEGORY)));
             book.setAuthor(cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_AUTHOR)));
             book.setDescription(cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_DESCRIPTION)));
-            book.setRecentChapterId(cursor.getInt(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_RECENT_ID)));
+            book.setRecentChapterUrl(cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_RECENT_CHAPTER_URL)));
             book.setPageIndex(cursor.getInt(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_PAGE_INDEX)));
             book.setBookCoverUrl(cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_COVER_URL)));
         }
@@ -201,7 +199,7 @@ public class BookDao {
         contentValues.put(BReaderContract.Books.COLUMN_NAME_CATEGORY, book.getCategory());
         contentValues.put(BReaderContract.Books.COLUMN_NAME_AUTHOR, book.getAuthor());
         contentValues.put(BReaderContract.Books.COLUMN_NAME_DESCRIPTION, book.getDescription());
-        contentValues.put(BReaderContract.Books.COLUMN_NAME_RECENT_ID, -1);
+        contentValues.put(BReaderContract.Books.COLUMN_NAME_RECENT_CHAPTER_URL, book.getChapters().get(0).getChapterUrl());
         contentValues.put(BReaderContract.Books.COLUMN_NAME_COVER_URL, book.getBookCoverUrl());
         contentValues.put(BReaderContract.Books.COLUMN_NAME_CONTENT_URL, book.getContentUrl());
         contentValues.put(BReaderContract.Books.COLUMN_NAME_PAGE_INDEX, 0);
@@ -249,7 +247,7 @@ public class BookDao {
 
     }
 
-    public void updateRecentChapterId(String bookUrl, int recentChapterId) {
+    public void updateBookState(String bookUrl, String recentChapterUrl, int pageIndex) {
         Cursor cursor;
         SQLiteDatabase db = bookSQLiteOpenHelper.getWritableDatabase();
         db.beginTransaction();
@@ -260,46 +258,22 @@ public class BookDao {
                 selection, new String[]{bookUrl}, null, null, null);
         if (cursor.getCount() != 0) {
             ContentValues contentValues = new ContentValues();
-            contentValues.put(BReaderContract.Books.COLUMN_NAME_RECENT_ID, recentChapterId);
-
-            try {
-                db.update(BReaderContract.Books.TABLE_NAME, contentValues,
-                        selection, new String[]{bookUrl});
-                db.setTransactionSuccessful();
-
-            } finally {
-                cursor.close();
-                db.endTransaction();
-                db.close();
-            }
-        }
-
-
-    }
-
-    public void updatePageIndex(String bookUrl, int pageIndex) {
-        Cursor cursor;
-        SQLiteDatabase db = bookSQLiteOpenHelper.getWritableDatabase();
-        db.beginTransaction();
-
-        String selection = BReaderContract.Books.COLUMN_NAME_BOOK_URL + "=?";
-
-        cursor = db.query(BReaderContract.Books.TABLE_NAME, null,
-                selection, new String[]{bookUrl}, null, null, null);
-        if (cursor.getCount() != 0) {
-            ContentValues contentValues = new ContentValues();
+            contentValues.put(BReaderContract.Books.COLUMN_NAME_RECENT_CHAPTER_URL, recentChapterUrl);
             contentValues.put(BReaderContract.Books.COLUMN_NAME_PAGE_INDEX, pageIndex);
+
             try {
                 db.update(BReaderContract.Books.TABLE_NAME, contentValues,
                         selection, new String[]{bookUrl});
                 db.setTransactionSuccessful();
+
             } finally {
                 cursor.close();
-
                 db.endTransaction();
                 db.close();
             }
         }
+
+
     }
 
     /**
