@@ -1,6 +1,8 @@
 package org.foree.bookreader.data.cache;
 
 import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 
 import org.foree.bookreader.base.BaseApplication;
 import org.foree.bookreader.data.book.Chapter;
@@ -27,8 +29,31 @@ public class DiskCache extends ChapterCache {
 
     @Override
     public Chapter get(String chapterUrl) {
-        BookDao bookDao = new BookDao(BaseApplication.getInstance());
-        return bookDao.getChapter(chapterUrl);
+        Chapter chapter = new Chapter();
+
+        String selection = BReaderContract.Chapters.COLUMN_NAME_CHAPTER_URL + "=?";
+
+        Cursor cursor = BaseApplication.getInstance().getContentResolver().query(
+                BReaderProvider.CONTENT_URI_CHAPTERS,
+                new String[]{BReaderContract.Chapters.COLUMN_NAME_CHAPTER_TITLE, BReaderContract.Chapters.COLUMN_NAME_CHAPTER_CONTENT},
+                selection,
+                new String[]{chapterUrl},
+                null
+        );
+
+        if (cursor != null && cursor.getCount() != 0 && cursor.moveToFirst()) {
+            String contents = cursor.getString(cursor.getColumnIndex(BReaderContract.Chapters.COLUMN_NAME_CHAPTER_CONTENT));
+            if (contents == null || contents.isEmpty()) {
+                chapter = null;
+            } else {
+                chapter.setContents(contents);
+                chapter.setChapterUrl(chapterUrl);
+                chapter.setChapterTitle(cursor.getString(cursor.getColumnIndex(BReaderContract.Chapters.COLUMN_NAME_CHAPTER_TITLE)));
+            }
+            cursor.close();
+        }
+
+        return chapter;
     }
 
     @Override
