@@ -50,7 +50,7 @@ import java.util.List;
 public class ReadActivity extends AppCompatActivity implements ReadViewPager.onPageAreaClickListener, LoaderManager.LoaderCallbacks {
     private static final String TAG = ReadActivity.class.getSimpleName();
 
-    String chapterUrl, bookUrl, newChapterUrl;
+    String chapterUrl, bookUrl;
 
     private List<Chapter> chapterList = new ArrayList<>();
 
@@ -58,7 +58,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
 
     private int pageIndex;
 
-    private boolean slipLeft = false;
+    private boolean mSlipLeft = false;
 
     // view pager
     private ReadViewPager mViewPager;
@@ -186,7 +186,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
                 mViewPager.setCurrentItem(pageIndex, false);
             } else {
                 updateChapterUrl(chapter.getChapterUrl());
-                if (slipLeft)
+                if (isSlipLeft())
                     mViewPager.setCurrentItem(chapter.numberOfPages() - 1, false);
                 else
                     mViewPager.setCurrentItem(0, false);
@@ -249,20 +249,12 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
 
     @Override
     public void onPreChapterClick() {
-        newChapterUrl = bookDao.getChapterUrl(-1, chapterUrl);
-        if (newChapterUrl != null) {
-            switchChapter(newChapterUrl);
-            slipLeft = true;
-        }
+        switchChapter(bookDao.getChapterUrl(-1, chapterUrl), true);
     }
 
     @Override
     public void onNextChapterClick() {
-        newChapterUrl = bookDao.getChapterUrl(1, chapterUrl);
-        if (newChapterUrl != null) {
-            switchChapter(newChapterUrl);
-            slipLeft = false;
-        }
+        switchChapter(bookDao.getChapterUrl(1, chapterUrl), false);
     }
 
     private void showContentDialog() {
@@ -302,17 +294,22 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 contentDialog.dismiss();
-                slipLeft = false;
-                switchChapter(chapterList.get(position).getChapterUrl());
+                switchChapter(chapterList.get(position).getChapterUrl(), false);
             }
         });
     }
 
-    private void switchChapter(String newChapterUrl) {
-        notifyState(STATE_LOADING);
-        PaginationLoader.getInstance().loadPagination(newChapterUrl);
+    private void switchChapter(String newChapterUrl, boolean slipLeft) {
+        if (newChapterUrl != null) {
+            notifyState(STATE_LOADING);
+            PaginationLoader.getInstance().loadPagination(newChapterUrl);
+            mSlipLeft = slipLeft;
+        }
     }
 
+    private boolean isSlipLeft(){
+        return mSlipLeft;
+    }
     private void openBook(String bookUrl) {
         //get all chapter
         Book book = bookDao.getBook(bookUrl);
