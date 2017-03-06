@@ -10,6 +10,10 @@
     <string name="search_hint">搜索小说</string>
     <string name="action_about">关于</string>
 
+    <!-- main tab title -->
+    <string name="tab_book_shelf">我的书架</string>
+    <string name="tab_book_store">书城</string>
+
     <!-- Chapter loading text -->
     <string name="loading">正在加载 &#8230;</string>
     <string name="load_fail">加载失败，请检查网络连接</string>
@@ -27,5 +31,8 @@
     <string name="bt_read">开始阅读</string>
     <string name="contents">目录</string>
     <string name="separator">/</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>
