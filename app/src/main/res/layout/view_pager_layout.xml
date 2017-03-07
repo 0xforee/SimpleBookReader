@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <org.foree.bookreader.ui.view.ReadViewPager
+        <org.foree.bookreader.readpage.ReadViewPager
             android:id="@+id/book_pager"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

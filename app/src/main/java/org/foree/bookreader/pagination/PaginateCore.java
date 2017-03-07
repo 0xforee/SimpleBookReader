@@ -3,7 +3,7 @@ package org.foree.bookreader.pagination;
 import android.text.Layout;
 import android.text.StaticLayout;
 
-import org.foree.bookreader.data.book.Chapter;
+import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.utils.StringUtils;
 
 /**

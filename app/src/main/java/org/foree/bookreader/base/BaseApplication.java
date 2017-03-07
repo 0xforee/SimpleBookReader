@@ -11,7 +11,6 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import org.foree.bookreader.R;
-import org.foree.bookreader.data.book.Book;
 
 import java.io.File;
 

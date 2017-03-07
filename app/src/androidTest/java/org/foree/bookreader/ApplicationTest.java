@@ -4,8 +4,8 @@ import android.app.Application;
 import android.test.ApplicationTestCase;
 import android.util.Log;
 
-import org.foree.bookreader.data.book.Book;
-import org.foree.bookreader.data.dao.BookDao;
+import org.foree.bookreader.bean.book.Book;
+import org.foree.bookreader.bean.dao.BookDao;
 import org.foree.bookreader.net.NetCallback;
 import org.foree.bookreader.parser.AbsWebParser;
 import org.foree.bookreader.parser.WebParserManager;

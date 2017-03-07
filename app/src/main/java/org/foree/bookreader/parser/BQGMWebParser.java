@@ -3,8 +3,8 @@ package org.foree.bookreader.parser;
 import android.text.Html;
 import android.util.Log;
 
-import org.foree.bookreader.data.book.Book;
-import org.foree.bookreader.data.book.Chapter;
+import org.foree.bookreader.bean.book.Book;
+import org.foree.bookreader.bean.book.Chapter;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;

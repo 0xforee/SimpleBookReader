@@ -1,9 +1,9 @@
 package org.foree.bookreader.parser;
 
-import org.foree.bookreader.data.book.Book;
-import org.foree.bookreader.data.book.Chapter;
-import org.foree.bookreader.data.cache.ChapterCache;
-import org.foree.bookreader.data.event.PaginationEvent;
+import org.foree.bookreader.bean.book.Book;
+import org.foree.bookreader.bean.book.Chapter;
+import org.foree.bookreader.bean.cache.ChapterCache;
+import org.foree.bookreader.bean.event.PaginationEvent;
 import org.foree.bookreader.net.NetCallback;
 import org.foree.bookreader.pagination.ChapterRequest;
 import org.foree.bookreader.pagination.PaginateCore;

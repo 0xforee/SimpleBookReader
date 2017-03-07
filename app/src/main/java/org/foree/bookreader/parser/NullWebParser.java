@@ -1,7 +1,7 @@
 package org.foree.bookreader.parser;
 
-import org.foree.bookreader.data.book.Book;
-import org.foree.bookreader.data.book.Chapter;
+import org.foree.bookreader.bean.book.Book;
+import org.foree.bookreader.bean.book.Chapter;
 import org.jsoup.nodes.Document;
 
 import java.util.List;

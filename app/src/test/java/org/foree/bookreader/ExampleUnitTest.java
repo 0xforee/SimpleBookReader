@@ -2,8 +2,8 @@ package org.foree.bookreader;
 
 import android.util.Log;
 
-import org.foree.bookreader.data.book.Book;
-import org.foree.bookreader.data.book.Chapter;
+import org.foree.bookreader.bean.book.Book;
+import org.foree.bookreader.bean.book.Chapter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;

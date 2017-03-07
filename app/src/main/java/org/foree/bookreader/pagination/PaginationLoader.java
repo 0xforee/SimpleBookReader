@@ -1,8 +1,8 @@
 package org.foree.bookreader.pagination;
 
-import org.foree.bookreader.data.cache.ChapterCache;
-import org.foree.bookreader.data.cache.DoubleCache;
-import org.foree.bookreader.data.cache.PaginationCache;
+import org.foree.bookreader.bean.cache.ChapterCache;
+import org.foree.bookreader.bean.cache.DoubleCache;
+import org.foree.bookreader.bean.cache.PaginationCache;
 
 /**
  * Created by foree on 17-2-6.
