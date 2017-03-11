@@ -22,8 +22,8 @@ import org.foree.bookreader.R;
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.dao.BookDao;
 import org.foree.bookreader.bean.event.BookUpdateEvent;
-import org.foree.bookreader.thread.SyncBooksThread;
 import org.foree.bookreader.readpage.ReadActivity;
+import org.foree.bookreader.thread.SyncBooksThread;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -36,6 +36,7 @@ public class BookShelfFragment extends Fragment implements SwipeRefreshLayout.On
 
     private ActionMode mActionMode;
     private BookDao bookDao;
+    private BookShelfActivity bookShelfActivity;
 
     private RecyclerView mRecyclerView;
     private BookShelfAdapter mAdapter;
@@ -59,12 +60,8 @@ public class BookShelfFragment extends Fragment implements SwipeRefreshLayout.On
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
 
-        }
         EventBus.getDefault().register(this);
-
-        syncNovelInfo();
 
         bookDao = new BookDao(getContext());
 
@@ -82,6 +79,9 @@ public class BookShelfFragment extends Fragment implements SwipeRefreshLayout.On
         mRecyclerView = (RecyclerView) view.findViewById(R.id.rv_book_shelf);
 
         setUpRecyclerViewAdapter();
+
+        syncNovelInfo();
+
         return view;
     }
 
@@ -161,6 +161,8 @@ public class BookShelfFragment extends Fragment implements SwipeRefreshLayout.On
     public void onAttach(Context context) {
         super.onAttach(context);
 
+        bookShelfActivity = (BookShelfActivity) getActivity();
+
     }
 
     @Override
@@ -214,7 +216,7 @@ public class BookShelfFragment extends Fragment implements SwipeRefreshLayout.On
         boolean hasCheckedItems = mAdapter.getSelectedCount() > 0;
 
         if (hasCheckedItems && mActionMode == null) {
-            //mActionMode = getActivity().startSupportActionMode(new ToolbarActionModeCallback());
+            mActionMode = bookShelfActivity.startSupportActionMode(new ToolbarActionModeCallback());
         } else if (!hasCheckedItems) {
             mActionMode.finish();
         }
