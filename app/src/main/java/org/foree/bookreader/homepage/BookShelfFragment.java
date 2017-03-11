@@ -181,13 +181,13 @@ public class BookShelfFragment extends Fragment implements SwipeRefreshLayout.On
 
 
     private void resetRefreshState() {
-        if (mSwipeRefreshLayout != null && mSwipeRefreshLayout.isRefreshing()) {
+        if (mSwipeRefreshLayout != null) {
             mSwipeRefreshLayout.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     mSwipeRefreshLayout.setRefreshing(false);
                 }
-            }, 500);
+            }, 1000);
         }
     }
 
