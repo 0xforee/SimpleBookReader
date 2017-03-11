@@ -73,7 +73,15 @@ public class BookInfoActivity extends AppCompatActivity {
 
     private void setupLayout() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(R.string.book_info);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         bookDao = new BookDao(this);
         tvNovelName = (TextView) findViewById(R.id.tv_novel_name);
