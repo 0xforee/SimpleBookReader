@@ -219,16 +219,18 @@ public class BiQuGeWebParser extends AbsWebParser {
             childList.add(otherTopBook);
 
             // get no image book
-            Elements no_image_books = other.getElementsByTag("li");
-            for (Element no_image_book : no_image_books) {
-                String noImageBookName = no_image_book.getElementsByTag("a").text();
-                if (DEBUG) Log.d(TAG, "noimage book_name = " + noImageBookName);
+            if (false) {
+                Elements no_image_books = other.getElementsByTag("li");
+                for (Element no_image_book : no_image_books) {
+                    String noImageBookName = no_image_book.getElementsByTag("a").text();
+                    if (DEBUG) Log.d(TAG, "noimage book_name = " + noImageBookName);
 
-                String noImageBookUrl = getHostUrl() + no_image_book.getElementsByTag("a").attr("href");
-                if (DEBUG) Log.d(TAG, "noimage book_url = " + noImageBookUrl);
+                    String noImageBookUrl = getHostUrl() + no_image_book.getElementsByTag("a").attr("href");
+                    if (DEBUG) Log.d(TAG, "noimage book_url = " + noImageBookUrl);
 
-                Book noImageBook = new Book(noImageBookName, noImageBookUrl, "", otherBookCategory, "");
-                childList.add(noImageBook);
+                    Book noImageBook = new Book(noImageBookName, noImageBookUrl, "", otherBookCategory, "");
+                    childList.add(noImageBook);
+                }
             }
             if (DEBUG) Log.d(TAG, "==============group separator================");
             bookStoreList.add(childList);

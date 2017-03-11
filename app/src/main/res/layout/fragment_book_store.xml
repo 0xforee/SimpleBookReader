@@ -5,10 +5,11 @@
     <ExpandableListView
         android:id="@+id/el_book_store"
         android:layout_width="match_parent"
-        android:childDivider="@color/md_white_1000"
         android:layout_height="match_parent"
+        android:childDivider="@android:color/transparent"
         android:paddingEnd="15dp"
-        android:paddingStart="15dp">
+        android:paddingStart="15dp"
+        android:scrollbars="none">
 
     </ExpandableListView>
 </android.support.v4.widget.SwipeRefreshLayout>

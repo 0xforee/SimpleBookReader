@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 
@@ -19,7 +18,6 @@ import org.foree.bookreader.bookinfopage.BookInfoActivity;
 import org.foree.bookreader.net.NetCallback;
 import org.foree.bookreader.parser.AbsWebParser;
 import org.foree.bookreader.parser.WebParserManager;
-import org.foree.bookreader.searchpage.SearchResultsActivity;
 
 import java.util.ArrayList;
 import java.util.List;
