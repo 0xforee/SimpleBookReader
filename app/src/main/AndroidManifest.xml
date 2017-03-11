@@ -23,7 +23,7 @@
 
             <meta-data
                 android:name="android.app.default_searchable"
-                android:value=".ui.activity.SearchResultsActivity" />
+                android:value=".searchpage.SearchResultsActivity" />
         </activity>
         <activity android:name=".readpage.ReadActivity" />
 
