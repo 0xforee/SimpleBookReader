@@ -5,7 +5,10 @@
     <ExpandableListView
         android:id="@+id/el_book_store"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:dividerHeight="10dp"
+        android:paddingEnd="15dp"
+        android:paddingStart="15dp">
 
     </ExpandableListView>
 </android.support.v4.widget.SwipeRefreshLayout>

@@ -75,6 +75,7 @@ public class BookStoreFragment extends Fragment {
                 return true;
             }
         });
+        mExpandableListView.setGroupIndicator(null);
     }
 
 }
