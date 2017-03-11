@@ -50,4 +50,9 @@ public class NullWebParser extends AbsWebParser{
     Chapter parseChapterContents(String chapterUrl, Document doc) {
         return null;
     }
+
+    @Override
+    List<List<Book>> parseHostUrl(String hostUrl, Document doc) {
+        return null;
+    }
 }

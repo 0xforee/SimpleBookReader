@@ -62,6 +62,8 @@ public abstract class AbsWebParser implements IWebParser {
 
     abstract Chapter parseChapterContents(String chapterUrl, Document doc);
 
+    abstract List<List<Book>> parseHostUrl(String hostUrl, Document doc);
+
     @Override
     public void searchBook(final String keywords, final NetCallback<List<Book>> netCallback) {
         new Thread() {
@@ -183,6 +185,28 @@ public abstract class AbsWebParser implements IWebParser {
 
         String[] subString = url.split("/|\\.");
         return Integer.parseInt(subString[subString.length - 2]);
+    }
+
+    @Override
+    public void getHomePageInfo(final String hostUrl, final NetCallback<List<List<Book>>> netCallback) {
+        new Thread() {
+            @Override
+            public void run() {
+                super.run();
+                Document doc;
+                try {
+                    doc = Jsoup.connect(hostUrl).get();
+                    if (netCallback != null && doc != null) {
+                        netCallback.onSuccess(parseHostUrl(hostUrl, doc));
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    if (netCallback != null) {
+                        netCallback.onFail(e.toString());
+                    }
+                }
+            }
+        }.start();
     }
 
     public void downloadChapter(final ChapterRequest request) {

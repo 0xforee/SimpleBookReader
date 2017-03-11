@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="150dp"
+    android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:paddingBottom="10dp">
 
     <org.foree.bookreader.common.RoundCornerImageView
         android:id="@+id/book_store_item_cover"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="150dp"
         android:layout_weight="3"
         android:scaleType="centerCrop"
         android:src="@drawable/book_cover"
-        android:visibility="visible" />
+        android:visibility="gone" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -26,7 +26,6 @@
             android:id="@+id/book_store_item_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="龙王传说"
             android:textAppearance="@style/TextAppearance.AppCompat.Title"
             android:textColor="@color/md_black_1000" />
 
@@ -37,7 +36,6 @@
             android:layout_marginTop="5dp"
             android:ellipsize="end"
             android:lines="6"
-            android:text="伴随着魂导科技的进步，斗罗大6上的人类征服了海洋，又现了两片大6。魂兽也随着人类魂师的猎杀无度走向灭亡，沉睡无数年的魂兽之王在星斗大森林最后的净土苏醒，它要带领仅存的族人，向人类复仇！唐舞麟立志要成为一名强大的魂师，可当武魂觉醒时，苏醒的，却是……旷世之才，龙王之争，我们的龙王传说，将由此开始." />
-
+            android:visibility="gone"/>
     </LinearLayout>
 </LinearLayout>

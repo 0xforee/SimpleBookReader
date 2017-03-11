@@ -187,4 +187,9 @@ public class BQGMWebParser extends AbsWebParser {
 
         return chapter;
     }
+
+    @Override
+    List<List<Book>> parseHostUrl(String hostUrl, Document doc) {
+        return null;
+    }
 }

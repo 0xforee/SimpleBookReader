@@ -6,9 +6,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
+
 import org.foree.bookreader.R;
+import org.foree.bookreader.base.BaseApplication;
 import org.foree.bookreader.bean.book.Book;
 
 import java.util.List;
@@ -68,7 +72,7 @@ public class BookStoreExpandableListAdapter implements ExpandableListAdapter {
 
     @Override
     public boolean hasStableIds() {
-        return false;
+        return true;
     }
 
     @Override
@@ -81,7 +85,7 @@ public class BookStoreExpandableListAdapter implements ExpandableListAdapter {
         } else {
             groupViewHolder = (GroupViewHolder) convertView.getTag();
         }
-        groupViewHolder.textView.setText(bookStoreList.get(groupPosition).get(0).getBookUrl());
+        groupViewHolder.textView.setText(bookStoreList.get(groupPosition).get(0).getCategory());
         return convertView;
     }
 
@@ -96,13 +100,33 @@ public class BookStoreExpandableListAdapter implements ExpandableListAdapter {
         } else {
             childViewHolder = (ChildViewHolder) convertView.getTag();
         }
-        childViewHolder.textView.setText(bookStoreList.get(groupPosition).get(childPosition).getBookName());
+
+        Book childBook = bookStoreList.get(groupPosition).get(childPosition);
+        childViewHolder.bookName.setText(childBook.getBookName());
+
+
+        if (!childBook.getBookCoverUrl().isEmpty()) {
+            ImageLoader.getInstance().displayImage(childBook.getBookCoverUrl(), childViewHolder.bookCover,
+                    BaseApplication.getInstance().getDisplayImageOptions());
+            childViewHolder.bookCover.setVisibility(View.VISIBLE);
+
+        } else {
+            childViewHolder.bookCover.setVisibility(View.GONE);
+        }
+
+        if (!childBook.getDescription().isEmpty()) {
+            childViewHolder.description.setText(childBook.getDescription());
+            childViewHolder.description.setVisibility(View.VISIBLE);
+        } else {
+            childViewHolder.description.setVisibility(View.GONE);
+        }
+
         return convertView;
     }
 
     @Override
     public boolean isChildSelectable(int groupPosition, int childPosition) {
-        return false;
+        return true;
     }
 
     @Override
@@ -144,10 +168,14 @@ public class BookStoreExpandableListAdapter implements ExpandableListAdapter {
     }
 
     private static class ChildViewHolder {
-        private TextView textView;
+        private TextView bookName;
+        private ImageView bookCover;
+        private TextView description;
 
         ChildViewHolder(View view) {
-            textView = (TextView) view.findViewById(R.id.book_store_item_name);
+            bookName = (TextView) view.findViewById(R.id.book_store_item_name);
+            bookCover = (ImageView) view.findViewById(R.id.book_store_item_cover);
+            description = (TextView) view.findViewById(R.id.book_store_item_description);
         }
     }
 }

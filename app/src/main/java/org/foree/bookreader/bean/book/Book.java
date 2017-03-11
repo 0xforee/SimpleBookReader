@@ -28,7 +28,11 @@ public class Book {
     }
 
     public Book(String bookName, String bookUrl) {
-        this(bookName, bookUrl, "", "", "", "", 0, "", "", "");
+        this(bookName, bookUrl, "", "", "");
+    }
+
+    public Book(String bookName, String bookUrl, String bookCoverUrl, String category, String description) {
+        this(bookName, bookUrl, "", category, "", description, 0, "", bookCoverUrl, "");
     }
 
     public Book(String bookName, String bookUrl, String updateTime, String category, String author,
