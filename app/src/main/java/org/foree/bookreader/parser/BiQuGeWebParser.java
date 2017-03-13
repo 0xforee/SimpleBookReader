@@ -167,75 +167,77 @@ public class BiQuGeWebParser extends AbsWebParser {
 
         // hot content
         Element hotContentElement = doc.getElementById("hotcontent");
-        String hotBookCategory = hotContentElement.getElementsByTag("h2") != null ?
-                hotContentElement.getElementsByTag("h2").text()
-                : "强烈推荐";
-        if (DEBUG) Log.d(TAG, "hot book_category = " + hotBookCategory);
-        Elements categories = hotContentElement.getElementsByClass("item");
-        for (Element item : categories) {
+        if( hotContentElement != null) {
+            String hotBookCategory = hotContentElement.getElementsByTag("h2") != null ?
+                    hotContentElement.getElementsByTag("h2").text()
+                    : "强烈推荐";
+            if (DEBUG) Log.d(TAG, "hot book_category = " + hotBookCategory);
+            Elements categories = hotContentElement.getElementsByClass("item");
+            for (Element item : categories) {
 
-            String hotBookName = item.getElementsByTag("a").text();
-            if (DEBUG) Log.d(TAG, "hot book_name = " + hotBookName);
+                String hotBookName = item.getElementsByTag("a").text();
+                if (DEBUG) Log.d(TAG, "hot book_name = " + hotBookName);
 
-            String hotBookUrl = getHostUrl() + item.getElementsByTag("a").attr("href");
-            if (DEBUG) Log.d(TAG, "hot book_url = " + hotBookUrl);
+                String hotBookUrl = getHostUrl() + item.getElementsByTag("a").attr("href");
+                if (DEBUG) Log.d(TAG, "hot book_url = " + hotBookUrl);
 
-            String hotBookCoverUrl = item.getElementsByTag("img").attr("src");
-            if (DEBUG) Log.d(TAG, "hot book_cover url = " + hotBookCoverUrl);
+                String hotBookCoverUrl = item.getElementsByTag("img").attr("src");
+                if (DEBUG) Log.d(TAG, "hot book_cover url = " + hotBookCoverUrl);
 
-            String description = item.getElementsByTag("dd").text();
-            if (DEBUG) Log.d(TAG, "hot book description = " + description);
+                String description = item.getElementsByTag("dd").text();
+                if (DEBUG) Log.d(TAG, "hot book description = " + description);
 
-            Book book = new Book(hotBookName, hotBookUrl, hotBookCoverUrl, hotBookCategory, description);
-            childList.add(book);
+                Book book = new Book(hotBookName, hotBookUrl, hotBookCoverUrl, hotBookCategory, description);
+                childList.add(book);
 
-        }
-
-        bookStoreList.add(childList);
-        childList = new ArrayList<>();
-
-        // not hot
-        Elements otherElements = doc.select("[class~=content*]");
-        for (Element other : otherElements) {
-            String otherBookCategory = other.getElementsByTag("h2").text();
-            if (DEBUG) Log.d(TAG, "other book_category = " + otherBookCategory);
-
-            // get top
-            Element top = other.getElementsByClass("top").get(0);
-
-            String otherTopBookCoverUrl = top.getElementsByTag("img").attr("src");
-            if (DEBUG) Log.d(TAG, "top book_cover url = " + otherTopBookCoverUrl);
-
-            String otherTopBookName = top.getElementsByTag("a").get(1).text();
-            if (DEBUG) Log.d(TAG, "top book_name = " + otherTopBookName);
-
-            String otherTopBookUrl = getHostUrl() + top.getElementsByTag("a").attr("href");
-            if (DEBUG) Log.d(TAG, "top book_url = " + otherTopBookUrl);
-
-            String otherTopDescription = top.getElementsByTag("dd").text();
-            if (DEBUG) Log.d(TAG, "top book description = " + otherTopDescription);
-
-            Book otherTopBook = new Book(otherTopBookName, otherTopBookUrl, otherTopBookCoverUrl, otherBookCategory, otherTopDescription);
-            childList.add(otherTopBook);
-
-            // get no image book
-            if (false) {
-                Elements no_image_books = other.getElementsByTag("li");
-                for (Element no_image_book : no_image_books) {
-                    String noImageBookName = no_image_book.getElementsByTag("a").text();
-                    if (DEBUG) Log.d(TAG, "noimage book_name = " + noImageBookName);
-
-                    String noImageBookUrl = getHostUrl() + no_image_book.getElementsByTag("a").attr("href");
-                    if (DEBUG) Log.d(TAG, "noimage book_url = " + noImageBookUrl);
-
-                    Book noImageBook = new Book(noImageBookName, noImageBookUrl, "", otherBookCategory, "");
-                    childList.add(noImageBook);
-                }
             }
-            if (DEBUG) Log.d(TAG, "==============group separator================");
+
             bookStoreList.add(childList);
             childList = new ArrayList<>();
 
+            // not hot
+            Elements otherElements = doc.select("[class~=content*]");
+            for (Element other : otherElements) {
+                String otherBookCategory = other.getElementsByTag("h2").text();
+                if (DEBUG) Log.d(TAG, "other book_category = " + otherBookCategory);
+
+                // get top
+                Element top = other.getElementsByClass("top").get(0);
+
+                String otherTopBookCoverUrl = top.getElementsByTag("img").attr("src");
+                if (DEBUG) Log.d(TAG, "top book_cover url = " + otherTopBookCoverUrl);
+
+                String otherTopBookName = top.getElementsByTag("a").get(1).text();
+                if (DEBUG) Log.d(TAG, "top book_name = " + otherTopBookName);
+
+                String otherTopBookUrl = getHostUrl() + top.getElementsByTag("a").attr("href");
+                if (DEBUG) Log.d(TAG, "top book_url = " + otherTopBookUrl);
+
+                String otherTopDescription = top.getElementsByTag("dd").text();
+                if (DEBUG) Log.d(TAG, "top book description = " + otherTopDescription);
+
+                Book otherTopBook = new Book(otherTopBookName, otherTopBookUrl, otherTopBookCoverUrl, otherBookCategory, otherTopDescription);
+                childList.add(otherTopBook);
+
+                // get no image book
+                if (false) {
+                    Elements no_image_books = other.getElementsByTag("li");
+                    for (Element no_image_book : no_image_books) {
+                        String noImageBookName = no_image_book.getElementsByTag("a").text();
+                        if (DEBUG) Log.d(TAG, "noimage book_name = " + noImageBookName);
+
+                        String noImageBookUrl = getHostUrl() + no_image_book.getElementsByTag("a").attr("href");
+                        if (DEBUG) Log.d(TAG, "noimage book_url = " + noImageBookUrl);
+
+                        Book noImageBook = new Book(noImageBookName, noImageBookUrl, "", otherBookCategory, "");
+                        childList.add(noImageBook);
+                    }
+                }
+                if (DEBUG) Log.d(TAG, "==============group separator================");
+                bookStoreList.add(childList);
+                childList = new ArrayList<>();
+
+            }
         }
         return bookStoreList;
     }

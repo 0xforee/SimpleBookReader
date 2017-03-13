@@ -66,7 +66,7 @@ public class BReaderProvider extends ContentProvider {
     @Override
     public Uri insert(@NonNull Uri uri, ContentValues values) {
         db = mOpenHelper.getWritableDatabase();
-        long rowId = db.insert(matchTable(uri), null, values);
+        long rowId = db.insertWithOnConflict(matchTable(uri), null, values, SQLiteDatabase.CONFLICT_IGNORE);
         notifyChange(uri);
         return ContentUris.withAppendedId(uri, rowId);
     }
