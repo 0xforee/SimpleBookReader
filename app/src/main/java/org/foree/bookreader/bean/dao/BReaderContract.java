@@ -20,6 +20,7 @@ public final class BReaderContract {
         public static final String COLUMN_NAME_CONTENT_URL = "content_url";
         public static final String COLUMN_NAME_COVER_URL = "cover_url";
         public static final String COLUMN_NAME_UPDATE_TIME = "update_time";
+        public static final String COLUMN_NAME_MODIFIED_TIME = "modified_time";
         public static final String COLUMN_NAME_PAGE_INDEX = "page_index";
         public static final String COLUMN_NAME_RECENT_CHAPTER_URL = "recent_chapter_url";
         public static final String COLUMN_NAME_CATEGORY = "category";

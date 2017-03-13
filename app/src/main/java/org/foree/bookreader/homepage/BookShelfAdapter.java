@@ -15,6 +15,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import org.foree.bookreader.R;
 import org.foree.bookreader.base.BaseApplication;
 import org.foree.bookreader.bean.book.Book;
+import org.foree.bookreader.utils.DateUtils;
 
 import java.util.List;
 
@@ -51,35 +52,43 @@ public class BookShelfAdapter extends RecyclerView.Adapter<BookShelfAdapter.MyVi
 
     @Override
     public void onBindViewHolder(final BookShelfAdapter.MyViewHolder holder, int position) {
-        if (bookList != null && !bookList.isEmpty())
-            holder.tvBookName.setText(bookList.get(position).getBookName());
+        if( bookList != null && !bookList.isEmpty()) {
+            Book book = bookList.get(position);
 
-        // 如果设置了回调，则设置点击事件
-        if (mOnItemClickListener != null) {
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int pos = holder.getLayoutPosition();
-                    mOnItemClickListener.onItemClick(holder.itemView, pos);
-                }
-            });
+            holder.tvBookName.setText(book.getBookName());
 
-            holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    int pos = holder.getLayoutPosition();
-                    mOnItemClickListener.onItemLongClick(holder.itemView, pos);
-                    return false;
-                }
-            });
-        }
+            // 如果设置了回调，则设置点击事件
+            if (mOnItemClickListener != null) {
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int pos = holder.getLayoutPosition();
+                        mOnItemClickListener.onItemClick(holder.itemView, pos);
+                    }
+                });
 
-        // 设置选中的背景颜色
-        holder.itemView.setBackgroundColor(mSelectedItemsIds.get(position) ? 0x9934B5E4 : Color.TRANSPARENT);
+                holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        int pos = holder.getLayoutPosition();
+                        mOnItemClickListener.onItemLongClick(holder.itemView, pos);
+                        return false;
+                    }
+                });
+            }
 
-        if(bookList.get(position).getBookCoverUrl()!=null){
-            ImageLoader.getInstance().displayImage(bookList.get(position).getBookCoverUrl(), holder.imageView,
-                    BaseApplication.getInstance().getDisplayImageOptions());
+            // 设置选中的背景颜色
+            holder.itemView.setBackgroundColor(mSelectedItemsIds.get(position) ? 0x9934B5E4 : Color.TRANSPARENT);
+
+            if (book.getBookCoverUrl() != null) {
+                ImageLoader.getInstance().displayImage(book.getBookCoverUrl(), holder.imageView,
+                        BaseApplication.getInstance().getDisplayImageOptions());
+            }
+
+            // 是否显示更新小圆点
+            if (DateUtils.isNewer(book.getModifiedTime(), book.getUpdateTime())){
+                holder.imageViewUpdate.setVisibility(View.VISIBLE);
+            }
         }
 
     }

@@ -9,6 +9,7 @@ import android.util.Log;
 
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
+import org.foree.bookreader.utils.DateUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,7 @@ public class BookDao {
             String bookName = cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_BOOK_NAME));
             String bookUrl = cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_BOOK_URL));
             String updateTime = cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_UPDATE_TIME));
+            String modifiedTime = cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_MODIFIED_TIME));
             String category = cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_CATEGORY));
             String author = cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_AUTHOR));
             String description = cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_DESCRIPTION));
@@ -46,7 +48,7 @@ public class BookDao {
             int pageIndex = cursor.getInt(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_PAGE_INDEX));
             String bookCoverUrl = cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_COVER_URL));
             String contentUrl = cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_CONTENT_URL));
-            Book book = new Book(bookName, bookUrl, updateTime, category, author, description, pageIndex, recentChapterId, bookCoverUrl, contentUrl);
+            Book book = new Book(bookName, bookUrl, updateTime, modifiedTime, category, author, description, pageIndex, recentChapterId, bookCoverUrl, contentUrl);
             bookList.add(book);
         }
 
@@ -102,6 +104,23 @@ public class BookDao {
         return chapterList;
     }
 
+    public void updateModifiedTime(String bookUrl, String modifiedTime){
+        Log.d(TAG, "update book " + bookUrl + " Time " + modifiedTime);
+
+        ContentValues contentValues = new ContentValues();
+        String selection = BReaderContract.Books.COLUMN_NAME_BOOK_URL + "=?";
+
+        // 内容不重复
+        contentValues.put(BReaderContract.Books.COLUMN_NAME_MODIFIED_TIME, modifiedTime);
+
+        mResolver.update(
+                BReaderProvider.CONTENT_URI_BOOKS,
+                contentValues,
+                selection,
+                new String[]{bookUrl}
+        );
+    }
+
     public void updateBookTime(String bookUrl, String updateTime) {
         Log.d(TAG, "update book " + bookUrl + " Time " + updateTime);
 
@@ -135,6 +154,7 @@ public class BookDao {
         if (cursor != null && cursor.getCount() != 0 && cursor.moveToFirst()) {
             book.setBookName(cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_BOOK_NAME)));
             book.setUpdateTime(cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_UPDATE_TIME)));
+            book.setModifiedTime(cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_MODIFIED_TIME)));
             book.setBookUrl(bookUrl);
             book.setCategory(cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_CATEGORY)));
             book.setAuthor(cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_AUTHOR)));
@@ -157,6 +177,7 @@ public class BookDao {
         contentValues.put(BReaderContract.Books.COLUMN_NAME_BOOK_URL, book.getBookUrl());
         contentValues.put(BReaderContract.Books.COLUMN_NAME_BOOK_NAME, book.getBookName());
         contentValues.put(BReaderContract.Books.COLUMN_NAME_UPDATE_TIME, book.getUpdateTime());
+        contentValues.put(BReaderContract.Books.COLUMN_NAME_MODIFIED_TIME, DateUtils.getCurrentTime());
         contentValues.put(BReaderContract.Books.COLUMN_NAME_CATEGORY, book.getCategory());
         contentValues.put(BReaderContract.Books.COLUMN_NAME_AUTHOR, book.getAuthor());
         contentValues.put(BReaderContract.Books.COLUMN_NAME_DESCRIPTION, book.getDescription());

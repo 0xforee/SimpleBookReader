@@ -9,6 +9,12 @@ public class Book {
     private String bookName;
     // android sqlite中数据是弱类型，所以用String存取时间，然后再转格式
     private String updateTime;
+    /**
+     * 用户点击进入书籍的时间
+     * 1. 和updateTime比较来判断是否显示小圆点
+     * 2. 用于书架书籍的排序
+     */
+    private String modifiedTime;
     private String category;
     private String author;
     private String bookUrl;
@@ -47,6 +53,21 @@ public class Book {
         this.recentChapterUrl = recentChapterUrl;
         this.bookCoverUrl = bookCoverUrl;
         this.contentUrl = contentUrl;
+    }
+
+    public Book(String bookName, String bookUrl, String updateTime, String modifiedTime, String category, String author,
+                String description,int pageIndex, String recentChapterUrl, String bookCoverUrl, String contentUrl) {
+        this.bookName = bookName;
+        this.updateTime = updateTime;
+        this.modifiedTime = modifiedTime;
+        this.category = category;
+        this.author = author;
+        this.bookUrl = bookUrl;
+        this.pageIndex = pageIndex;
+        this.contentUrl = contentUrl;
+        this.bookCoverUrl = bookCoverUrl;
+        this.description = description;
+        this.recentChapterUrl = recentChapterUrl;
     }
 
     public String getBookName() {
@@ -143,5 +164,13 @@ public class Book {
 
     public void setPageIndex(int pageIndex) {
         this.pageIndex = pageIndex;
+    }
+
+    public String getModifiedTime() {
+        return modifiedTime;
+    }
+
+    public void setModifiedTime(String modifiedTime) {
+        this.modifiedTime = modifiedTime;
     }
 }

@@ -24,7 +24,7 @@ public class DateUtils {
      * @return 更新返回true, 否则返回false
      */
     public static boolean isNewer(String currentTime, String newTime) {
-        SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ENGLISH);
+        SimpleDateFormat simpleFormat = getUpdateTimeFormat();
         try {
             if (DEBUG) Log.d(TAG, "currentTime = " + currentTime);
             if (DEBUG) Log.d(TAG, "newTime = " + newTime);
@@ -38,5 +38,14 @@ public class DateUtils {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public static SimpleDateFormat getUpdateTimeFormat(){
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ENGLISH);
+    }
+
+    public static String getCurrentTime(){
+        SimpleDateFormat simpleFormat = getUpdateTimeFormat();
+        return simpleFormat.format(new Date());
     }
 }

@@ -13,7 +13,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import org.foree.bookreader.utils.DateUtils;
+
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 
 /**
  * Created by foree on 17-3-2.
@@ -143,7 +147,7 @@ public class BReaderProvider extends ContentProvider {
      * 数据库创建升级的帮助类
      */
     protected static final class BookDataBaseHelper extends SQLiteOpenHelper {
-        private static final int DB_VERSION = 1;
+        private static final int DB_VERSION = 2;
         private static final String DB_NAME = "bookReader.db";
 
         BookDataBaseHelper(Context context) {
@@ -168,9 +172,24 @@ public class BReaderProvider extends ContentProvider {
                 case 1:
                     createEntriesTable(db);
                     break;
+                case 2:
+                    addModifiedTimeColumn(db);
+                    break;
                 default:
                     throw new IllegalStateException("Don't known to upgrade to " + version);
             }
+        }
+
+        private void addModifiedTimeColumn(SQLiteDatabase db) {
+            db.execSQL("alter table " + BReaderContract.Books.TABLE_NAME + " add column " +
+                    BReaderContract.Books.COLUMN_NAME_MODIFIED_TIME + " varchar");
+
+            // 设置点击时间为当前时间
+            SimpleDateFormat df = DateUtils.getUpdateTimeFormat();
+            System.out.println();// new Date()为获取当前系统时间
+            ContentValues contentValue = new ContentValues();
+            contentValue.put(BReaderContract.Books.COLUMN_NAME_MODIFIED_TIME, df.format(new Date()));
+            db.update(BReaderContract.Books.TABLE_NAME, contentValue, null, null);
         }
 
         private void createEntriesTable(SQLiteDatabase db) {

@@ -34,6 +34,7 @@ import org.foree.bookreader.bean.dao.BookDao;
 import org.foree.bookreader.bean.event.PaginationEvent;
 import org.foree.bookreader.pagination.PaginationArgs;
 import org.foree.bookreader.pagination.PaginationLoader;
+import org.foree.bookreader.utils.DateUtils;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -311,6 +312,9 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
 
         pageIndex = book.getPageIndex();
         //Log.d(TAG, "open Book at position " + pageIndex);
+
+        bookDao.updateModifiedTime(bookUrl, DateUtils.getCurrentTime());
+
     }
 
     private void closeBook() {
