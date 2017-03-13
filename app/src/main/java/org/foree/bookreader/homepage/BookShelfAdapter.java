@@ -119,11 +119,13 @@ public class BookShelfAdapter extends RecyclerView.Adapter<BookShelfAdapter.MyVi
     class MyViewHolder extends RecyclerView.ViewHolder {
         TextView tvBookName;
         ImageView imageView;
+        ImageView imageViewUpdate;
 
         public MyViewHolder(View view) {
             super(view);
             tvBookName = (TextView) view.findViewById(R.id.tv_novel_name);
             imageView = (ImageView) view.findViewById(R.id.iv_novel_image);
+            imageViewUpdate = (ImageView) view.findViewById(R.id.tv_update_ig);
         }
     }
 }
