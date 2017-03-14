@@ -9,6 +9,7 @@ import org.foree.bookreader.bean.dao.BookDao;
 import org.foree.bookreader.net.NetCallback;
 import org.foree.bookreader.parser.AbsWebParser;
 import org.foree.bookreader.parser.WebParserManager;
+import org.foree.bookreader.utils.DateUtils;
 
 import java.util.List;
 
@@ -65,5 +66,13 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         String nextChapterUrl = bookDao.getChapterUrl(-1, chapterUrl);
 
         Log.d(TAG, "nextChapterUrl = " + nextChapterUrl);
+    }
+
+    public void testUpdateView(){
+        BookDao bookDao = new BookDao(getContext());
+        String modifiedDate = DateUtils.getUpdateTimeFormat().format("2015-02-02 13:10");
+
+        bookDao.updateModifiedTime("http://www.biquge.cn/book/2831/", modifiedDate);
+
     }
 }

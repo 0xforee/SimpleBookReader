@@ -88,7 +88,8 @@ public class BookShelfAdapter extends RecyclerView.Adapter<BookShelfAdapter.MyVi
             // 是否显示更新小圆点
             if (DateUtils.isNewer(book.getModifiedTime(), book.getUpdateTime())){
                 holder.imageViewUpdate.setVisibility(View.VISIBLE);
-            }
+            }else
+                holder.imageViewUpdate.setVisibility(View.INVISIBLE);
         }
 
     }

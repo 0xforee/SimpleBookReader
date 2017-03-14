@@ -83,7 +83,7 @@ public class BReaderProvider extends ContentProvider {
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
         db = mOpenHelper.getWritableDatabase();
         int rowId = db.delete(matchTable(uri), selection, selectionArgs);
-        notifyChange(uri);
+        //notifyChange(uri);
         return rowId;
     }
 

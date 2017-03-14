@@ -2,7 +2,10 @@ package org.foree.bookreader.homepage;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.ContentObserver;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -20,6 +23,7 @@ import android.view.ViewGroup;
 
 import org.foree.bookreader.R;
 import org.foree.bookreader.bean.book.Book;
+import org.foree.bookreader.bean.dao.BReaderProvider;
 import org.foree.bookreader.bean.dao.BookDao;
 import org.foree.bookreader.bean.event.BookUpdateEvent;
 import org.foree.bookreader.readpage.ReadActivity;
@@ -46,6 +50,19 @@ public class BookShelfFragment extends Fragment implements SwipeRefreshLayout.On
 
     SwipeRefreshLayout mSwipeRefreshLayout;
 
+    private BookContentObserver bookObserver;
+
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            if (mAdapter != null) {
+                Log.d(TAG, "book list updated");
+                mAdapter.notifyDataSetChanged();
+            }
+
+        }
+    };
+
     public BookShelfFragment() {
         // Required empty public constructor
     }
@@ -65,6 +82,17 @@ public class BookShelfFragment extends Fragment implements SwipeRefreshLayout.On
 
         bookDao = new BookDao(getContext());
 
+        bookObserver = new BookContentObserver(null);
+
+        registerContentObserver();
+    }
+
+    private void registerContentObserver() {
+        getContext().getContentResolver().registerContentObserver(
+                BReaderProvider.CONTENT_URI_BOOKS,
+                false,
+                bookObserver
+        );
     }
 
     @Override
@@ -147,17 +175,6 @@ public class BookShelfFragment extends Fragment implements SwipeRefreshLayout.On
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        // refresh book list
-        bookList.clear();
-        bookList.addAll(bookDao.getAllBooks());
-        if (mAdapter != null) {
-            mAdapter.notifyDataSetChanged();
-        }
-    }
-
-    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
 
@@ -177,6 +194,8 @@ public class BookShelfFragment extends Fragment implements SwipeRefreshLayout.On
         EventBus.getDefault().unregister(this);
         if (syncThread != null && !syncThread.isInterrupted())
             syncThread.interrupt();
+
+        getContext().getContentResolver().unregisterContentObserver(bookObserver);
     }
 
 
@@ -266,6 +285,21 @@ public class BookShelfFragment extends Fragment implements SwipeRefreshLayout.On
             mAdapter.removeSelection();
             if (mActionMode != null)
                 mActionMode = null;
+        }
+    }
+
+    class BookContentObserver extends ContentObserver {
+
+        public BookContentObserver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            Log.d(TAG, "data changed");
+            bookList.clear();
+            bookList.addAll(bookDao.getAllBooks());
+            mHandler.sendEmptyMessage(0);
         }
     }
 }
