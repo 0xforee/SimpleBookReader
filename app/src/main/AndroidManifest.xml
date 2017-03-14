@@ -52,7 +52,7 @@
         <provider
             android:name=".bean.dao.BReaderProvider"
             android:authorities="org.foree.bookreader.provider"
-            android:exported="false"/>
+            android:exported="true"/>
     </application>
 
 </manifest>

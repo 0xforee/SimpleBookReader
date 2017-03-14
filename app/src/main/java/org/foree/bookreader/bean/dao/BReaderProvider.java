@@ -139,7 +139,6 @@ public class BReaderProvider extends ContentProvider {
         }
         db.setTransactionSuccessful();
         db.endTransaction();
-        db.close();
     }
 
     /**
