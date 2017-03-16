@@ -1,5 +1,6 @@
 package org.foree.bookreader.parser;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +29,6 @@ public class WebParserManager {
     private WebParserManager() {
         mParserMap = new HashMap<>();
         mParserMap.put("http://www.biquge.cn", new BiQuGeWebParser());
-        mParserMap.put("http://m.biquge.com", new BQGMWebParser());
 
     }
 
@@ -40,6 +40,10 @@ public class WebParserManager {
         } else {
             return new NullWebParser();
         }
+    }
+
+    public Collection<AbsWebParser> getParsers(){
+        return mParserMap.values();
     }
 
     public void registerParser(String url, AbsWebParser parser) {

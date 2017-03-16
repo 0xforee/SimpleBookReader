@@ -17,54 +17,44 @@ import java.util.List;
 
 /**
  * Created by foree on 17-1-7.
+ * 解析器的公共api接口，用于构建标准的接口
  */
 
 public abstract class AbsWebParser implements IWebParser {
     private static final String TAG = AbsWebParser.class.getSimpleName();
 
-    // webParser base info
+    public interface WebInfo {
+        /**
+         * 获取目标网站名称
+         *
+         * @return 网站名称
+         */
+        String getHostName();
 
-    /**
-     * 获取目标网站名称
-     *
-     * @return 网站名称
-     */
-    abstract String getHostName();
+        /**
+         * 获取解析网站的网页编码
+         *
+         * @return 网页编码
+         */
+        String getWebChar();
 
-    /**
-     * 获取解析网站的网页编码
-     *
-     * @return 网页编码
-     */
-    abstract String getWebChar();
+        /**
+         * 获取目标网站地址
+         *
+         * @return 网页主机host地址
+         */
+        String getHostUrl();
 
-    /**
-     * 获取目标网站地址
-     *
-     * @return 网页主机host地址
-     */
-    abstract String getHostUrl();
+        /**
+         * 获取搜索api用于传入搜索关键字
+         *
+         * @return 搜索api
+         */
+        String getSearchApi();
+    }
 
-    /**
-     * 获取搜索api用于传入搜索关键字
-     *
-     * @return 搜索api
-     */
-    abstract String getSearchApi();
+    abstract WebInfo getWebInfo();
 
-
-    // parse api
-    abstract List<Book> parseBookList(Document doc);
-
-    abstract Book parseBookInfo(String bookUrl, Document doc);
-
-    abstract List<Chapter> parseChapterList(String bookUrl, String contentUrl, Document doc);
-
-    abstract Chapter parseChapterContents(String chapterUrl, Document doc);
-
-    abstract List<List<Book>> parseHostUrl(String hostUrl, Document doc);
-
-    @Override
     public void searchBook(final String keywords, final NetCallback<List<Book>> netCallback) {
         new Thread() {
             @Override
@@ -72,7 +62,7 @@ public abstract class AbsWebParser implements IWebParser {
                 super.run();
                 Document doc;
                 try {
-                    doc = Jsoup.connect(getSearchApi() + keywords).get();
+                    doc = Jsoup.connect(getWebInfo().getSearchApi() + keywords).get();
                     if (netCallback != null && doc != null) {
                         netCallback.onSuccess(parseBookList(doc));
                     }
@@ -86,7 +76,6 @@ public abstract class AbsWebParser implements IWebParser {
         }.start();
     }
 
-    @Override
     public void getBookInfo(final String bookUrl, final NetCallback<Book> netCallback) {
         new Thread() {
             @Override
@@ -123,7 +112,6 @@ public abstract class AbsWebParser implements IWebParser {
         return book;
     }
 
-    @Override
     public void getChapterList(final String bookUrl, final String contentUrl, final NetCallback<List<Chapter>> netCallback) {
         new Thread() {
             @Override
@@ -158,7 +146,6 @@ public abstract class AbsWebParser implements IWebParser {
         return null;
     }
 
-    @Override
     public void getChapterContents(final String chapterUrl, final NetCallback<Chapter> netCallback) {
         new Thread() {
             @Override
@@ -187,7 +174,6 @@ public abstract class AbsWebParser implements IWebParser {
         return Integer.parseInt(subString[subString.length - 2]);
     }
 
-    @Override
     public void getHomePageInfo(final String hostUrl, final NetCallback<List<List<Book>>> netCallback) {
         new Thread() {
             @Override

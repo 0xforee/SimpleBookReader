@@ -2,23 +2,24 @@ package org.foree.bookreader.parser;
 
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
-import org.foree.bookreader.net.NetCallback;
+import org.jsoup.nodes.Document;
 
 import java.util.List;
 
 /**
  * Created by foree on 17-1-7.
- * 每个web都要实现的
+ * webParser要实现的解析网站的方法
  */
 
 public interface IWebParser {
-    void searchBook(String keywords, NetCallback<List<Book>> netCallback);
+    // parse api
+    List<Book> parseBookList(Document doc);
 
-    void getBookInfo(String bookUrl, NetCallback<Book> netCallback);
+    Book parseBookInfo(String bookUrl, Document doc);
 
-    void getChapterList(String bookUrl, String contentUrl, NetCallback<List<Chapter>> netCallback);
+    List<Chapter> parseChapterList(String bookUrl, String contentUrl, Document doc);
 
-    void getChapterContents(String chapterUrl, NetCallback<Chapter> netCallback);
+    Chapter parseChapterContents(String chapterUrl, Document doc);
 
-    void getHomePageInfo(String hostUrl, NetCallback<List<List<Book>>> netCallback);
+    List<List<Book>> parseHostUrl(String hostUrl, Document doc);
 }

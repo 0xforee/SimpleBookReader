@@ -22,27 +22,32 @@ public class BiQuGeWebParser extends AbsWebParser {
     private static boolean DEBUG = false;
 
     @Override
-    String getHostName() {
-        return "笔趣阁";
+    WebInfo getWebInfo() {
+        return new WebInfo() {
+            @Override
+            public String getHostName() {
+                return "笔趣阁";
+            }
+
+            @Override
+            public String getWebChar() {
+                return "utf-8";
+            }
+
+            @Override
+            public String getHostUrl() {
+                return "http://www.biquge.cn";
+            }
+
+            @Override
+            public String getSearchApi() {
+                return "http://zhannei.baidu.com/cse/search?s=11869390265411396408&ie=utf-8&q=";
+            }
+        };
     }
 
     @Override
-    String getWebChar() {
-        return "utf-8";
-    }
-
-    @Override
-    String getHostUrl() {
-        return "http://www.biquge.cn";
-    }
-
-    @Override
-    String getSearchApi() {
-        return "http://zhannei.baidu.com/cse/search?s=11869390265411396408&ie=utf-8&q=";
-    }
-
-    @Override
-    List<Book> parseBookList(Document doc) {
+    public List<Book> parseBookList(Document doc) {
         List<Book> bookList = new ArrayList<>();
         Elements resultList = doc.getElementsByClass("result-game-item");
         for (Element result : resultList) {
@@ -64,7 +69,7 @@ public class BiQuGeWebParser extends AbsWebParser {
     }
 
     @Override
-    Book parseBookInfo(String bookUrl, Document doc) {
+    public Book parseBookInfo(String bookUrl, Document doc) {
         Book book = new Book();
         Chapter newestChapter = new Chapter();
 
@@ -112,7 +117,7 @@ public class BiQuGeWebParser extends AbsWebParser {
     }
 
     @Override
-    List<Chapter> parseChapterList(String bookUrl, String contentUrl, Document doc) {
+    public List<Chapter> parseChapterList(String bookUrl, String contentUrl, Document doc) {
         // ChapterList
         List<Chapter> chapters = new ArrayList<>();
         Elements elements_contents = doc.select("dd");
@@ -122,7 +127,7 @@ public class BiQuGeWebParser extends AbsWebParser {
             Chapter chapter = new Chapter();
 
             chapter.setChapterTitle(link.text());
-            chapter.setChapterUrl(getHostUrl() + link.attr("href"));
+            chapter.setChapterUrl(getWebInfo().getHostUrl() + link.attr("href"));
             // set bookUrl
             chapter.setBookUrl(bookUrl);
             // set chapterId for sort
@@ -136,7 +141,7 @@ public class BiQuGeWebParser extends AbsWebParser {
     }
 
     @Override
-    Chapter parseChapterContents(String chapterUrl, Document doc) {
+    public Chapter parseChapterContents(String chapterUrl, Document doc) {
         Chapter chapter = new Chapter();
 
         chapter.setChapterUrl(chapterUrl);
@@ -161,13 +166,13 @@ public class BiQuGeWebParser extends AbsWebParser {
     }
 
     @Override
-    List<List<Book>> parseHostUrl(String hostUrl, Document doc) {
+    public List<List<Book>> parseHostUrl(String hostUrl, Document doc) {
         List<List<Book>> bookStoreList = new ArrayList<>();
         List<Book> childList = new ArrayList<>();
 
         // hot content
         Element hotContentElement = doc.getElementById("hotcontent");
-        if( hotContentElement != null) {
+        if (hotContentElement != null) {
             String hotBookCategory = hotContentElement.getElementsByTag("h2") != null ?
                     hotContentElement.getElementsByTag("h2").text()
                     : "强烈推荐";
@@ -178,7 +183,7 @@ public class BiQuGeWebParser extends AbsWebParser {
                 String hotBookName = item.getElementsByTag("a").text();
                 if (DEBUG) Log.d(TAG, "hot book_name = " + hotBookName);
 
-                String hotBookUrl = getHostUrl() + item.getElementsByTag("a").attr("href");
+                String hotBookUrl = getWebInfo().getHostUrl() + item.getElementsByTag("a").attr("href");
                 if (DEBUG) Log.d(TAG, "hot book_url = " + hotBookUrl);
 
                 String hotBookCoverUrl = item.getElementsByTag("img").attr("src");
@@ -210,7 +215,7 @@ public class BiQuGeWebParser extends AbsWebParser {
                 String otherTopBookName = top.getElementsByTag("a").get(1).text();
                 if (DEBUG) Log.d(TAG, "top book_name = " + otherTopBookName);
 
-                String otherTopBookUrl = getHostUrl() + top.getElementsByTag("a").attr("href");
+                String otherTopBookUrl = getWebInfo().getHostUrl() + top.getElementsByTag("a").attr("href");
                 if (DEBUG) Log.d(TAG, "top book_url = " + otherTopBookUrl);
 
                 String otherTopDescription = top.getElementsByTag("dd").text();
@@ -226,7 +231,7 @@ public class BiQuGeWebParser extends AbsWebParser {
                         String noImageBookName = no_image_book.getElementsByTag("a").text();
                         if (DEBUG) Log.d(TAG, "noimage book_name = " + noImageBookName);
 
-                        String noImageBookUrl = getHostUrl() + no_image_book.getElementsByTag("a").attr("href");
+                        String noImageBookUrl = getWebInfo().getHostUrl() + no_image_book.getElementsByTag("a").attr("href");
                         if (DEBUG) Log.d(TAG, "noimage book_url = " + noImageBookUrl);
 
                         Book noImageBook = new Book(noImageBookName, noImageBookUrl, "", otherBookCategory, "");
@@ -241,4 +246,5 @@ public class BiQuGeWebParser extends AbsWebParser {
         }
         return bookStoreList;
     }
+
 }

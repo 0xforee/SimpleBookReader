@@ -11,48 +11,54 @@ import java.util.List;
  */
 
 public class NullWebParser extends AbsWebParser{
+
     @Override
-    String getHostName() {
+    WebInfo getWebInfo() {
+        return new WebInfo() {
+            @Override
+            public String getHostName() {
+                return null;
+            }
+
+            @Override
+            public String getWebChar() {
+                return null;
+            }
+
+            @Override
+            public String getHostUrl() {
+                return null;
+            }
+
+            @Override
+            public String getSearchApi() {
+                return null;
+            }
+        };
+    }
+
+    @Override
+    public List<Book> parseBookList(Document doc) {
         return null;
     }
 
     @Override
-    String getWebChar() {
+    public Book parseBookInfo(String bookUrl, Document doc) {
         return null;
     }
 
     @Override
-    String getHostUrl() {
+    public List<Chapter> parseChapterList(String bookUrl, String contentUrl, Document doc) {
         return null;
     }
 
     @Override
-    String getSearchApi() {
+    public Chapter parseChapterContents(String chapterUrl, Document doc) {
         return null;
     }
 
     @Override
-    List<Book> parseBookList(Document doc) {
-        return null;
-    }
-
-    @Override
-    Book parseBookInfo(String bookUrl, Document doc) {
-        return null;
-    }
-
-    @Override
-    List<Chapter> parseChapterList(String bookUrl, String contentUrl, Document doc) {
-        return null;
-    }
-
-    @Override
-    Chapter parseChapterContents(String chapterUrl, Document doc) {
-        return null;
-    }
-
-    @Override
-    List<List<Book>> parseHostUrl(String hostUrl, Document doc) {
+    public List<List<Book>> parseHostUrl(String hostUrl, Document doc) {
         return null;
     }
 }
