@@ -7,10 +7,13 @@ package org.foree.bookreader.pagination;
 public class ChapterRequest implements Comparable {
     private String url;
     private PaginationArgs paginationArgs;
+    // 判断是缓存还是当前章节请求
+    private boolean current;
 
-    public ChapterRequest(String url, PaginationArgs paginationArgs) {
+    public ChapterRequest(String url, PaginationArgs paginationArgs, boolean current) {
         this.url = url;
         this.paginationArgs = paginationArgs;
+        this.current = current;
     }
 
     public String getUrl() {
@@ -19,6 +22,10 @@ public class ChapterRequest implements Comparable {
 
     public PaginationArgs getPaginationArgs() {
         return paginationArgs;
+    }
+
+    public boolean isCurrent() {
+        return current;
     }
 
     @Override

@@ -51,7 +51,7 @@ public class SyncBooksThread extends Thread {
                     public Boolean call() throws Exception {
 
                         final AbsWebParser webParser = WebParserManager.getInstance().getWebParser(oldBook.getBookUrl());
-                        final Book newBook = webParser.getBookInfo(oldBook.getBookUrl());
+                        final Book newBook = webParser.getBookInfoSync(oldBook.getBookUrl());
 
                         if (DateUtils.isNewer(oldBook.getUpdateTime(), newBook.getUpdateTime())) {
                             // update chapters

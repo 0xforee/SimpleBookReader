@@ -47,7 +47,7 @@ public class PaginationLoader {
     }
 
     public void loadPagination(String url) {
-        mRequestQueue.add(new ChapterRequest(url, paginationArgs));
+        mRequestQueue.add(new ChapterRequest(url, paginationArgs, true));
 
     }
 

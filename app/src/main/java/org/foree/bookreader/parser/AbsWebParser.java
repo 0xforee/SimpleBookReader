@@ -98,7 +98,7 @@ public abstract class AbsWebParser implements IWebParser {
 
     }
 
-    public Book getBookInfo(final String bookUrl) {
+    public Book getBookInfoSync(final String bookUrl) {
         Document doc;
         Book book = null;
         try {
@@ -144,6 +144,20 @@ public abstract class AbsWebParser implements IWebParser {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public Chapter getChapterContentsSync(final String chapterUrl) {
+        Document doc;
+        Chapter chapter = null;
+        try {
+            doc = Jsoup.connect(chapterUrl).get();
+            if (doc != null) {
+                chapter = parseChapterContents(chapterUrl, doc);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return chapter;
     }
 
     public void getChapterContents(final String chapterUrl, final NetCallback<Chapter> netCallback) {
@@ -196,38 +210,29 @@ public abstract class AbsWebParser implements IWebParser {
     }
 
     public void downloadChapter(final ChapterRequest request) {
+        Chapter chapter;
+
         if (request.getUrl() != null && !request.getUrl().isEmpty()) {
             final ChapterCache chapterCache = PaginationLoader.getInstance().getChapterCache();
-            Chapter chapter = chapterCache.get(request.getUrl());
+            // get from cache
+            chapter = chapterCache.get(request.getUrl());
             if (chapter == null) {
-                getChapterContents(request.getUrl(), new NetCallback<Chapter>() {
-                    @Override
-                    public void onSuccess(Chapter chapter) {
-                        if (chapter.getContents() != null) {
-                            PaginateCore.splitPage(request.getPaginationArgs(), chapter);
+                // download from net
+                chapter = getChapterContentsSync(request.getUrl());
+            }
 
-                            // put pagination cache
-                            //PaginationCache.getInstance().put(url, chapter);
+            if (chapter.getContents() != null) {
+                // put chapter cache
+                chapterCache.put(request.getUrl(), chapter);
 
-                            // put chapter cache
-                            chapterCache.put(request.getUrl(), chapter);
-
-                            // post
-                            EventBus.getDefault().post(new PaginationEvent(chapter));
-                        } else {
-                            EventBus.getDefault().post(new PaginationEvent(null));
-                        }
-                    }
-
-                    @Override
-                    public void onFail(String msg) {
-                        EventBus.getDefault().post(new PaginationEvent(null));
-                    }
-                });
+                if (request.isCurrent()) {
+                    PaginateCore.splitPage(request.getPaginationArgs(), chapter);
+                    // post
+                    EventBus.getDefault().post(new PaginationEvent(chapter));
+                }
             } else {
-                PaginateCore.splitPage(request.getPaginationArgs(), chapter);
-                // post
-                EventBus.getDefault().post(new PaginationEvent(chapter));
+                if (request.isCurrent())
+                    EventBus.getDefault().post(new PaginationEvent(null));
             }
         }
     }
