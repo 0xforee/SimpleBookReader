@@ -12,7 +12,9 @@ import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.utils.DateUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by foree on 2016/8/6.
@@ -348,5 +350,77 @@ public class BookDao {
         }
 
         return chapterUrl;
+    }
+
+    /**
+     * TODO: 根据指定url和偏移量获取目标url
+     *
+     * @param flag 偏移量，-1=上一章，1=后一章
+     * @param url  指定url
+     * @return 有则返回目标url，没有返回null
+     */
+    public Map<String, Boolean> getChapterUrlLimit(int flag, String url, int limit) {
+
+        Cursor cursor;
+        String chapterUrl = null;
+        String bookUrl = null;
+        String orderBy = null;
+        Map<String, Boolean> mCachedMap = new HashMap<>();
+
+        if (url != null) {
+
+            int chapterId = getChapterId(url);
+
+            String selection = BReaderContract.Chapters.COLUMN_NAME_CHAPTER_URL + "=?";
+
+            // 限定条件加入bookUrl限定
+            cursor = mResolver.query(
+                    BReaderProvider.CONTENT_URI_CHAPTERS,
+                    new String[]{BReaderContract.Chapters.COLUMN_NAME_BOOK_URL},
+                    selection,
+                    new String[]{url},
+                    null
+            );
+            if (cursor != null && cursor.getCount() != 0 && cursor.moveToFirst()) {
+                bookUrl = cursor.getString(cursor.getColumnIndex(BReaderContract.Chapters.COLUMN_NAME_BOOK_URL));
+            }
+
+            if (bookUrl != null) {
+                if (flag > 0) {
+                    // 获取下一章url
+                    selection = BReaderContract.Chapters.COLUMN_NAME_BOOK_URL + " = ? and " +
+                            BReaderContract.Chapters.COLUMN_NAME_CHAPTER_ID + " > ?";
+                    orderBy = BReaderContract.Chapters.COLUMN_NAME_CHAPTER_ID + " asc";
+                } else {
+                    // 获取上一章url
+                    selection = BReaderContract.Chapters.COLUMN_NAME_BOOK_URL + " = ? and " +
+                            BReaderContract.Chapters.COLUMN_NAME_CHAPTER_ID + " < ?";
+                    orderBy = BReaderContract.Chapters.COLUMN_NAME_CHAPTER_ID + " desc";
+                }
+
+                if(limit>0)
+                    orderBy = orderBy + " limit " + limit;
+
+                cursor = mResolver.query(
+                        BReaderProvider.CONTENT_URI_CHAPTERS,
+                        new String[]{BReaderContract.Chapters.COLUMN_NAME_CHAPTER_URL, BReaderContract.Chapters.COLUMN_NAME_CACHED},
+                        selection,
+                        new String[]{bookUrl, chapterId + ""},
+                        orderBy
+                );
+
+                if( cursor != null && cursor.getCount()!=0) {
+                    while(cursor.moveToNext()){
+                        chapterUrl = cursor.getString(cursor.getColumnIndex(BReaderContract.Chapters.COLUMN_NAME_CHAPTER_URL));
+                        boolean offline = cursor.getInt(cursor.getColumnIndex(BReaderContract.Chapters.COLUMN_NAME_CACHED)) == 1;
+                        mCachedMap.put(chapterUrl,offline);
+                    }
+                    cursor.close();
+                }
+            }
+
+        }
+
+        return mCachedMap;
     }
 }
