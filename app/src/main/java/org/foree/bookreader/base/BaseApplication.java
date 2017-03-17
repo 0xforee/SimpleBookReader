@@ -56,9 +56,9 @@ public class BaseApplication extends Application {
         if(options == null) {
             // init displayOptions
             options = new DisplayImageOptions.Builder()
-                    .showImageOnLoading(R.drawable.book_cover)
-                    .showImageOnFail(R.drawable.book_cover)
-                    .showImageForEmptyUri(R.drawable.book_cover)
+                    .showImageOnLoading(R.drawable.book_cover_holder)
+                    .showImageOnFail(R.drawable.book_cover_holder)
+                    .showImageForEmptyUri(R.drawable.book_cover_holder)
                     .cacheInMemory(true)
                     .cacheOnDisk(true)
                     .build();

@@ -36,7 +36,7 @@
                     android:layout_height="130dp"
                     android:layout_weight="2"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/book_cover" />
+                    android:src="@drawable/book_cover_holder" />
 
                 <LinearLayout
                     android:layout_width="0dp"

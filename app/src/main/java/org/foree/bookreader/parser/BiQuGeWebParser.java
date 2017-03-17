@@ -187,7 +187,7 @@ public class BiQuGeWebParser extends AbsWebParser {
                 if (DEBUG) Log.d(TAG, "hot book_url = " + hotBookUrl);
 
                 String hotBookCoverUrl = item.getElementsByTag("img").attr("src");
-                if (DEBUG) Log.d(TAG, "hot book_cover url = " + hotBookCoverUrl);
+                if (DEBUG) Log.d(TAG, "hot book_cover_holder url = " + hotBookCoverUrl);
 
                 String description = item.getElementsByTag("dd").text();
                 if (DEBUG) Log.d(TAG, "hot book description = " + description);
@@ -210,7 +210,7 @@ public class BiQuGeWebParser extends AbsWebParser {
                 Element top = other.getElementsByClass("top").get(0);
 
                 String otherTopBookCoverUrl = top.getElementsByTag("img").attr("src");
-                if (DEBUG) Log.d(TAG, "top book_cover url = " + otherTopBookCoverUrl);
+                if (DEBUG) Log.d(TAG, "top book_cover_holder url = " + otherTopBookCoverUrl);
 
                 String otherTopBookName = top.getElementsByTag("a").get(1).text();
                 if (DEBUG) Log.d(TAG, "top book_name = " + otherTopBookName);

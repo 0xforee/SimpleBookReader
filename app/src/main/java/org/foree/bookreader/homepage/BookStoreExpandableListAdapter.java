@@ -79,7 +79,7 @@ public class BookStoreExpandableListAdapter implements ExpandableListAdapter {
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         GroupViewHolder groupViewHolder;
         if (convertView == null) {
-            convertView = LayoutInflater.from(mContext).inflate(R.layout.book_store_category, parent, false);
+            convertView = LayoutInflater.from(mContext).inflate(R.layout.view_book_store_category, parent, false);
             groupViewHolder = new GroupViewHolder(convertView);
             convertView.setTag(groupViewHolder);
         } else {
@@ -93,7 +93,7 @@ public class BookStoreExpandableListAdapter implements ExpandableListAdapter {
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
         ChildViewHolder childViewHolder;
         if (convertView == null) {
-            convertView = LayoutInflater.from(mContext).inflate(R.layout.book_store_item, parent, false);
+            convertView = LayoutInflater.from(mContext).inflate(R.layout.view_book_store_item, parent, false);
 
             childViewHolder = new ChildViewHolder(convertView);
             convertView.setTag(childViewHolder);

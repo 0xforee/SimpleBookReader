@@ -27,7 +27,7 @@ public class ContentAdapter extends CursorAdapter {
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         LayoutInflater layoutInflater = LayoutInflater.from(context);
-        View rootView = layoutInflater.inflate(R.layout.listview_content_item_holder, null);
+        View rootView = layoutInflater.inflate(R.layout.lv_content_item_holder, null);
         ViewHolder viewHolder = new ViewHolder(rootView);
         rootView.setTag(viewHolder);
 

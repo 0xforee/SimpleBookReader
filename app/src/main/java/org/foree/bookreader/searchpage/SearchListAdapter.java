@@ -46,7 +46,7 @@ public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.My
 
     @Override
     public SearchListAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new MyViewHolder(mLayoutInflater.inflate(R.layout.novel_card_view, parent, false));
+        return new MyViewHolder(mLayoutInflater.inflate(R.layout.rv_search_holder, parent, false));
 
     }
 

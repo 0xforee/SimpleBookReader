@@ -73,7 +73,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.view_pager_layout);
+        setContentView(R.layout.vp_layout);
 
         // register EventBus
         EventBus.getDefault().register(this);
@@ -84,22 +84,22 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        setUpLayoutViews();
+        initViews();
         initTextView();
-        setUpMenuPop();
+        initMenuPop();
 
         notifyState(STATE_LOADING);
 
     }
 
-    private void setUpLayoutViews() {
+    private void initViews() {
         //init textView
         mTvLoading = (TextView) findViewById(R.id.loading);
 
         mViewPager = (ReadViewPager) findViewById(R.id.book_pager);
         pageAdapter = new PageAdapter(getSupportFragmentManager());
 
-        rootView = LayoutInflater.from(this).inflate(R.layout.view_pager_layout, null);
+        rootView = LayoutInflater.from(this).inflate(R.layout.vp_layout, null);
         mViewPager.setAdapter(pageAdapter);
 
         mViewPager.setOnPageAreaClickListener(this);
@@ -191,7 +191,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
         super.onDestroy();
     }
 
-    private void setUpMenuPop() {
+    private void initMenuPop() {
         // 弹出一个popupMenu
         View view = LayoutInflater.from(this).inflate(R.layout.popupmenu_read_menu, null);
 

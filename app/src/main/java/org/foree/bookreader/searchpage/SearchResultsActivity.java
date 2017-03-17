@@ -40,12 +40,12 @@ public class SearchResultsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
-        setUpLayoutViews();
+        initViews();
         handlerIntent(getIntent());
 
     }
 
-    private void setUpLayoutViews() {
+    private void initViews() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 

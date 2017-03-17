@@ -71,12 +71,12 @@ public class BookStoreFragment extends Fragment {
         //mSwipeRefreshLayout.setOnRefreshListener(this);
 
         mExpandableListView = (ExpandableListView) view.findViewById(R.id.el_book_store);
-        setUpExpandableListView();
+        initExpandableListView();
 
         return view;
     }
 
-    private void setUpExpandableListView() {
+    private void initExpandableListView() {
         final Context context = this.getContext();
         AbsWebParser webParser = WebParserManager.getInstance().getWebParser("http://www.biquge.cn/xxxx");
         webParser.getHomePageInfo("http://www.biquge.cn", new NetCallback<List<List<Book>>>() {

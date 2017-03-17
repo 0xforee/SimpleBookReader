@@ -60,18 +60,18 @@ public class BookInfoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_info);
 
-        setupLayout();
+        initLayout();
 
         Bundle bundle = getIntent().getExtras();
 
         bookUrl = bundle.getString("book_url");
 
-        setupView();
+        initViews();
 
         notifyUpdate(STATE_LOADING);
     }
 
-    private void setupLayout() {
+    private void initLayout() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.book_info);
         setSupportActionBar(toolbar);
@@ -125,7 +125,7 @@ public class BookInfoActivity extends AppCompatActivity {
         }
     }
 
-    private void setupView() {
+    private void initViews() {
         final AbsWebParser webInfo = WebParserManager.getInstance().getWebParser(bookUrl);
         webInfo.getBookInfo(bookUrl, new NetCallback<Book>() {
             @Override

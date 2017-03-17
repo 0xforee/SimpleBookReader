@@ -106,14 +106,14 @@ public class BookShelfFragment extends Fragment implements SwipeRefreshLayout.On
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.rv_book_shelf);
 
-        setUpRecyclerViewAdapter();
+        initRecyclerAdapter();
 
         syncNovelInfo();
 
         return view;
     }
 
-    private void setUpRecyclerViewAdapter() {
+    private void initRecyclerAdapter() {
 
         bookList = bookDao.getAllBooks();
         mAdapter = new BookShelfAdapter(getContext(), bookList);

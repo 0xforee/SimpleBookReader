@@ -29,7 +29,7 @@ public class BookShelfActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_shelf);
 
-        setUpLayoutViews();
+        initViews();
 
         PushManager.getInstance().initialize(this.getApplicationContext());
 
@@ -47,7 +47,7 @@ public class BookShelfActivity extends AppCompatActivity {
 
     }
 
-    private void setUpLayoutViews() {
+    private void initViews() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
