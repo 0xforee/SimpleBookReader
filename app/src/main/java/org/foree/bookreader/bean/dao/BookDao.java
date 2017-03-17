@@ -4,7 +4,6 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import org.foree.bookreader.bean.book.Book;
@@ -106,7 +105,7 @@ public class BookDao {
         return chapterList;
     }
 
-    public void updateModifiedTime(String bookUrl, String modifiedTime){
+    public void updateModifiedTime(String bookUrl, String modifiedTime) {
         Log.d(TAG, "update book " + bookUrl + " Time " + modifiedTime);
 
         ContentValues contentValues = new ContentValues();
@@ -249,7 +248,7 @@ public class BookDao {
                 selection,
                 new String[]{chapterUrl},
                 null
-                );
+        );
         if (cursor != null && cursor.getCount() != 0 && cursor.moveToFirst()) {
             chapterId = cursor.getInt(cursor.getColumnIndex(BReaderContract.Chapters.COLUMN_NAME_CHAPTER_ID));
             cursor.close();
@@ -294,62 +293,13 @@ public class BookDao {
      */
     public String getChapterUrl(int flag, String url) {
 
-        Cursor cursor;
-        String chapterUrl = null;
-        String bookUrl = null;
-        String orderBy = null;
+        Map<String, Boolean> cached = getChapterUrlLimit(flag, url, 1);
 
-        if (url != null) {
-
-            int chapterId = getChapterId(url);
-
-            String selection = BReaderContract.Chapters.COLUMN_NAME_CHAPTER_URL + "=?";
-
-            // 限定条件加入bookUrl限定
-            cursor = mResolver.query(
-                    BReaderProvider.CONTENT_URI_CHAPTERS,
-                    new String[]{BReaderContract.Chapters.COLUMN_NAME_BOOK_URL},
-                    selection,
-                    new String[]{url},
-                    null
-            );
-            if (cursor != null && cursor.getCount() != 0 && cursor.moveToFirst()) {
-                bookUrl = cursor.getString(cursor.getColumnIndex(BReaderContract.Chapters.COLUMN_NAME_BOOK_URL));
-            }
-
-            if (bookUrl != null) {
-                if (flag > 0) {
-                    // 获取下一章url
-                    selection = BReaderContract.Chapters.COLUMN_NAME_BOOK_URL + " = ? and " +
-                            BReaderContract.Chapters.COLUMN_NAME_CHAPTER_ID + " > ?";
-                    orderBy = BReaderContract.Chapters.COLUMN_NAME_CHAPTER_ID + " asc";
-                } else {
-                    // 获取上一章url
-                    selection = BReaderContract.Chapters.COLUMN_NAME_BOOK_URL + " = ? and " +
-                            BReaderContract.Chapters.COLUMN_NAME_CHAPTER_ID + " < ?";
-                    orderBy = BReaderContract.Chapters.COLUMN_NAME_CHAPTER_ID + " desc";
-                }
-
-                cursor = mResolver.query(
-                        BReaderProvider.CONTENT_URI_CHAPTERS,
-                        new String[]{BReaderContract.Chapters.COLUMN_NAME_CHAPTER_URL},
-                        selection,
-                        new String[]{bookUrl, chapterId + ""},
-                        orderBy
-                );
-
-                if (cursor != null && cursor.getCount() != 0 && cursor.moveToFirst()) {
-                    chapterUrl = cursor.getString(cursor.getColumnIndex(BReaderContract.Chapters.COLUMN_NAME_CHAPTER_URL));
-                } else {
-                    // 没有上一章或者没有下一章
-                    chapterUrl = null;
-                }
-            }
-
-            if (cursor != null) cursor.close();
+        if (cached == null || cached.isEmpty()) {
+            return null;
+        } else {
+            return (String) cached.keySet().toArray()[0];
         }
-
-        return chapterUrl;
     }
 
     /**
@@ -398,7 +348,7 @@ public class BookDao {
                     orderBy = BReaderContract.Chapters.COLUMN_NAME_CHAPTER_ID + " desc";
                 }
 
-                if(limit>0)
+                if (limit > 0)
                     orderBy = orderBy + " limit " + limit;
 
                 cursor = mResolver.query(
@@ -409,11 +359,11 @@ public class BookDao {
                         orderBy
                 );
 
-                if( cursor != null && cursor.getCount()!=0) {
-                    while(cursor.moveToNext()){
+                if (cursor != null && cursor.getCount() != 0) {
+                    while (cursor.moveToNext()) {
                         chapterUrl = cursor.getString(cursor.getColumnIndex(BReaderContract.Chapters.COLUMN_NAME_CHAPTER_URL));
                         boolean offline = cursor.getInt(cursor.getColumnIndex(BReaderContract.Chapters.COLUMN_NAME_CACHED)) == 1;
-                        mCachedMap.put(chapterUrl,offline);
+                        mCachedMap.put(chapterUrl, offline);
                     }
                     cursor.close();
                 }
