@@ -111,24 +111,24 @@ public class ReadFragment extends Fragment implements SharedPreferences.OnShared
     private void changeTheme(Boolean nightMode) {
         int backgroundColor = getResources().getColor(R.color.classical_page_background);
         int textColor = getResources().getColor(R.color.md_black_1000);
-        if(nightMode){
-            // set mNightMode
-            backgroundColor = getResources().getColor(R.color.nightBackground);
-            textColor = getResources().getColor(R.color.nightTextColor);
-            rootView.setBackgroundColor(backgroundColor);
-            tvTitle.setTextColor(textColor);
-            tvContents.setTextColor(textColor);
-            tvTime.setTextColor(textColor);
-            tvPageNum.setTextColor(textColor);
-            tvIndex.setTextColor(textColor);
-        }else{
-            rootView.setBackgroundColor(backgroundColor);
-            tvTitle.setTextColor(textColor);
-            tvContents.setTextColor(textColor);
-            tvIndex.setTextColor(textColor);
-            tvPageNum.setTextColor(textColor);
-            tvTime.setTextColor(textColor);
-        }
+//        if(nightMode){
+//            // set mNightMode
+//            backgroundColor = getResources().getColor(R.color.nightBackground);
+//            textColor = getResources().getColor(R.color.nightTextColor);
+//            rootView.setBackgroundColor(backgroundColor);
+//            tvTitle.setTextColor(textColor);
+//            tvContents.setTextColor(textColor);
+//            tvTime.setTextColor(textColor);
+//            tvPageNum.setTextColor(textColor);
+//            tvIndex.setTextColor(textColor);
+//        }else{
+//            rootView.setBackgroundColor(backgroundColor);
+//            tvTitle.setTextColor(textColor);
+//            tvContents.setTextColor(textColor);
+//            tvIndex.setTextColor(textColor);
+//            tvPageNum.setTextColor(textColor);
+//            tvTime.setTextColor(textColor);
+//        }
     }
 
 

@@ -2,7 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/classical_page_background"
     android:orientation="vertical">
 
     <TextView
@@ -20,7 +19,6 @@
         android:layout_margin="@dimen/read_page_margin"
         android:layout_weight="30"
         android:lineSpacingExtra="@dimen/read_line_spacing"
-        android:textColor="@color/md_black_1000"
         android:textSize="17sp" />
 
     <RelativeLayout

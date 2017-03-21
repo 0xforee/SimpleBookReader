@@ -5,7 +5,6 @@
     android:fitsSystemWindows="true">
 
     <RelativeLayout
-        android:background="@color/classical_page_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
