@@ -7,13 +7,13 @@ import java.io.Serializable;
  * ReadFragment 使用的数据集
  */
 
-public class ReadPageDataEvent implements Serializable {
+public class ReadPageDataSet implements Serializable {
     private String title;
     private String contents;
     private int pageNum;
     private int index;
 
-    public ReadPageDataEvent(String title, String contents, int pageNum, int index) {
+    public ReadPageDataSet(String title, String contents, int pageNum, int index) {
         this.title = title;
         this.contents = contents;
         this.pageNum = pageNum;

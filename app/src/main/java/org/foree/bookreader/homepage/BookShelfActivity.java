@@ -2,6 +2,7 @@ package org.foree.bookreader.homepage;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -10,10 +11,12 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import com.igexin.sdk.PushManager;
 
 import org.foree.bookreader.R;
+import org.foree.bookreader.settings.SettingsActivity;
 
 public class BookShelfActivity extends AppCompatActivity {
 
@@ -69,11 +72,23 @@ public class BookShelfActivity extends AppCompatActivity {
 
         // Associate searchable configuration with searchView
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
 
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.action_about:
+                break;
+            case R.id.action_settings:
+                Intent intent = new Intent(BookShelfActivity.this, SettingsActivity.class);
+                startActivity(intent);
+                break;
+        }
+        return true;
+    }
 }

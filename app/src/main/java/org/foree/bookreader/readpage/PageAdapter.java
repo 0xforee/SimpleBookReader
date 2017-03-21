@@ -4,7 +4,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import org.foree.bookreader.bean.ReadPageDataEvent;
+import org.foree.bookreader.bean.ReadPageDataSet;
 import org.foree.bookreader.bean.book.Chapter;
 
 /**
@@ -21,7 +21,7 @@ public class PageAdapter extends FragmentStatePagerAdapter {
     @Override
     public Fragment getItem(int position) {
         return ReadFragment.newInstance(
-                new ReadPageDataEvent(
+                new ReadPageDataSet(
                         chapter.getChapterTitle(),
                         chapter.getPage(position),
                         chapter != null ? chapter.numberOfPages() : 0,

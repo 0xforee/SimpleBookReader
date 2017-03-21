@@ -3,7 +3,6 @@
     package="org.foree.bookreader">
 
     <uses-permission android:name="android.permission.INTERNET" />
-
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
@@ -13,7 +12,6 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
-
         <activity android:name=".homepage.BookShelfActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -52,7 +50,11 @@
         <provider
             android:name=".bean.dao.BReaderProvider"
             android:authorities="org.foree.bookreader.provider"
-            android:exported="true"/>
+            android:exported="true" />
+
+        <activity
+            android:name=".settings.SettingsActivity"
+            android:label="@string/title_activity_settings"></activity>
     </application>
 
 </manifest>
