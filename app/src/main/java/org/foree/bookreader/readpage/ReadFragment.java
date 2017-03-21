@@ -20,8 +20,10 @@ public class ReadFragment extends Fragment implements SharedPreferences.OnShared
     private static final String ARG_TITLE = "title";
 
     private TextView tvContents, tvTitle, tvTime, tvIndex, tvPageNum;
+    private View rootView;
+    private boolean mNightMode;
 
-    private SharedPreferences nightPreference;
+    private SharedPreferences mNightPreference;
 
     public static ReadFragment newInstance(ReadPageDataSet readPageDataSet) {
         ReadFragment fragment = new ReadFragment();
@@ -52,38 +54,39 @@ public class ReadFragment extends Fragment implements SharedPreferences.OnShared
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_read, null);
-        tvContents = (TextView) view.findViewById(R.id.book_content);
-        tvTitle = (TextView) view.findViewById(R.id.tv_title);
-        tvTime = (TextView) view.findViewById(R.id.tv_time);
-        tvIndex = (TextView) view.findViewById(R.id.tv_index);
-        tvPageNum = (TextView) view.findViewById(R.id.tv_page_num);
+        rootView = inflater.inflate(R.layout.fragment_read, null);
+        tvContents = (TextView) rootView.findViewById(R.id.book_content);
+        tvTitle = (TextView) rootView.findViewById(R.id.tv_title);
+        tvTime = (TextView) rootView.findViewById(R.id.tv_time);
+        tvIndex = (TextView) rootView.findViewById(R.id.tv_index);
+        tvPageNum = (TextView) rootView.findViewById(R.id.tv_page_num);
         if (getArguments() != null) {
             setData((ReadPageDataSet) getArguments().getSerializable(ARG_TITLE));
         }
 
-        return view;
-    }
+        changeTheme(mNightMode);
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        //tvContents.setData(Html.fromHtml(getArguments().getString(ARG_CONTENT)));
-
+        return rootView;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        nightPreference = getContext().getSharedPreferences(SettingsActivity.KEY_PREF_NIGHT_MODE, Context.MODE_PRIVATE);
-        nightPreference.registerOnSharedPreferenceChangeListener(this);
+        mNightPreference = getContext().getSharedPreferences(SettingsActivity.PREF_NAME, Context.MODE_PRIVATE);
+        mNightMode = mNightPreference.getBoolean(SettingsActivity.KEY_PREF_NIGHT_MODE, false);
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        nightPreference.unregisterOnSharedPreferenceChangeListener(this);
+    public void onResume() {
+        super.onResume();
+        mNightPreference.registerOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mNightPreference.unregisterOnSharedPreferenceChangeListener(this);
     }
 
     private String getCurrentTime() {
@@ -99,6 +102,34 @@ public class ReadFragment extends Fragment implements SharedPreferences.OnShared
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-
+        if(key.equals(SettingsActivity.KEY_PREF_NIGHT_MODE)){
+            Boolean nightMode = sharedPreferences.getBoolean(SettingsActivity.KEY_PREF_NIGHT_MODE, false);
+            changeTheme(nightMode);
+        }
     }
+
+    private void changeTheme(Boolean nightMode) {
+        int backgroundColor = getResources().getColor(R.color.classical_page_background);
+        int textColor = getResources().getColor(R.color.md_black_1000);
+        if(nightMode){
+            // set mNightMode
+            backgroundColor = getResources().getColor(R.color.nightBackground);
+            textColor = getResources().getColor(R.color.nightTextColor);
+            rootView.setBackgroundColor(backgroundColor);
+            tvTitle.setTextColor(textColor);
+            tvContents.setTextColor(textColor);
+            tvTime.setTextColor(textColor);
+            tvPageNum.setTextColor(textColor);
+            tvIndex.setTextColor(textColor);
+        }else{
+            rootView.setBackgroundColor(backgroundColor);
+            tvTitle.setTextColor(textColor);
+            tvContents.setTextColor(textColor);
+            tvIndex.setTextColor(textColor);
+            tvPageNum.setTextColor(textColor);
+            tvTime.setTextColor(textColor);
+        }
+    }
+
+
 }

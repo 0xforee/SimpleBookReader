@@ -2,8 +2,10 @@ package org.foree.bookreader.readpage;
 
 import android.app.Dialog;
 import android.app.LoaderManager;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -34,6 +36,7 @@ import org.foree.bookreader.bean.dao.BookDao;
 import org.foree.bookreader.bean.event.PaginationEvent;
 import org.foree.bookreader.pagination.PaginationArgs;
 import org.foree.bookreader.pagination.PaginationLoader;
+import org.foree.bookreader.settings.SettingsActivity;
 import org.foree.bookreader.utils.DateUtils;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -228,6 +231,18 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
                 chapterTitleListView.setSelection(getChapterPosition() - 2);
                 contentAdapter.notifyDataSetChanged();
 
+            }
+        });
+
+        tvBrightness.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SharedPreferences preferences = getSharedPreferences(SettingsActivity.PREF_NAME, Context.MODE_PRIVATE);
+                boolean nightMode = preferences.getBoolean(SettingsActivity.KEY_PREF_NIGHT_MODE, false);
+                preferences.edit().putBoolean(SettingsActivity.KEY_PREF_NIGHT_MODE, !nightMode).apply();
+                if (menuPop.isShowing()) {
+                    menuPop.dismiss();
+                }
             }
         });
     }

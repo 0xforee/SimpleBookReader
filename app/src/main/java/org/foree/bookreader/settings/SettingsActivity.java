@@ -24,6 +24,7 @@ import org.foree.bookreader.R;
 import java.util.List;
 
 public class SettingsActivity extends AppCompatPreferenceActivity {
+    public static final String PREF_NAME = "settings";
     public static final String KEY_PREF_NIGHT_MODE = "pref_nightMode";
 
     /**
