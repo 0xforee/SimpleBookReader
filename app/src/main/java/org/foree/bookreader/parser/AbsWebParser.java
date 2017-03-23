@@ -221,7 +221,7 @@ public abstract class AbsWebParser implements IWebParser {
                 chapter = getChapterContentsSync(request.getUrl());
             }
 
-            if (chapter.getContents() != null) {
+            if (chapter != null && chapter.getContents() != null) {
                 // put chapter cache
                 chapterCache.put(request.getUrl(), chapter);
 

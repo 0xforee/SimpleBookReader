@@ -12,6 +12,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
@@ -53,10 +55,7 @@ import java.util.List;
  */
 public class ReadActivity extends AppCompatActivity implements ReadViewPager.onPageAreaClickListener, LoaderManager.LoaderCallbacks {
     private static final String TAG = ReadActivity.class.getSimpleName();
-    // loading state
-    private static final int STATE_FAILED = -1;
-    private static final int STATE_LOADING = 0;
-    private static final int STATE_SUCCESS = 1;
+
     String chapterUrl, bookUrl;
     private List<Chapter> chapterList = new ArrayList<>();
     private BookDao bookDao;
@@ -74,6 +73,36 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
     private ContentAdapter contentAdapter;
     // menuPop
     private TextView tvContent, tvProgress, tvFont, tvBrightness;
+
+    // loading state
+    private static final int MSG_FAILED = -1;
+    private static final int MSG_LOADING = 0;
+    private static final int MSG_SUCCESS = 1;
+    private final Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case MSG_LOADING:
+                    mTvLoading.setVisibility(View.VISIBLE);
+                    mViewPager.setVisibility(View.INVISIBLE);
+                    break;
+                case MSG_FAILED:
+                    mTvLoading.setVisibility(View.GONE);
+                    mViewPager.setVisibility(View.VISIBLE);
+                    Chapter chapter = new Chapter();
+                    chapter.addPage(getResources().getText(R.string.load_fail).toString());
+                    pageAdapter.setChapter(chapter);
+                    mViewPager.setCurrentItem(0, false);
+                    break;
+                case MSG_SUCCESS:
+                    mTvLoading.setVisibility(View.GONE);
+                    mViewPager.setVisibility(View.VISIBLE);
+                    break;
+
+            }
+        }
+    };
 
 
     @Override
@@ -94,7 +123,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
         initTextView();
         initMenuPop();
 
-        notifyState(STATE_LOADING);
+        mHandler.sendEmptyMessageDelayed(MSG_LOADING, 500);
 
     }
 
@@ -143,33 +172,14 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
         });
     }
 
-    private void notifyState(int state) {
-        switch (state) {
-            case STATE_FAILED:
-                mTvLoading.setVisibility(View.GONE);
-                mViewPager.setVisibility(View.VISIBLE);
-                Chapter chapter = new Chapter();
-                chapter.addPage(getResources().getText(R.string.load_fail).toString());
-                pageAdapter.setChapter(chapter);
-                mViewPager.setCurrentItem(0, false);
-                break;
-            case STATE_LOADING:
-                mTvLoading.setVisibility(View.VISIBLE);
-                mViewPager.setVisibility(View.INVISIBLE);
-                break;
-            case STATE_SUCCESS:
-                mTvLoading.setVisibility(View.GONE);
-                mViewPager.setVisibility(View.VISIBLE);
-                break;
-        }
-    }
-
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(PaginationEvent pageEvent) {
         Log.d("EventBus", "notifyState");
+        if (mHandler.hasMessages(MSG_LOADING))
+            mHandler.removeMessages(MSG_LOADING);
         Chapter chapter = pageEvent.getChapter();
         if (chapter != null) {
-            notifyState(STATE_SUCCESS);
+            mHandler.sendEmptyMessage(MSG_SUCCESS);
 
             pageAdapter.setChapter(chapter);
 
@@ -186,7 +196,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
             }
 
         } else {
-            notifyState(STATE_FAILED);
+            mHandler.sendEmptyMessage(MSG_FAILED);
         }
     }
 
@@ -323,7 +333,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
 
     private void switchChapter(String newChapterUrl, boolean slipLeft) {
         if (newChapterUrl != null) {
-            notifyState(STATE_LOADING);
+            mHandler.sendEmptyMessageDelayed(MSG_LOADING, 1000);
             PaginationLoader.getInstance().loadPagination(newChapterUrl);
             mSlipLeft = slipLeft;
         }

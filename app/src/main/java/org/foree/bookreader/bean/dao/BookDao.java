@@ -365,9 +365,10 @@ public class BookDao {
                         boolean offline = cursor.getInt(cursor.getColumnIndex(BReaderContract.Chapters.COLUMN_NAME_CACHED)) == 1;
                         mCachedMap.put(chapterUrl, offline);
                     }
-                    cursor.close();
                 }
             }
+
+            if (cursor != null) cursor.close();
 
         }
 
