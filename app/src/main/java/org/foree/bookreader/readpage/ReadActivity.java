@@ -125,6 +125,8 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
 
         mHandler.sendEmptyMessageDelayed(MSG_LOADING, 500);
 
+        PaginationLoader.getInstance().initPaginationCache(bookUrl);
+
     }
 
     private void initViews() {

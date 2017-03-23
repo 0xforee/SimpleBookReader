@@ -225,6 +225,8 @@ public abstract class AbsWebParser implements IWebParser {
                 // put chapter cache
                 chapterCache.put(request.getUrl(), chapter);
 
+                PaginationLoader.getInstance().setCached(request.getUrl());
+
                 if (request.isCurrent()) {
                     PaginateCore.splitPage(request.getPaginationArgs(), chapter);
                     // post

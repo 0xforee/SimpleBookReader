@@ -48,8 +48,9 @@ public class DiskCache extends ChapterCache {
                 chapter.setChapterUrl(chapterUrl);
                 chapter.setChapterTitle(cursor.getString(cursor.getColumnIndex(BReaderContract.Chapters.COLUMN_NAME_CHAPTER_TITLE)));
             }
-            cursor.close();
         }
+
+        if(cursor != null) cursor.close();
 
         return chapter;
     }

@@ -18,7 +18,6 @@ import java.util.Map;
 /**
  * Created by foree on 2016/8/6.
  * 数据库操作方法
- * TODO:性能优化，批量操作不使用循环
  */
 public class BookDao {
     private static final String TAG = BookDao.class.getSimpleName();
@@ -75,7 +74,7 @@ public class BookDao {
         );
     }
 
-    private List<Chapter> getChapters(String bookUrl) {
+    public List<Chapter> getChapters(String bookUrl) {
         Log.d(TAG, "get chapterList from db, bookUrl = " + bookUrl);
         List<Chapter> chapterList = new ArrayList<>();
         String selection = BReaderContract.Chapters.COLUMN_NAME_BOOK_URL + "=?";
@@ -163,11 +162,11 @@ public class BookDao {
             book.setRecentChapterUrl(cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_RECENT_CHAPTER_URL)));
             book.setPageIndex(cursor.getInt(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_PAGE_INDEX)));
             book.setBookCoverUrl(cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_COVER_URL)));
-            cursor.close();
         }
 
         book.setChapters(getChapters(bookUrl));
 
+        if (cursor != null) cursor.close();
         return book;
     }
 
@@ -251,9 +250,9 @@ public class BookDao {
         );
         if (cursor != null && cursor.getCount() != 0 && cursor.moveToFirst()) {
             chapterId = cursor.getInt(cursor.getColumnIndex(BReaderContract.Chapters.COLUMN_NAME_CHAPTER_ID));
-            cursor.close();
         }
 
+        if (cursor != null) cursor.close();
         return chapterId;
     }
 
@@ -281,6 +280,8 @@ public class BookDao {
             cursor.close();
 
         }
+
+        if (cursor != null) cursor.close();
         return chapterUrl;
     }
 
