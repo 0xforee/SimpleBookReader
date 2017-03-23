@@ -133,6 +133,7 @@ public class BookShelfFragment extends Fragment implements SwipeRefreshLayout.On
                     intent.putExtras(bundle);
 
                     startActivity(intent);
+                    getActivity().finish();
                 }
             }
 

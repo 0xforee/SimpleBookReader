@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.app.LoaderManager;
 import android.content.Context;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -28,12 +29,14 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import org.foree.bookreader.R;
+import org.foree.bookreader.base.GlobalConfig;
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.dao.BReaderContract;
 import org.foree.bookreader.bean.dao.BReaderProvider;
 import org.foree.bookreader.bean.dao.BookDao;
 import org.foree.bookreader.bean.event.PaginationEvent;
+import org.foree.bookreader.homepage.BookShelfActivity;
 import org.foree.bookreader.pagination.PaginationArgs;
 import org.foree.bookreader.pagination.PaginationLoader;
 import org.foree.bookreader.settings.SettingsActivity;
@@ -238,13 +241,27 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
             @Override
             public void onClick(View v) {
                 SharedPreferences preferences = getSharedPreferences(SettingsActivity.PREF_NAME, Context.MODE_PRIVATE);
-                boolean nightMode = preferences.getBoolean(SettingsActivity.KEY_PREF_NIGHT_MODE, false);
+                boolean nightMode = GlobalConfig.getInstance().isNightMode();
+                Log.d(TAG, "onClick: nightMode = " + nightMode);
                 preferences.edit().putBoolean(SettingsActivity.KEY_PREF_NIGHT_MODE, !nightMode).apply();
+                // change theme
+                GlobalConfig.getInstance().changeTheme();
+
+                recreate();
+
                 if (menuPop.isShowing()) {
                     menuPop.dismiss();
                 }
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(ReadActivity.this, BookShelfActivity.class));
+        finish();
+        overridePendingTransition(0, android.R.anim.slide_out_right);
     }
 
     @Override

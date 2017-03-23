@@ -41,7 +41,11 @@ public class BaseApplication extends Application {
         mInstance = this;
 
         // night mode
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        if(GlobalConfig.getInstance().isNightMode()) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        }else{
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
 
         initApplicationDir();
         initWebSites();
