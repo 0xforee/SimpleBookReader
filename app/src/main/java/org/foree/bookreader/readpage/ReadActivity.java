@@ -275,7 +275,9 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        startActivity(new Intent(ReadActivity.this, BookShelfActivity.class));
+        Intent intent = new Intent(ReadActivity.this, BookShelfActivity.class);
+        intent.putExtra("back", true);
+        startActivity(intent);
         finish();
         overridePendingTransition(0, android.R.anim.slide_out_right);
     }

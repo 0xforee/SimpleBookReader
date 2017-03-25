@@ -108,7 +108,10 @@ public class BookShelfFragment extends Fragment implements SwipeRefreshLayout.On
 
         initRecyclerAdapter();
 
-        syncNovelInfo();
+        Bundle bundle = bookShelfActivity.getIntent().getExtras();
+
+        if (bundle == null || !bundle.getBoolean("back"))
+            syncNovelInfo();
 
         return view;
     }
@@ -180,6 +183,7 @@ public class BookShelfFragment extends Fragment implements SwipeRefreshLayout.On
         super.onAttach(context);
 
         bookShelfActivity = (BookShelfActivity) getActivity();
+
 
     }
 
