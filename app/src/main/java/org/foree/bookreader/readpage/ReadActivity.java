@@ -26,6 +26,7 @@ import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -56,7 +57,8 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
     // view pager
     private ReadViewPager mViewPager;
     private PageAdapter pageAdapter;
-    private TextView mTextView, mTvLoading;
+    private TextView mTextView;
+    private Button mBtnLoading;
     // popWindow
     private PopupWindow menuPop;
     private Dialog contentDialog;
@@ -76,20 +78,17 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
             super.handleMessage(msg);
             switch (msg.what) {
                 case MSG_LOADING:
-                    mTvLoading.setVisibility(View.VISIBLE);
-                    mViewPager.setVisibility(View.INVISIBLE);
+                    mBtnLoading.setVisibility(View.VISIBLE);
+                    mBtnLoading.setClickable(false);
+                    mBtnLoading.setText(getResources().getText(R.string.loading));
                     break;
                 case MSG_FAILED:
-                    mTvLoading.setVisibility(View.GONE);
-                    mViewPager.setVisibility(View.VISIBLE);
-                    Chapter chapter = new Chapter();
-                    chapter.addPage(getResources().getText(R.string.load_fail).toString());
-                    pageAdapter.setChapter(chapter);
-                    mViewPager.setCurrentItem(0, false);
+                    mBtnLoading.setVisibility(View.VISIBLE);
+                    mBtnLoading.setClickable(true);
+                    mBtnLoading.setText(getResources().getText(R.string.load_fail_other));
                     break;
                 case MSG_SUCCESS:
-                    mTvLoading.setVisibility(View.GONE);
-                    mViewPager.setVisibility(View.VISIBLE);
+                    mBtnLoading.setVisibility(View.GONE);
                     break;
 
             }
@@ -121,7 +120,14 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
 
     private void initViews() {
         //init textView
-        mTvLoading = (TextView) findViewById(R.id.loading);
+        mBtnLoading = (Button) findViewById(R.id.loading);
+
+        mBtnLoading.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switchChapter(BookRecord.getInstance().getCurrentUrl(), false, true);
+            }
+        });
 
         mViewPager = (ReadViewPager) findViewById(R.id.book_pager);
         pageAdapter = new PageAdapter(getSupportFragmentManager());
@@ -177,15 +183,11 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
 
             pageAdapter.setChapter(chapter);
 
-            // if open book ,load index page
-            if (BookRecord.getInstance().isCurrentChapter(chapter.getChapterUrl())) {
-                mViewPager.setCurrentItem(BookRecord.getInstance().getPageIndex(), false);
+            // if open book ,load index page, otherwise load normal
+            if (BookRecord.getInstance().isInitCompleted()) {
+                mViewPager.setCurrentItem(isSlipLeft() ? chapter.numberOfPages() - 1 : 0, false);
             } else {
-                BookRecord.getInstance().switchChapter(chapter.getChapterUrl());
-                if (isSlipLeft())
-                    mViewPager.setCurrentItem(chapter.numberOfPages() - 1, false);
-                else
-                    mViewPager.setCurrentItem(0, false);
+                mViewPager.setCurrentItem(BookRecord.getInstance().getPageIndex(), false);
             }
 
         } else {
@@ -327,9 +329,11 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
 
     private void switchChapter(String newChapterUrl, boolean slipLeft, boolean skip) {
         if (newChapterUrl != null) {
+            pageAdapter.setChapter(null);
             if (skip)
                 mHandler.sendEmptyMessage(MSG_LOADING);
             PaginationLoader.getInstance().loadPagination(newChapterUrl);
+            BookRecord.getInstance().switchChapter(newChapterUrl);
             mSlipLeft = slipLeft;
         }
     }

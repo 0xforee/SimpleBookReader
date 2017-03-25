@@ -32,6 +32,9 @@ public class BookRecord {
     // 存储mChapters的url对应的index，加快索引速度
     private Map<String, Integer> mIndexMap;
 
+    // 初始化是否完成，指第一次页码切换是否完成
+    private boolean completed = false;
+
     private static BookRecord mInstance;
 
     private BookRecord() {
@@ -74,6 +77,7 @@ public class BookRecord {
      */
     public void saveBookRecord(int pageIndex) {
         mBook.setPageIndex(pageIndex);
+        completed = false;
 
         saveToDatabase(mBook);
     }
@@ -94,8 +98,13 @@ public class BookRecord {
         return getIndexFromUrl(getCurrentUrl());
     }
 
-    public boolean isCurrentChapter(String url){
-        return url.equals(getCurrentUrl());
+    public boolean isInitCompleted(){
+        if(completed){
+            return true;
+        }else{
+            completed = true;
+            return false;
+        }
     }
 
     public String getUrl(int position) {

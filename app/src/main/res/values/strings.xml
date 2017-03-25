@@ -16,7 +16,8 @@
 
     <!-- Chapter loading text -->
     <string name="loading">正在加载 &#8230;</string>
-    <string name="load_fail">加载失败，请检查网络连接</string>
+    <string name="load_fail_other">加载失败，请点我重试</string>
+    <string name="load_fail_net_error">加载失败，请检查网络连接</string>
 
     <!-- page popupMenu -->
     <string name="content">目录</string>

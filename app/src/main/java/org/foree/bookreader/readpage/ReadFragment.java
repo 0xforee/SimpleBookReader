@@ -19,7 +19,7 @@ import java.util.Calendar;
 public class ReadFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener{
     private static final String ARG_TITLE = "title";
 
-    private TextView tvContents, tvTitle, tvTime, tvIndex, tvPageNum;
+    private TextView tvContents, tvTitle, tvTime, tvIndex, tvPageNum, tvSeparator;
     private View rootView;
     private boolean mNightMode;
 
@@ -49,6 +49,7 @@ public class ReadFragment extends Fragment implements SharedPreferences.OnShared
         tvTime.setText(getCurrentTime());
         tvPageNum.setText(readPageDataSet.getPageNum());
         tvIndex.setText(readPageDataSet.getIndex());
+        tvSeparator.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -60,6 +61,7 @@ public class ReadFragment extends Fragment implements SharedPreferences.OnShared
         tvTime = (TextView) rootView.findViewById(R.id.tv_time);
         tvIndex = (TextView) rootView.findViewById(R.id.tv_index);
         tvPageNum = (TextView) rootView.findViewById(R.id.tv_page_num);
+        tvSeparator = (TextView) rootView.findViewById(R.id.tv_separator);
         if (getArguments() != null) {
             setData((ReadPageDataSet) getArguments().getSerializable(ARG_TITLE));
         }
