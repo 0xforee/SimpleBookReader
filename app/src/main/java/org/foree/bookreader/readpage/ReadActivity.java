@@ -32,23 +32,18 @@ import android.widget.TextView;
 
 import org.foree.bookreader.R;
 import org.foree.bookreader.base.GlobalConfig;
-import org.foree.bookreader.bean.book.Book;
+import org.foree.bookreader.bean.BookRecord;
 import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.dao.BReaderContract;
 import org.foree.bookreader.bean.dao.BReaderProvider;
-import org.foree.bookreader.bean.dao.BookDao;
 import org.foree.bookreader.bean.event.PaginationEvent;
 import org.foree.bookreader.homepage.BookShelfActivity;
 import org.foree.bookreader.pagination.PaginationArgs;
 import org.foree.bookreader.pagination.PaginationLoader;
 import org.foree.bookreader.settings.SettingsActivity;
-import org.foree.bookreader.utils.DateUtils;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by foree on 16-7-21.
@@ -56,10 +51,7 @@ import java.util.List;
 public class ReadActivity extends AppCompatActivity implements ReadViewPager.onPageAreaClickListener, LoaderManager.LoaderCallbacks {
     private static final String TAG = ReadActivity.class.getSimpleName();
 
-    String chapterUrl, bookUrl;
-    private List<Chapter> chapterList = new ArrayList<>();
-    private BookDao bookDao;
-    private int pageIndex;
+    String bookUrl;
     private boolean mSlipLeft = false;
     // view pager
     private ReadViewPager mViewPager;
@@ -113,9 +105,9 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
         // register EventBus
         EventBus.getDefault().register(this);
 
-        bookDao = new BookDao(this);
         bookUrl = getIntent().getExtras().getString("book_url");
-        openBook(bookUrl);
+
+        BookRecord.getInstance().restoreBookRecord(bookUrl);
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
@@ -124,8 +116,6 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
         initMenuPop();
 
         mHandler.sendEmptyMessageDelayed(MSG_LOADING, 500);
-
-        PaginationLoader.getInstance().initPaginationCache(bookUrl);
 
     }
 
@@ -168,7 +158,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
                         mTextView.getPaint(),
                         mTextView.getIncludeFontPadding()));
 
-                PaginationLoader.getInstance().loadPagination(chapterUrl);
+                PaginationLoader.getInstance().loadPagination(BookRecord.getInstance().getCurrentUrl());
 
             }
         });
@@ -186,11 +176,10 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
             pageAdapter.setChapter(chapter);
 
             // if open book ,load index page
-            if (chapter.getChapterUrl().equals(chapterUrl)) {
-                //Log.d(TAG, "slip to page " + pageIndex);
-                mViewPager.setCurrentItem(pageIndex, false);
+            if (BookRecord.getInstance().isCurrentChapter(chapter.getChapterUrl())) {
+                mViewPager.setCurrentItem(BookRecord.getInstance().getPageIndex(), false);
             } else {
-                updateChapterUrl(chapter.getChapterUrl());
+                BookRecord.getInstance().switchChapter(chapter.getChapterUrl());
                 if (isSlipLeft())
                     mViewPager.setCurrentItem(chapter.numberOfPages() - 1, false);
                 else
@@ -204,9 +193,10 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
 
     @Override
     protected void onDestroy() {
-        closeBook();
         EventBus.getDefault().unregister(this);
         super.onDestroy();
+
+        BookRecord.getInstance().saveBookRecord(mViewPager.getCurrentItem());
     }
 
     private void initMenuPop() {
@@ -243,7 +233,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
                     contentDialog.show();
                     getLoaderManager().restartLoader(0, null, ReadActivity.this);
                 }
-                chapterTitleListView.setSelection(getChapterPosition() - 2);
+                chapterTitleListView.setSelection(BookRecord.getInstance().getCurPosition() - 2);
                 contentAdapter.notifyDataSetChanged();
 
             }
@@ -283,12 +273,12 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
 
     @Override
     public void onPreChapterClick() {
-        switchChapter(bookDao.getChapterUrl(-1, chapterUrl), true);
+        switchChapter(BookRecord.getInstance().getUrlFromFlag(-1), true);
     }
 
     @Override
     public void onNextChapterClick() {
-        switchChapter(bookDao.getChapterUrl(1, chapterUrl), false);
+        switchChapter(BookRecord.getInstance().getUrlFromFlag(1), false);
     }
 
     private void showContentDialog() {
@@ -327,7 +317,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 contentDialog.dismiss();
-                switchChapter(chapterList.get(position).getChapterUrl(), false);
+                switchChapter(BookRecord.getInstance().getUrl(position), false);
                 contentAdapter.setSelectedPosition(position);
             }
         });
@@ -343,30 +333,6 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
 
     private boolean isSlipLeft() {
         return mSlipLeft;
-    }
-
-    private void openBook(String bookUrl) {
-        //get all chapter
-        Book book = bookDao.getBook(bookUrl);
-        // get chapterList
-        chapterList = book.getChapters();
-
-        // get chapterUrl
-        updateChapterUrl(book.getRecentChapterUrl());
-
-        pageIndex = book.getPageIndex();
-        //Log.d(TAG, "open Book at position " + pageIndex);
-
-        bookDao.updateModifiedTime(bookUrl, DateUtils.getCurrentTime());
-
-    }
-
-    private void closeBook() {
-        bookDao.updateBookState(bookUrl, chapterUrl, mViewPager.getCurrentItem());
-    }
-
-    private void updateChapterUrl(String newUrl) {
-        chapterUrl = newUrl;
     }
 
     @Override
@@ -391,8 +357,8 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
         Log.d(TAG, "onLoadFinished");
         contentAdapter.changeCursor((Cursor) data);
 
-        chapterTitleListView.setSelection(getChapterPosition() - 2);
-        contentAdapter.setSelectedPosition(getChapterPosition());
+        chapterTitleListView.setSelection(BookRecord.getInstance().getCurPosition() - 2);
+        contentAdapter.setSelectedPosition(BookRecord.getInstance().getCurPosition());
         contentAdapter.notifyDataSetChanged();
 
     }
@@ -402,12 +368,5 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
         contentAdapter.swapCursor(null);
     }
 
-    private int getChapterPosition() {
-        for (int i = 0; i < chapterList.size(); i++) {
-            if (chapterList.get(i).getChapterUrl().equals(chapterUrl)) {
-                return i;
-            }
-        }
-        return 0;
-    }
+
 }

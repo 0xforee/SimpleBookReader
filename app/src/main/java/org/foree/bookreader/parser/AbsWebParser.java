@@ -1,5 +1,6 @@
 package org.foree.bookreader.parser;
 
+import org.foree.bookreader.bean.BookRecord;
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.cache.ChapterCache;
@@ -225,7 +226,7 @@ public abstract class AbsWebParser implements IWebParser {
                 // put chapter cache
                 chapterCache.put(request.getUrl(), chapter);
 
-                PaginationLoader.getInstance().setCached(request.getUrl());
+                BookRecord.getInstance().setCached(request.getUrl());
 
                 if (request.isCurrent()) {
                     PaginateCore.splitPage(request.getPaginationArgs(), chapter);

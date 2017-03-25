@@ -59,20 +59,4 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
             }
         });
     }
-
-    public void testGetChapterByUrl() {
-        BookDao bookDao = new BookDao(getContext());
-        String chapterUrl = "http://www.biquge.com/14_14929/8194590.html";
-        String nextChapterUrl = bookDao.getChapterUrl(-1, chapterUrl);
-
-        Log.d(TAG, "nextChapterUrl = " + nextChapterUrl);
-    }
-
-    public void testUpdateView(){
-        BookDao bookDao = new BookDao(getContext());
-        String modifiedDate = DateUtils.getUpdateTimeFormat().format("2015-02-02 13:10");
-
-        bookDao.updateModifiedTime("http://www.biquge.cn/book/2831/", modifiedDate);
-
-    }
 }
