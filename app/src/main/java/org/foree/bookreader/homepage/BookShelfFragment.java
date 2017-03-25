@@ -165,7 +165,7 @@ public class BookShelfFragment extends Fragment implements SwipeRefreshLayout.On
                         mSwipeRefreshLayout.setRefreshing(true);
 
                     }
-                }, 500);
+                }, 100);
             }
 
             // if refresh start, get newer book info
@@ -211,7 +211,7 @@ public class BookShelfFragment extends Fragment implements SwipeRefreshLayout.On
                 public void run() {
                     mSwipeRefreshLayout.setRefreshing(false);
                 }
-            }, 1000);
+            }, 500);
         }
     }
 
