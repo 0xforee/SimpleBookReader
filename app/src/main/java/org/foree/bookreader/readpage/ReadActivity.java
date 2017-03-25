@@ -115,7 +115,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
         initTextView();
         initMenuPop();
 
-        mHandler.sendEmptyMessageDelayed(MSG_LOADING, 500);
+        mHandler.sendEmptyMessage(MSG_LOADING);
 
     }
 
@@ -167,8 +167,10 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(PaginationEvent pageEvent) {
         Log.d("EventBus", "notifyState");
+
         if (mHandler.hasMessages(MSG_LOADING))
             mHandler.removeMessages(MSG_LOADING);
+
         Chapter chapter = pageEvent.getChapter();
         if (chapter != null) {
             mHandler.sendEmptyMessage(MSG_SUCCESS);
@@ -273,12 +275,12 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
 
     @Override
     public void onPreChapterClick() {
-        switchChapter(BookRecord.getInstance().getUrlFromFlag(-1), true);
+        switchChapter(BookRecord.getInstance().getUrlFromFlag(-1), true, false);
     }
 
     @Override
     public void onNextChapterClick() {
-        switchChapter(BookRecord.getInstance().getUrlFromFlag(1), false);
+        switchChapter(BookRecord.getInstance().getUrlFromFlag(1), false, false);
     }
 
     private void showContentDialog() {
@@ -317,15 +319,16 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 contentDialog.dismiss();
-                switchChapter(BookRecord.getInstance().getUrl(position), false);
+                switchChapter(BookRecord.getInstance().getUrl(position), false, true);
                 contentAdapter.setSelectedPosition(position);
             }
         });
     }
 
-    private void switchChapter(String newChapterUrl, boolean slipLeft) {
+    private void switchChapter(String newChapterUrl, boolean slipLeft, boolean skip) {
         if (newChapterUrl != null) {
-            mHandler.sendEmptyMessageDelayed(MSG_LOADING, 1000);
+            if (skip)
+                mHandler.sendEmptyMessage(MSG_LOADING);
             PaginationLoader.getInstance().loadPagination(newChapterUrl);
             mSlipLeft = slipLeft;
         }
