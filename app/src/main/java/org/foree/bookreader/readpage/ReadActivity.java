@@ -51,6 +51,7 @@ import org.greenrobot.eventbus.ThreadMode;
  */
 public class ReadActivity extends AppCompatActivity implements ReadViewPager.onPageAreaClickListener, LoaderManager.LoaderCallbacks {
     private static final String TAG = ReadActivity.class.getSimpleName();
+    private static final String KEY_RECREATE = TAG + "_recreate";
 
     String bookUrl;
     private boolean mSlipLeft = false;
@@ -114,8 +115,17 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
         initTextView();
         initMenuPop();
 
-        mHandler.sendEmptyMessage(MSG_LOADING);
+        if (savedInstanceState == null || !savedInstanceState.getBoolean(KEY_RECREATE)) {
+            mHandler.sendEmptyMessage(MSG_LOADING);
+            Log.d(TAG, "onCreate: recreate activity");
+        }
 
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(KEY_RECREATE, true);
     }
 
     private void initViews() {
