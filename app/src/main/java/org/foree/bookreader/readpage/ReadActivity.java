@@ -112,13 +112,8 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         initViews();
-        initTextView();
+        initTextView(savedInstanceState);
         initMenuPop();
-
-        if (savedInstanceState == null || !savedInstanceState.getBoolean(KEY_RECREATE)) {
-            mHandler.sendEmptyMessage(MSG_LOADING);
-            Log.d(TAG, "onCreate: recreate activity");
-        }
 
     }
 
@@ -149,7 +144,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
 
     }
 
-    private void initTextView() {
+    private void initTextView(final Bundle savedInstanceState) {
         mTextView = (TextView) findViewById(R.id.book_content);
         mTextView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @SuppressWarnings("deprecation")
@@ -174,7 +169,13 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
                         mTextView.getPaint(),
                         mTextView.getIncludeFontPadding()));
 
-                PaginationLoader.getInstance().loadPagination(BookRecord.getInstance().getCurrentUrl());
+                if (savedInstanceState!=null && savedInstanceState.getBoolean(KEY_RECREATE)) {
+                    switchChapter(BookRecord.getInstance().getCurrentUrl(), false, false);
+                    Log.d(TAG, "onCreate: recreate activity");
+                }else{
+                    // loading
+                    switchChapter(BookRecord.getInstance().getCurrentUrl(), false, true);
+                }
 
             }
         });
