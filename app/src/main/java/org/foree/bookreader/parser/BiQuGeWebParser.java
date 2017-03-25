@@ -149,7 +149,7 @@ public class BiQuGeWebParser extends AbsWebParser {
         // get chapter title
         Elements titles = doc.getElementsByTag("h1");
         if (titles != null && titles.size() != 0) {
-            Log.d(TAG, "Title" + titles.get(0).text());
+            Log.d(TAG, "Title : " + titles.get(0).text());
             chapter.setChapterTitle(titles.get(0).text());
         }
 

@@ -63,36 +63,43 @@ public class PaginationLoader {
      * @param offset 当前章节的偏移量
      * @param url    当前章节的url
      */
-    private void startPaginationCache(String url, final int offset) {
-        int tmp = 1;
-        final int index = BookRecord.getInstance().getIndexFromUrl(url);
-        if (index != -1) {
+    private void startPaginationCache(final String url, final int offset) {
+        new Thread() {
+            @Override
+            public void run() {
+                super.run();
+                int tmp = 1;
+                final int index = BookRecord.getInstance().getIndexFromUrl(url);
+                if (index != -1) {
 
-            // 前几章
-            int newIndex = index - tmp;
-            while (newIndex > 0 && tmp < offset) {
-                if (!BookRecord.getInstance().isChapterCached(newIndex)) {
-                    // add request
-                    mRequestQueue.add(new ChapterRequest(BookRecord.getInstance().getUrl(newIndex), paginationArgs, false));
+                    // 前几章
+                    int newIndex = index - tmp;
+                    while (newIndex > 0 && tmp < offset) {
+                        if (!BookRecord.getInstance().isChapterCached(newIndex)) {
+                            // add request
+                            mRequestQueue.add(new ChapterRequest(BookRecord.getInstance().getUrl(newIndex), paginationArgs, false));
+                        }
+                        tmp++;
+                        newIndex = index - tmp;
+                    }
+
+                    // 后几章
+                    tmp = 1;
+                    newIndex = index + tmp;
+
+                    while (newIndex < BookRecord.getInstance().getChaptersSize() && tmp < offset) {
+                        if (!BookRecord.getInstance().isChapterCached(newIndex)) {
+                            // add request
+                            mRequestQueue.add(new ChapterRequest(BookRecord.getInstance().getUrl(newIndex), paginationArgs, false));
+
+                        }
+                        tmp++;
+                        newIndex = index + tmp;
+                    }
+
                 }
-                tmp++;
-                newIndex = index - tmp;
             }
+        }.start();
 
-            // 后几章
-            tmp = 1;
-            newIndex = index + tmp;
-
-            while (newIndex < BookRecord.getInstance().getChaptersSize() && tmp < offset) {
-                if (!BookRecord.getInstance().isChapterCached(newIndex)) {
-                    // add request
-                    mRequestQueue.add(new ChapterRequest(BookRecord.getInstance().getUrl(newIndex), paginationArgs, false));
-
-                }
-                tmp++;
-                newIndex = index + tmp;
-            }
-
-        }
     }
 }
