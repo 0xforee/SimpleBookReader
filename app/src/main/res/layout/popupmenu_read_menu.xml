@@ -14,22 +14,22 @@
         <TextView
             android:id="@+id/content"
             style="@style/ReadPopupMenuItemTextView"
-            android:drawableTop="@mipmap/ic_catalog_day" />
+            android:drawableTop="@mipmap/ic_catalog" />
 
         <TextView
             android:id="@+id/progress"
             style="@style/ReadPopupMenuItemTextView"
-            android:drawableTop="@mipmap/ic_progress_day" />
+            android:drawableTop="@mipmap/ic_progress" />
 
         <TextView
             android:id="@+id/font"
             style="@style/ReadPopupMenuItemTextView"
-            android:drawableTop="@mipmap/ic_textsize_day" />
+            android:drawableTop="@mipmap/ic_textsize" />
 
         <TextView
             android:id="@+id/brightness"
             style="@style/ReadPopupMenuItemTextView"
-            android:drawableTop="@mipmap/ic_brightness_day" />
+            android:drawableTop="@mipmap/ic_brightness" />
 
     </LinearLayout>
 </LinearLayout>
