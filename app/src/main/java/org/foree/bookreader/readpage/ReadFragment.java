@@ -1,9 +1,7 @@
 package org.foree.bookreader.readpage;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,18 +10,14 @@ import android.widget.TextView;
 
 import org.foree.bookreader.R;
 import org.foree.bookreader.bean.ReadPageDataSet;
-import org.foree.bookreader.settings.SettingsActivity;
 
 import java.util.Calendar;
 
-public class ReadFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener{
+public class ReadFragment extends Fragment {
     private static final String ARG_TITLE = "title";
 
     private TextView tvContents, tvTitle, tvTime, tvIndex, tvPageNum, tvSeparator;
     private View rootView;
-    private boolean mNightMode;
-
-    private SharedPreferences mNightPreference;
 
     public static ReadFragment newInstance(ReadPageDataSet readPageDataSet) {
         ReadFragment fragment = new ReadFragment();
@@ -66,29 +60,7 @@ public class ReadFragment extends Fragment implements SharedPreferences.OnShared
             setData((ReadPageDataSet) getArguments().getSerializable(ARG_TITLE));
         }
 
-        changeTheme(mNightMode);
-
         return rootView;
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        mNightPreference = getContext().getSharedPreferences(SettingsActivity.PREF_NAME, Context.MODE_PRIVATE);
-        mNightMode = mNightPreference.getBoolean(SettingsActivity.KEY_PREF_NIGHT_MODE, false);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        mNightPreference.registerOnSharedPreferenceChangeListener(this);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mNightPreference.unregisterOnSharedPreferenceChangeListener(this);
     }
 
     private String getCurrentTime() {
@@ -101,37 +73,4 @@ public class ReadFragment extends Fragment implements SharedPreferences.OnShared
         else
             return hour + ":" + min;
     }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if(key.equals(SettingsActivity.KEY_PREF_NIGHT_MODE)){
-            Boolean nightMode = sharedPreferences.getBoolean(SettingsActivity.KEY_PREF_NIGHT_MODE, false);
-            changeTheme(nightMode);
-        }
-    }
-
-    private void changeTheme(Boolean nightMode) {
-        int backgroundColor = getResources().getColor(R.color.classical_page_background);
-        int textColor = getResources().getColor(R.color.md_black_1000);
-//        if(nightMode){
-//            // set mNightMode
-//            backgroundColor = getResources().getColor(R.color.nightBackground);
-//            textColor = getResources().getColor(R.color.nightTextColor);
-//            rootView.setBackgroundColor(backgroundColor);
-//            tvTitle.setTextColor(textColor);
-//            tvContents.setTextColor(textColor);
-//            tvTime.setTextColor(textColor);
-//            tvPageNum.setTextColor(textColor);
-//            tvIndex.setTextColor(textColor);
-//        }else{
-//            rootView.setBackgroundColor(backgroundColor);
-//            tvTitle.setTextColor(textColor);
-//            tvContents.setTextColor(textColor);
-//            tvIndex.setTextColor(textColor);
-//            tvPageNum.setTextColor(textColor);
-//            tvTime.setTextColor(textColor);
-//        }
-    }
-
-
 }

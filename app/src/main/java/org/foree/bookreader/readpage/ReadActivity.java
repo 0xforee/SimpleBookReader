@@ -14,6 +14,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
@@ -268,7 +269,8 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
         tvBrightness.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SharedPreferences preferences = getSharedPreferences(SettingsActivity.PREF_NAME, Context.MODE_PRIVATE);
+
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ReadActivity.this);
                 boolean nightMode = GlobalConfig.getInstance().isNightMode();
                 Log.d(TAG, "onClick: nightMode = " + nightMode);
                 preferences.edit().putBoolean(SettingsActivity.KEY_PREF_NIGHT_MODE, !nightMode).apply();

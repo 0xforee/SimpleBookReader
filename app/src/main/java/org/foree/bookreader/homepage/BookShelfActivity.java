@@ -87,6 +87,7 @@ public class BookShelfActivity extends AppCompatActivity {
             case R.id.action_settings:
                 Intent intent = new Intent(BookShelfActivity.this, SettingsActivity.class);
                 startActivity(intent);
+                finish();
                 break;
         }
         return true;

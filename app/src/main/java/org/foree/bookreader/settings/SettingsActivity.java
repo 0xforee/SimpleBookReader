@@ -1,18 +1,23 @@
 package org.foree.bookreader.settings;
 
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import org.foree.bookreader.R;
+import org.foree.bookreader.base.GlobalConfig;
+import org.foree.bookreader.homepage.BookShelfActivity;
 
 /**
  * Created by foree on 16-7-28.
  * 设置界面
  */
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = SettingsActivity.class.getSimpleName();
 
     /**
@@ -46,5 +51,39 @@ public class SettingsActivity extends AppCompatActivity {
                 .replace(R.id.content_main, new SettingsFragment())
                 .commit();
 
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        switch (key) {
+            case KEY_PREF_NIGHT_MODE:
+                GlobalConfig.getInstance().changeTheme();
+                recreate();
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(SettingsActivity.this, BookShelfActivity.class);
+        intent.putExtra("back", true);
+        startActivity(intent);
+        finish();
+        overridePendingTransition(0, android.R.anim.slide_out_right);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);
     }
 }

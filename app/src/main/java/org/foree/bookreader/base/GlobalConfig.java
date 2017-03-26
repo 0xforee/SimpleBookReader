@@ -1,7 +1,7 @@
 package org.foree.bookreader.base;
 
-import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
 
@@ -22,7 +22,7 @@ public class GlobalConfig {
     }
 
     public boolean isNightMode() {
-        SharedPreferences preferences = BaseApplication.getInstance().getSharedPreferences(SettingsActivity.PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(BaseApplication.getInstance());
         boolean isNight = preferences.getBoolean(SettingsActivity.KEY_PREF_NIGHT_MODE, false);
         Log.d(TAG, "isNightMode: " + isNight);
         return isNight;
