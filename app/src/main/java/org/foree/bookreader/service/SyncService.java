@@ -1,5 +1,6 @@
 package org.foree.bookreader.service;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -73,15 +74,20 @@ public class SyncService extends Service {
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentTitle(title)
-                .setContentText(message);
+                .setContentText(message)
+                .setDefaults(Notification.DEFAULT_ALL);
 
         Intent resultIntent = new Intent(this, BookShelfActivity.class);
         resultIntent.putExtra("back", true);
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, resultIntent, 0);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(pendingIntent);
 
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        manager.notify(0, mBuilder.build());
+
+        Notification notification = mBuilder.build();
+        notification.flags |= Notification.FLAG_AUTO_CANCEL;
+
+        manager.notify(0, notification);
     }
 }
