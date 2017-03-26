@@ -24,6 +24,7 @@ import org.foree.bookreader.settings.SettingsActivity;
 public class BookShelfActivity extends AppCompatActivity {
 
     private static final String TAG = BookShelfActivity.class.getSimpleName();
+    public static final boolean DEBUG = false;
 
     Toolbar toolbar;
     ViewPager viewPager;
@@ -59,9 +60,16 @@ public class BookShelfActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                SystemClock.elapsedRealtime() + AlarmManager.INTERVAL_FIFTEEN_MINUTES,
-                AlarmManager.INTERVAL_HALF_HOUR, alarmIntent);
+        if (DEBUG) {
+            alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                    SystemClock.elapsedRealtime() + 10000,
+                    60000, alarmIntent);
+        } else {
+
+            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                    SystemClock.elapsedRealtime() + AlarmManager.INTERVAL_FIFTEEN_MINUTES,
+                    AlarmManager.INTERVAL_HALF_HOUR, alarmIntent);
+        }
         Log.d(TAG, "onPause: start alarm");
     }
 
