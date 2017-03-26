@@ -1,21 +1,24 @@
 package org.foree.bookreader.homepage;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import com.igexin.sdk.PushManager;
-
 import org.foree.bookreader.R;
+import org.foree.bookreader.service.SyncService;
 import org.foree.bookreader.settings.SettingsActivity;
 
 public class BookShelfActivity extends AppCompatActivity {
@@ -27,6 +30,9 @@ public class BookShelfActivity extends AppCompatActivity {
     TabLayout tabLayout;
     TabViewPagerAdapter tabViewPagerAdapter;
 
+    private AlarmManager alarmManager;
+    private PendingIntent alarmIntent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,7 +40,11 @@ public class BookShelfActivity extends AppCompatActivity {
 
         initViews();
 
-        PushManager.getInstance().initialize(this.getApplicationContext());
+        //PushManager.getInstance().initialize(this.getApplicationContext());
+
+        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, SyncService.class);
+        alarmIntent = PendingIntent.getService(this, 0, intent, 0);
 
     }
 
@@ -42,6 +52,17 @@ public class BookShelfActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         //Log.d(TAG, "onResume");
+        alarmManager.cancel(alarmIntent);
+        Log.d(TAG, "onResume: cancel alarm");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                SystemClock.elapsedRealtime() + AlarmManager.INTERVAL_FIFTEEN_MINUTES,
+                AlarmManager.INTERVAL_HALF_HOUR, alarmIntent);
+        Log.d(TAG, "onPause: start alarm");
     }
 
     @Override
@@ -81,7 +102,7 @@ public class BookShelfActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.action_about:
                 break;
             case R.id.action_settings:

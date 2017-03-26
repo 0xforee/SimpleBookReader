@@ -34,21 +34,21 @@ public class SyncBooksThread extends Thread {
     @Override
     public void run() {
         long startTime = System.currentTimeMillis();
-        int updatedNum = 0;
+        ArrayList<Book> updatedBooks = new ArrayList<>();
         List<Book> books = bookDao.getAllBooks();
 
         // init thread about
         ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-        final List<Callable<Boolean>> tasks = new ArrayList<>();
+        final List<Callable<Book>> tasks = new ArrayList<>();
         final List<Callable<Boolean>> chapterTasks = new ArrayList<>();
-        List<Future<Boolean>> futures;
+        List<Future<Book>> futures;
         // add task
         for (final Book oldBook : books) {
             if (oldBook != null) {
-                Callable<Boolean> callable = new Callable<Boolean>() {
+                Callable<Book> callable = new Callable<Book>() {
                     @Override
-                    public Boolean call() throws Exception {
+                    public Book call() throws Exception {
 
                         final AbsWebParser webParser = WebParserManager.getInstance().getWebParser(oldBook.getBookUrl());
                         final Book newBook = webParser.getBookInfoSync(oldBook.getBookUrl());
@@ -68,9 +68,9 @@ public class SyncBooksThread extends Thread {
 
                             bookDao.updateBookTime(newBook.getBookUrl(), newBook.getUpdateTime());
 
-                            return true;
+                            return newBook;
                         }
-                        return false;
+                        return null;
                     }
                 };
 
@@ -86,13 +86,13 @@ public class SyncBooksThread extends Thread {
             futures = executor.invokeAll(tasks);
 
             // 2. get results
-            for (Future<Boolean> future : futures) {
-                if (future.get()) {
-                    updatedNum++;
+            for (Future<Book> future : futures) {
+                if (future.get() != null) {
+                    updatedBooks.add(future.get());
                 }
             }
             // 3. notify update
-            EventBus.getDefault().post(new BookUpdateEvent(updatedNum));
+            EventBus.getDefault().post(new BookUpdateEvent(updatedBooks));
 
             // 3. sync chapters
             executor.invokeAll(chapterTasks);
@@ -107,7 +107,7 @@ public class SyncBooksThread extends Thread {
         executor.shutdown();
 
 
-        Log.d(TAG, "costs " + (System.currentTimeMillis() - startTime) + " ms to check update, updated " + updatedNum);
+        Log.d(TAG, "costs " + (System.currentTimeMillis() - startTime) + " ms to check update, updated " + updatedBooks.size());
 
     }
 }
