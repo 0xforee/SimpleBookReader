@@ -15,10 +15,9 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
+import com.bumptech.glide.Glide;
 
 import org.foree.bookreader.R;
-import org.foree.bookreader.base.BaseApplication;
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.dao.BookDao;
@@ -144,8 +143,7 @@ public class BookInfoActivity extends AppCompatActivity {
                                     tvNovelDescription.setText(Html.fromHtml(data1.getDescription()));
 
                                 if (book.getBookCoverUrl() != null) {
-                                    ImageLoader.getInstance().displayImage(book.getBookCoverUrl(), imageView,
-                                            BaseApplication.getInstance().getDisplayImageOptions());
+                                    Glide.with(BookInfoActivity.this).load(book.getBookCoverUrl()).crossFade().into(imageView);
                                 }
                                 notifyUpdate(STATE_SUCCESS);
                             }

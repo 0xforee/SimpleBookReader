@@ -10,10 +10,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
+import com.bumptech.glide.Glide;
 
 import org.foree.bookreader.R;
-import org.foree.bookreader.base.BaseApplication;
 import org.foree.bookreader.bean.book.Book;
 
 import java.util.List;
@@ -25,11 +24,13 @@ public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.My
     private LayoutInflater mLayoutInflater;
     private List<Book> bookList;
     private SparseBooleanArray mSelectedItemsIds;
+    private Context mContext;
 
     public SearchListAdapter(Context context, List<Book> itemList) {
         mLayoutInflater = LayoutInflater.from(context);
         bookList = itemList;
         mSelectedItemsIds = new SparseBooleanArray();
+        mContext = context;
     }
 
     public interface OnItemClickListener {
@@ -79,8 +80,7 @@ public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.My
         holder.itemView.setBackgroundColor(mSelectedItemsIds.get(position) ? 0x9934B5E4 : Color.TRANSPARENT);
 
         if (bookList.get(position).getBookCoverUrl() != null) {
-            ImageLoader.getInstance().displayImage(bookList.get(position).getBookCoverUrl(), holder.imageView,
-                    BaseApplication.getInstance().getDisplayImageOptions());
+            Glide.with(mContext).load(bookList.get(position).getBookCoverUrl()).crossFade().into(holder.imageView);
         }
     }
 

@@ -7,12 +7,6 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
 
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-
-import org.foree.bookreader.R;
-
 import java.io.File;
 
 /**
@@ -29,7 +23,6 @@ public class BaseApplication extends Application {
     public static final String myApplicationConfigsName = "configs";
     // 应用程序缓存目录名
     public static final String myApplicationCacheName = "cache";
-    public DisplayImageOptions options;
 
     public static synchronized BaseApplication getInstance() {
         return mInstance;
@@ -41,37 +34,15 @@ public class BaseApplication extends Application {
         mInstance = this;
 
         // night mode
-        if(GlobalConfig.getInstance().isNightMode()) {
+        if (GlobalConfig.getInstance().isNightMode()) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        }else{
+        } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         }
 
         initApplicationDir();
         initWebSites();
-        initImageLoader();
 
-    }
-
-    private void initImageLoader() {
-        ImageLoaderConfiguration config = ImageLoaderConfiguration.createDefault(this);
-
-        ImageLoader.getInstance().init(config);
-
-    }
-
-    public DisplayImageOptions getDisplayImageOptions(){
-        if(options == null) {
-            // init displayOptions
-            options = new DisplayImageOptions.Builder()
-                    .showImageOnLoading(R.drawable.book_cover_holder)
-                    .showImageOnFail(R.drawable.book_cover_holder)
-                    .showImageForEmptyUri(R.drawable.book_cover_holder)
-                    .cacheInMemory(true)
-                    .cacheOnDisk(true)
-                    .build();
-        }
-        return options;
     }
 
     public void initApplicationDir() {

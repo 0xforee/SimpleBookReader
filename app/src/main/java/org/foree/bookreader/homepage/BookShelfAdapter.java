@@ -10,10 +10,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
+import com.bumptech.glide.Glide;
 
 import org.foree.bookreader.R;
-import org.foree.bookreader.base.BaseApplication;
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.utils.DateUtils;
 
@@ -26,11 +25,13 @@ public class BookShelfAdapter extends RecyclerView.Adapter<BookShelfAdapter.MyVi
     private LayoutInflater mLayoutInflater;
     private List<Book> bookList;
     private SparseBooleanArray mSelectedItemsIds;
+    private Context mContext;
 
     public BookShelfAdapter(Context context, List<Book> itemList) {
         mLayoutInflater = LayoutInflater.from(context);
         bookList = itemList;
         mSelectedItemsIds = new SparseBooleanArray();
+        mContext = context;
     }
 
     public interface OnItemClickListener {
@@ -52,7 +53,7 @@ public class BookShelfAdapter extends RecyclerView.Adapter<BookShelfAdapter.MyVi
 
     @Override
     public void onBindViewHolder(final BookShelfAdapter.MyViewHolder holder, int position) {
-        if( bookList != null && !bookList.isEmpty()) {
+        if (bookList != null && !bookList.isEmpty()) {
             Book book = bookList.get(position);
 
             holder.tvBookName.setText(book.getBookName());
@@ -81,14 +82,13 @@ public class BookShelfAdapter extends RecyclerView.Adapter<BookShelfAdapter.MyVi
             holder.itemView.setBackgroundColor(mSelectedItemsIds.get(position) ? 0x9934B5E4 : Color.TRANSPARENT);
 
             if (book.getBookCoverUrl() != null) {
-                ImageLoader.getInstance().displayImage(book.getBookCoverUrl(), holder.imageView,
-                        BaseApplication.getInstance().getDisplayImageOptions());
+                Glide.with(mContext).load(book.getBookCoverUrl()).crossFade().into(holder.imageView);
             }
 
             // 是否显示更新小圆点
-            if (DateUtils.isNewer(book.getModifiedTime(), book.getUpdateTime())){
+            if (DateUtils.isNewer(book.getModifiedTime(), book.getUpdateTime())) {
                 holder.imageViewUpdate.setVisibility(View.VISIBLE);
-            }else
+            } else
                 holder.imageViewUpdate.setVisibility(View.INVISIBLE);
         }
 

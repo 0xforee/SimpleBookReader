@@ -9,10 +9,9 @@ import android.widget.ExpandableListAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
+import com.bumptech.glide.Glide;
 
 import org.foree.bookreader.R;
-import org.foree.bookreader.base.BaseApplication;
 import org.foree.bookreader.bean.book.Book;
 
 import java.util.List;
@@ -106,8 +105,7 @@ public class BookStoreExpandableListAdapter implements ExpandableListAdapter {
 
 
         if (!childBook.getBookCoverUrl().isEmpty()) {
-            ImageLoader.getInstance().displayImage(childBook.getBookCoverUrl(), childViewHolder.bookCover,
-                    BaseApplication.getInstance().getDisplayImageOptions());
+            Glide.with(mContext).load(childBook.getBookCoverUrl()).crossFade().into(childViewHolder.bookCover);
             childViewHolder.bookCover.setVisibility(View.VISIBLE);
 
         } else {
