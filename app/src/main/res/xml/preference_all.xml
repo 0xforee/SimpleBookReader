@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/pref_general">
+        <SwitchPreference
+            android:key="pref_key_night_mode"
+            android:title="@string/pref_title_night_mode" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_offline">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="pref_key_offline_enable"
+            android:summary="@string/pref_summary_offline_enable"
+            android:title="@string/pref_title_offline_enable" />
+        <SwitchPreference
+            android:dependency="pref_key_offline_enable"
+            android:key="pref_key_offline_wifi_only"
+            android:summary="@string/pref_summary_offline_wifi_only"
+            android:title="@string/pref_title_offline_wifi_only" />
+        <ListPreference
+            android:defaultValue="5"
+            android:dependency="pref_key_offline_enable"
+            android:entries="@array/pref_offline_offset_entries"
+            android:entryValues="@array/pref_offline_offset_values"
+            android:key="pref_key_offline_offset"
+            android:title="@string/offline_offset" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_title_data_sync">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="pref_key_sync_enable"
+            android:title="@string/pref_title_sync_enable" />
+
+        <SwitchPreference
+            android:defaultValue="true"
+            android:dependency="pref_key_sync_enable"
+            android:key="pref_key_sync_notification"
+            android:title="@string/pref_title_sync_notification" />
+        <SwitchPreference
+            android:dependency="pref_key_sync_enable"
+            android:key="pref_key_sync_pre_load"
+            android:title="@string/pref_title_pre_load" />
+        <ListPreference
+            android:defaultValue="60"
+            android:dependency="pref_key_sync_enable"
+            android:entries="@array/pref_sync_frequency_titles"
+            android:entryValues="@array/pref_sync_frequency_values"
+            android:key="pref_key_sync_frequency"
+            android:title="@string/pref_title_sync_frequency" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_title_about">
+        <Preference android:title="@string/pref_title_about">
+            <intent android:action=".AboutActivity" />
+        </Preference>
+    </PreferenceCategory>
+</PreferenceScreen>
