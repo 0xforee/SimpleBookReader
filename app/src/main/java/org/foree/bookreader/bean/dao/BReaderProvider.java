@@ -130,15 +130,19 @@ public class BReaderProvider extends ContentProvider {
 
     private void insertWithTransaction(Uri uri, ContentValues[] contentValues) {
         db = mOpenHelper.getWritableDatabase();
-        db.beginTransaction();
-        for (ContentValues value : contentValues) {
-            // 内容不重复
-            if (ContentUris.parseId(insert(uri, value)) == -1) {
-                Log.e(TAG, "Database insert error");
+        try {
+            db.beginTransaction();
+            for (ContentValues value : contentValues) {
+                // 内容不重复
+                insert(uri, value);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.setTransactionSuccessful();
+            db.endTransaction();
         }
-        db.setTransactionSuccessful();
-        db.endTransaction();
+
     }
 
     /**
