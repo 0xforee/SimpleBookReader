@@ -57,11 +57,19 @@ public class BiQuGeWebParser extends AbsWebParser {
             //Log.d(TAG, titles.toString());
             Element title = titles.get(0);
 
-            Log.d(TAG, title.attr("href"));
-            Log.d(TAG, title.attr("title"));
+            Log.d(TAG, "parseBookList: bookUrl = " + title.attr("href"));
+            Log.d(TAG, "parseBookList: bookName = " + title.attr("title"));
 
             book.setBookName(title.attr("title"));
             book.setBookUrl(title.attr("href"));
+
+            // get book cover url
+            Elements bookCovers = result.getElementsByClass("result-game-item-pic-link-img");
+            Element bookCover = bookCovers.get(0);
+
+            Log.d(TAG, "parseBookList: bookCover = " + bookCover.attr("src"));
+            book.setBookCoverUrl(bookCover.attr("src"));
+
             bookList.add(book);
 
         }
