@@ -54,12 +54,14 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
     private static final String KEY_RECREATE = TAG + "_recreate";
 
     String bookUrl;
+    private BookRecord mBookRecord;
     private boolean mSlipLeft = false;
     // view pager
     private ReadViewPager mViewPager;
     private PageAdapter pageAdapter;
     private TextView mTextView;
     private Button mBtnLoading;
+
     // popWindow
     private PopupWindow menuPop;
     private Dialog contentDialog;
@@ -104,10 +106,11 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
 
         // register EventBus
         EventBus.getDefault().register(this);
+        mBookRecord = new BookRecord(this);
 
         bookUrl = getIntent().getExtras().getString("book_url");
 
-        BookRecord.getInstance().restoreBookRecord(bookUrl);
+        mBookRecord.restoreBookRecord(bookUrl);
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
@@ -130,7 +133,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
         mBtnLoading.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                switchChapter(BookRecord.getInstance().getCurrentUrl(), false, true);
+                switchChapter(mBookRecord.getCurrentUrl(), false, true);
             }
         });
 
@@ -167,14 +170,15 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
                         mTextView.getLineSpacingMultiplier(),
                         mTextView.getLineSpacingExtra(),
                         mTextView.getPaint(),
-                        mTextView.getIncludeFontPadding()));
+                        mTextView.getIncludeFontPadding()))
+                        .smartLoadInit(mBookRecord, 5);
 
-                if (savedInstanceState!=null && savedInstanceState.getBoolean(KEY_RECREATE)) {
-                    switchChapter(BookRecord.getInstance().getCurrentUrl(), false, false);
+                if (savedInstanceState != null && savedInstanceState.getBoolean(KEY_RECREATE)) {
+                    switchChapter(mBookRecord.getCurrentUrl(), false, false);
                     Log.d(TAG, "onCreate: recreate activity");
-                }else{
+                } else {
                     // loading
-                    switchChapter(BookRecord.getInstance().getCurrentUrl(), false, true);
+                    switchChapter(mBookRecord.getCurrentUrl(), false, true);
                 }
 
             }
@@ -189,20 +193,27 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
             mHandler.removeMessages(MSG_LOADING);
 
         Chapter chapter = pageEvent.getChapter();
-        if (chapter != null) {
-            mHandler.sendEmptyMessage(MSG_SUCCESS);
+        if(pageEvent.isCurrent()) {
+            if (chapter != null) {
 
-            pageAdapter.setChapter(chapter);
+                mBookRecord.setCached(chapter.getChapterUrl());
 
-            // if open book ,load index page, otherwise load normal
-            if (BookRecord.getInstance().isInitCompleted()) {
-                mViewPager.setCurrentItem(isSlipLeft() ? chapter.numberOfPages() - 1 : 0, false);
+                if (pageEvent.isCurrent()) {
+
+                    mHandler.sendEmptyMessage(MSG_SUCCESS);
+
+                    pageAdapter.setChapter(chapter);
+
+                    // if open book ,load index page, otherwise load normal
+                    if (mBookRecord.isInitCompleted()) {
+                        mViewPager.setCurrentItem(isSlipLeft() ? chapter.numberOfPages() - 1 : 0, false);
+                    } else {
+                        mViewPager.setCurrentItem(mBookRecord.getPageIndex(), false);
+                    }
+                }
             } else {
-                mViewPager.setCurrentItem(BookRecord.getInstance().getPageIndex(), false);
+                mHandler.sendEmptyMessage(MSG_FAILED);
             }
-
-        } else {
-            mHandler.sendEmptyMessage(MSG_FAILED);
         }
     }
 
@@ -211,7 +222,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
         EventBus.getDefault().unregister(this);
         super.onDestroy();
 
-        BookRecord.getInstance().saveBookRecord(mViewPager.getCurrentItem());
+        mBookRecord.saveBookRecord(mViewPager.getCurrentItem());
     }
 
     private void initMenuPop() {
@@ -248,7 +259,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
                     contentDialog.show();
                     getLoaderManager().restartLoader(0, null, ReadActivity.this);
                 }
-                chapterTitleListView.setSelection(BookRecord.getInstance().getCurPosition() - 2);
+                chapterTitleListView.setSelection(mBookRecord.getCurPosition() - 2);
                 contentAdapter.notifyDataSetChanged();
 
             }
@@ -290,12 +301,12 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
 
     @Override
     public void onPreChapterClick() {
-        switchChapter(BookRecord.getInstance().getUrlFromFlag(-1), true, false);
+        switchChapter(mBookRecord.getUrlFromFlag(-1), true, false);
     }
 
     @Override
     public void onNextChapterClick() {
-        switchChapter(BookRecord.getInstance().getUrlFromFlag(1), false, false);
+        switchChapter(mBookRecord.getUrlFromFlag(1), false, false);
     }
 
     private void showContentDialog() {
@@ -334,7 +345,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 contentDialog.dismiss();
-                switchChapter(BookRecord.getInstance().getUrl(position), false, true);
+                switchChapter(mBookRecord.getUrl(position), false, true);
                 contentAdapter.setSelectedPosition(position);
             }
         });
@@ -346,7 +357,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
             if (skip)
                 mHandler.sendEmptyMessage(MSG_LOADING);
             PaginationLoader.getInstance().loadPagination(newChapterUrl);
-            BookRecord.getInstance().switchChapter(newChapterUrl);
+            mBookRecord.switchChapter(newChapterUrl);
             mSlipLeft = slipLeft;
         }
     }
@@ -377,8 +388,8 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
         Log.d(TAG, "onLoadFinished");
         contentAdapter.changeCursor((Cursor) data);
 
-        chapterTitleListView.setSelection(BookRecord.getInstance().getCurPosition() - 2);
-        contentAdapter.setSelectedPosition(BookRecord.getInstance().getCurPosition());
+        chapterTitleListView.setSelection(mBookRecord.getCurPosition() - 2);
+        contentAdapter.setSelectedPosition(mBookRecord.getCurPosition());
         contentAdapter.notifyDataSetChanged();
 
     }

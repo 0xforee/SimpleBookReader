@@ -9,12 +9,18 @@ import org.foree.bookreader.bean.book.Chapter;
 public class PaginationEvent {
 
     private Chapter chapter;
+    private boolean current;
 
-    public PaginationEvent(Chapter chapter) {
+    public PaginationEvent(Chapter chapter, boolean current) {
+        this.current = current;
         this.chapter = chapter;
     }
 
     public Chapter getChapter() {
         return chapter;
+    }
+
+    public boolean isCurrent(){
+        return current;
     }
 }

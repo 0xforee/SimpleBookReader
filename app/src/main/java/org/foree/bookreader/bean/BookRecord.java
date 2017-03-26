@@ -1,10 +1,10 @@
 package org.foree.bookreader.bean;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
 
-import org.foree.bookreader.base.BaseApplication;
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.dao.BReaderContract;
@@ -29,29 +29,19 @@ public class BookRecord {
     private Book mBook;
     private List<Chapter> mChapters;
 
+    private Context mContext;
+
     // 存储mChapters的url对应的index，加快索引速度
     private Map<String, Integer> mIndexMap;
 
     // 初始化是否完成，指第一次页码切换是否完成
     private boolean completed = false;
 
-    private static BookRecord mInstance;
-
-    private BookRecord() {
+    public BookRecord(Context context) {
         mBook = new Book();
         mChapters = new ArrayList<>();
         mIndexMap = new HashMap<>();
-    }
-
-    public static BookRecord getInstance() {
-        if (mInstance == null) {
-            synchronized (BookRecord.class) {
-                if (mInstance == null)
-                    mInstance = new BookRecord();
-            }
-        }
-
-        return mInstance;
+        mContext = context;
     }
 
     /**
@@ -98,10 +88,10 @@ public class BookRecord {
         return getIndexFromUrl(getCurrentUrl());
     }
 
-    public boolean isInitCompleted(){
-        if(completed){
+    public boolean isInitCompleted() {
+        if (completed) {
             return true;
-        }else{
+        } else {
             completed = true;
             return false;
         }
@@ -160,7 +150,7 @@ public class BookRecord {
         String orderBy = BReaderContract.Chapters.COLUMN_NAME_CHAPTER_ID + " asc";
 
         // chapter_id sort by desc or asc
-        Cursor cursor = BaseApplication.getInstance().getContentResolver().query(
+        Cursor cursor = mContext.getContentResolver().query(
                 BReaderProvider.CONTENT_URI_CHAPTERS,
                 null,
                 selection,
@@ -194,7 +184,7 @@ public class BookRecord {
         Book book = new Book();
         Cursor cursor;
         String selection = BReaderContract.Books.COLUMN_NAME_BOOK_URL + "=?";
-        cursor = BaseApplication.getInstance().getContentResolver().query(
+        cursor = mContext.getContentResolver().query(
                 BReaderProvider.CONTENT_URI_BOOKS,
                 null,
                 selection,
@@ -228,7 +218,7 @@ public class BookRecord {
         contentValues.put(BReaderContract.Books.COLUMN_NAME_RECENT_CHAPTER_URL, book.getRecentChapterUrl());
         contentValues.put(BReaderContract.Books.COLUMN_NAME_PAGE_INDEX, book.getPageIndex());
 
-        BaseApplication.getInstance().getContentResolver().update(
+        mContext.getContentResolver().update(
                 BReaderProvider.CONTENT_URI_BOOKS,
                 contentValues,
                 selection,

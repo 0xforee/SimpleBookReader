@@ -32,7 +32,7 @@ public class PaginationLoader {
     private PaginationLoader() {
     }
 
-    public void init(PaginationArgs paginationArgs) {
+    public PaginationLoader init(PaginationArgs paginationArgs) {
         this.paginationArgs = paginationArgs;
         if (mRequestQueue == null) {
             mRequestQueue = new RequestQueue();
@@ -40,17 +40,24 @@ public class PaginationLoader {
         }
 
         PaginationCache.getInstance().init(paginationArgs);
+
+        return this;
     }
 
-    public void setChapterCache(ChapterCache chapterCache) {
-        this.chapterCache = chapterCache;
+    private BookRecord mBookRecord;
+    private int mOffset;
+
+    public PaginationLoader smartLoadInit(BookRecord bookRecord, int offset) {
+        mBookRecord = bookRecord;
+        mOffset = offset;
+
+        return this;
     }
 
     public void loadPagination(final String url) {
         mRequestQueue.add(new ChapterRequest(url, paginationArgs, true));
 
-        startPaginationCache(url, 5);
-
+        smartLoad();
     }
 
     public ChapterCache getChapterCache() {
@@ -59,47 +66,46 @@ public class PaginationLoader {
 
     /**
      * 获取指定章节的前后偏移章节
-     *
-     * @param offset 当前章节的偏移量
-     * @param url    当前章节的url
      */
-    private void startPaginationCache(final String url, final int offset) {
-        new Thread() {
-            @Override
-            public void run() {
-                super.run();
-                int tmp = 1;
-                final int index = BookRecord.getInstance().getIndexFromUrl(url);
-                if (index != -1) {
+    private void smartLoad() {
+        if (mBookRecord != null && mOffset != 0) {
+            new Thread() {
+                @Override
+                public void run() {
+                    super.run();
+                    int tmp = 1;
+                    final int index = mBookRecord.getIndexFromUrl(mBookRecord.getCurrentUrl());
+                    if (index != -1) {
 
-                    // 前几章
-                    int newIndex = index - tmp;
-                    while (newIndex > 0 && tmp < offset) {
-                        if (!BookRecord.getInstance().isChapterCached(newIndex)) {
-                            // add request
-                            mRequestQueue.add(new ChapterRequest(BookRecord.getInstance().getUrl(newIndex), paginationArgs, false));
+                        // 前几章
+                        int newIndex = index - tmp;
+                        while (newIndex > 0 && tmp <= mOffset) {
+                            if (!mBookRecord.isChapterCached(newIndex)) {
+                                // add request
+                                mRequestQueue.add(new ChapterRequest(mBookRecord.getUrl(newIndex), paginationArgs, false));
+                            }
+                            tmp++;
+                            newIndex = index - tmp;
                         }
-                        tmp++;
-                        newIndex = index - tmp;
-                    }
 
-                    // 后几章
-                    tmp = 1;
-                    newIndex = index + tmp;
-
-                    while (newIndex < BookRecord.getInstance().getChaptersSize() && tmp < offset) {
-                        if (!BookRecord.getInstance().isChapterCached(newIndex)) {
-                            // add request
-                            mRequestQueue.add(new ChapterRequest(BookRecord.getInstance().getUrl(newIndex), paginationArgs, false));
-
-                        }
-                        tmp++;
+                        // 后几章
+                        tmp = 1;
                         newIndex = index + tmp;
-                    }
 
+                        while (newIndex < mBookRecord.getChaptersSize() && tmp <= mOffset) {
+                            if (!mBookRecord.isChapterCached(newIndex)) {
+                                // add request
+                                mRequestQueue.add(new ChapterRequest(mBookRecord.getUrl(newIndex), paginationArgs, false));
+
+                            }
+                            tmp++;
+                            newIndex = index + tmp;
+                        }
+
+                    }
                 }
-            }
-        }.start();
+            }.start();
+        }
 
     }
 }
