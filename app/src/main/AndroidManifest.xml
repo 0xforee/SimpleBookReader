@@ -30,15 +30,6 @@
             android:name=".readpage.ReadActivity"
             android:theme="@style/AppTheme.NoActionBar" />
 
-        <!-- 配置第三方Receiver -->
-        <receiver
-            android:name=".receiver.PushReceiver"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.igexin.sdk.action.${GETUI_APP_ID}" />
-            </intent-filter>
-        </receiver>
-
         <activity
             android:name=".searchpage.SearchResultsActivity"
             android:launchMode="singleTop"

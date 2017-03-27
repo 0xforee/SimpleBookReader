@@ -11,18 +11,9 @@ android {
         versionCode 1
         versionName "1.0"
 
-        //APP_ID、APP_KEY、APP_SECRET请根据个推开发者后台申请到的应用参数进行相应替换
-        manifestPlaceholders = [
-                GETUI_APP_ID    : "s7imd2wTRa7dZw1641WCg8",
-                GETUI_APP_KEY   : "4HzEvd6DAr6SB61bc2CkM5",
-                GETUI_APP_SECRET: "ItnQwMumTcAespxAtWMa8",
-                PACKAGE_NAME    : applicationId
-        ]
-        ndk {
-            abiFilters "armeabi", "armeabi-v7a", "arm64-v8a"
-        }
         vectorDrawables.useSupportLibrary = true
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -41,7 +32,6 @@ dependencies {
     compile 'com.android.support:support-v4:23.4.0'
     compile 'org.greenrobot:eventbus:3.0.0'
     compile 'com.android.support:appcompat-v7:23.4.0'
-    compile 'com.getui:sdk:2.9.0.0'
     compile 'com.android.support:design:23.4.0'
     compile 'com.android.support:cardview-v7:23.4.0'
     compile 'org.jsoup:jsoup:1.10.2'

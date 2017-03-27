@@ -41,8 +41,6 @@ public class BookShelfActivity extends AppCompatActivity {
 
         initViews();
 
-        //PushManager.getInstance().initialize(this.getApplicationContext());
-
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(this, SyncService.class);
         alarmIntent = PendingIntent.getService(this, 0, intent, 0);
