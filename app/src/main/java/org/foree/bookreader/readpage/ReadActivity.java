@@ -171,8 +171,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
                         mTextView.getLineSpacingMultiplier(),
                         mTextView.getLineSpacingExtra(),
                         mTextView.getPaint(),
-                        mTextView.getIncludeFontPadding()))
-                        .smartLoadInit(mBookRecord, 5);
+                        mTextView.getIncludeFontPadding()));
 
                 if (savedInstanceState != null && savedInstanceState.getBoolean(KEY_RECREATE)) {
                     switchChapter(mBookRecord.getCurrentUrl(), false, false);
@@ -184,6 +183,15 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
 
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // init smart load offset
+        int offset = Integer.valueOf(PreferenceManager.getDefaultSharedPreferences(this).getString(SettingsActivity.KEY_PREF_OFFLINE_OFFSET, "5"));
+        PaginationLoader.getInstance().smartLoadInit(mBookRecord, offset);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
