@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -56,8 +57,8 @@ public class BookShelfActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onDestroy() {
+        super.onDestroy();
         if (DEBUG) {
             alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
                     SystemClock.elapsedRealtime() + 10000,
@@ -66,15 +67,16 @@ public class BookShelfActivity extends AppCompatActivity {
 
             alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
                     SystemClock.elapsedRealtime() + AlarmManager.INTERVAL_FIFTEEN_MINUTES,
-                    AlarmManager.INTERVAL_HALF_HOUR, alarmIntent);
+                    getInterval(), alarmIntent);
         }
-        Log.d(TAG, "onPause: start alarm");
+        Log.d(TAG, "onDestroy: start alarm");
+
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    private long getInterval() {
+        int select = Integer.valueOf(PreferenceManager.getDefaultSharedPreferences(this).getString(SettingsActivity.KEY_PREF_SYNC_FREQUENCY, "60"));
 
+        return select * 60 * 1000;
     }
 
     private void initViews() {
