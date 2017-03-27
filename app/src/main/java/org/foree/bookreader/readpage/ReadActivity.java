@@ -2,9 +2,7 @@ package org.foree.bookreader.readpage;
 
 import android.app.Dialog;
 import android.app.LoaderManager;
-import android.content.Context;
 import android.content.CursorLoader;
-import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -39,7 +37,6 @@ import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.dao.BReaderContract;
 import org.foree.bookreader.bean.dao.BReaderProvider;
 import org.foree.bookreader.bean.event.PaginationEvent;
-import org.foree.bookreader.homepage.BookShelfActivity;
 import org.foree.bookreader.pagination.PaginationArgs;
 import org.foree.bookreader.pagination.PaginationLoader;
 import org.foree.bookreader.settings.SettingsActivity;
@@ -202,7 +199,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
             mHandler.removeMessages(MSG_LOADING);
 
         Chapter chapter = pageEvent.getChapter();
-        if(pageEvent.isCurrent()) {
+        if (pageEvent.isCurrent()) {
             if (chapter != null) {
 
                 mBookRecord.setCached(chapter.getChapterUrl());
@@ -292,16 +289,6 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
                 }
             }
         });
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        Intent intent = new Intent(ReadActivity.this, BookShelfActivity.class);
-        intent.putExtra("back", true);
-        startActivity(intent);
-        finish();
-        overridePendingTransition(0, android.R.anim.slide_out_right);
     }
 
     @Override

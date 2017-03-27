@@ -6,6 +6,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
@@ -19,12 +20,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import org.foree.bookreader.R;
+import org.foree.bookreader.base.GlobalConfig;
 import org.foree.bookreader.service.SyncService;
 import org.foree.bookreader.settings.SettingsActivity;
 
 public class BookShelfActivity extends AppCompatActivity {
 
     private static final String TAG = BookShelfActivity.class.getSimpleName();
+    private static final String KEY_RECREATE = TAG + "_recreate";
+
     public static final boolean DEBUG = false;
 
     Toolbar toolbar;
@@ -35,6 +39,8 @@ public class BookShelfActivity extends AppCompatActivity {
     private AlarmManager alarmManager;
     private PendingIntent alarmIntent;
 
+    private boolean mNightMode;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,9 +48,19 @@ public class BookShelfActivity extends AppCompatActivity {
 
         initViews();
 
+        mNightMode = GlobalConfig.getInstance().isNightMode();
+
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(this, SyncService.class);
         alarmIntent = PendingIntent.getService(this, 0, intent, 0);
+
+        if (savedInstanceState != null && savedInstanceState.getBoolean(KEY_RECREATE)) {
+            Log.d(TAG, "onCreate: recreate activity");
+        } else {
+            // loading
+            alarmManager.cancel(alarmIntent);
+            Log.d(TAG, "onCreate: cancel alarm");
+        }
 
     }
 
@@ -52,25 +68,37 @@ public class BookShelfActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         //Log.d(TAG, "onResume");
-        alarmManager.cancel(alarmIntent);
-        Log.d(TAG, "onResume: cancel alarm");
+        if (mNightMode != GlobalConfig.getInstance().isNightMode()) {
+            GlobalConfig.getInstance().changeTheme();
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    recreate();
+                }
+            }, 100);
+        }
     }
-
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(KEY_RECREATE, true);
+    }
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (DEBUG) {
-            alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                    SystemClock.elapsedRealtime() + 10000,
-                    60000, alarmIntent);
-        } else {
+        if (mNightMode == GlobalConfig.getInstance().isNightMode()) {
+            if (DEBUG) {
+                alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                        SystemClock.elapsedRealtime() + 10000,
+                        60000, alarmIntent);
+            } else {
 
-            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                    SystemClock.elapsedRealtime() + AlarmManager.INTERVAL_FIFTEEN_MINUTES,
-                    getInterval(), alarmIntent);
+                alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                        SystemClock.elapsedRealtime() + AlarmManager.INTERVAL_FIFTEEN_MINUTES,
+                        getInterval(), alarmIntent);
+            }
+            Log.d(TAG, "onDestroy: start alarm");
         }
-        Log.d(TAG, "onDestroy: start alarm");
-
     }
 
     private long getInterval() {
@@ -116,7 +144,6 @@ public class BookShelfActivity extends AppCompatActivity {
             case R.id.action_settings:
                 Intent intent = new Intent(BookShelfActivity.this, SettingsActivity.class);
                 startActivity(intent);
-                finish();
                 break;
         }
         return true;

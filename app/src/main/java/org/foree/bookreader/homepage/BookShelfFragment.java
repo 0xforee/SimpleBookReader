@@ -37,6 +37,7 @@ import java.util.List;
 
 public class BookShelfFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = BookShelfFragment.class.getSimpleName();
+    private static final String KEY_RECREATE = TAG + "_recreate";
 
     private ActionMode mActionMode;
     private BookDao bookDao;
@@ -96,6 +97,12 @@ public class BookShelfFragment extends Fragment implements SwipeRefreshLayout.On
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(KEY_RECREATE, true);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -108,10 +115,12 @@ public class BookShelfFragment extends Fragment implements SwipeRefreshLayout.On
 
         initRecyclerAdapter();
 
-        Bundle bundle = bookShelfActivity.getIntent().getExtras();
-
-        if (bundle == null || !bundle.getBoolean("back"))
+        if (savedInstanceState != null && savedInstanceState.getBoolean(KEY_RECREATE)) {
+            Log.d(TAG, "onCreate: recreate activity");
+        } else {
+            // loading
             syncNovelInfo();
+        }
 
         return view;
     }
@@ -136,7 +145,6 @@ public class BookShelfFragment extends Fragment implements SwipeRefreshLayout.On
                     intent.putExtras(bundle);
 
                     startActivity(intent);
-                    getActivity().finish();
                 }
             }
 

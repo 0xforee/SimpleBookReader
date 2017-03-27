@@ -1,7 +1,6 @@
 package org.foree.bookreader.settings;
 
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -11,7 +10,6 @@ import android.support.v7.widget.Toolbar;
 
 import org.foree.bookreader.R;
 import org.foree.bookreader.base.GlobalConfig;
-import org.foree.bookreader.homepage.BookShelfActivity;
 
 /**
  * Created by foree on 16-7-28.
@@ -63,16 +61,6 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
             default:
                 break;
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        Intent intent = new Intent(SettingsActivity.this, BookShelfActivity.class);
-        intent.putExtra("back", true);
-        startActivity(intent);
-        finish();
-        overridePendingTransition(0, android.R.anim.slide_out_right);
     }
 
     @Override
