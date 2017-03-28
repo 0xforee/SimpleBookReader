@@ -11,7 +11,6 @@ import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -20,14 +19,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import org.foree.bookreader.R;
+import org.foree.bookreader.base.BaseActivity;
 import org.foree.bookreader.base.GlobalConfig;
 import org.foree.bookreader.service.SyncService;
 import org.foree.bookreader.settings.SettingsActivity;
 
-public class BookShelfActivity extends AppCompatActivity {
+public class BookShelfActivity extends BaseActivity {
 
     private static final String TAG = BookShelfActivity.class.getSimpleName();
-    private static final String KEY_RECREATE = TAG + "_recreate";
 
     public static final boolean DEBUG = false;
 
@@ -54,7 +53,7 @@ public class BookShelfActivity extends AppCompatActivity {
         Intent intent = new Intent(this, SyncService.class);
         alarmIntent = PendingIntent.getService(this, 0, intent, 0);
 
-        if (savedInstanceState != null && savedInstanceState.getBoolean(KEY_RECREATE)) {
+        if (savedInstanceState != null && savedInstanceState.getBoolean(BaseActivity.KEY_RECREATE)) {
             Log.d(TAG, "onCreate: recreate activity");
         } else {
             // loading
@@ -82,7 +81,7 @@ public class BookShelfActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBoolean(KEY_RECREATE, true);
+        outState.putBoolean(BaseActivity.KEY_RECREATE, true);
     }
 
     @Override

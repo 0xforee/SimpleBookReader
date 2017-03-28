@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,8 +13,9 @@ import android.util.Log;
 import android.view.View;
 
 import org.foree.bookreader.R;
-import org.foree.bookreader.bookinfopage.BookInfoActivity;
+import org.foree.bookreader.base.BaseActivity;
 import org.foree.bookreader.bean.book.Book;
+import org.foree.bookreader.bookinfopage.BookInfoActivity;
 import org.foree.bookreader.net.NetCallback;
 import org.foree.bookreader.parser.AbsWebParser;
 import org.foree.bookreader.parser.BiQuGeWebParser;
@@ -23,7 +23,7 @@ import org.foree.bookreader.parser.BiQuGeWebParser;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SearchResultsActivity extends AppCompatActivity {
+public class SearchResultsActivity extends BaseActivity {
     private static final String TAG = SearchResultsActivity.class.getSimpleName();
     private RecyclerView mRecyclerView;
     private SearchListAdapter mAdapter;

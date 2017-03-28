@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.view.View;
@@ -18,6 +17,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 
 import org.foree.bookreader.R;
+import org.foree.bookreader.base.BaseActivity;
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.dao.BookDao;
@@ -31,7 +31,7 @@ import java.util.List;
  * Created by foree on 17-1-10.
  */
 
-public class BookInfoActivity extends AppCompatActivity {
+public class BookInfoActivity extends BaseActivity {
     private TextView tvNovelName, tvNovelAuthor, tvNovelDescription;
     private Button bt;
     private ListView lv;

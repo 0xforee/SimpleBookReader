@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.foree.bookreader.R;
+import org.foree.bookreader.base.BaseActivity;
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.dao.BReaderProvider;
 import org.foree.bookreader.bean.dao.BookDao;
@@ -37,7 +38,6 @@ import java.util.List;
 
 public class BookShelfFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = BookShelfFragment.class.getSimpleName();
-    private static final String KEY_RECREATE = TAG + "_recreate";
 
     private ActionMode mActionMode;
     private BookDao bookDao;
@@ -99,7 +99,7 @@ public class BookShelfFragment extends Fragment implements SwipeRefreshLayout.On
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBoolean(KEY_RECREATE, true);
+        outState.putBoolean(BaseActivity.KEY_RECREATE, true);
     }
 
     @Override
@@ -115,7 +115,7 @@ public class BookShelfFragment extends Fragment implements SwipeRefreshLayout.On
 
         initRecyclerAdapter();
 
-        if (savedInstanceState != null && savedInstanceState.getBoolean(KEY_RECREATE)) {
+        if (savedInstanceState != null && savedInstanceState.getBoolean(BaseActivity.KEY_RECREATE)) {
             Log.d(TAG, "onCreate: recreate activity");
         } else {
             // loading

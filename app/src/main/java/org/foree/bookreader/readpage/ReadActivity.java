@@ -14,7 +14,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -31,6 +30,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import org.foree.bookreader.R;
+import org.foree.bookreader.base.BaseActivity;
 import org.foree.bookreader.base.GlobalConfig;
 import org.foree.bookreader.bean.BookRecord;
 import org.foree.bookreader.bean.book.Chapter;
@@ -47,9 +47,8 @@ import org.greenrobot.eventbus.ThreadMode;
 /**
  * Created by foree on 16-7-21.
  */
-public class ReadActivity extends AppCompatActivity implements ReadViewPager.onPageAreaClickListener, LoaderManager.LoaderCallbacks {
+public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAreaClickListener, LoaderManager.LoaderCallbacks {
     private static final String TAG = ReadActivity.class.getSimpleName();
-    private static final String KEY_RECREATE = TAG + "_recreate";
 
     String bookUrl;
     private BookRecord mBookRecord;
@@ -121,7 +120,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBoolean(KEY_RECREATE, true);
+        outState.putBoolean(BaseActivity.KEY_RECREATE, true);
     }
 
     private void initViews() {
@@ -170,7 +169,7 @@ public class ReadActivity extends AppCompatActivity implements ReadViewPager.onP
                         mTextView.getPaint(),
                         mTextView.getIncludeFontPadding()));
 
-                if (savedInstanceState != null && savedInstanceState.getBoolean(KEY_RECREATE)) {
+                if (savedInstanceState != null && savedInstanceState.getBoolean(BaseActivity.KEY_RECREATE)) {
                     switchChapter(mBookRecord.getCurrentUrl(), false, false);
                     Log.d(TAG, "onCreate: recreate activity");
                 } else {
