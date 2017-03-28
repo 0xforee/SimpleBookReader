@@ -42,15 +42,14 @@
     <string name="pref_offline">智能离线</string>
     <string name="pref_title_about">关于</string>
     <string name="pref_title_night_mode">夜间模式</string>
-    <string name="pref_title_offline_wifi_only">仅在Wifi时缓存</string>
-    <string name="pref_summary_offline_wifi_only">仅当Wifi连接可用时缓存章节</string>
+    <string name="pref_title_offline_wifi_only">使用移动网络时提醒</string>
     <string name="pref_title_offline_enable">离线模式</string>
     <string name="pref_summary_offline_enable">打开时，会自动缓存章节</string>
     <string name="action_refresh">刷新</string>
     <string name="action_stop_refresh">停止刷新</string>
 
     <string name="pref_title_data_sync">后台同步</string>
-    <string name="pref_title_sync_notification">接收更新通知</string>
+    <string name="pref_title_sync_notification">接收通知</string>
     <string name="pref_title_pre_load">预缓存</string>
     <string name="pref_title_sync_enable">后台同步</string>
     <string name="pref_title_sync_frequency">同步频率</string>
@@ -70,6 +69,7 @@
     </string-array>
 
     <string name="offline_offset">离线数量</string>
+    <string name="pre_summary_offline_offset">离线当前章节的前后章节数量</string>
     <string-array name="pref_offline_offset_entries">
         <item>3 章</item>
         <item>5 章</item>

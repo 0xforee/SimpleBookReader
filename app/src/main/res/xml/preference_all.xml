@@ -4,6 +4,13 @@
         <SwitchPreference
             android:key="pref_key_night_mode"
             android:title="@string/pref_title_night_mode" />
+        <SwitchPreference
+            android:key="pref_key_offline_wifi_only"
+            android:title="@string/pref_title_offline_wifi_only" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="pref_key_sync_notification"
+            android:title="@string/pref_title_sync_notification" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/pref_offline">
@@ -12,17 +19,13 @@
             android:key="pref_key_offline_enable"
             android:summary="@string/pref_summary_offline_enable"
             android:title="@string/pref_title_offline_enable" />
-        <SwitchPreference
-            android:dependency="pref_key_offline_enable"
-            android:key="pref_key_offline_wifi_only"
-            android:summary="@string/pref_summary_offline_wifi_only"
-            android:title="@string/pref_title_offline_wifi_only" />
         <ListPreference
             android:defaultValue="5"
             android:dependency="pref_key_offline_enable"
             android:entries="@array/pref_offline_offset_entries"
             android:entryValues="@array/pref_offline_offset_values"
             android:key="pref_key_offline_offset"
+            android:summary="@string/pre_summary_offline_offset"
             android:title="@string/offline_offset" />
     </PreferenceCategory>
 
@@ -32,11 +35,6 @@
             android:key="pref_key_sync_enable"
             android:title="@string/pref_title_sync_enable" />
 
-        <SwitchPreference
-            android:defaultValue="true"
-            android:dependency="pref_key_sync_enable"
-            android:key="pref_key_sync_notification"
-            android:title="@string/pref_title_sync_notification" />
         <SwitchPreference
             android:dependency="pref_key_sync_enable"
             android:key="pref_key_sync_pre_load"
