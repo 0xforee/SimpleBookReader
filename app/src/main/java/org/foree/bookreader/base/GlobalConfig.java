@@ -35,4 +35,11 @@ public class GlobalConfig {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         }
     }
+
+    public boolean isSyncEnable(){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(BaseApplication.getInstance());
+        boolean isSyncEnable = preferences.getBoolean(SettingsActivity.KEY_PREF_SYNC_ENABLE, false);
+        Log.d(TAG, "isSyncEnable: " + isSyncEnable);
+        return isSyncEnable;
+    }
 }

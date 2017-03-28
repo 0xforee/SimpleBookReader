@@ -78,15 +78,18 @@ public class BookShelfActivity extends AppCompatActivity {
             }, 100);
         }
     }
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean(KEY_RECREATE, true);
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mNightMode == GlobalConfig.getInstance().isNightMode()) {
+        if (mNightMode == GlobalConfig.getInstance().isNightMode()
+                && GlobalConfig.getInstance().isSyncEnable()) {
             if (DEBUG) {
                 alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
                         SystemClock.elapsedRealtime() + 10000,
@@ -98,6 +101,7 @@ public class BookShelfActivity extends AppCompatActivity {
                         getInterval(), alarmIntent);
             }
             Log.d(TAG, "onDestroy: start alarm");
+
         }
     }
 
