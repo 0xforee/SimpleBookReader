@@ -1,19 +1,14 @@
 package org.foree.bookreader.homepage;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.SystemClock;
-import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -21,22 +16,16 @@ import android.view.MenuItem;
 import org.foree.bookreader.R;
 import org.foree.bookreader.base.BaseActivity;
 import org.foree.bookreader.base.GlobalConfig;
-import org.foree.bookreader.service.SyncService;
 import org.foree.bookreader.settings.SettingsActivity;
 
 public class BookShelfActivity extends BaseActivity {
 
     private static final String TAG = BookShelfActivity.class.getSimpleName();
 
-    public static final boolean DEBUG = false;
-
     Toolbar toolbar;
     ViewPager viewPager;
     TabLayout tabLayout;
     TabViewPagerAdapter tabViewPagerAdapter;
-
-    private AlarmManager alarmManager;
-    private PendingIntent alarmIntent;
 
     private boolean mNightMode;
 
@@ -48,18 +37,6 @@ public class BookShelfActivity extends BaseActivity {
         initViews();
 
         mNightMode = GlobalConfig.getInstance().isNightMode();
-
-        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(this, SyncService.class);
-        alarmIntent = PendingIntent.getService(this, 0, intent, 0);
-
-        if (savedInstanceState != null && savedInstanceState.getBoolean(BaseActivity.KEY_RECREATE)) {
-            Log.d(TAG, "onCreate: recreate activity");
-        } else {
-            // loading
-            alarmManager.cancel(alarmIntent);
-            Log.d(TAG, "onCreate: cancel alarm");
-        }
 
     }
 
@@ -76,38 +53,6 @@ public class BookShelfActivity extends BaseActivity {
                 }
             }, 100);
         }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBoolean(BaseActivity.KEY_RECREATE, true);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (mNightMode == GlobalConfig.getInstance().isNightMode()
-                && GlobalConfig.getInstance().isSyncEnable()) {
-            if (DEBUG) {
-                alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                        SystemClock.elapsedRealtime() + 10000,
-                        60000, alarmIntent);
-            } else {
-
-                alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                        SystemClock.elapsedRealtime() + AlarmManager.INTERVAL_FIFTEEN_MINUTES,
-                        getInterval(), alarmIntent);
-            }
-            Log.d(TAG, "onDestroy: start alarm");
-
-        }
-    }
-
-    private long getInterval() {
-        int select = Integer.valueOf(PreferenceManager.getDefaultSharedPreferences(this).getString(SettingsActivity.KEY_PREF_SYNC_FREQUENCY, "60"));
-
-        return select * 60 * 1000;
     }
 
     private void initViews() {

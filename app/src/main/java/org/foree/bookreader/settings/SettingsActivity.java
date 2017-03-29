@@ -9,6 +9,7 @@ import android.support.v7.widget.Toolbar;
 
 import org.foree.bookreader.R;
 import org.foree.bookreader.base.BaseActivity;
+import org.foree.bookreader.base.BaseApplication;
 import org.foree.bookreader.base.GlobalConfig;
 
 /**
@@ -21,7 +22,6 @@ public class SettingsActivity extends BaseActivity implements SharedPreferences.
     /**
      * keys for Application preference
      */
-    public static final String PREF_NAME = "settings";
 
     // night mode
     public static final String KEY_PREF_NIGHT_MODE = "pref_key_night_mode";
@@ -57,6 +57,11 @@ public class SettingsActivity extends BaseActivity implements SharedPreferences.
             case KEY_PREF_NIGHT_MODE:
                 GlobalConfig.getInstance().changeTheme();
                 recreate();
+                break;
+            case KEY_PREF_SYNC_ENABLE:
+                boolean value = sharedPreferences.getBoolean(KEY_PREF_SYNC_ENABLE, false);
+                BaseApplication.getInstance().setReceiverEnable(value);
+                BaseApplication.getInstance().startAlarm(value);
                 break;
             default:
                 break;
