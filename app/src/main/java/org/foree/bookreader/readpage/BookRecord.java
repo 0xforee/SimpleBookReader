@@ -1,4 +1,4 @@
-package org.foree.bookreader.bean;
+package org.foree.bookreader.readpage;
 
 import android.content.ContentValues;
 import android.content.Context;

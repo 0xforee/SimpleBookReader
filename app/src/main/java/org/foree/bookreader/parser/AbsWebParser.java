@@ -1,6 +1,5 @@
 package org.foree.bookreader.parser;
 
-import org.foree.bookreader.bean.BookRecord;
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.cache.ChapterCache;

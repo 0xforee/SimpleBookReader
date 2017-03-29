@@ -1,6 +1,6 @@
 package org.foree.bookreader.pagination;
 
-import org.foree.bookreader.bean.BookRecord;
+import org.foree.bookreader.readpage.BookRecord;
 import org.foree.bookreader.bean.cache.ChapterCache;
 import org.foree.bookreader.bean.cache.DoubleCache;
 import org.foree.bookreader.bean.cache.PaginationCache;

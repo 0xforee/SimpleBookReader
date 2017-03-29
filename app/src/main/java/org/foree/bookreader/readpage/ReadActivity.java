@@ -32,7 +32,6 @@ import android.widget.TextView;
 import org.foree.bookreader.R;
 import org.foree.bookreader.base.BaseActivity;
 import org.foree.bookreader.base.GlobalConfig;
-import org.foree.bookreader.bean.BookRecord;
 import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.dao.BReaderContract;
 import org.foree.bookreader.bean.dao.BReaderProvider;
