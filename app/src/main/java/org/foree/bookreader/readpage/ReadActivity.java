@@ -60,7 +60,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
 
     // popWindow
     private PopupWindow menuPop;
-    private Dialog contentDialog;
+    private Dialog contentDialog, fontDialog;
     private View rootView;
     private ListView chapterTitleListView;
     private ContentAdapter contentAdapter;
@@ -287,6 +287,21 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
                 }
             }
         });
+
+        tvFont.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(menuPop.isShowing()){
+                    menuPop.dismiss();
+                }
+                if (fontDialog == null) {
+                    showFontDialog();
+                } else {
+                    fontDialog.show();
+                }
+
+            }
+        });
     }
 
     @Override
@@ -302,6 +317,33 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
     @Override
     public void onNextChapterClick() {
         switchChapter(mBookRecord.getUrlFromFlag(1), false, false);
+    }
+
+    private void showFontDialog(){
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_font_layout, null);
+
+        DisplayMetrics dp = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dp);
+
+        fontDialog = new Dialog(this, R.style.contentDialogStyle);
+        fontDialog.setContentView(view);
+        fontDialog.setTitle();
+        Window dialogWindow = fontDialog.getWindow();
+        if (dialogWindow != null) {
+            WindowManager.LayoutParams lp = dialogWindow.getAttributes();
+            dialogWindow.setGravity(Gravity.BOTTOM);
+
+            lp.x = 0;
+            lp.y = 0;
+            lp.width = dp.widthPixels;
+            lp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+
+            dialogWindow.setAttributes(lp);
+        }
+        fontDialog.setCanceledOnTouchOutside(true);
+
+        fontDialog.show();
+
     }
 
     private void showContentDialog() {
