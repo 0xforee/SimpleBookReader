@@ -9,6 +9,10 @@
 
     <!-- read page background -->
     <color name="classical_page_background">#F1E5C9</color>
+    <color name="classical_page_background_2">#EEE6CA</color>
+    <color name="day_page_background">#FFFFFF</color>
+    <color name="night_page_background">#212A2F</color>
+    <color name="eye_mode_page_background">C5DCCC</color>
 
     <!-- chapter offline state -->
     <color name="colorChapterOfflined">@color/md_black_1000</color>
