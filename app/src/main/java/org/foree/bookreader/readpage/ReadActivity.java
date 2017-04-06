@@ -325,9 +325,8 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
         DisplayMetrics dp = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dp);
 
-        fontDialog = new Dialog(this, R.style.contentDialogStyle);
+        fontDialog = new Dialog(this, R.style.fontDialogStyle);
         fontDialog.setContentView(view);
-        fontDialog.setTitle();
         Window dialogWindow = fontDialog.getWindow();
         if (dialogWindow != null) {
             WindowManager.LayoutParams lp = dialogWindow.getAttributes();

@@ -62,4 +62,10 @@
         <item name="android:windowBackground">@color/windowBackgroundColor</item>
 
     </style>
+
+    <style name="fontDialogStyle" parent="Theme.AppCompat.DayNight.Dialog">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@color/windowBackgroundColor</item>
+
+    </style>
 </resources>
