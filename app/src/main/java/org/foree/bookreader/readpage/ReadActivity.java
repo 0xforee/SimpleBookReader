@@ -7,6 +7,8 @@ import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.StateListDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -27,6 +29,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import org.foree.bookreader.R;
@@ -291,7 +294,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
         tvFont.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(menuPop.isShowing()){
+                if (menuPop.isShowing()) {
                     menuPop.dismiss();
                 }
                 if (fontDialog == null) {
@@ -319,7 +322,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
         switchChapter(mBookRecord.getUrlFromFlag(1), false, false);
     }
 
-    private void showFontDialog(){
+    private void showFontDialog() {
         View view = LayoutInflater.from(this).inflate(R.layout.dialog_font_layout, null);
 
         DisplayMetrics dp = new DisplayMetrics();
@@ -340,8 +343,32 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
             dialogWindow.setAttributes(lp);
         }
         fontDialog.setCanceledOnTouchOutside(true);
-
+        RadioButton rd1 = (RadioButton) view.findViewById(R.id.bt1);
+        rd1.setBackground(getDrawList(R.color.classical_page_background));
+        RadioButton rd2 = (RadioButton) view.findViewById(R.id.bt2);
+        rd2.setBackground(getDrawList(R.color.day_page_background));
+        RadioButton rd3 = (RadioButton) view.findViewById(R.id.bt3);
+        rd3.setBackground(getDrawList(R.color.eye_mode_page_background));
+        RadioButton rd4 = (RadioButton) view.findViewById(R.id.bt4);
+        rd4.setBackground(getDrawList(R.color.night_page_background));
         fontDialog.show();
+
+    }
+
+    private StateListDrawable getDrawList(int backgroundColor) {
+        StateListDrawable bg = new StateListDrawable();
+
+        GradientDrawable gradientDrawable = new GradientDrawable();
+        gradientDrawable.setColor(getResources().getColor(backgroundColor));
+        gradientDrawable.setShape(GradientDrawable.RECTANGLE);
+        gradientDrawable.setCornerRadius(5);
+
+        bg.addState(new int[]{}, gradientDrawable);
+
+        gradientDrawable.setStroke(2, getResources().getColor(R.color.md_yellow_500));
+        bg.addState(new int[]{android.R.attr.state_checked}, gradientDrawable);
+
+        return bg;
 
     }
 
