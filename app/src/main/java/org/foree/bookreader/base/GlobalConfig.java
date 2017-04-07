@@ -47,10 +47,10 @@ public class GlobalConfig {
     public int getPageBackground() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(BaseApplication.getInstance());
         int index = preferences.getInt(SettingsActivity.KEY_PREF_PAGE_BACKGROUND, 0);
-        int color = R.color.day_page_background;
+        int color = R.color.normal_page_background;
         switch (index) {
             case 0:
-                color = R.color.day_page_background;
+                color = R.color.normal_page_background;
                 break;
             case 1:
                 color = R.color.classical_page_background;

@@ -28,7 +28,7 @@ public class FontDialog extends Dialog implements View.OnClickListener {
 
     private SharedPreferences backgroundPreference;
 
-    private RadioButton classicalRb, dayRb, eyeModeRb, nightRb;
+    private RadioButton classicalRb, normalRb, eyeModeRb, nightRb;
 
     public FontDialog(Context context) {
         this(context, R.style.fontDialogStyle);
@@ -47,7 +47,7 @@ public class FontDialog extends Dialog implements View.OnClickListener {
         int index = backgroundPreference.getInt(SettingsActivity.KEY_PREF_PAGE_BACKGROUND, 0);
         switch (index) {
             case 0:
-                dayRb.setChecked(true);
+                normalRb.setChecked(true);
                 break;
             case 1:
                 classicalRb.setChecked(true);
@@ -85,32 +85,32 @@ public class FontDialog extends Dialog implements View.OnClickListener {
 
         setCanceledOnTouchOutside(true);
 
-        dayRb = (RadioButton) rootView.findViewById(R.id.rb_normal);
-        dayRb.setBackground(getDrawList(R.color.day_page_background));
-        dayRb.setOnClickListener(this);
+        normalRb = (RadioButton) rootView.findViewById(R.id.rb_normal);
+        normalRb.setBackground(getDrawList(R.color.normal_page_background, R.color.normal_primary));
+        normalRb.setOnClickListener(this);
 
         classicalRb = (RadioButton) rootView.findViewById(R.id.rb_classical);
-        classicalRb.setBackground(getDrawList(R.color.classical_page_background));
+        classicalRb.setBackground(getDrawList(R.color.classical_page_background, R.color.classical_primary));
         classicalRb.setOnClickListener(this);
 
         eyeModeRb = (RadioButton) rootView.findViewById(R.id.rb_eye);
-        eyeModeRb.setBackground(getDrawList(R.color.eye_mode_page_background));
+        eyeModeRb.setBackground(getDrawList(R.color.eye_mode_page_background, R.color.eye_primary));
         eyeModeRb.setOnClickListener(this);
 
         nightRb = (RadioButton) rootView.findViewById(R.id.rb_night);
-        nightRb.setBackground(getDrawList(R.color.night_page_background));
+        nightRb.setBackground(getDrawList(R.color.night_page_background, R.color.night_primary));
         nightRb.setOnClickListener(this);
     }
 
 
-    private StateListDrawable getDrawList(int backgroundColor) {
+    private StateListDrawable getDrawList(int backgroundColor, int primaryColor) {
         StateListDrawable bg = new StateListDrawable();
 
         GradientDrawable checkedDrawable = new GradientDrawable();
         checkedDrawable.setColor(getContext().getResources().getColor(backgroundColor));
         checkedDrawable.setShape(GradientDrawable.RECTANGLE);
         checkedDrawable.setCornerRadius(5);
-        checkedDrawable.setStroke(3, getContext().getResources().getColor(R.color.md_yellow_500));
+        checkedDrawable.setStroke(7, getContext().getResources().getColor(primaryColor));
 
         GradientDrawable normalDrawable = new GradientDrawable();
         normalDrawable.setColor(getContext().getResources().getColor(backgroundColor));

@@ -245,7 +245,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
         menuPop.setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
         menuPop.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         menuPop.setFocusable(true);
-        menuPop.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.windowBackgroundColor)));
+        menuPop.setBackgroundDrawable(new ColorDrawable(GlobalConfig.getInstance().getPageBackground()));
 
         menuPop.setOutsideTouchable(true);
 
