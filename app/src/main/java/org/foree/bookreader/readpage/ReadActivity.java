@@ -358,15 +358,19 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
     private StateListDrawable getDrawList(int backgroundColor) {
         StateListDrawable bg = new StateListDrawable();
 
-        GradientDrawable gradientDrawable = new GradientDrawable();
-        gradientDrawable.setColor(getResources().getColor(backgroundColor));
-        gradientDrawable.setShape(GradientDrawable.RECTANGLE);
-        gradientDrawable.setCornerRadius(5);
+        GradientDrawable checkedDrawable = new GradientDrawable();
+        checkedDrawable.setColor(getResources().getColor(backgroundColor));
+        checkedDrawable.setShape(GradientDrawable.RECTANGLE);
+        checkedDrawable.setCornerRadius(5);
+        checkedDrawable.setStroke(3, getResources().getColor(R.color.md_yellow_500));
 
-        bg.addState(new int[]{}, gradientDrawable);
+        GradientDrawable normalDrawable = new GradientDrawable();
+        normalDrawable.setColor(getResources().getColor(backgroundColor));
+        normalDrawable.setShape(GradientDrawable.RECTANGLE);
+        normalDrawable.setCornerRadius(5);
 
-        gradientDrawable.setStroke(2, getResources().getColor(R.color.md_yellow_500));
-        bg.addState(new int[]{android.R.attr.state_checked}, gradientDrawable);
+        bg.addState(new int[]{android.R.attr.state_checked}, checkedDrawable);
+        bg.addState(new int[]{}, normalDrawable);
 
         return bg;
 
