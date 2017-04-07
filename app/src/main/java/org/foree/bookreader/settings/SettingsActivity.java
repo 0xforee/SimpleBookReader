@@ -37,6 +37,9 @@ public class SettingsActivity extends BaseActivity implements SharedPreferences.
     public static final String KEY_PREF_SYNC_PRE_LOAD = "pref_key_sync_pre_load";
     public static final String KEY_PREF_SYNC_FREQUENCY = "pref_key_sync_frequency";
 
+    // page background
+    public static final String KEY_PREF_PAGE_BACKGROUND = "pref_key_page_background";
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

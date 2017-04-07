@@ -1,6 +1,8 @@
 package org.foree.bookreader.readpage;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,10 +10,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.foree.bookreader.R;
+import org.foree.bookreader.base.GlobalConfig;
+import org.foree.bookreader.settings.SettingsActivity;
 
 import java.util.Calendar;
 
-public class ReadFragment extends Fragment {
+public class ReadFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String ARG_TITLE = "title";
 
     private TextView tvContents, tvTitle, tvTime, tvIndex, tvPageNum, tvSeparator;
@@ -58,6 +62,7 @@ public class ReadFragment extends Fragment {
             setData((ReadPageDataSet) getArguments().getSerializable(ARG_TITLE));
         }
 
+        rootView.setBackgroundColor(GlobalConfig.getInstance().getPageBackground());
         return rootView;
     }
 
@@ -70,5 +75,24 @@ public class ReadFragment extends Fragment {
             return hour + ":0" + min;
         else
             return hour + ":" + min;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        PreferenceManager.getDefaultSharedPreferences(getContext()).registerOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        PreferenceManager.getDefaultSharedPreferences(getContext()).unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(SettingsActivity.KEY_PREF_PAGE_BACKGROUND)) {
+            rootView.setBackgroundColor(GlobalConfig.getInstance().getPageBackground());
+        }
     }
 }
