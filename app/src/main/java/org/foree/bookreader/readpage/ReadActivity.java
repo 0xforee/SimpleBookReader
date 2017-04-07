@@ -39,6 +39,7 @@ import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.dao.BReaderContract;
 import org.foree.bookreader.bean.dao.BReaderProvider;
 import org.foree.bookreader.bean.event.PaginationEvent;
+import org.foree.bookreader.common.FontDialog;
 import org.foree.bookreader.pagination.PaginationArgs;
 import org.foree.bookreader.pagination.PaginationLoader;
 import org.foree.bookreader.settings.SettingsActivity;
@@ -323,58 +324,10 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
     }
 
     private void showFontDialog() {
-        View view = LayoutInflater.from(this).inflate(R.layout.dialog_font_layout, null);
-
-        DisplayMetrics dp = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(dp);
-
-        fontDialog = new Dialog(this, R.style.fontDialogStyle);
-        fontDialog.setContentView(view);
-        Window dialogWindow = fontDialog.getWindow();
-        if (dialogWindow != null) {
-            WindowManager.LayoutParams lp = dialogWindow.getAttributes();
-            dialogWindow.setGravity(Gravity.BOTTOM);
-
-            lp.x = 0;
-            lp.y = 0;
-            lp.width = dp.widthPixels;
-            lp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-
-            dialogWindow.setAttributes(lp);
-        }
-        fontDialog.setCanceledOnTouchOutside(true);
-        RadioButton rd1 = (RadioButton) view.findViewById(R.id.bt1);
-        rd1.setBackground(getDrawList(R.color.classical_page_background));
-        RadioButton rd2 = (RadioButton) view.findViewById(R.id.bt2);
-        rd2.setBackground(getDrawList(R.color.day_page_background));
-        RadioButton rd3 = (RadioButton) view.findViewById(R.id.bt3);
-        rd3.setBackground(getDrawList(R.color.eye_mode_page_background));
-        RadioButton rd4 = (RadioButton) view.findViewById(R.id.bt4);
-        rd4.setBackground(getDrawList(R.color.night_page_background));
+        fontDialog = new FontDialog(this);
         fontDialog.show();
-
     }
 
-    private StateListDrawable getDrawList(int backgroundColor) {
-        StateListDrawable bg = new StateListDrawable();
-
-        GradientDrawable checkedDrawable = new GradientDrawable();
-        checkedDrawable.setColor(getResources().getColor(backgroundColor));
-        checkedDrawable.setShape(GradientDrawable.RECTANGLE);
-        checkedDrawable.setCornerRadius(5);
-        checkedDrawable.setStroke(3, getResources().getColor(R.color.md_yellow_500));
-
-        GradientDrawable normalDrawable = new GradientDrawable();
-        normalDrawable.setColor(getResources().getColor(backgroundColor));
-        normalDrawable.setShape(GradientDrawable.RECTANGLE);
-        normalDrawable.setCornerRadius(5);
-
-        bg.addState(new int[]{android.R.attr.state_checked}, checkedDrawable);
-        bg.addState(new int[]{}, normalDrawable);
-
-        return bg;
-
-    }
 
     private void showContentDialog() {
         View view = LayoutInflater.from(this).inflate(R.layout.dialog_content_layout, null);

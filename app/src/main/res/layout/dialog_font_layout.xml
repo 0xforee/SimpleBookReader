@@ -20,25 +20,25 @@
         android:paddingTop="10dp">
 
         <RadioButton
-            android:id="@+id/bt1"
+            android:id="@+id/rb_classical"
             style="@style/BackgroundButtonStyle"
             android:checked="true"
-            android:text="复古" />
+            android:text="@string/classical_background" />
 
         <RadioButton
-            android:id="@+id/bt2"
+            android:id="@+id/rb_normal"
             style="@style/BackgroundButtonStyle"
-            android:text="常规" />
+            android:text="@string/normal_background" />
 
         <RadioButton
-            android:id="@+id/bt3"
+            android:id="@+id/rb_eye"
             style="@style/BackgroundButtonStyle"
-            android:text="护眼" />
+            android:text="@string/eye_background" />
 
         <RadioButton
-            android:id="@+id/bt4"
+            android:id="@+id/rb_night"
             style="@style/BackgroundButtonStyle"
-            android:text="夜间" />
+            android:text="@string/night_background" />
 
     </RadioGroup>
 </LinearLayout>
