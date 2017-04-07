@@ -7,8 +7,6 @@ import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.StateListDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,7 +27,6 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.PopupWindow;
-import android.widget.RadioButton;
 import android.widget.TextView;
 
 import org.foree.bookreader.R;
@@ -64,7 +61,8 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
 
     // popWindow
     private PopupWindow menuPop;
-    private Dialog contentDialog, fontDialog;
+    private Dialog contentDialog;
+    private FontDialog.Builder fontDialog;
     private View rootView;
     private ListView chapterTitleListView;
     private ContentAdapter contentAdapter;
@@ -301,7 +299,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
                 if (fontDialog == null) {
                     showFontDialog();
                 } else {
-                    fontDialog.show();
+                    fontDialog.showDialog();
                 }
 
             }
@@ -324,8 +322,8 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
     }
 
     private void showFontDialog() {
-        fontDialog = new FontDialog(this);
-        fontDialog.show();
+        fontDialog = new FontDialog.Builder(this);
+        fontDialog.showDialog();
     }
 
 

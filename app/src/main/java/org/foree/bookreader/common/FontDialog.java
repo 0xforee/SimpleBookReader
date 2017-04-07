@@ -17,6 +17,7 @@ import android.view.WindowManager;
 import android.widget.RadioButton;
 
 import org.foree.bookreader.R;
+import org.foree.bookreader.base.GlobalConfig;
 import org.foree.bookreader.settings.SettingsActivity;
 
 /**
@@ -29,8 +30,9 @@ public class FontDialog extends Dialog implements View.OnClickListener {
     private SharedPreferences backgroundPreference;
 
     private RadioButton classicalRb, normalRb, eyeModeRb, nightRb;
+    private View rootView;
 
-    public FontDialog(Context context) {
+    private FontDialog(Context context) {
         this(context, R.style.fontDialogStyle);
     }
 
@@ -62,7 +64,7 @@ public class FontDialog extends Dialog implements View.OnClickListener {
     }
 
     private void init() {
-        View rootView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_font_layout, null);
+        rootView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_font_layout, null);
 
         DisplayMetrics dp = new DisplayMetrics();
         WindowManager windowManager = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
@@ -127,19 +129,47 @@ public class FontDialog extends Dialog implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         Log.d(TAG, "onClick");
+        int index = 0;
         switch (view.getId()) {
             case R.id.rb_normal:
-                backgroundPreference.edit().putInt(SettingsActivity.KEY_PREF_PAGE_BACKGROUND, 0).apply();
+                index = 0;
                 break;
             case R.id.rb_classical:
-                backgroundPreference.edit().putInt(SettingsActivity.KEY_PREF_PAGE_BACKGROUND, 1).apply();
+                index = 1;
                 break;
             case R.id.rb_eye:
-                backgroundPreference.edit().putInt(SettingsActivity.KEY_PREF_PAGE_BACKGROUND, 2).apply();
+                index = 2;
                 break;
             case R.id.rb_night:
-                backgroundPreference.edit().putInt(SettingsActivity.KEY_PREF_PAGE_BACKGROUND, 3).apply();
+                index = 3;
                 break;
+        }
+        
+        backgroundPreference.edit().putInt(SettingsActivity.KEY_PREF_PAGE_BACKGROUND, index).apply();
+        rootView.setBackgroundColor(GlobalConfig.getInstance().getPageBackground());
+
+    }
+
+    public static class Builder {
+        private Context mContext;
+        private int mThemeResId;
+        private FontDialog fontDialog;
+
+        public Builder(Context context) {
+            this(context, R.style.fontDialogStyle);
+        }
+
+        private Builder(Context context, int themeResId) {
+            mContext = context;
+            mThemeResId = themeResId;
+        }
+
+        public void showDialog() {
+            if (fontDialog == null)
+                fontDialog = new FontDialog(mContext, mThemeResId);
+            fontDialog.rootView.setBackgroundColor(GlobalConfig.getInstance().getPageBackground());
+            fontDialog.setContentView(fontDialog.rootView);
+            fontDialog.show();
         }
     }
 }
