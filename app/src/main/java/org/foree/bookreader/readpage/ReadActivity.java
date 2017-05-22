@@ -271,24 +271,24 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
             }
         });
 
-        tvBrightness.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ReadActivity.this);
-                boolean nightMode = GlobalConfig.getInstance().isNightMode();
-                Log.d(TAG, "onClick: nightMode = " + nightMode);
-                preferences.edit().putBoolean(SettingsActivity.KEY_PREF_NIGHT_MODE, !nightMode).apply();
-                // change theme
-                GlobalConfig.getInstance().changeTheme();
-
-                recreate();
-
-                if (menuPop.isShowing()) {
-                    menuPop.dismiss();
-                }
-            }
-        });
+//        tvBrightness.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ReadActivity.this);
+//                boolean nightMode = GlobalConfig.getInstance().isNightMode();
+//                Log.d(TAG, "onClick: nightMode = " + nightMode);
+//                preferences.edit().putBoolean(SettingsActivity.KEY_PREF_NIGHT_MODE, !nightMode).apply();
+//                // change theme
+//                GlobalConfig.getInstance().changeTheme();
+//
+//                recreate();
+//
+//                if (menuPop.isShowing()) {
+//                    menuPop.dismiss();
+//                }
+//            }
+//        });
 
         tvFont.setOnClickListener(new View.OnClickListener() {
             @Override

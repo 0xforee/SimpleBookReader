@@ -3,6 +3,7 @@
     <PreferenceCategory android:title="@string/pref_general">
         <SwitchPreference
             android:key="pref_key_night_mode"
+            android:enabled="false"
             android:title="@string/pref_title_night_mode" />
         <SwitchPreference
             android:key="pref_key_offline_wifi_only"
