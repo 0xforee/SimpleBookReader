@@ -308,6 +308,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
 
     @Override
     public void onMediumAreaClick() {
+        menuPop.setBackgroundDrawable(new ColorDrawable(GlobalConfig.getInstance().getPageBackground()));
         menuPop.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
     }
 
