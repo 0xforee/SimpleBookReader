@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.SeekBar;
 
@@ -111,6 +112,11 @@ public class FontDialog extends Dialog implements View.OnClickListener, SeekBar.
         nightRb = (RadioButton) rootView.findViewById(R.id.rb_night);
         nightRb.setBackground(getDrawList(R.color.night_page_background, R.color.night_primary));
         nightRb.setOnClickListener(this);
+
+        ImageView brightness_low = (ImageView) rootView.findViewById(R.id.brightness_low);
+        brightness_low.setAlpha(140);
+        ImageView brightness_high = (ImageView) rootView.findViewById(R.id.brightness_high);
+        brightness_high.setAlpha(140);
 
         // init brightness
         seekBar = (SeekBar) rootView.findViewById(R.id.seekBar);
