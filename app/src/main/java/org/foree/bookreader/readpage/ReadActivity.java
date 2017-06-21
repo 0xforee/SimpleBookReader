@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.Loader;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -189,6 +188,11 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
         // init smart load offset
         int offset = Integer.valueOf(PreferenceManager.getDefaultSharedPreferences(this).getString(SettingsActivity.KEY_PREF_OFFLINE_OFFSET, "5"));
         PaginationLoader.getInstance().smartLoadInit(mBookRecord, offset);
+
+        // set brightness
+        WindowManager.LayoutParams lp = getWindow().getAttributes();
+        lp.screenBrightness = GlobalConfig.getInstance().getAppBrightness();
+        getWindow().setAttributes(lp);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

@@ -2,6 +2,7 @@ package org.foree.bookreader.base;
 
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
 
@@ -14,6 +15,9 @@ import org.foree.bookreader.settings.SettingsActivity;
 public class GlobalConfig {
     private static GlobalConfig ourInstance = new GlobalConfig();
     private static String TAG = GlobalConfig.class.getSimpleName();
+
+    // 0 to 1 adjusts the brightness from dark to full bright.
+    private static float mAppBrightness = -1;
 
     public static GlobalConfig getInstance() {
         return ourInstance;
@@ -35,6 +39,22 @@ public class GlobalConfig {
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         }
+    }
+
+    public float getAppBrightness() {
+        if (mAppBrightness == -1) {
+            try {
+                // get system brightness value
+                mAppBrightness = Settings.System.getInt(BaseApplication.getInstance().getContentResolver(), Settings.System.SCREEN_BRIGHTNESS) / 255f;
+            } catch (Settings.SettingNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        return mAppBrightness;
+    }
+
+    public void setAppBrightness(float brightness) {
+        mAppBrightness = brightness;
     }
 
     public boolean isSyncEnable() {

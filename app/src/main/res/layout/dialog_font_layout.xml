@@ -38,6 +38,7 @@
         <RadioButton
             android:id="@+id/rb_night"
             style="@style/BackgroundButtonStyle"
+            android:textColor="@color/md_white_1000"
             android:text="@string/night_background" />
 
     </RadioGroup>

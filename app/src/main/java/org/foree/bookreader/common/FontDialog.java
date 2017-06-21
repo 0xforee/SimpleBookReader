@@ -15,22 +15,28 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.RadioButton;
+import android.widget.SeekBar;
 
 import org.foree.bookreader.R;
 import org.foree.bookreader.base.GlobalConfig;
+import org.foree.bookreader.readpage.ReadActivity;
 import org.foree.bookreader.settings.SettingsActivity;
 
 /**
  * Created by foree on 17-4-7.
  */
 
-public class FontDialog extends Dialog implements View.OnClickListener {
+public class FontDialog extends Dialog implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
     private static final String TAG = FontDialog.class.getSimpleName();
 
+    private static final float BRIGHTNESS_MAX = 255f;
+    Window window;
+    private float mBrightness;
     private SharedPreferences backgroundPreference;
-
     private RadioButton classicalRb, normalRb, eyeModeRb, nightRb;
     private View rootView;
+    private SeekBar seekBar;
+    private ReadActivity activity;
 
     private FontDialog(Context context) {
         this(context, R.style.fontDialogStyle);
@@ -38,6 +44,9 @@ public class FontDialog extends Dialog implements View.OnClickListener {
 
     private FontDialog(Context context, int themeResId) {
         super(context, themeResId);
+
+        activity = (ReadActivity) context;
+        window = getWindow();
 
         init();
         initPreference();
@@ -102,8 +111,30 @@ public class FontDialog extends Dialog implements View.OnClickListener {
         nightRb = (RadioButton) rootView.findViewById(R.id.rb_night);
         nightRb.setBackground(getDrawList(R.color.night_page_background, R.color.night_primary));
         nightRb.setOnClickListener(this);
+
+        // init brightness
+        seekBar = (SeekBar) rootView.findViewById(R.id.seekBar);
+        seekBar.setOnSeekBarChangeListener(this);
+        seekBar.setMax((int) BRIGHTNESS_MAX);
+
     }
 
+    @Override
+    public void dismiss() {
+        super.dismiss();
+        WindowManager.LayoutParams lp = activity.getWindow().getAttributes();
+        lp.screenBrightness = GlobalConfig.getInstance().getAppBrightness();
+        activity.getWindow().setAttributes(lp);
+    }
+
+    private void initBrightness() {
+        mBrightness = GlobalConfig.getInstance().getAppBrightness();
+
+        seekBar.setProgress((int) (mBrightness * BRIGHTNESS_MAX));
+        WindowManager.LayoutParams lp = window.getAttributes();
+        lp.screenBrightness = mBrightness;
+        window.setAttributes(lp);
+    }
 
     private StateListDrawable getDrawList(int backgroundColor, int primaryColor) {
         StateListDrawable bg = new StateListDrawable();
@@ -144,10 +175,31 @@ public class FontDialog extends Dialog implements View.OnClickListener {
                 index = 3;
                 break;
         }
-        
+
         backgroundPreference.edit().putInt(SettingsActivity.KEY_PREF_PAGE_BACKGROUND, index).apply();
         rootView.setBackgroundColor(GlobalConfig.getInstance().getPageBackground());
 
+    }
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        if (fromUser) {
+            mBrightness = progress / BRIGHTNESS_MAX;
+            WindowManager.LayoutParams lp = window.getAttributes();
+            Log.d(TAG, "onProgressChanged: progress = " + mBrightness);
+            lp.screenBrightness = mBrightness;
+            window.setAttributes(lp);
+        }
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+        GlobalConfig.getInstance().setAppBrightness(mBrightness);
     }
 
     public static class Builder {
@@ -169,6 +221,7 @@ public class FontDialog extends Dialog implements View.OnClickListener {
                 fontDialog = new FontDialog(mContext, mThemeResId);
             fontDialog.rootView.setBackgroundColor(GlobalConfig.getInstance().getPageBackground());
             fontDialog.setContentView(fontDialog.rootView);
+            fontDialog.initBrightness();
             fontDialog.show();
         }
     }
