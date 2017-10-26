@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- read page background start -->
+    <string-array name="read_background_array">
+        <item>#FFFFFF</item> <!-- normal -->
+        <item>#F1E5C9</item> <!-- classical -->
+        <!-- <item>#EEE6CA</item> classical 2 -->
+        <item>#C5DCCC</item> <!-- eyemode -->
+        <item>#212A2F</item> <!-- night -->
+    </string-array>
+
+    <string-array name="read_background_checked_array">
+        <item>#F9A825</item> <!-- normal checked-->
+        <item>#03A9F4</item> <!-- classical checked-->
+        <item>#03A9F4</item> <!-- eyemode checked-->
+        <item>#66BB6A</item> <!-- night checked-->
+    </string-array>
+
+    <string-array name="read_background_text_array">
+        <item>@string/normal_background</item>
+        <item>@string/classical_background</item>
+        <item>@string/eye_background</item>
+        <item>@string/night_background</item>
+    </string-array>
+
+    <!-- read page background end -->
+</resources>

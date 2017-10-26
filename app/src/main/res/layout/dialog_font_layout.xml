@@ -46,33 +46,12 @@
         android:background="#10757575" />
 
     <RadioGroup
+        android:id="@+id/font_custom_bg"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginEnd="-5dp"
         android:layout_marginStart="-5dp"
         android:orientation="horizontal">
-
-        <RadioButton
-            android:id="@+id/rb_normal"
-            style="@style/BackgroundButtonStyle"
-            android:checked="true"
-            android:text="@string/normal_background" />
-
-        <RadioButton
-            android:id="@+id/rb_classical"
-            style="@style/BackgroundButtonStyle"
-            android:text="@string/classical_background" />
-
-        <RadioButton
-            android:id="@+id/rb_eye"
-            style="@style/BackgroundButtonStyle"
-            android:text="@string/eye_background" />
-
-        <RadioButton
-            android:id="@+id/rb_night"
-            style="@style/BackgroundButtonStyle"
-            android:text="@string/night_background"
-            android:textColor="@color/md_white_1000" />
 
     </RadioGroup>
 </LinearLayout>

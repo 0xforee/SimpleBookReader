@@ -1,9 +1,11 @@
 package org.foree.bookreader.base;
 
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatDelegate;
+import android.text.TextUtils;
 import android.util.Log;
 
 import org.foree.bookreader.R;
@@ -19,16 +21,18 @@ public class GlobalConfig {
     // 0 to 1 adjusts the brightness from dark to full bright.
     private static float mAppBrightness = -1;
 
+    private SharedPreferences mSharedPreference;
+
     public static GlobalConfig getInstance() {
         return ourInstance;
     }
 
     private GlobalConfig() {
+        mSharedPreference = PreferenceManager.getDefaultSharedPreferences(BaseApplication.getInstance());
     }
 
     public boolean isNightMode() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(BaseApplication.getInstance());
-        boolean isNight = preferences.getBoolean(SettingsActivity.KEY_PREF_NIGHT_MODE, false);
+        boolean isNight = mSharedPreference.getBoolean(SettingsActivity.KEY_PREF_NIGHT_MODE, false);
         Log.d(TAG, "isNightMode: " + isNight);
         return isNight;
     }
@@ -58,31 +62,17 @@ public class GlobalConfig {
     }
 
     public boolean isSyncEnable() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(BaseApplication.getInstance());
-        boolean isSyncEnable = preferences.getBoolean(SettingsActivity.KEY_PREF_SYNC_ENABLE, false);
+        boolean isSyncEnable = mSharedPreference.getBoolean(SettingsActivity.KEY_PREF_SYNC_ENABLE, false);
         Log.d(TAG, "isSyncEnable: " + isSyncEnable);
         return isSyncEnable;
     }
 
     public int getPageBackground() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(BaseApplication.getInstance());
-        int index = preferences.getInt(SettingsActivity.KEY_PREF_PAGE_BACKGROUND, 0);
-        int color = R.color.normal_page_background;
-        switch (index) {
-            case 0:
-                color = R.color.normal_page_background;
-                break;
-            case 1:
-                color = R.color.classical_page_background;
-                break;
-            case 2:
-                color = R.color.eye_mode_page_background;
-                break;
-            case 3:
-                color = R.color.night_page_background;
-                break;
-        }
+        int color = BaseApplication.getInstance().getResources().getColor(R.color.normal_page_background);
+        return mSharedPreference.getInt(SettingsActivity.KEY_PREF_PAGE_BACKGROUND, color);
+    }
 
-        return BaseApplication.getInstance().getResources().getColor(color);
+    public void setPageBackground(int color) {
+        mSharedPreference.edit().putInt(SettingsActivity.KEY_PREF_PAGE_BACKGROUND, color).apply();
     }
 }
