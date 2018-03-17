@@ -4,12 +4,8 @@ import android.util.Log;
 
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,46 +14,6 @@ import java.util.List;
 
 class PiaoTianWebParser extends AbsWebParser {
     private static final String TAG = PiaoTianWebParser.class.getSimpleName();
-    @Override
-    public List<Book> parseBookList(Document doc) {
-        List<Book> books = new ArrayList<>();
-        Log.d(TAG, "parseBookList: " + doc.toString());
-        Elements trs = doc.getElementsByTag("tr");
-        for(Element tr: trs){
-            // skip first table header
-            if (tr.hasAttr("align")) {
-                continue;
-            }else{
-                Book book = new Book();
-                // parse search book info
-                Log.d(TAG, "parseBookList: bookUrl = " + tr.child(0).child(0).attr("href"));
-                Log.d(TAG, "parseBookList: bookName = " + tr.child(0).child(0).text());
-                Log.d(TAG, "parseBookList: author = " + tr.child(2).text());
-
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public Book parseBookInfo(String bookUrl, Document doc) {
-        return null;
-    }
-
-    @Override
-    public List<Chapter> parseChapterList(String bookUrl, String contentUrl, Document doc) {
-        return null;
-    }
-
-    @Override
-    public Chapter parseChapterContents(String chapterUrl, Document doc) {
-        return null;
-    }
-
-    @Override
-    public List<Book> parseHostUrl(String hostUrl, Document doc) {
-        return null;
-    }
 
     @Override
     WebInfo getWebInfo() {
@@ -89,5 +45,30 @@ class PiaoTianWebParser extends AbsWebParser {
                 return api;
             }
         };
+    }
+
+    @Override
+    public List<Book> searchBook(String keyword) {
+        return null;
+    }
+
+    @Override
+    public Book getBookInfo(String bookUrl) {
+        return null;
+    }
+
+    @Override
+    public List<Chapter> getContents(String bookUrl, String contentsUrl) {
+        return null;
+    }
+
+    @Override
+    public Chapter getChapter(String bookUrl, String chapterUrl) {
+        return null;
+    }
+
+    @Override
+    public List<Book> getHomePageInfo() {
+        return null;
     }
 }

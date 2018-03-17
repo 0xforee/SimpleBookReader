@@ -39,27 +39,27 @@ class NullWebParser extends AbsWebParser{
     }
 
     @Override
-    public List<Book> parseBookList(Document doc) {
+    public List<Book> searchBook(String keyword) {
         return null;
     }
 
     @Override
-    public Book parseBookInfo(String bookUrl, Document doc) {
+    public Book getBookInfo(String bookUrl) {
         return null;
     }
 
     @Override
-    public List<Chapter> parseChapterList(String bookUrl, String contentUrl, Document doc) {
+    public List<Chapter> getContents(String bookUrl, String contentsUrl) {
         return null;
     }
 
     @Override
-    public Chapter parseChapterContents(String chapterUrl, Document doc) {
+    public Chapter getChapter(String bookUrl, String chapterUrl) {
         return null;
     }
 
     @Override
-    public List<Book> parseHostUrl(String hostUrl, Document doc) {
+    public List<Book> getHomePageInfo() {
         return null;
     }
 }

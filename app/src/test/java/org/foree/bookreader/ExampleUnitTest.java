@@ -170,7 +170,7 @@ public class ExampleUnitTest {
         String url = "https://www.piaotian.com/modules/article/search.php?searchtype=articlename&searchkey=%D0%A1%CB%B5&Submit=+%CB%D1+%CB%F7+&page=1";
         String host = "http://m.piaotian.com";
         String mUrl = "http://m.piaotian.com/s.php";
-        String keyword = "五行天";
+        String keyword = "历史";
         try {
             //System.out.print(url);
             Map<String, String > headers = new HashMap<>();

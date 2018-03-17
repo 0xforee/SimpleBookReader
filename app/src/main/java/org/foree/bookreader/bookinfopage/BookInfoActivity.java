@@ -22,7 +22,7 @@ import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.dao.BookDao;
 import org.foree.bookreader.net.NetCallback;
-import org.foree.bookreader.parser.WebParserProxy;
+import org.foree.bookreader.parser.WebParser;
 
 import java.util.List;
 
@@ -124,10 +124,10 @@ public class BookInfoActivity extends BaseActivity {
     }
 
     private void initViews() {
-        WebParserProxy.getInstance().getBookInfoAsync(bookUrl, new NetCallback<Book>() {
+        WebParser.getInstance().getBookInfoAsync(bookUrl, new NetCallback<Book>() {
             @Override
             public void onSuccess(final Book data1) {
-                WebParserProxy.getInstance().getContentsAsync(bookUrl, data1.getContentUrl(), new NetCallback<List<Chapter>>() {
+                WebParser.getInstance().getContentsAsync(bookUrl, data1.getContentUrl(), new NetCallback<List<Chapter>>() {
                     @Override
                     public void onSuccess(final List<Chapter> data) {
                         mHandler.postDelayed(new Runnable() {

@@ -6,7 +6,7 @@ import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.dao.BookDao;
 import org.foree.bookreader.bean.event.BookUpdateEvent;
-import org.foree.bookreader.parser.WebParserProxy;
+import org.foree.bookreader.parser.WebParser;
 import org.foree.bookreader.utils.DateUtils;
 import org.greenrobot.eventbus.EventBus;
 
@@ -49,14 +49,14 @@ public class SyncBooksThread extends Thread {
                     @Override
                     public Book call() throws Exception {
 
-                        final Book newBook = WebParserProxy.getInstance().getBookInfo(oldBook.getBookUrl());
+                        final Book newBook = WebParser.getInstance().getBookInfo(oldBook.getBookUrl());
 
                         if (DateUtils.isNewer(oldBook.getUpdateTime(), newBook.getUpdateTime())) {
                             // update chapters
                             chapterTasks.add(new Callable<Boolean>() {
                                 @Override
                                 public Boolean call() throws Exception {
-                                    List<Chapter> chapters = WebParserProxy.getInstance().getContents(newBook.getBookUrl(), newBook.getContentUrl());
+                                    List<Chapter> chapters = WebParser.getInstance().getContents(newBook.getBookUrl(), newBook.getContentUrl());
                                     if (chapters != null) {
                                         bookDao.insertChapters(chapters);
                                     }

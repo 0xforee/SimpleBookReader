@@ -10,6 +10,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,7 +48,81 @@ class BiQuGeWebParser extends AbsWebParser {
     }
 
     @Override
-    public List<Book> parseBookList(Document doc) {
+    public List<Book> searchBook(String keyword) {
+        Document doc;
+        try {
+            doc = Jsoup.connect(getWebInfo().getSearchApi(keyword)).get();
+            Log.d(TAG, "run: " + getWebInfo().getHostName());
+            if (doc != null) {
+                return parseBookList(doc);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return new ArrayList<>();
+    }
+
+    @Override
+    public Book getBookInfo(String bookUrl) {
+        Document doc;
+        Book book = null;
+        try {
+            doc = Jsoup.connect(bookUrl).get();
+            if (doc != null) {
+                book = parseBookInfo(bookUrl, doc);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return book;
+    }
+
+    @Override
+    public List<Chapter> getContents(String bookUrl, String contentsUrl) {
+        Document doc;
+        try {
+            doc = Jsoup.connect(contentsUrl).get();
+            if (doc != null) {
+                return parseChapterList(bookUrl, contentsUrl, doc);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
+    }
+
+    @Override
+    public Chapter getChapter(String bookUrl, String chapterUrl) {
+        Document doc;
+        try {
+            doc = Jsoup.connect(chapterUrl).get();
+            if (doc != null) {
+                return parseChapterContents(chapterUrl, doc);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new Chapter();
+    }
+
+    @Override
+    public List<Book> getHomePageInfo() {
+        Document doc;
+        try {
+            doc = Jsoup.connect(getWebInfo().getHostUrl()).get();
+            if (doc != null) {
+                return parseHostUrl(getWebInfo().getHostUrl(), doc);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+
+        }
+
+        return new ArrayList<>();
+    }
+
+    private List<Book> parseBookList(Document doc) {
         List<Book> bookList = new ArrayList<>();
         Elements resultList = doc.getElementsByClass("result-game-item");
         for (Element result : resultList) {
@@ -76,8 +151,7 @@ class BiQuGeWebParser extends AbsWebParser {
         return bookList;
     }
 
-    @Override
-    public Book parseBookInfo(String bookUrl, Document doc) {
+    private Book parseBookInfo(String bookUrl, Document doc) {
         Book book = new Book();
         Chapter newestChapter = new Chapter();
 
@@ -124,8 +198,7 @@ class BiQuGeWebParser extends AbsWebParser {
         return book;
     }
 
-    @Override
-    public List<Chapter> parseChapterList(String bookUrl, String contentUrl, Document doc) {
+    private List<Chapter> parseChapterList(String bookUrl, String contentUrl, Document doc) {
         // ChapterList
         List<Chapter> chapters = new ArrayList<>();
         Elements elements_contents = doc.select("dd");
@@ -148,8 +221,7 @@ class BiQuGeWebParser extends AbsWebParser {
         return chapters;
     }
 
-    @Override
-    public Chapter parseChapterContents(String chapterUrl, Document doc) {
+    private Chapter parseChapterContents(String chapterUrl, Document doc) {
         Chapter chapter = new Chapter();
 
         chapter.setChapterUrl(chapterUrl);
@@ -173,8 +245,7 @@ class BiQuGeWebParser extends AbsWebParser {
         return chapter;
     }
 
-    @Override
-    public List<Book> parseHostUrl(String hostUrl, Document doc) {
+    private List<Book> parseHostUrl(String hostUrl, Document doc) {
         List<Book> categroyList = new ArrayList<>();
 
         // hot content

@@ -14,11 +14,11 @@ import java.util.Map;
  * 用于对外的统一接口，所有的对书籍的资源请求都通过这个代理类处理
  */
 
-public class WebParserProxy implements IWebParserProxy {
+public class WebParser implements IWebParser {
     private Map<String, AbsWebParser> mParserMap = new HashMap<>();
-    private static WebParserProxy mInstance;
+    private static WebParser mInstance;
 
-    private WebParserProxy() {
+    private WebParser() {
 
         registerParser("http://www.biquge.cn", new BiQuGeWebParser());
         registerParser("http://m.piaotian.com", new PiaoTianWebParser());
@@ -26,12 +26,12 @@ public class WebParserProxy implements IWebParserProxy {
     }
 
 
-    public static WebParserProxy getInstance() {
+    public static WebParser getInstance() {
         // double check
         if (mInstance == null) {
-            synchronized (WebParserProxy.class) {
+            synchronized (WebParser.class) {
                 if (mInstance == null) {
-                    mInstance = new WebParserProxy();
+                    mInstance = new WebParser();
                 }
             }
         }
@@ -96,25 +96,25 @@ public class WebParserProxy implements IWebParserProxy {
             @Override
             public void run() {
                 super.run();
-                netCallback.onSuccess(getWebParser(contentsUrl).getChapterList(bookUrl, contentsUrl));
+                netCallback.onSuccess(getWebParser(contentsUrl).getContents(bookUrl, contentsUrl));
             }
         }.start();
     }
 
     @Override
-    public void getChapterAsync(String bookUrl, final String chapterUrl, final NetCallback<Chapter> netCallback) {
+    public void getChapterAsync(final String bookUrl, final String chapterUrl, final NetCallback<Chapter> netCallback) {
         new Thread() {
             @Override
             public void run() {
                 super.run();
-                netCallback.onSuccess(getWebParser(chapterUrl).getChapterContents(chapterUrl));
+                netCallback.onSuccess(getWebParser(chapterUrl).getChapter(bookUrl, chapterUrl));
 
             }
         }.start();
     }
 
     @Override
-    public void getHomePageAsync(final NetCallback<List<Book>> netCallback) {
+    public void getHomePageInfoAsync(final NetCallback<List<Book>> netCallback) {
         new Thread() {
             @Override
             public void run() {
@@ -143,16 +143,16 @@ public class WebParserProxy implements IWebParserProxy {
 
     @Override
     public List<Chapter> getContents(String bookUrl, String contentsUrl) {
-        return getWebParser(bookUrl).getChapterList(bookUrl, contentsUrl);
+        return getWebParser(bookUrl).getContents(bookUrl, contentsUrl);
     }
 
     @Override
     public Chapter getChapter(String bookUrl, String chapterUrl) {
-        return getWebParser(chapterUrl).getChapterContents(chapterUrl);
+        return getWebParser(chapterUrl).getChapter(bookUrl, chapterUrl);
     }
 
     @Override
-    public List<Book> getHomePage() {
+    public List<Book> getHomePageInfo() {
         List<Book> list = new ArrayList<>();
         for (AbsWebParser parser : mParserMap.values()) {
             List<Book> result = parser.getHomePageInfo();

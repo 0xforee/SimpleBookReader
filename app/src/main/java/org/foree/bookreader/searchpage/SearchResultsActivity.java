@@ -17,7 +17,7 @@ import org.foree.bookreader.base.BaseActivity;
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bookinfopage.BookInfoActivity;
 import org.foree.bookreader.net.NetCallback;
-import org.foree.bookreader.parser.WebParserProxy;
+import org.foree.bookreader.parser.WebParser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,7 +83,7 @@ public class SearchResultsActivity extends BaseActivity {
             String query = intent.getStringExtra(SearchManager.QUERY);
             Log.d(TAG, "query keywords = " + query);
 
-            WebParserProxy.getInstance().searchBookAsync(query, new NetCallback<List<Book>>() {
+            WebParser.getInstance().searchBookAsync(query, new NetCallback<List<Book>>() {
                 @Override
                 public void onSuccess(final List<Book> data) {
                     mHandler.postDelayed(new Runnable() {

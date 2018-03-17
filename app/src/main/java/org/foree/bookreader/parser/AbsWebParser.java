@@ -1,14 +1,9 @@
 package org.foree.bookreader.parser;
 
-import android.util.Log;
-
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
+import org.foree.bookreader.net.NetCallback;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -51,59 +46,29 @@ abstract class AbsWebParser implements IWebParser {
 
     abstract WebInfo getWebInfo();
 
-    List<Book> searchBook(final String keywords) {
-        Document doc;
-        try {
-            doc = Jsoup.connect(getWebInfo().getSearchApi(keywords)).get();
-            Log.d(TAG, "run: " + getWebInfo().getHostName());
-            if (doc != null) {
-                return parseBookList(doc);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return new ArrayList<>();
+    @Override
+    public void searchBookAsync(String keyword, NetCallback<List<Book>> netCallback) {
+        // default implement
     }
 
-    Book getBookInfo(final String bookUrl) {
-        Document doc;
-        Book book = null;
-        try {
-            doc = Jsoup.connect(bookUrl).get();
-            if (doc != null) {
-                book = parseBookInfo(bookUrl, doc);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return book;
+    @Override
+    public void getBookInfoAsync(String bookUrl, NetCallback<Book> netCallback) {
+        // default implement
     }
 
-    List<Chapter> getChapterList(final String bookUrl, final String contentUrl) {
-        Document doc;
-        try {
-            doc = Jsoup.connect(contentUrl).get();
-            if (doc != null) {
-                return parseChapterList(bookUrl, contentUrl, doc);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return new ArrayList<>();
+    @Override
+    public void getContentsAsync(String bookUrl, String contentsUrl, NetCallback<List<Chapter>> netCallback) {
+        // default implement
     }
 
-    Chapter getChapterContents(final String chapterUrl) {
-        Document doc;
-        try {
-            doc = Jsoup.connect(chapterUrl).get();
-            if (doc != null) {
-                return parseChapterContents(chapterUrl, doc);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return new Chapter();
+    @Override
+    public void getChapterAsync(String bookUrl, String chapterUrl, NetCallback<Chapter> netCallback) {
+        // default implement
+    }
+
+    @Override
+    public void getHomePageInfoAsync(NetCallback<List<Book>> netCallback) {
+        // default implement
     }
 
     int getChapterId(String url) {
@@ -111,21 +76,6 @@ abstract class AbsWebParser implements IWebParser {
 
         String[] subString = url.split("/|\\.");
         return Integer.parseInt(subString[subString.length - 2]);
-    }
-
-    List<Book> getHomePageInfo() {
-        Document doc;
-        try {
-            doc = Jsoup.connect(getWebInfo().getHostUrl()).get();
-            if (doc != null) {
-                return parseHostUrl(getWebInfo().getHostUrl(), doc);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-
-        }
-
-        return new ArrayList<>();
     }
 
 }

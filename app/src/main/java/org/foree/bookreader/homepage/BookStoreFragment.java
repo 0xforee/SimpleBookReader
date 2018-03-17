@@ -16,7 +16,7 @@ import org.foree.bookreader.R;
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bookinfopage.BookInfoActivity;
 import org.foree.bookreader.net.NetCallback;
-import org.foree.bookreader.parser.WebParserProxy;
+import org.foree.bookreader.parser.WebParser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,10 +85,10 @@ public class BookStoreFragment extends Fragment {
 
     private void initExpandableListView() {
         final Context context = this.getContext();
-        WebParserProxy.getInstance().getHomePageAsync(new NetCallback<List<Book>>() {
+        WebParser.getInstance().getHomePageInfoAsync(new NetCallback<List<Book>>() {
             @Override
             public void onSuccess(List<Book> data) {
-                if(data == null) return;
+                if(data == null || data.isEmpty()) return;
                 bookStoreList.clear();
                 bookStoreList.addAll(generateCategoryList(data));
                 mAdapter = new BookStoreExpandableListAdapter(context, bookStoreList);

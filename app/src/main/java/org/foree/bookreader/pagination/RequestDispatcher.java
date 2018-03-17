@@ -3,7 +3,7 @@ package org.foree.bookreader.pagination;
 import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.cache.ChapterCache;
 import org.foree.bookreader.bean.event.PaginationEvent;
-import org.foree.bookreader.parser.WebParserProxy;
+import org.foree.bookreader.parser.WebParser;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.concurrent.PriorityBlockingQueue;
@@ -33,7 +33,7 @@ public class RequestDispatcher extends Thread {
                     chapter = chapterCache.get(request.getUrl());
                     if (chapter == null) {
                         // download from net
-                        chapter = WebParserProxy.getInstance().getChapter("", request.getUrl());
+                        chapter = WebParser.getInstance().getChapter("", request.getUrl());
                     }
 
                     if (chapter != null && chapter.getContents() != null) {
