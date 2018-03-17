@@ -1,7 +1,10 @@
 package org.foree.bookreader.pagination;
 
-import org.foree.bookreader.parser.AbsWebParser;
-import org.foree.bookreader.parser.WebParserManager;
+import org.foree.bookreader.bean.book.Chapter;
+import org.foree.bookreader.bean.cache.ChapterCache;
+import org.foree.bookreader.bean.event.PaginationEvent;
+import org.foree.bookreader.parser.WebParserProxy;
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.concurrent.PriorityBlockingQueue;
 
@@ -22,9 +25,28 @@ public class RequestDispatcher extends Thread {
             try {
                 ChapterRequest request = mPriorityQueue.take();
 
-                AbsWebParser absWebParser = WebParserManager.getInstance().getWebParser(request.getUrl());
+                Chapter chapter;
 
-                absWebParser.downloadChapter(request);
+                if (request.getUrl() != null && !request.getUrl().isEmpty()) {
+                    final ChapterCache chapterCache = PaginationLoader.getInstance().getChapterCache();
+                    // get from cache
+                    chapter = chapterCache.get(request.getUrl());
+                    if (chapter == null) {
+                        // download from net
+                        chapter = WebParserProxy.getInstance().getChapter("", request.getUrl());
+                    }
+
+                    if (chapter != null && chapter.getContents() != null) {
+                        // put chapter cache
+                        chapterCache.put(request.getUrl(), chapter);
+
+                        PaginateCore.splitPage(request.getPaginationArgs(), chapter);
+
+                    }
+
+                    // post
+                    EventBus.getDefault().post(new PaginationEvent(chapter, request.isCurrent()));
+                }
 
             } catch (InterruptedException e) {
                 e.printStackTrace();

@@ -11,7 +11,7 @@ import java.util.List;
  * webParser要实现的解析网站的方法
  */
 
-public interface IWebParser {
+interface IWebParser {
     // parse api
     List<Book> parseBookList(Document doc);
 
@@ -21,5 +21,5 @@ public interface IWebParser {
 
     Chapter parseChapterContents(String chapterUrl, Document doc);
 
-    List<List<Book>> parseHostUrl(String hostUrl, Document doc);
+    List<Book> parseHostUrl(String hostUrl, Document doc);
 }

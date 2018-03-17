@@ -7,8 +7,7 @@ import android.util.Log;
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.dao.BookDao;
 import org.foree.bookreader.net.NetCallback;
-import org.foree.bookreader.parser.AbsWebParser;
-import org.foree.bookreader.parser.WebParserManager;
+import org.foree.bookreader.parser.WebParserProxy;
 import org.foree.bookreader.utils.DateUtils;
 
 import java.util.List;
@@ -46,8 +45,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
     public void testParseBookInfo() {
         String url = "http://www.biquge.com/0_168/";
-        AbsWebParser absWebParser = WebParserManager.getInstance().getWebParser(url);
-        absWebParser.getBookInfo(url, new NetCallback<Book>() {
+        WebParserProxy.getInstance().getBookInfoAsync(url, new NetCallback<Book>() {
             @Override
             public void onSuccess(Book data) {
 

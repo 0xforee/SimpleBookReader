@@ -17,7 +17,7 @@ import java.util.List;
  * Created by foree on 17-1-7.
  */
 
-public class BiQuGeWebParser extends AbsWebParser {
+class BiQuGeWebParser extends AbsWebParser {
     private static final String TAG = BiQuGeWebParser.class.getSimpleName();
     private static boolean DEBUG = false;
 
@@ -174,9 +174,8 @@ public class BiQuGeWebParser extends AbsWebParser {
     }
 
     @Override
-    public List<List<Book>> parseHostUrl(String hostUrl, Document doc) {
-        List<List<Book>> bookStoreList = new ArrayList<>();
-        List<Book> childList = new ArrayList<>();
+    public List<Book> parseHostUrl(String hostUrl, Document doc) {
+        List<Book> categroyList = new ArrayList<>();
 
         // hot content
         Element hotContentElement = doc.getElementById("hotcontent");
@@ -201,12 +200,12 @@ public class BiQuGeWebParser extends AbsWebParser {
                 if (DEBUG) Log.d(TAG, "hot book description = " + description);
 
                 Book book = new Book(hotBookName, hotBookUrl, hotBookCoverUrl, hotBookCategory, description);
-                childList.add(book);
+                categroyList.add(book);
 
             }
 
-            bookStoreList.add(childList);
-            childList = new ArrayList<>();
+            //bookStoreList.add(childList);
+            // childList = new ArrayList<>();
 
             // not hot
             Elements otherElements = doc.select("[class~=content*]");
@@ -230,7 +229,8 @@ public class BiQuGeWebParser extends AbsWebParser {
                 if (DEBUG) Log.d(TAG, "top book description = " + otherTopDescription);
 
                 Book otherTopBook = new Book(otherTopBookName, otherTopBookUrl, otherTopBookCoverUrl, otherBookCategory, otherTopDescription);
-                childList.add(otherTopBook);
+                // childList.add(otherTopBook);
+                categroyList.add(otherTopBook);
 
                 // get no image book
                 if (false) {
@@ -243,16 +243,16 @@ public class BiQuGeWebParser extends AbsWebParser {
                         if (DEBUG) Log.d(TAG, "noimage book_url = " + noImageBookUrl);
 
                         Book noImageBook = new Book(noImageBookName, noImageBookUrl, "", otherBookCategory, "");
-                        childList.add(noImageBook);
+                        categroyList.add(noImageBook);
                     }
                 }
                 if (DEBUG) Log.d(TAG, "==============group separator================");
-                bookStoreList.add(childList);
-                childList = new ArrayList<>();
+                // bookStoreList.add(childList);
+                //childList = new ArrayList<>();
 
             }
         }
-        return bookStoreList;
+        return categroyList;
     }
 
 }

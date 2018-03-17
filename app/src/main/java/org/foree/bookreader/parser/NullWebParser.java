@@ -8,9 +8,10 @@ import java.util.List;
 
 /**
  * Created by foree on 17-1-19.
+ * 空对象模式
  */
 
-public class NullWebParser extends AbsWebParser{
+class NullWebParser extends AbsWebParser{
 
     @Override
     WebInfo getWebInfo() {
@@ -58,7 +59,7 @@ public class NullWebParser extends AbsWebParser{
     }
 
     @Override
-    public List<List<Book>> parseHostUrl(String hostUrl, Document doc) {
+    public List<Book> parseHostUrl(String hostUrl, Document doc) {
         return null;
     }
 }

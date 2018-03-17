@@ -16,8 +16,7 @@ import org.foree.bookreader.R;
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bookinfopage.BookInfoActivity;
 import org.foree.bookreader.net.NetCallback;
-import org.foree.bookreader.parser.AbsWebParser;
-import org.foree.bookreader.parser.WebParserManager;
+import org.foree.bookreader.parser.WebParserProxy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,13 +75,22 @@ public class BookStoreFragment extends Fragment {
         return view;
     }
 
+    private List<List<Book>> generateCategoryList(List<Book> books){
+        List<List<Book>> categories = new ArrayList<>();
+
+        categories.add(books);
+
+        return categories;
+    }
+
     private void initExpandableListView() {
         final Context context = this.getContext();
-        AbsWebParser webParser = WebParserManager.getInstance().getWebParser("http://www.biquge.cn/xxxx");
-        webParser.getHomePageInfo("http://www.biquge.cn", new NetCallback<List<List<Book>>>() {
+        WebParserProxy.getInstance().getHomePageAsync(new NetCallback<List<Book>>() {
             @Override
-            public void onSuccess(List<List<Book>> data) {
-                bookStoreList.addAll(data);
+            public void onSuccess(List<Book> data) {
+                if(data == null) return;
+                bookStoreList.clear();
+                bookStoreList.addAll(generateCategoryList(data));
                 mAdapter = new BookStoreExpandableListAdapter(context, bookStoreList);
                 mExpandableListView.postDelayed(new Runnable() {
                     @Override

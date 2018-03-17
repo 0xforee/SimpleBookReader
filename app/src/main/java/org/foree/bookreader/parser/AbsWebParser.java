@@ -4,17 +4,11 @@ import android.util.Log;
 
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
-import org.foree.bookreader.bean.cache.ChapterCache;
-import org.foree.bookreader.bean.event.PaginationEvent;
-import org.foree.bookreader.net.NetCallback;
-import org.foree.bookreader.pagination.ChapterRequest;
-import org.foree.bookreader.pagination.PaginateCore;
-import org.foree.bookreader.pagination.PaginationLoader;
-import org.greenrobot.eventbus.EventBus;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,7 +16,7 @@ import java.util.List;
  * 解析器的公共api接口，用于构建标准的接口
  */
 
-public abstract class AbsWebParser implements IWebParser {
+abstract class AbsWebParser implements IWebParser {
     private static final String TAG = AbsWebParser.class.getSimpleName();
 
     public interface WebInfo {
@@ -57,51 +51,22 @@ public abstract class AbsWebParser implements IWebParser {
 
     abstract WebInfo getWebInfo();
 
-    public void searchBook(final String keywords, final NetCallback<List<Book>> netCallback) {
-        new Thread() {
-            @Override
-            public void run() {
-                super.run();
-                Document doc;
-                try {
-                    doc = Jsoup.connect(getWebInfo().getSearchApi(keywords)).get();
-                    Log.d(TAG, "run: " + getWebInfo().getHostName());
-                    if (netCallback != null && doc != null) {
-                        netCallback.onSuccess(parseBookList(doc));
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    if (netCallback != null) {
-                        netCallback.onFail(e.toString());
-                    }
-                }
+    List<Book> searchBook(final String keywords) {
+        Document doc;
+        try {
+            doc = Jsoup.connect(getWebInfo().getSearchApi(keywords)).get();
+            Log.d(TAG, "run: " + getWebInfo().getHostName());
+            if (doc != null) {
+                return parseBookList(doc);
             }
-        }.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return new ArrayList<>();
     }
 
-    public void getBookInfo(final String bookUrl, final NetCallback<Book> netCallback) {
-        new Thread() {
-            @Override
-            public void run() {
-                super.run();
-                Document doc;
-                try {
-                    doc = Jsoup.connect(bookUrl).get();
-                    if (netCallback != null && doc != null) {
-                        netCallback.onSuccess(parseBookInfo(bookUrl, doc));
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    if (netCallback != null) {
-                        netCallback.onFail(e.toString());
-                    }
-                }
-            }
-        }.start();
-
-    }
-
-    public Book getBookInfoSync(final String bookUrl) {
+    Book getBookInfo(final String bookUrl) {
         Document doc;
         Book book = null;
         try {
@@ -115,28 +80,7 @@ public abstract class AbsWebParser implements IWebParser {
         return book;
     }
 
-    public void getChapterList(final String bookUrl, final String contentUrl, final NetCallback<List<Chapter>> netCallback) {
-        new Thread() {
-            @Override
-            public void run() {
-                super.run();
-                Document doc;
-                try {
-                    doc = Jsoup.connect(contentUrl).get();
-                    if (netCallback != null && doc != null) {
-                        netCallback.onSuccess(parseChapterList(bookUrl, contentUrl, doc));
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    if (netCallback != null) {
-                        netCallback.onFail(e.toString());
-                    }
-                }
-            }
-        }.start();
-    }
-
-    public List<Chapter> getChapterList(final String bookUrl, final String contentUrl) {
+    List<Chapter> getChapterList(final String bookUrl, final String contentUrl) {
         Document doc;
         try {
             doc = Jsoup.connect(contentUrl).get();
@@ -146,42 +90,20 @@ public abstract class AbsWebParser implements IWebParser {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+        return new ArrayList<>();
     }
 
-    public Chapter getChapterContentsSync(final String chapterUrl) {
+    Chapter getChapterContents(final String chapterUrl) {
         Document doc;
-        Chapter chapter = null;
         try {
             doc = Jsoup.connect(chapterUrl).get();
             if (doc != null) {
-                chapter = parseChapterContents(chapterUrl, doc);
+                return parseChapterContents(chapterUrl, doc);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return chapter;
-    }
-
-    public void getChapterContents(final String chapterUrl, final NetCallback<Chapter> netCallback) {
-        new Thread() {
-            @Override
-            public void run() {
-                super.run();
-                Document doc;
-                try {
-                    doc = Jsoup.connect(chapterUrl).get();
-                    if (netCallback != null && doc != null) {
-                        netCallback.onSuccess(parseChapterContents(chapterUrl, doc));
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    if (netCallback != null) {
-                        netCallback.onFail(e.toString());
-                    }
-                }
-            }
-        }.start();
+        return new Chapter();
     }
 
     int getChapterId(String url) {
@@ -191,49 +113,19 @@ public abstract class AbsWebParser implements IWebParser {
         return Integer.parseInt(subString[subString.length - 2]);
     }
 
-    public void getHomePageInfo(final String hostUrl, final NetCallback<List<List<Book>>> netCallback) {
-        new Thread() {
-            @Override
-            public void run() {
-                super.run();
-                Document doc;
-                try {
-                    doc = Jsoup.connect(hostUrl).get();
-                    if (netCallback != null && doc != null) {
-                        netCallback.onSuccess(parseHostUrl(hostUrl, doc));
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    if (netCallback != null) {
-                        netCallback.onFail(e.toString());
-                    }
-                }
+    List<Book> getHomePageInfo() {
+        Document doc;
+        try {
+            doc = Jsoup.connect(getWebInfo().getHostUrl()).get();
+            if (doc != null) {
+                return parseHostUrl(getWebInfo().getHostUrl(), doc);
             }
-        }.start();
-    }
+        } catch (IOException e) {
+            e.printStackTrace();
 
-    public void downloadChapter(final ChapterRequest request) {
-        Chapter chapter;
-
-        if (request.getUrl() != null && !request.getUrl().isEmpty()) {
-            final ChapterCache chapterCache = PaginationLoader.getInstance().getChapterCache();
-            // get from cache
-            chapter = chapterCache.get(request.getUrl());
-            if (chapter == null) {
-                // download from net
-                chapter = getChapterContentsSync(request.getUrl());
-            }
-
-            if (chapter != null && chapter.getContents() != null) {
-                // put chapter cache
-                chapterCache.put(request.getUrl(), chapter);
-
-                PaginateCore.splitPage(request.getPaginationArgs(), chapter);
-
-            }
-
-            // post
-            EventBus.getDefault().post(new PaginationEvent(chapter, request.isCurrent()));
         }
+
+        return new ArrayList<>();
     }
+
 }

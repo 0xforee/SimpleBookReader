@@ -16,7 +16,7 @@ import java.util.List;
  * Created by foree on 2018/3/15.
  */
 
-public class PiaoTianWebParser extends AbsWebParser {
+class PiaoTianWebParser extends AbsWebParser {
     private static final String TAG = PiaoTianWebParser.class.getSimpleName();
     @Override
     public List<Book> parseBookList(Document doc) {
@@ -55,7 +55,7 @@ public class PiaoTianWebParser extends AbsWebParser {
     }
 
     @Override
-    public List<List<Book>> parseHostUrl(String hostUrl, Document doc) {
+    public List<Book> parseHostUrl(String hostUrl, Document doc) {
         return null;
     }
 
