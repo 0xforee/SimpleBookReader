@@ -127,6 +127,7 @@ public class BookInfoActivity extends BaseActivity {
         WebParser.getInstance().getBookInfoAsync(bookUrl, new NetCallback<Book>() {
             @Override
             public void onSuccess(final Book data1) {
+                if (data1 == null) return;
                 WebParser.getInstance().getContentsAsync(bookUrl, data1.getContentUrl(), new NetCallback<List<Chapter>>() {
                     @Override
                     public void onSuccess(final List<Chapter> data) {

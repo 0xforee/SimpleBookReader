@@ -4,7 +4,9 @@ import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.net.NetCallback;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by foree on 17-1-7.
@@ -13,6 +15,7 @@ import java.util.List;
 
 abstract class AbsWebParser implements IWebParser {
     private static final String TAG = AbsWebParser.class.getSimpleName();
+    static boolean DEBUG = false;
 
     public interface WebInfo {
         /**
@@ -76,6 +79,12 @@ abstract class AbsWebParser implements IWebParser {
 
         String[] subString = url.split("/|\\.");
         return Integer.parseInt(subString[subString.length - 2]);
+    }
+
+    Map<String, String> getHeader(){
+        Map<String, String > headers = new HashMap<>();
+        headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36");
+        return headers;
     }
 
 }
