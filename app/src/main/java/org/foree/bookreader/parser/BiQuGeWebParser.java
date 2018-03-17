@@ -40,8 +40,8 @@ public class BiQuGeWebParser extends AbsWebParser {
             }
 
             @Override
-            public String getSearchApi() {
-                return "http://zhannei.baidu.com/cse/search?s=11869390265411396408&ie=utf-8&q=";
+            public String getSearchApi(String keyword) {
+                return "http://zhannei.baidu.com/cse/search?s=11869390265411396408&ie=utf-8&q=" + keyword;
             }
         };
     }

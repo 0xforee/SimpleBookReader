@@ -11,6 +11,8 @@ import org.jsoup.select.Elements;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -159,6 +161,68 @@ public class ExampleUnitTest {
         if (url.contains("http://") && url.length() > 7 ){
             System.out.println(url.indexOf("/", 7));
             System.out.println(url.substring(0,url.indexOf("/", 7)));
+        }
+    }
+
+    @Test
+    public void testPiaoTianBookList() {
+        Element doc;
+        String url = "https://www.piaotian.com/modules/article/search.php?searchtype=articlename&searchkey=%D0%A1%CB%B5&Submit=+%CB%D1+%CB%F7+&page=1";
+        String host = "http://m.piaotian.com";
+        String mUrl = "http://m.piaotian.com/s.php";
+        String keyword = "五行天";
+        try {
+            //System.out.print(url);
+            Map<String, String > headers = new HashMap<>();
+            headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36");
+            //keyword = java.net.URLEncoder.encode(keyword, "gb2312");
+            Map<String, String> data = new HashMap<>();
+            data.put("type", "articlename");
+            data.put("s", keyword);
+            data.put("submit", "");
+            doc  = Jsoup.connect(mUrl).headers(headers).data(data).postDataCharset("gb2312").post();
+            //doc = Jsoup.connect(url).headers(headers).
+            //doc = Jsoup.connect(url).get();
+            if (doc != null){
+                //System.out.print(doc.toString());
+
+                // parse book list
+                Elements list = doc.getElementsByClass("line");
+                for(Element book: list){
+                    //System.out.println(book.toString());
+                    for(Element info: book.children()){
+                        if(info.hasAttr("href")) {
+                            String href = info.attr("href");
+                                if(href.contains("sort")){
+                                    //System.out.println("category = " + info.text());
+                                }
+                                if (href.contains("book")){
+                                    System.out.println("bookName = " + info.text() + ", book_url = " + host + href);
+                                    Element bookDoc = Jsoup.connect(host+href).headers(headers).get();
+                                    System.out.println(bookDoc.toString());
+                                    Element img = bookDoc.getElementsByTag("img").get(0);
+                                    System.out.println("img link = " + img.attr("src"));
+
+                                    Element bookInfo = bookDoc.getElementsByClass("block_txt2").get(0);
+                                    System.out.println(bookInfo.toString());
+
+                                    Element description = bookDoc.getElementsByClass("intro_info").get(0);
+                                    System.out.println("description = " + description.text());
+
+                                    Element content = bookDoc.getElementsByClass("ablum_read").get(0).child(0);
+                                    System.out.println("content link = " + content.child(0).attr("href"));
+
+                                }
+                                if (href.contains("author")){
+                                    //System.out.println("author = " + info.text());
+                                }
+                            }
+
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

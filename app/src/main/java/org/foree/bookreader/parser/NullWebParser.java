@@ -31,7 +31,7 @@ public class NullWebParser extends AbsWebParser{
             }
 
             @Override
-            public String getSearchApi() {
+            public String getSearchApi(String keyword) {
                 return null;
             }
         };

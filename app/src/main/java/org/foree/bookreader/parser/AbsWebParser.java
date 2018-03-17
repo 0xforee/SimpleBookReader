@@ -1,5 +1,7 @@
 package org.foree.bookreader.parser;
 
+import android.util.Log;
+
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.cache.ChapterCache;
@@ -50,7 +52,7 @@ public abstract class AbsWebParser implements IWebParser {
          *
          * @return 搜索api
          */
-        String getSearchApi();
+        String getSearchApi(String keyword);
     }
 
     abstract WebInfo getWebInfo();
@@ -62,7 +64,8 @@ public abstract class AbsWebParser implements IWebParser {
                 super.run();
                 Document doc;
                 try {
-                    doc = Jsoup.connect(getWebInfo().getSearchApi() + keywords).get();
+                    doc = Jsoup.connect(getWebInfo().getSearchApi(keywords)).get();
+                    Log.d(TAG, "run: " + getWebInfo().getHostName());
                     if (netCallback != null && doc != null) {
                         netCallback.onSuccess(parseBookList(doc));
                     }
