@@ -13,6 +13,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -26,15 +27,18 @@ public class ExampleUnitTest {
     }
 
     @Test
-    public void convertUrl2Id(){
-        String url = "/0_168/2512063.html";
-        String url2 = "http://m.bxwx9.org/b/98/98289//0_168/2512063.html";
-        String id = null;
+    public void convertUrl2Id() {
+        Map<String, String> urls = new HashMap<>();
+        urls.put("/0_168/2512063.html", "2512063");
+        urls.put( "http://m.bxwx9.org/b/98/98289//0_168/2512063.html","2512063");
+        urls.put("http://m.piaotian.com/html/7/7564/6285377.html", "6285377");
 
-        String[] subString = url2.split("/|\\.");
-        id = subString[subString.length-2];
+        for(Map.Entry<String, String> url: urls.entrySet()) {
+            String[] subString = url.getKey().split("/|\\.");
+            String id = subString[subString.length - 2];
 
-        assertEquals(id, "2512063");
+            assertEquals(id, url.getValue());
+        }
     }
 
     @Test
@@ -55,22 +59,22 @@ public class ExampleUnitTest {
 
         System.out.println("hhhahaha");
         Elements updates = doc.getElementsByClass("block_txt2");
-        if(updates != null && !updates.isEmpty()){
+        if (updates != null && !updates.isEmpty()) {
             Element bookInfos = updates.get(0);
             Elements bookNames = bookInfos.getElementsByTag("h2");
-            if(bookNames != null && !bookNames.isEmpty()){
+            if (bookNames != null && !bookNames.isEmpty()) {
                 book.setBookName(bookNames.get(0).toString());
             }
 
             Elements bookOthers = bookInfos.getElementsByTag("p");
-            if(bookOthers != null && !bookOthers.isEmpty()){
-                for(Element otherInfo: bookOthers){
+            if (bookOthers != null && !bookOthers.isEmpty()) {
+                for (Element otherInfo : bookOthers) {
                     String otherInfoString = otherInfo.text();
                     //System.out.println(otherInfo.toString());
                     //Log.d(TAG, otherInfo.toString());
-                    if ( otherInfoString.contains("：")){
+                    if (otherInfoString.contains("：")) {
                         //System.out.println(otherInfo.text().split("：")[1]);
-                        switch (otherInfoString.split("：")[0]){
+                        switch (otherInfoString.split("：")[0]) {
                             case "作者":
                                 book.setAuthor(otherInfoString.split("：")[1]);
                                 break;
@@ -82,7 +86,7 @@ public class ExampleUnitTest {
                                 break;
                             case "最新":
                                 Elements newest_ele = otherInfo.getElementsByTag("a");
-                                if(newest_ele !=null && !newest_ele.isEmpty()){
+                                if (newest_ele != null && !newest_ele.isEmpty()) {
                                     newestChapter.setChapterTitle(otherInfo.text().split("：")[1]);
                                     newestChapter.setChapterUrl(newest_ele.get(0).attr("href"));
                                 }
@@ -109,7 +113,7 @@ public class ExampleUnitTest {
             doc = Jsoup.connect(chapterListUrl).get();
             if (doc != null) {
                 Elements chapters = doc.getElementsByClass("chapter");
-                if( chapters != null && !chapters.isEmpty()) {
+                if (chapters != null && !chapters.isEmpty()) {
                     Elements li = chapters.select("li");
                     //System.out.print(li.toString());
                     for (Element chapter : li) {
@@ -130,7 +134,7 @@ public class ExampleUnitTest {
     }
 
     @Test
-    public void testParseChapter(){
+    public void testParseChapter() {
         Element doc;
         try {
             doc = Jsoup.connect("http://m.biquge.com/0_168/1214399.html").get();
@@ -158,9 +162,9 @@ public class ExampleUnitTest {
     public void getWebParser() {
         String url = "http://www.biquge.com/0_168/2494428.html";
 
-        if (url.contains("http://") && url.length() > 7 ){
+        if (url.contains("http://") && url.length() > 7) {
             System.out.println(url.indexOf("/", 7));
-            System.out.println(url.substring(0,url.indexOf("/", 7)));
+            System.out.println(url.substring(0, url.indexOf("/", 7)));
         }
     }
 
@@ -170,53 +174,99 @@ public class ExampleUnitTest {
         String url = "https://www.piaotian.com/modules/article/search.php?searchtype=articlename&searchkey=%D0%A1%CB%B5&Submit=+%CB%D1+%CB%F7+&page=1";
         String host = "http://m.piaotian.com";
         String mUrl = "http://m.piaotian.com/s.php";
-        String keyword = "历史";
+        String keyword = "五行天";
         try {
             //System.out.print(url);
-            Map<String, String > headers = new HashMap<>();
+            Map<String, String> headers = new HashMap<>();
             headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36");
             //keyword = java.net.URLEncoder.encode(keyword, "gb2312");
             Map<String, String> data = new HashMap<>();
             data.put("type", "articlename");
             data.put("s", keyword);
             data.put("submit", "");
-            doc  = Jsoup.connect(mUrl).headers(headers).data(data).postDataCharset("gb2312").post();
+            doc = Jsoup.connect(mUrl).headers(headers).data(data).postDataCharset("gb2312").post();
             //doc = Jsoup.connect(url).headers(headers).
             //doc = Jsoup.connect(url).get();
-            if (doc != null){
+            if (doc != null) {
                 //System.out.print(doc.toString());
 
-                // parse book list
+                //@@@ searchBook() parse book list
                 Elements list = doc.getElementsByClass("line");
-                for(Element book: list){
+                for (Element book : list) {
                     //System.out.println(book.toString());
-                    for(Element info: book.children()){
-                        if(info.hasAttr("href")) {
+                    for (Element info : book.children()) {
+                        if (info.hasAttr("href")) {
                             String href = info.attr("href");
-                                if(href.contains("sort")){
-                                    //System.out.println("category = " + info.text());
-                                }
-                                if (href.contains("book")){
-                                    System.out.println("bookName = " + info.text() + ", book_url = " + host + href);
-                                    Element bookDoc = Jsoup.connect(host+href).headers(headers).get();
-                                    System.out.println(bookDoc.toString());
-                                    Element img = bookDoc.getElementsByTag("img").get(0);
-                                    System.out.println("img link = " + img.attr("src"));
-
-                                    Element bookInfo = bookDoc.getElementsByClass("block_txt2").get(0);
-                                    System.out.println(bookInfo.toString());
-
-                                    Element description = bookDoc.getElementsByClass("intro_info").get(0);
-                                    System.out.println("description = " + description.text());
-
-                                    Element content = bookDoc.getElementsByClass("ablum_read").get(0).child(0);
-                                    System.out.println("content link = " + content.child(0).attr("href"));
-
-                                }
-                                if (href.contains("author")){
-                                    //System.out.println("author = " + info.text());
-                                }
+                            if (href.contains("sort")) {
+                                //System.out.println("category = " + info.text());
                             }
+                            if (href.contains("book")) {
+                                // book name and book url
+                                System.out.println("bookName = " + info.text() + ", book_url = " + host + href);
+                                Element bookDoc = Jsoup.connect(host + href).headers(headers).get();
+                                //System.out.println(bookDoc.toString());
+
+                                // book cover url
+                                Element img = bookDoc.getElementsByTag("img").get(0);
+                                System.out.println("img link = " + img.attr("src"));
+
+                                // book info
+                                Element bookInfo = bookDoc.getElementsByClass("block_txt2").get(0);
+                                //System.out.println(bookInfo.toString());
+                                for(Element p: bookInfo.children()){
+                                    if(!p.text().isEmpty()){
+                                        String tmp = p.text();
+                                        if (tmp.contains("：")){
+                                            if(tmp.contains("作者")){
+                                                System.out.println("author = " + tmp.split("：")[1]);
+                                            }else if(tmp.contains("分类")){
+                                                System.out.println("category = " + tmp.split("：")[1]);
+                                            }else if(tmp.contains("更新")){
+                                                System.out.println("update time = " + tmp.split("：")[1]);
+                                            }else if(tmp.contains("最新")){
+                                                System.out.println("newest chapter link = " + host + p.child(0).attr("href")
+                                                        + ", name = " + tmp.split("：")[1]);
+
+                                                // @@@ getChapter()
+                                                doc = Jsoup.connect(host + p.child(0).attr("href")).get();
+                                                //System.out.println(doc.toString());
+                                                System.out.println(doc.getElementById("nr_title").text());
+                                                System.out.println(doc.getElementById("nr1").text());
+                                            }
+                                        }
+                                    }
+                                   // System.out.println(p.text());
+                                }
+
+                                // description
+                                Element description = bookDoc.getElementsByClass("intro_info").get(0);
+                                System.out.println("description = " + description.text());
+
+                                // contents url
+                                Element content = bookDoc.getElementsByClass("ablum_read").get(0).child(1);
+                                System.out.println("content link = " + host + content.child(0).attr("href"));
+
+                                //@@@ getContents() parse contents link
+                                String contentsUrl = (host + content.child(0).attr("href")).replace("http://m", "http://www");
+                                System.out.println("getContents: url = " + contentsUrl);
+                                doc = Jsoup.connect(contentsUrl).headers(headers).get();
+                                if (doc != null) {
+                                    //System.out.println("getContents: doc = " +doc.toString());
+                                    for(Element element: doc.getElementsByTag("li")){
+                                        if (element.children().size() > 0) {
+                                            contentsUrl = contentsUrl.replace("index.html", "").replace("http://www", "http://m");
+                                            String chapterUrl = contentsUrl + element.child(0).attr("href");
+//                                            System.out.print("chapter url = " + chapterUrl);
+//                                            System.out.println(", chapter name = " + element.text());
+                                        }
+                                    }
+                                }
+
+                            }
+                            if (href.contains("author")) {
+                                //System.out.println("author = " + info.text());
+                            }
+                        }
 
                     }
                 }
