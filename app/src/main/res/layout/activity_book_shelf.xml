@@ -30,10 +30,15 @@
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
-
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:layout_margin="8dp"
+            android:background="@color/md_white_1000"
+            android:elevation="8dp"
+            app:navigationIcon="@drawable/ic_action_search"
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:titleTextAppearance="@style/Toolbar.TitleText" />
 
         <android.support.design.widget.TabLayout
             android:id="@+id/tab_layout_main"

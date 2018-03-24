@@ -1,16 +1,24 @@
 package org.foree.bookreader.searchpage;
 
-import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import org.foree.bookreader.R;
 import org.foree.bookreader.base.BaseActivity;
@@ -22,12 +30,15 @@ import org.foree.bookreader.parser.WebParser;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SearchResultsActivity extends BaseActivity {
+public class SearchResultsActivity extends BaseActivity{
     private static final String TAG = SearchResultsActivity.class.getSimpleName();
     private RecyclerView mRecyclerView;
     private SearchListAdapter mAdapter;
     private List<Book> bookList = new ArrayList<>();
     Toolbar toolbar;
+    EditText mEtSearchText;
+    private String mSearchString;
+    SwipeRefreshLayout mSwipeRefreshLayout;
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -40,13 +51,14 @@ public class SearchResultsActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
         initViews();
-        handlerIntent(getIntent());
 
     }
 
     private void initViews() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.content_main);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.rv_book_shelf);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -70,38 +82,83 @@ public class SearchResultsActivity extends BaseActivity {
 
             }
         });
+
+        toolbar.setNavigationIcon(R.drawable.ic_action_back);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+
+        mEtSearchText = (EditText) toolbar.findViewById(R.id.dt_search_text);
+        mEtSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                if (i == EditorInfo.IME_ACTION_SEARCH) {
+                    mSearchString = textView.getText().toString();
+                    hideKeyBoard();
+                    mSwipeRefreshLayout.setRefreshing(true);
+                    handlerSearch(mSearchString);
+
+                }
+                return false;
+            }
+        });
+    }
+
+    private void handlerSearch(String query) {
+        Log.d(TAG, "query keywords = " + query);
+
+        WebParser.getInstance().searchBookAsync(query, new NetCallback<List<Book>>() {
+            @Override
+            public void onSuccess(final List<Book> data) {
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        bookList.clear();
+                        bookList.addAll(data);
+                        mAdapter.notifyDataSetChanged();
+                        if(mSwipeRefreshLayout.isRefreshing()){
+                            mSwipeRefreshLayout.setRefreshing(false);
+                        }
+                    }
+                }, 0);
+
+            }
+
+            @Override
+            public void onFail(String msg) {
+                if(mSwipeRefreshLayout.isRefreshing())
+                    mSwipeRefreshLayout.setRefreshing(false);
+            }
+        });
+    }
+
+    private void hideKeyBoard() {
+        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+    }
+
+    private void showKeyboard() {
+        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
     }
 
     @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        handlerIntent(intent);
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_search, menu);
+        return true;
     }
 
-    private void handlerIntent(Intent intent) {
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            Log.d(TAG, "query keywords = " + query);
-
-            WebParser.getInstance().searchBookAsync(query, new NetCallback<List<Book>>() {
-                @Override
-                public void onSuccess(final List<Book> data) {
-                    mHandler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            bookList.clear();
-                            bookList.addAll(data);
-                            mAdapter.notifyDataSetChanged();
-                        }
-                    }, 0);
-
-                }
-
-                @Override
-                public void onFail(String msg) {
-
-                }
-            });
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_clear){
+           mEtSearchText.setText(null);
+           mEtSearchText.requestFocus();
+           //showKeyboard();
+           return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 }
