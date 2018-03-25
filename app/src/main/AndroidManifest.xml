@@ -15,8 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".homepage.BookShelfActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:name=".homepage.BookShelfActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,17 +23,14 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".readpage.ReadActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:name=".readpage.ReadActivity" />
 
         <activity
             android:name=".searchpage.SearchResultsActivity"
-            android:launchMode="singleTop"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:launchMode="singleTop">
         </activity>
         <activity
-            android:name=".bookinfopage.BookInfoActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:name=".bookinfopage.BookInfoActivity" />
 
         <provider
             android:name=".bean.dao.BReaderProvider"
@@ -43,8 +39,7 @@
 
         <activity
             android:name=".settings.SettingsActivity"
-            android:label="@string/title_activity_settings"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:label="@string/title_activity_settings" />
 
         <service
             android:name=".service.SyncService"
@@ -59,8 +54,7 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".settings.AboutActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+        <activity android:name=".settings.AboutActivity">
             <intent-filter>
                 <action android:name=".AboutActivity" />
                 <category android:name="android.intent.category.DEFAULT" />

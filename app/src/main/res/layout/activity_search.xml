@@ -17,9 +17,8 @@
             app:navigationIcon="@drawable/ic_action_back"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:titleTextColor="@color/md_grey_500"
             android:background="@color/md_white_1000"
-            android:elevation="8dp"
+            android:theme="@style/AppTheme"
             app:popupTheme="@style/AppTheme.PopupOverlay" >
             <EditText
                 android:id="@+id/dt_search_text"

@@ -33,9 +33,10 @@
             android:layout_height="48dp"
             android:layout_gravity="center"
             android:layout_margin="8dp"
-            android:background="@color/md_white_1000"
-            android:elevation="8dp"
+            android:background="@drawable/toolbar_shadows"
+            android:elevation="1dp"
             app:navigationIcon="@drawable/ic_action_search"
+            android:theme="@style/AppTheme"
             app:popupTheme="@style/AppTheme.PopupOverlay"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:titleTextAppearance="@style/Toolbar.TitleText" />

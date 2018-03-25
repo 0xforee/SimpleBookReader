@@ -59,6 +59,7 @@ public class SearchResultsActivity extends BaseActivity{
         setSupportActionBar(toolbar);
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.content_main);
+        mSwipeRefreshLayout.setEnabled(false);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.rv_book_shelf);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
