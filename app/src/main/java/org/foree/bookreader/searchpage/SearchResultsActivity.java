@@ -10,11 +10,15 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.transition.AutoTransition;
+import android.transition.Transition;
+import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -30,7 +34,7 @@ import org.foree.bookreader.parser.WebParser;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SearchResultsActivity extends BaseActivity{
+public class SearchResultsActivity extends BaseActivity {
     private static final String TAG = SearchResultsActivity.class.getSimpleName();
     private RecyclerView mRecyclerView;
     private SearchListAdapter mAdapter;
@@ -52,6 +56,27 @@ public class SearchResultsActivity extends BaseActivity{
         setContentView(R.layout.activity_search);
         initViews();
 
+        // start from bookshelf activity
+        if (savedInstanceState == null) {
+            // hide first
+            hideToolBarContent();
+
+            ViewTreeObserver viewTreeObserver = toolbar.getViewTreeObserver();
+            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    toolbar.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+
+                    Transition transition = new AutoTransition();
+                    transition.setDuration(200);
+                    //toolbar fade in
+                    TransitionManager.beginDelayedTransition(toolbar, transition);
+
+                    showToolBarContent();
+
+                }
+            });
+        }
     }
 
     private void initViews() {
@@ -106,6 +131,7 @@ public class SearchResultsActivity extends BaseActivity{
                 return false;
             }
         });
+
     }
 
     private void handlerSearch(String query) {
@@ -120,7 +146,7 @@ public class SearchResultsActivity extends BaseActivity{
                         bookList.clear();
                         bookList.addAll(data);
                         mAdapter.notifyDataSetChanged();
-                        if(mSwipeRefreshLayout.isRefreshing()){
+                        if (mSwipeRefreshLayout.isRefreshing()) {
                             mSwipeRefreshLayout.setRefreshing(false);
                         }
                     }
@@ -130,7 +156,7 @@ public class SearchResultsActivity extends BaseActivity{
 
             @Override
             public void onFail(String msg) {
-                if(mSwipeRefreshLayout.isRefreshing())
+                if (mSwipeRefreshLayout.isRefreshing())
                     mSwipeRefreshLayout.setRefreshing(false);
             }
         });
@@ -154,12 +180,77 @@ public class SearchResultsActivity extends BaseActivity{
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_clear){
-           mEtSearchText.setText(null);
-           mEtSearchText.requestFocus();
-           //showKeyboard();
-           return true;
+        if (item.getItemId() == R.id.action_clear) {
+            mEtSearchText.setText(null);
+            mEtSearchText.requestFocus();
+            //showKeyboard();
+            return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void transitionToMain() {
+
+    }
+
+
+    /**
+     * Take care of popping the fragment back stack or finishing the activity
+     * as appropriate.
+     */
+    @Override
+    public void onBackPressed() {
+        finish();
+    }
+
+    @Override
+    public void finish() {
+        // do transition animation
+        Transition transition = new AutoTransition();
+        transition.setDuration(250);
+        transition.addListener(new Transition.TransitionListener() {
+            @Override
+            public void onTransitionStart(Transition transition) {
+
+            }
+
+            @Override
+            public void onTransitionEnd(Transition transition) {
+                SearchResultsActivity.super.finish();
+                // not do window animation
+                overridePendingTransition(0, 0);
+            }
+
+            @Override
+            public void onTransitionCancel(Transition transition) {
+
+            }
+
+            @Override
+            public void onTransitionPause(Transition transition) {
+
+            }
+
+            @Override
+            public void onTransitionResume(Transition transition) {
+
+            }
+        });
+
+        TransitionManager.beginDelayedTransition(toolbar, transition);
+        hideToolBarContent();
+
+    }
+
+    private void hideToolBarContent() {
+        for (int i = 0; i < toolbar.getChildCount(); i++) {
+            toolbar.getChildAt(i).setVisibility(View.GONE);
+        }
+    }
+
+    private void showToolBarContent() {
+        for (int i = 0; i < toolbar.getChildCount(); i++) {
+            toolbar.getChildAt(i).setVisibility(View.VISIBLE);
+        }
     }
 }

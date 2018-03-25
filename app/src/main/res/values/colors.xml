@@ -13,4 +13,6 @@
 
     <color name="normal_page_background">#FFFFFF</color>
 
+    <color name="toolbar_title_color">#a0000000</color>
+
 </resources>

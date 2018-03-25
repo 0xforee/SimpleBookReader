@@ -75,6 +75,7 @@
     <string name="eye_background">护眼</string>
     <string name="night_background">夜间</string>
     <string name="about_tips">这里什么都没有</string>
+    <string name="toolbar_search_hint">搜索书名</string>
     <string-array name="pref_offline_offset_entries">
         <item>3 章</item>
         <item>5 章</item>

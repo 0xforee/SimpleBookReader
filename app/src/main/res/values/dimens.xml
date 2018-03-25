@@ -9,4 +9,8 @@
     <dimen name="tv_padding">15dp</dimen>
     <dimen name="read_line_spacing">5dp</dimen>
 
+    <dimen name="toolbar_margin">6dp</dimen>
+    <dimen name="toolbar_height_small">48dp</dimen>
+    <dimen name="toolbar_height_large">56dp</dimen>
+
 </resources>

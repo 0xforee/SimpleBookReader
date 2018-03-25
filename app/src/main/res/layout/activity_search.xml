@@ -9,32 +9,33 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:elevation="0dp"
+        android:elevation="1dp"
         android:theme="@style/AppTheme.AppBarOverlay">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
-            app:navigationIcon="@drawable/ic_action_back"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/md_white_1000"
             android:theme="@style/AppTheme"
-            app:popupTheme="@style/AppTheme.PopupOverlay" >
+            app:navigationIcon="@drawable/ic_action_back"
+            app:popupTheme="@style/AppTheme.PopupOverlay">
+
             <EditText
                 android:id="@+id/dt_search_text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/md_white_1000"
                 android:focusable="true"
-                android:background="@null"
-                android:maxLines="1"
                 android:imeOptions="actionSearch"
                 android:inputType="text"
-                android:textColor="@color/md_grey_500"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:maxLines="1"
+                android:textColor="@color/toolbar_title_color" />
         </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>
 
 
-    <include layout="@layout/content_main"/>
+    <include layout="@layout/content_main" />
 
 </android.support.design.widget.CoordinatorLayout>
