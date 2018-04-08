@@ -9,6 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.transition.AutoTransition;
 import android.transition.Transition;
 import android.transition.TransitionManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -16,11 +17,21 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
 import org.foree.bookreader.R;
 import org.foree.bookreader.base.BaseActivity;
 import org.foree.bookreader.base.GlobalConfig;
 import org.foree.bookreader.searchpage.SearchResultsActivity;
 import org.foree.bookreader.settings.SettingsActivity;
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 public class BookShelfActivity extends BaseActivity {
 
@@ -42,6 +53,56 @@ public class BookShelfActivity extends BaseActivity {
 
         mNightMode = GlobalConfig.getInstance().isNightMode();
 
+        testVolley();
+    }
+
+    private void testVolley() {
+        final String chapterUrl = "http://chapter2.zhuishushenqi.com/chapter/http%3a%2f%2fbook.my716.com%2fgetBooks.aspx%3fmethod%3dcontent%26bookId%3d1228859%26chapterFile%3dU_1228859_201709201834298915_0798_2.txt";
+        String bookUrl = "http://api.zhuishushenqi.com/book/5816b415b06d1d32157790b1";
+        String searchApi = "http://api.zhuishushenqi.com/book/fuzzy-search";
+        final String searchKeyword = "五行天";
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+
+        // get book info
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(bookUrl, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject jsonObject) {
+                Log.d(TAG, "[foree] onResponse: " + jsonObject.toString());
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+
+            }
+        });
+
+
+        // search book
+        try {
+            String encodeKeyword = URLEncoder.encode(searchKeyword, "utf-8");
+            String searchUri = String.format(searchApi + "?query=%1$s", encodeKeyword);
+            // search book
+            JsonObjectRequest searchBookRequest = new JsonObjectRequest(searchUri, null, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject jsonObject) {
+                    Log.d(TAG, "[foree] onResponse: " + jsonObject.toString());
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError volleyError) {
+
+                }
+            });
+
+            queue.add(searchBookRequest);
+
+
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+
+        queue.add(jsonObjectRequest);
     }
 
 

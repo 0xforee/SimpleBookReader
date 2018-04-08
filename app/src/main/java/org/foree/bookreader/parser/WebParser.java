@@ -23,6 +23,8 @@ public class WebParser implements IWebParser {
         registerParser("http://www.biquge.cn", new BiQuGeWebParser());
         registerParser("http://m.piaotian.com", new PiaoTianWebParser());
         registerParser("http://www.piaotian.com", new PiaoTianWebParser());
+        registerParser("http://api.zhuishushenqi.com", new ZhuishuWebParser());
+        registerParser("http://chapter2.zhuishushenqi.com", new ZhuishuWebParser());
     }
 
 
