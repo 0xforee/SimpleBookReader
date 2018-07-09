@@ -17,36 +17,6 @@ abstract class AbsWebParser implements IWebParser {
     private static final String TAG = AbsWebParser.class.getSimpleName();
     static boolean DEBUG = false;
 
-    public interface WebInfo {
-        /**
-         * 获取目标网站名称
-         *
-         * @return 网站名称
-         */
-        String getHostName();
-
-        /**
-         * 获取解析网站的网页编码
-         *
-         * @return 网页编码
-         */
-        String getWebChar();
-
-        /**
-         * 获取目标网站地址
-         *
-         * @return 网页主机host地址
-         */
-        String getHostUrl();
-
-        /**
-         * 获取搜索api用于传入搜索关键字
-         *
-         * @return 搜索api
-         */
-        String getSearchApi(String keyword);
-    }
-
     abstract WebInfo getWebInfo();
 
     @Override
