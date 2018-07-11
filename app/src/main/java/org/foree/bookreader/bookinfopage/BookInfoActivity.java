@@ -1,5 +1,6 @@
 package org.foree.bookreader.bookinfopage;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -23,6 +24,7 @@ import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.dao.BookDao;
 import org.foree.bookreader.net.NetCallback;
 import org.foree.bookreader.parser.WebParser;
+import org.foree.bookreader.readpage.ReadActivity;
 
 import java.util.List;
 
@@ -32,7 +34,7 @@ import java.util.List;
 
 public class BookInfoActivity extends BaseActivity {
     private TextView tvNovelName, tvNovelAuthor, tvNovelDescription;
-    private Button bt;
+    private Button mBtAdd, mBtRead;
     private ListView lv;
     private String bookUrl;
     private BookDao bookDao;
@@ -87,21 +89,37 @@ public class BookInfoActivity extends BaseActivity {
         tvNovelDescription = (TextView) findViewById(R.id.tv_description);
         progressBar = (ProgressBar) findViewById(R.id.pb_progress);
         linearLayout = (LinearLayout) findViewById(R.id.ll_book_info);
-        bt = (Button) findViewById(R.id.bt_add);
+        mBtAdd = (Button) findViewById(R.id.bt_add);
+        mBtRead = (Button) findViewById(R.id.bt_read);
         lv = (ListView) findViewById(R.id.lv_chapter_list);
         imageView = (ImageView) findViewById(R.id.iv_novel_image);
 
-        bt.setOnClickListener(new View.OnClickListener() {
+        mBtAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 bookDao.addBook(book);
 
                 // update bt_add
-                bt.setBackgroundColor(getResources().getColor(R.color.material_drawer_dark_hint_text));
-                bt.setText(getResources().getText(R.string.bt_added));
-                bt.setClickable(false);
+                mBtAdd.setBackgroundColor(getResources().getColor(R.color.material_drawer_dark_hint_text));
+                mBtAdd.setText(getResources().getText(R.string.bt_added));
+                mBtAdd.setClickable(false);
             }
         });
+
+        mBtRead.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(BookInfoActivity.this, ReadActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("book_url", bookUrl);
+                bundle.putBoolean("online", true);
+                intent.putExtras(bundle);
+
+                startActivity(intent);
+            }
+        });
+
+
     }
 
     private void notifyUpdate(int state) {

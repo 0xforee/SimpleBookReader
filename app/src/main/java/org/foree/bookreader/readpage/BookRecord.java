@@ -3,13 +3,17 @@ package org.foree.bookreader.readpage;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.dao.BReaderContract;
 import org.foree.bookreader.bean.dao.BReaderProvider;
+import org.foree.bookreader.bean.event.BookLoadCompleteEvent;
+import org.foree.bookreader.parser.WebParser;
 import org.foree.bookreader.utils.DateUtils;
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,7 +22,8 @@ import java.util.Map;
 
 /**
  * Created by foree on 17-3-25.
- * 用于存放书籍打开之后的状态，将对书籍的所有处理集中到这个类中
+ * 用于存放书籍打开之后的状态，将对书籍的所有处理集中到这个类中，区分从书架还是详情界面打开
+ * 异步，在未加载好之前，使用loading状态
  * 在打开书籍时，restoreBookRecord
  * 在关闭书籍时，saveBookRecord
  */
@@ -37,6 +42,9 @@ public class BookRecord {
     // 初始化是否完成，指第一次页码切换是否完成
     private boolean completed = false;
 
+    private boolean mOnline = false;
+    private String mBookUrl;
+
     public BookRecord(Context context) {
         mBook = new Book();
         mChapters = new ArrayList<>();
@@ -45,14 +53,24 @@ public class BookRecord {
     }
 
     /**
-     * 根据bookUrl打开一本书状态
+     * 根据bookUrl打开一本书状态，区分在线还是本地
      *
      * @param bookUrl book的唯一标示
      */
-    public void restoreBookRecord(String bookUrl) {
+    public void restoreBookRecord(final String bookUrl, boolean onLine) {
+        mOnline = onLine;
+        mBookUrl = bookUrl;
 
-        mBook = bookInit(bookUrl);
-        mChapters = chapterInit(bookUrl);
+       new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mBook = mOnline ? initBookOnline(mBookUrl) : initBookLocal(mBookUrl);
+                mChapters = mOnline ? initChapterOnline(mBookUrl) : initChapterLocal(mBookUrl);
+
+                // send compelete message
+                EventBus.getDefault().post(new BookLoadCompleteEvent(mBook != null && mChapters != null));
+            }
+        }).start();
 
         // 打开书的时候就更新书籍的修改时间
         mBook.setModifiedTime(DateUtils.getCurrentTime());
@@ -142,7 +160,7 @@ public class BookRecord {
         return getUrlFromFlag(flag, getCurrentUrl());
     }
 
-    private List<Chapter> chapterInit(String bookUrl) {
+    private List<Chapter> initChapterLocal(String bookUrl) {
         Log.d(TAG, "get chapterList from db, bookUrl = " + bookUrl);
 
         List<Chapter> chapterList = new ArrayList<>();
@@ -178,8 +196,21 @@ public class BookRecord {
 
     }
 
-    private Book bookInit(String bookUrl) {
-        Log.d(TAG, "get book info from db, bookUrl = " + bookUrl);
+    /**
+     * 从网络获取章节信息
+     * @param bookUrl book_id or book_url
+     * @return 章节列表
+     */
+    private List<Chapter> initChapterOnline(String bookUrl){
+        List<Chapter> chapters;
+
+        chapters = WebParser.getInstance().getContents(bookUrl, mBook.getContentUrl());
+
+        return chapters;
+    }
+
+    private Book initBookLocal(String bookUrl) {
+        Log.d(TAG, "get book info from db, mBookUrl = " + bookUrl);
 
         Book book = new Book();
         Cursor cursor;
@@ -208,6 +239,15 @@ public class BookRecord {
         return book;
 
 
+    }
+
+    /**
+     * 通过网络初始化书籍信息
+     * @param bookUrl book_id or book_url
+     */
+    private Book initBookOnline(String bookUrl){
+        Book book = WebParser.getInstance().getBookInfo(bookUrl);
+        return book;
     }
 
     private void saveToDatabase(Book book) {
