@@ -107,6 +107,7 @@ public class ZhuishuWebParserUnitTest {
         // 测试五行天，_id = 563552f7688af08743c2ce91
         String bookId = "563552f7688af08743c2ce91";
         String bookInfoApi = "http://api.zhuishushenqi.com/book/";
+        String imageApi = "http://statics.zhuishushenqi.com";
 
         try {
             Document document = Jsoup.connect(bookInfoApi + bookId).ignoreContentType(true).headers(headers).get();
@@ -114,6 +115,11 @@ public class ZhuishuWebParserUnitTest {
 
                 JSONObject bookInfoObject = new JSONObject(document.body().text());
 
+                String bookUrl = bookInfoObject.getString("_id");
+                String bookName = bookInfoObject.getString("title");
+                String author = bookInfoObject.getString("author");
+                String coverUrl = imageApi + bookInfoObject.getString("cover");
+                String cate = bookInfoObject.getString("majorCate");
                 String description = bookInfoObject.getString("longIntro");
                 String updateTime = bookInfoObject.getString("updated");
                 String contentsUrl = getBookSourceId(bookId);
