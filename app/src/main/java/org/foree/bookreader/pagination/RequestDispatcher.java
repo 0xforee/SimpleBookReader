@@ -1,5 +1,7 @@
 package org.foree.bookreader.pagination;
 
+import android.util.Log;
+
 import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.cache.ChapterCache;
 import org.foree.bookreader.bean.event.PaginationEvent;

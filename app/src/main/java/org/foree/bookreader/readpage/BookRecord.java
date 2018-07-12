@@ -113,6 +113,10 @@ public class BookRecord {
         saveToDatabase(mBook);
     }
 
+    public boolean isOnline(){
+        return mOnline;
+    }
+
     /**
      * 上次用户阅读的章节分页
      * @return 书籍详情页总是返回0，书架页返回记录的数据

@@ -198,7 +198,7 @@ class PiaoTianWebParser extends AbsWebParser {
                         chapter.setChapterTitle(element.text());
                         chapter.setChapterUrl(chapterUrl);
                         chapter.setBookUrl(bookUrl);
-                        chapter.setChapterId(getChapterId(chapterUrl));
+                        chapter.setChapterIndex(getChapterId(chapterUrl));
 
                         chapters.add(chapter);
                     }

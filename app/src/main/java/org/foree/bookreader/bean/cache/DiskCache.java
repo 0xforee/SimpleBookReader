@@ -27,7 +27,7 @@ public class DiskCache extends ChapterCache {
 
     @Override
     public Chapter get(String chapterUrl) {
-        Chapter chapter = new Chapter();
+        Chapter chapter = null;
 
         String selection = BReaderContract.Chapters.COLUMN_NAME_CHAPTER_URL + "=?";
 
@@ -41,9 +41,8 @@ public class DiskCache extends ChapterCache {
 
         if (cursor != null && cursor.getCount() != 0 && cursor.moveToFirst()) {
             String contents = cursor.getString(cursor.getColumnIndex(BReaderContract.Chapters.COLUMN_NAME_CHAPTER_CONTENT));
-            if (contents == null || contents.isEmpty()) {
-                chapter = null;
-            } else {
+            if (contents != null && !contents.isEmpty()) {
+                chapter = new Chapter();
                 chapter.setContents(contents);
                 chapter.setChapterUrl(chapterUrl);
                 chapter.setChapterTitle(cursor.getString(cursor.getColumnIndex(BReaderContract.Chapters.COLUMN_NAME_CHAPTER_TITLE)));

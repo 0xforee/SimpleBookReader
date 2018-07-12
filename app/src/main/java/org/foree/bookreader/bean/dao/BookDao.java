@@ -11,9 +11,7 @@ import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.utils.DateUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by foree on 2016/8/6.
@@ -62,7 +60,7 @@ public class BookDao {
             ContentValues contentValue = new ContentValues();
             contentValue.put(BReaderContract.Chapters.COLUMN_NAME_CHAPTER_TITLE, chapters.get(i).getChapterTitle());
             contentValue.put(BReaderContract.Chapters.COLUMN_NAME_CHAPTER_URL, chapters.get(i).getChapterUrl());
-            contentValue.put(BReaderContract.Chapters.COLUMN_NAME_CHAPTER_ID, chapters.get(i).getChapterId());
+            contentValue.put(BReaderContract.Chapters.COLUMN_NAME_CHAPTER_ID, chapters.get(i).getChapterIndex());
             contentValue.put(BReaderContract.Chapters.COLUMN_NAME_BOOK_URL, chapters.get(i).getBookUrl());
 
             contentValues[i] = contentValue;

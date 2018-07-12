@@ -212,7 +212,7 @@ class BiQuGeWebParser extends AbsWebParser {
             // set bookUrl
             chapter.setBookUrl(bookUrl);
             // set chapterId for sort
-            chapter.setChapterId(getChapterId(link.attr("href")));
+            chapter.setChapterIndex(getChapterId(link.attr("href")));
 
             if (DEBUG) Log.d("HH", link.text());
             if (DEBUG) Log.d("HH", link.attr("href"));

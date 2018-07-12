@@ -10,7 +10,7 @@ public class Chapter implements Serializable {
     private String chapterTitle;
     private String chapterUrl;
     private String bookUrl;
-    private int chapterId;
+    private int chapterIndex;
     private String contents;
     private boolean offline;
     /**
@@ -26,11 +26,11 @@ public class Chapter implements Serializable {
         this.chapterUrl = chapterUrl;
     }
 
-    public Chapter(String chapterTitle, String chapterUrl, String bookUrl, int chapterId, boolean offline) {
+    public Chapter(String chapterTitle, String chapterUrl, String bookUrl, int chapterIndex, boolean offline) {
         this.chapterTitle = chapterTitle;
         this.chapterUrl = chapterUrl;
         this.bookUrl = bookUrl;
-        this.chapterId = chapterId;
+        this.chapterIndex = chapterIndex;
         this.offline = offline;
     }
 
@@ -58,12 +58,12 @@ public class Chapter implements Serializable {
         this.bookUrl = bookUrl;
     }
 
-    public int getChapterId() {
-        return chapterId;
+    public int getChapterIndex() {
+        return chapterIndex;
     }
 
-    public void setChapterId(int chapterId) {
-        this.chapterId = chapterId;
+    public void setChapterIndex(int chapterIndex) {
+        this.chapterIndex = chapterIndex;
     }
 
     public void addPage(String text) {

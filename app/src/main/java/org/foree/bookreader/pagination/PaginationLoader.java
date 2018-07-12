@@ -1,5 +1,6 @@
 package org.foree.bookreader.pagination;
 
+import org.foree.bookreader.bean.cache.MemoryCache;
 import org.foree.bookreader.readpage.BookRecord;
 import org.foree.bookreader.bean.cache.ChapterCache;
 import org.foree.bookreader.bean.cache.DoubleCache;
@@ -16,6 +17,7 @@ public class PaginationLoader {
     private static PaginationLoader mInstance;
 
     private ChapterCache chapterCache = new DoubleCache();
+    private ChapterCache mOnlineChache = MemoryCache.getInstance();
 
     public static PaginationLoader getInstance() {
         if (mInstance == null) {
@@ -61,7 +63,7 @@ public class PaginationLoader {
     }
 
     public ChapterCache getChapterCache() {
-        return chapterCache;
+        return mBookRecord.isOnline() ? mOnlineChache : chapterCache;
     }
 
     /**
