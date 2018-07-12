@@ -13,6 +13,9 @@ public class Chapter implements Serializable {
     private int chapterId;
     private String contents;
     private boolean offline;
+    /**
+     * 存放章节的分页结果
+     */
     private ArrayList<String> pages = new ArrayList<>();
 
     public Chapter() {

@@ -34,6 +34,7 @@ import org.foree.bookreader.base.GlobalConfig;
 import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.dao.BReaderContract;
 import org.foree.bookreader.bean.dao.BReaderProvider;
+import org.foree.bookreader.bean.event.BookLoadCompleteEvent;
 import org.foree.bookreader.bean.event.PaginationEvent;
 import org.foree.bookreader.common.FontDialog;
 import org.foree.bookreader.pagination.PaginationArgs;
@@ -49,7 +50,8 @@ import org.greenrobot.eventbus.ThreadMode;
 public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAreaClickListener, LoaderManager.LoaderCallbacks {
     private static final String TAG = ReadActivity.class.getSimpleName();
 
-    String bookUrl;
+    String mBookUrl;
+    boolean mOnline;
     private BookRecord mBookRecord;
     private boolean mSlipLeft = false;
     // view pager
@@ -105,14 +107,19 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
         EventBus.getDefault().register(this);
         mBookRecord = new BookRecord(this);
 
-        bookUrl = getIntent().getExtras().getString("book_url");
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            mBookUrl = getIntent().getExtras().getString("book_url");
+            mOnline = bundle.getBoolean("online", false);
+        }
 
-        mBookRecord.restoreBookRecord(bookUrl);
+        mHandler.sendEmptyMessage(MSG_LOADING);
+
+        mBookRecord.restoreBookRecord(mBookUrl, mOnline);
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        initViews();
-        initTextView(savedInstanceState);
+        initViews(savedInstanceState);
         initMenuPop();
 
     }
@@ -123,7 +130,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
         outState.putBoolean(BaseActivity.KEY_RECREATE, true);
     }
 
-    private void initViews() {
+    private void initViews(final Bundle savedInstanceState) {
         //init textView
         mBtnLoading = (Button) findViewById(R.id.loading);
 
@@ -141,6 +148,8 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
         mViewPager.setAdapter(pageAdapter);
 
         mViewPager.setOnPageAreaClickListener(this);
+
+        initTextView(savedInstanceState);
 
     }
 
@@ -206,7 +215,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
         if (pageEvent.isCurrent()) {
             if (chapter != null) {
 
-                mBookRecord.setCached(chapter.getChapterUrl());
+                mBookRecord.setChapterCached(chapter.getChapterUrl());
 
                 if (pageEvent.isCurrent()) {
 
@@ -227,12 +236,22 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
         }
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(BookLoadCompleteEvent event){
+
+        mHandler.sendEmptyMessage(event.getState() ? MSG_SUCCESS : MSG_FAILED);
+        if (event.getState()) {
+            switchChapter(mBookRecord.getCurrentUrl(), false, false);
+        }
+    }
+
     @Override
     protected void onDestroy() {
         EventBus.getDefault().unregister(this);
         super.onDestroy();
 
-        mBookRecord.saveBookRecord(mViewPager.getCurrentItem());
+        mBookRecord.switchPageIndex(mViewPager.getCurrentItem());
+        mBookRecord.saveBookRecord();
     }
 
     private void initMenuPop() {
@@ -269,7 +288,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
                     contentDialog.show();
                     getLoaderManager().restartLoader(0, null, ReadActivity.this);
                 }
-                chapterTitleListView.setSelection(mBookRecord.getCurPosition() - 2);
+                chapterTitleListView.setSelection(mBookRecord.getCurrentChapterPos() - 2);
                 contentAdapter.notifyDataSetChanged();
 
             }
@@ -318,12 +337,12 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
 
     @Override
     public void onPreChapterClick() {
-        switchChapter(mBookRecord.getUrlFromFlag(-1), true, false);
+        switchChapter(mBookRecord.getOffsetChapter(-1), true, false);
     }
 
     @Override
     public void onNextChapterClick() {
-        switchChapter(mBookRecord.getUrlFromFlag(1), false, false);
+        switchChapter(mBookRecord.getOffsetChapter(1), false, false);
     }
 
     private void showFontDialog() {
@@ -368,7 +387,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 contentDialog.dismiss();
-                switchChapter(mBookRecord.getUrl(position), false, true);
+                switchChapter(mBookRecord.getChapterUrl(position), false, true);
                 contentAdapter.setSelectedPosition(position);
             }
         });
@@ -400,7 +419,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
                 BReaderContract.Chapters.COLUMN_NAME_CHAPTER_ID
         };
         String selection = BReaderContract.Chapters.COLUMN_NAME_BOOK_URL + "=?";
-        String[] selectionArgs = new String[]{bookUrl};
+        String[] selectionArgs = new String[]{mBookUrl};
         String orderBy = BReaderContract.Chapters.COLUMN_NAME_CHAPTER_ID + " asc";
 
         return new CursorLoader(this, baseUri, projection, selection, selectionArgs, orderBy);
@@ -411,8 +430,8 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
         Log.d(TAG, "onLoadFinished");
         contentAdapter.changeCursor((Cursor) data);
 
-        chapterTitleListView.setSelection(mBookRecord.getCurPosition() - 2);
-        contentAdapter.setSelectedPosition(mBookRecord.getCurPosition());
+        chapterTitleListView.setSelection(mBookRecord.getCurrentChapterPos() - 2);
+        contentAdapter.setSelectedPosition(mBookRecord.getCurrentChapterPos());
         contentAdapter.notifyDataSetChanged();
 
     }

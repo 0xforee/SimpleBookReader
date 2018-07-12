@@ -18,6 +18,9 @@ public class Book {
     private String category;
     private String author;
     private String bookUrl;
+    /**
+     * 当前阅读到的章节的分页
+     */
     private int pageIndex;
 
     // set content url
@@ -27,7 +30,9 @@ public class Book {
     private List<Chapter> chapters;
     private String description;
     private Chapter newestChapter;
-    // recentChapterId默认为-1，在openBook时检查病初始化
+    /**
+     * recentChapterId默认为-1，在openBook时检查病初始化
+     */
     private String recentChapterUrl;
 
     public Book() {

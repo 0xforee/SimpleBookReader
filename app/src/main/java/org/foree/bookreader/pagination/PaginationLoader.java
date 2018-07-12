@@ -74,7 +74,7 @@ public class PaginationLoader {
                 public void run() {
                     super.run();
                     int tmp = 1;
-                    final int index = mBookRecord.getIndexFromUrl(mBookRecord.getCurrentUrl());
+                    final int index = mBookRecord.getChapterIndex(mBookRecord.getCurrentUrl());
                     if (index != -1) {
 
                         // 前几章
@@ -82,7 +82,7 @@ public class PaginationLoader {
                         while (newIndex > 0 && tmp <= mOffset) {
                             if (!mBookRecord.isChapterCached(newIndex)) {
                                 // add request
-                                mRequestQueue.add(new ChapterRequest(mBookRecord.getUrl(newIndex), paginationArgs, false));
+                                mRequestQueue.add(new ChapterRequest(mBookRecord.getChapterUrl(newIndex), paginationArgs, false));
                             }
                             tmp++;
                             newIndex = index - tmp;
@@ -95,7 +95,7 @@ public class PaginationLoader {
                         while (newIndex < mBookRecord.getChaptersSize() && tmp <= mOffset) {
                             if (!mBookRecord.isChapterCached(newIndex)) {
                                 // add request
-                                mRequestQueue.add(new ChapterRequest(mBookRecord.getUrl(newIndex), paginationArgs, false));
+                                mRequestQueue.add(new ChapterRequest(mBookRecord.getChapterUrl(newIndex), paginationArgs, false));
 
                             }
                             tmp++;

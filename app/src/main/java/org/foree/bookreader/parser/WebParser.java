@@ -20,10 +20,10 @@ public class WebParser implements IWebParser {
 
     private WebParser() {
 
-        registerParser("http://www.biquge.cn", new BiQuGeWebParser());
-        registerParser("http://m.piaotian.com", new PiaoTianWebParser());
-        registerParser("http://www.piaotian.com", new PiaoTianWebParser());
-        registerParser("http://api.zhuishushenqi.com", new ZhuishuWebParser());
+        //registerParser("http://www.biquge.cn", new BiQuGeWebParser());
+        //registerParser("http://m.piaotian.com", new PiaoTianWebParser());
+        //registerParser("http://www.piaotian.com", new PiaoTianWebParser());
+        //registerParser("http://api.zhuishushenqi.com", new ZhuishuWebParser());
         registerParser("http://chapter2.zhuishushenqi.com", new ZhuishuWebParser());
     }
 
@@ -54,13 +54,13 @@ public class WebParser implements IWebParser {
 
     private AbsWebParser getWebParser(String url) {
         // parse host url
-        if (url.contains("http://") && url.length() > 7) {
-            int index = url.indexOf("/", 7);
-            String keyUrl = url.substring(0, index == -1 ? url.length() : index);
-            return mParserMap.get(keyUrl);
-        } else {
-            return new NullWebParser();
-        }
+//        if (url.contains("http://") && url.length() > 7) {
+//            int index = url.indexOf("/", 7);
+//            String keyUrl = url.substring(0, index == -1 ? url.length() : index);
+//            return mParserMap.get(keyUrl);
+//        } else {
+            return new ZhuishuWebParser();
+//        }
     }
 
     @Override
