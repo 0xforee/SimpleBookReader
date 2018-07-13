@@ -138,7 +138,7 @@ public class ZhuishuWebParser extends AbsWebParser {
                     String chapterTitle = chapterObject.getString("title");
                     int chapterIndex = i;
 
-                    Log.d(TAG, chapterTitle + ", " + chatperUrl + ", " + chapterIndex);
+//                    Log.d(TAG, chapterTitle + ", " + chatperUrl + ", " + chapterIndex);
 
                     chapter.setBookUrl(bookId);
                     chapter.setChapterIndex(chapterIndex);
@@ -153,6 +153,7 @@ public class ZhuishuWebParser extends AbsWebParser {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        Log.d(TAG, "[foree] getContents finish!");
         return chapterList;
     }
 
@@ -227,7 +228,7 @@ public class ZhuishuWebParser extends AbsWebParser {
             Document document = Jsoup.connect(bookSourceApi).data(data).ignoreContentType(true).get();
             if (document != null){
                 JSONArray jsonArray = new JSONArray(document.body().text());
-                JSONObject sourceObject = (JSONObject) jsonArray.get(0);
+                JSONObject sourceObject = (JSONObject) jsonArray.get(jsonArray.length() > 1 ? 1 : 0);
                 String sourceId = sourceObject.getString("_id");
                 Log.d(TAG, sourceId);
                 return sourceId;

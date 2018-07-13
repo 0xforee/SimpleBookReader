@@ -33,7 +33,7 @@ public class RequestDispatcher extends Thread {
                     final ChapterCache chapterCache = PaginationLoader.getInstance().getChapterCache();
                     // get from cache
                     chapter = chapterCache.get(request.getUrl());
-                    if (chapter == null) {
+                    if (chapter == null || chapter.getChapterUrl() == null) {
                         // download from net
                         chapter = WebParser.getInstance().getChapter("", request.getUrl());
                     }

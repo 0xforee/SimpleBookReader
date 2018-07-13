@@ -1,12 +1,7 @@
 package org.foree.bookreader.readpage;
 
 import android.app.Dialog;
-import android.app.LoaderManager;
-import android.content.CursorLoader;
-import android.content.Loader;
-import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -32,8 +27,6 @@ import org.foree.bookreader.R;
 import org.foree.bookreader.base.BaseActivity;
 import org.foree.bookreader.base.GlobalConfig;
 import org.foree.bookreader.bean.book.Chapter;
-import org.foree.bookreader.bean.dao.BReaderContract;
-import org.foree.bookreader.bean.dao.BReaderProvider;
 import org.foree.bookreader.bean.event.BookLoadCompleteEvent;
 import org.foree.bookreader.bean.event.PaginationEvent;
 import org.foree.bookreader.common.FontDialog;
@@ -47,7 +40,7 @@ import org.greenrobot.eventbus.ThreadMode;
 /**
  * Created by foree on 16-7-21.
  */
-public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAreaClickListener, LoaderManager.LoaderCallbacks {
+public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAreaClickListener {
     private static final String TAG = ReadActivity.class.getSimpleName();
 
     String mBookUrl;
@@ -66,7 +59,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
     private FontDialog.Builder fontDialog;
     private View rootView;
     private ListView chapterTitleListView;
-    private ContentAdapter contentAdapter;
+    private CustomChapterListAdapter contentAdapter;
     // menuPop
     private TextView tvContent, tvProgress, tvFont, tvBrightness;
 
@@ -180,7 +173,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
 
                 if (savedInstanceState != null && savedInstanceState.getBoolean(BaseActivity.KEY_RECREATE)) {
                     switchChapter(mBookRecord.getCurrentUrl(), false, false);
-                    Log.d(TAG, "onCreate: recreate activity");
+                    Log.d(TAG, "onCreate: recreate activity for theme apply");
                 } else {
                     // loading
                     switchChapter(mBookRecord.getCurrentUrl(), false, true);
@@ -237,7 +230,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(BookLoadCompleteEvent event){
+    public void onEventMainThread(BookLoadCompleteEvent event) {
 
         mHandler.sendEmptyMessage(event.getState() ? MSG_SUCCESS : MSG_FAILED);
         if (event.getState()) {
@@ -286,7 +279,6 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
                     showContentDialog();
                 } else {
                     contentDialog.show();
-                    getLoaderManager().restartLoader(0, null, ReadActivity.this);
                 }
                 chapterTitleListView.setSelection(mBookRecord.getCurrentChapterPos() - 2);
                 contentAdapter.notifyDataSetChanged();
@@ -376,12 +368,11 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
 
         chapterTitleListView = (ListView) view.findViewById(R.id.rv_item_list);
 
-        contentAdapter = new ContentAdapter(this, null, 0);
+        contentAdapter = new CustomChapterListAdapter(this);
+        contentAdapter.updateData(mBookRecord.getChapters());
         chapterTitleListView.setAdapter(contentAdapter);
 
         contentDialog.show();
-
-        getLoaderManager().initLoader(0, null, this);
 
         chapterTitleListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -393,6 +384,13 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
         });
     }
 
+    /**
+     * 切换章节
+     *
+     * @param newChapterUrl 切换的目标章节url(id)
+     * @param slipLeft      是否向左翻页
+     * @param skip          非连续切换章节（从目录跳转）
+     */
     private void switchChapter(String newChapterUrl, boolean slipLeft, boolean skip) {
         if (newChapterUrl != null) {
             pageAdapter.setChapter(null);
@@ -407,39 +405,5 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
     private boolean isSlipLeft() {
         return mSlipLeft;
     }
-
-    @Override
-    public Loader onCreateLoader(int id, Bundle args) {
-        Uri baseUri = BReaderProvider.CONTENT_URI_CHAPTERS;
-        String[] projection = new String[]{
-                BReaderContract.Chapters._ID,
-                BReaderContract.Chapters.COLUMN_NAME_CHAPTER_URL,
-                BReaderContract.Chapters.COLUMN_NAME_CHAPTER_TITLE,
-                BReaderContract.Chapters.COLUMN_NAME_CACHED,
-                BReaderContract.Chapters.COLUMN_NAME_CHAPTER_ID
-        };
-        String selection = BReaderContract.Chapters.COLUMN_NAME_BOOK_URL + "=?";
-        String[] selectionArgs = new String[]{mBookUrl};
-        String orderBy = BReaderContract.Chapters.COLUMN_NAME_CHAPTER_ID + " asc";
-
-        return new CursorLoader(this, baseUri, projection, selection, selectionArgs, orderBy);
-    }
-
-    @Override
-    public void onLoadFinished(Loader loader, Object data) {
-        Log.d(TAG, "onLoadFinished");
-        contentAdapter.changeCursor((Cursor) data);
-
-        chapterTitleListView.setSelection(mBookRecord.getCurrentChapterPos() - 2);
-        contentAdapter.setSelectedPosition(mBookRecord.getCurrentChapterPos());
-        contentAdapter.notifyDataSetChanged();
-
-    }
-
-    @Override
-    public void onLoaderReset(Loader loader) {
-        contentAdapter.swapCursor(null);
-    }
-
 
 }

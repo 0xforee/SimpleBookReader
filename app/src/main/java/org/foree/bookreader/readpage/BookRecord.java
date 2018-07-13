@@ -159,7 +159,9 @@ public class BookRecord {
     }
 
     public void setChapterCached(String url) {
-        mChapters.get(mIndexMap.get(url)).setOffline(true);
+        if (mIndexMap.get(url) != null) {
+            mChapters.get(mIndexMap.get(url)).setOffline(true);
+        }
     }
 
     public boolean isChapterCached(int index) {
@@ -176,6 +178,10 @@ public class BookRecord {
         } else {
             return -1;
         }
+    }
+
+    public List<Chapter> getChapters(){
+        return mChapters;
     }
 
     /**
