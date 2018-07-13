@@ -4,6 +4,8 @@ import android.util.Log;
 
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
+import org.foree.bookreader.bean.book.Source;
+import org.foree.bookreader.utils.DateUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,7 +32,7 @@ public class ZhuishuWebParser extends AbsWebParser {
         List<Book> bookList = new ArrayList<>();
         String encodeKeyword = URLEncoder.encode(keyword);
 
-        Log.d(TAG,"encodeKeyword = " + encodeKeyword);
+        Log.d(TAG, "encodeKeyword = " + encodeKeyword);
 
         Map<String, String> data = new HashMap<>();
         data.put("query", encodeKeyword);
@@ -41,7 +43,7 @@ public class ZhuishuWebParser extends AbsWebParser {
         try {
             document = Jsoup.connect(getWebInfo().getSearchApi("")).headers(getHeader()).data(data).ignoreContentType(true).get();
 
-            if( document != null){
+            if (document != null) {
                 String json = document.body().text().trim();
                 Log.d(TAG, json);
 
@@ -83,7 +85,7 @@ public class ZhuishuWebParser extends AbsWebParser {
 
         try {
             Document document = Jsoup.connect(bookInfoApi + bookId).ignoreContentType(true).headers(getHeader()).get();
-            if(document != null){
+            if (document != null) {
 
                 JSONObject bookInfoObject = new JSONObject(document.body().text());
                 String bookUrl = bookInfoObject.getString("_id");
@@ -126,7 +128,7 @@ public class ZhuishuWebParser extends AbsWebParser {
 
         try {
             Document document = Jsoup.connect(contentsApi + getBookSourceId(bookId)).data(data).ignoreContentType(true).get();
-            if (document != null){
+            if (document != null) {
                 JSONObject jsonObject = new JSONObject(document.body().text());
 
                 JSONArray contentsArray = jsonObject.getJSONArray("chapters");
@@ -168,7 +170,7 @@ public class ZhuishuWebParser extends AbsWebParser {
             Log.d(TAG, "get link = " + contentApi + encodeLink);
 
             Document document = Jsoup.connect(contentApi + encodeLink).ignoreContentType(true).get();
-            if (document != null){
+            if (document != null) {
                 JSONObject jsonObject = new JSONObject(document.body().text());
                 JSONObject chapterObject = jsonObject.getJSONObject("chapter");
                 String content = chapterObject.getString("body");
@@ -215,29 +217,51 @@ public class ZhuishuWebParser extends AbsWebParser {
         };
     }
 
-    private String getBookSourceId(String bookId){
-        //根据book_id获取书源，后续章节列表需要从某个书源获取
-
+    @Override
+    public List<Source> getBookSource(String bookId) {
+        //根据book_id获取书源信息，后续章节列表需要从某个书源获取
+        List<Source> sourceList = new ArrayList<>();
         String bookSourceApi = "http://api.zhuishushenqi.com/toc";
 
-        Map<String, String> data = new HashMap<>();
+        Map<String, String> data = new HashMap<>(2);
         data.put("view", "summary");
         data.put("book", bookId);
 
         try {
             Document document = Jsoup.connect(bookSourceApi).data(data).ignoreContentType(true).get();
-            if (document != null){
+            if (document != null) {
                 JSONArray jsonArray = new JSONArray(document.body().text());
-                JSONObject sourceObject = (JSONObject) jsonArray.get(jsonArray.length() > 1 ? 1 : 0);
-                String sourceId = sourceObject.getString("_id");
-                Log.d(TAG, sourceId);
-                return sourceId;
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject sourceObject = (JSONObject) jsonArray.get(i);
+                    Source source = new Source();
+                    source.setChapterCount(sourceObject.getInt("chaptersCount"));
+                    source.setCharge(sourceObject.getBoolean("isCharge"));
+                    source.setHost(sourceObject.getString("host"));
+                    source.setLastChapter(sourceObject.getString("lastChapter"));
+                    source.setSourceId(sourceObject.getString("_id"));
+                    source.setSourceLink(sourceObject.getString("link"));
+                    source.setSourceName(sourceObject.getString("name"));
+                    source.setStarting(sourceObject.getBoolean("starting"));
+                    source.setUpdated(DateUtils.formateJSDate(sourceObject.getString("updated")));
+
+                    sourceList.add(source);
+
+                    Log.d(TAG, source.getHost() + ", " + source.getSourceName() + ", " + source.getLastChapter() + ", " + source.getUpdated());
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return "";
+        return sourceList;
+    }
+
+    private String getBookSourceId(String bookId) {
+        //根据book_id获取书源，后续章节列表需要从某个书源获取
+
+        List<Source> sourceList = getBookSource(bookId);
+        String sourceId = sourceList.get(sourceList.size() > 1 ? 1 : 0).getSourceId();
+        return sourceId;
     }
 }

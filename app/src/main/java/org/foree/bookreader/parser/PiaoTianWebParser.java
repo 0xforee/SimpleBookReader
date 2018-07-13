@@ -150,7 +150,7 @@ class PiaoTianWebParser extends AbsWebParser {
                                 newestChapter.setChapterTitle(tmp.split("：")[1]);
                                 newestChapter.setChapterUrl(getWebInfo().getHostUrl() + p.child(0).attr("href"));
                             }
-                        }else{
+                        } else {
                             book.setBookName(tmp);
                         }
                     }
@@ -186,12 +186,12 @@ class PiaoTianWebParser extends AbsWebParser {
             Log.d(TAG, "getContents: url = " + contentsUrl);
             doc = Jsoup.connect(contentsUrl).headers(getHeader()).get();
             if (doc != null) {
-                if(DEBUG) Log.d(TAG, "getContents: doc = " +doc.toString());
-                for(Element element: doc.getElementsByTag("li")){
+                if (DEBUG) Log.d(TAG, "getContents: doc = " + doc.toString());
+                for (Element element : doc.getElementsByTag("li")) {
                     if (element.children().size() > 0) {
                         Chapter chapter = new Chapter();
 
-                        String  chapterUrl = contentsUrl.replace("index.html", "").replace("http://www", "http://m");
+                        String chapterUrl = contentsUrl.replace("index.html", "").replace("http://www", "http://m");
                         chapterUrl = chapterUrl + element.child(0).attr("href");
                         Log.d(TAG, "chapter url = " + chapterUrl + ", chapter name = " + element.text());
 
@@ -232,7 +232,7 @@ class PiaoTianWebParser extends AbsWebParser {
                 if (DEBUG) Log.d(TAG, content.toString());
                 chapter.setContents(Html.fromHtml(content.toString()).toString());
             }
-        }catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 

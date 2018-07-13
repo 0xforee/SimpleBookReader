@@ -7,6 +7,7 @@ import android.util.Log;
 
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
+import org.foree.bookreader.bean.book.Source;
 import org.foree.bookreader.bean.dao.BReaderContract;
 import org.foree.bookreader.bean.dao.BReaderProvider;
 import org.foree.bookreader.bean.event.BookLoadCompleteEvent;
@@ -23,12 +24,12 @@ import java.util.Map;
  * Created by foree on 17-3-25.
  * 用于存放书籍打开之后的状态，区分从书架还是详情界面打开
  * 异步，在未加载好之前，使用loading状态
- *
+ * <p>
  * 在打开书籍时，restoreBookRecord
  * restore状态包括：book基本信息，章节列表，上次阅读章节和分页
- *
+ * <p>
  * 在切换章节，分页时，保存这两个状态
- *
+ * <p>
  * 在关闭书籍时，saveBookRecord
  * 保存上次阅读章节和分页
  */
@@ -38,6 +39,7 @@ public class BookRecord {
 
     private Book mBook;
     private List<Chapter> mChapters;
+    private List<Source> mSourceList;
 
     private Context mContext;
 
@@ -76,12 +78,13 @@ public class BookRecord {
         mOnline = onLine;
         mBookUrl = bookUrl;
 
-       new Thread(new Runnable() {
+        new Thread(new Runnable() {
             @Override
             public void run() {
                 mBook = mOnline ? initBookInfoOnline(mBookUrl) : initBookInfoLocal(mBookUrl);
                 mChapters = mOnline ? initChapterListOnline(mBookUrl) : initChapterListLocal(mBookUrl);
-                if (onLine){
+                mSourceList = initSourceList(mBookUrl);
+                if (onLine) {
                     mBook.setRecentChapterUrl(mChapters.get(0).getChapterUrl());
                 }
 
@@ -97,6 +100,10 @@ public class BookRecord {
 
     }
 
+    private List<Source> initSourceList(String mBookUrl) {
+        return WebParser.getInstance().getBookSource(mBookUrl);
+    }
+
     /**
      * 保存当前打开书本的状态
      * 1. 当前阅读章节（切换章节的时候就设置好）
@@ -105,7 +112,7 @@ public class BookRecord {
      * TODO:网络模式进入不做处理，后续根据是否加入书架这一行为来处理
      */
     public void saveBookRecord() {
-        if (mOnline){
+        if (mOnline) {
             return;
         }
         completed = false;
@@ -113,19 +120,20 @@ public class BookRecord {
         saveToDatabase(mBook);
     }
 
-    public boolean isOnline(){
+    public boolean isOnline() {
         return mOnline;
     }
 
     /**
      * 上次用户阅读的章节分页
+     *
      * @return 书籍详情页总是返回0，书架页返回记录的数据
      */
     public int getPageIndex() {
         return mBook.getPageIndex();
     }
 
-    public void switchPageIndex(int pageIndex){
+    public void switchPageIndex(int pageIndex) {
         mBook.setPageIndex(pageIndex);
     }
 
@@ -139,6 +147,7 @@ public class BookRecord {
 
     /**
      * 用于标定章节在list中的位置
+     *
      * @return 获取当前章节所处的位置
      */
     public int getCurrentChapterPos() {
@@ -180,15 +189,19 @@ public class BookRecord {
         }
     }
 
-    public List<Chapter> getChapters(){
+    public List<Chapter> getChapters() {
         return mChapters;
+    }
+
+    public List<Source> getSourceList() {
+        return mSourceList;
     }
 
     /**
      * 获取指定chapter url对应偏移量的章节url
      *
      * @param offset 偏移量，-1表示前一章，1表示后一章
-     * @param url  指定url
+     * @param url    指定url
      * @return 有则返回目标url，没有返回null
      */
     private String getOffsetChapter(int offset, String url) {
@@ -239,7 +252,7 @@ public class BookRecord {
 
     }
 
-    private void initChapterIndexMap(){
+    private void initChapterIndexMap() {
         for (int i = 0; i < mChapters.size(); i++) {
             // 使用hashMap加快索引位置
             mIndexMap.put(mChapters.get(i).getChapterUrl(), i++);
@@ -248,10 +261,11 @@ public class BookRecord {
 
     /**
      * 从网络获取章节信息
+     *
      * @param bookUrl book_id or book_url
      * @return 章节列表
      */
-    private List<Chapter> initChapterListOnline(String bookUrl){
+    private List<Chapter> initChapterListOnline(String bookUrl) {
         List<Chapter> chapters;
 
         chapters = WebParser.getInstance().getContents(bookUrl, mBook.getContentUrl());
@@ -293,9 +307,10 @@ public class BookRecord {
 
     /**
      * 通过网络初始化书籍信息
+     *
      * @param bookUrl book_id or book_url
      */
-    private Book initBookInfoOnline(String bookUrl){
+    private Book initBookInfoOnline(String bookUrl) {
         Book book = WebParser.getInstance().getBookInfo(bookUrl);
         book.setPageIndex(0);
         return book;

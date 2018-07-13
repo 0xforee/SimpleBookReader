@@ -21,12 +21,14 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import org.foree.bookreader.R;
 import org.foree.bookreader.base.BaseActivity;
 import org.foree.bookreader.base.GlobalConfig;
 import org.foree.bookreader.bean.book.Chapter;
+import org.foree.bookreader.bean.book.Source;
 import org.foree.bookreader.bean.event.BookLoadCompleteEvent;
 import org.foree.bookreader.bean.event.PaginationEvent;
 import org.foree.bookreader.common.FontDialog;
@@ -37,10 +39,15 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Created by foree on 16-7-21.
  */
-public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAreaClickListener {
+public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAreaClickListener, View.OnClickListener {
     private static final String TAG = ReadActivity.class.getSimpleName();
 
     String mBookUrl;
@@ -55,11 +62,12 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
 
     // popWindow
     private PopupWindow menuPop;
-    private Dialog contentDialog;
+    private Dialog contentDialog, mSourceChangeDialog;
     private FontDialog.Builder fontDialog;
     private View rootView;
-    private ListView chapterTitleListView;
+    private ListView chapterTitleListView, mSourceChangeListView;
     private CustomChapterListAdapter contentAdapter;
+    private SimpleAdapter mSourceChangeAdapter;
     // menuPop
     private TextView tvContent, tvProgress, tvFont, tvBrightness;
 
@@ -126,13 +134,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
     private void initViews(final Bundle savedInstanceState) {
         //init textView
         mBtnLoading = (Button) findViewById(R.id.loading);
-
-        mBtnLoading.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                switchChapter(mBookRecord.getCurrentUrl(), false, true);
-            }
-        });
+        mBtnLoading.setOnClickListener(this);
 
         mViewPager = (ReadViewPager) findViewById(R.id.book_pager);
         pageAdapter = new PageAdapter(getSupportFragmentManager());
@@ -269,56 +271,11 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
         tvBrightness = (TextView) view.findViewById(R.id.brightness);
 
 
-        tvContent.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (menuPop.isShowing()) {
-                    menuPop.dismiss();
-                }
-                if (contentDialog == null) {
-                    showContentDialog();
-                } else {
-                    contentDialog.show();
-                }
-                chapterTitleListView.setSelection(mBookRecord.getCurrentChapterPos() - 2);
-                contentAdapter.notifyDataSetChanged();
+        tvContent.setOnClickListener(this);
 
-            }
-        });
+        tvBrightness.setOnClickListener(this);
 
-//        tvBrightness.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ReadActivity.this);
-//                boolean nightMode = GlobalConfig.getInstance().isNightMode();
-//                Log.d(TAG, "onClick: nightMode = " + nightMode);
-//                preferences.edit().putBoolean(SettingsActivity.KEY_PREF_NIGHT_MODE, !nightMode).apply();
-//                // change theme
-//                GlobalConfig.getInstance().changeTheme();
-//
-//                recreate();
-//
-//                if (menuPop.isShowing()) {
-//                    menuPop.dismiss();
-//                }
-//            }
-//        });
-
-        tvFont.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (menuPop.isShowing()) {
-                    menuPop.dismiss();
-                }
-                if (fontDialog == null) {
-                    showFontDialog();
-                } else {
-                    fontDialog.showDialog();
-                }
-
-            }
-        });
+        tvFont.setOnClickListener(this);
     }
 
     @Override
@@ -344,29 +301,9 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
 
 
     private void showContentDialog() {
-        View view = LayoutInflater.from(this).inflate(R.layout.dialog_content_layout, null);
+        contentDialog = getDialog(getString(R.string.content));
 
-        DisplayMetrics dp = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(dp);
-
-        contentDialog = new Dialog(this, R.style.contentDialogStyle);
-        contentDialog.setContentView(view);
-        contentDialog.setTitle(R.string.content);
-        Window dialogWindow = contentDialog.getWindow();
-        if (dialogWindow != null) {
-            WindowManager.LayoutParams lp = dialogWindow.getAttributes();
-            dialogWindow.setGravity(Gravity.BOTTOM);
-
-            lp.x = 0;
-            lp.y = 0;
-            lp.width = dp.widthPixels;
-            lp.height = dp.heightPixels / 5 * 4;
-
-            dialogWindow.setAttributes(lp);
-        }
-        contentDialog.setCanceledOnTouchOutside(true);
-
-        chapterTitleListView = (ListView) view.findViewById(R.id.rv_item_list);
+        chapterTitleListView = (ListView) contentDialog.findViewById(R.id.rv_item_list);
 
         contentAdapter = new CustomChapterListAdapter(this);
         contentAdapter.updateData(mBookRecord.getChapters());
@@ -382,6 +319,63 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
                 contentAdapter.setSelectedPosition(position);
             }
         });
+    }
+
+    private void showChangeDialog() {
+        mSourceChangeDialog = getDialog(getString(R.string.source_change));
+
+        mSourceChangeListView = (ListView) mSourceChangeDialog.findViewById(R.id.rv_item_list);
+        List<Map<String, ?>> sourceList = new ArrayList<>();
+        for (int i = 0; i < mBookRecord.getSourceList().size(); i++) {
+            Source source = mBookRecord.getSourceList().get(i);
+            Map<String, String> map = new HashMap<>();
+            map.put("updated", source.getUpdated().toString());
+            map.put("title", source.getLastChapter());
+            map.put("host", source.getHost());
+
+            sourceList.add(map);
+        }
+
+        mSourceChangeAdapter = new SimpleAdapter(this, sourceList, R.layout.lv_source_change_item_holder,
+                new String[]{"updated", "title", "host"}, new int[]{R.id.tv_updated, R.id.tv_last_chapter, R.id.tv_source_host});
+
+
+        mSourceChangeListView.setAdapter(mSourceChangeAdapter);
+
+        mSourceChangeDialog.show();
+
+        mSourceChangeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                mSourceChangeDialog.dismiss();
+                //TODO:点击切换书源
+            }
+        });
+    }
+
+    private Dialog getDialog(String tile) {
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_content_layout, null);
+        DisplayMetrics dp = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dp);
+
+        Dialog contentDialog = new Dialog(this, R.style.contentDialogStyle);
+        contentDialog.setTitle(tile);
+        contentDialog.setContentView(view);
+        Window dialogWindow = contentDialog.getWindow();
+        if (dialogWindow != null) {
+            WindowManager.LayoutParams lp = dialogWindow.getAttributes();
+            dialogWindow.setGravity(Gravity.BOTTOM);
+
+            lp.x = 0;
+            lp.y = 0;
+            lp.width = dp.widthPixels;
+            lp.height = dp.heightPixels / 5 * 4;
+
+            dialogWindow.setAttributes(lp);
+        }
+        contentDialog.setCanceledOnTouchOutside(true);
+
+        return contentDialog;
     }
 
     /**
@@ -406,4 +400,52 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
         return mSlipLeft;
     }
 
+    /**
+     * Called when a view has been clicked.
+     *
+     * @param v The view that was clicked.
+     */
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.content:
+                if (menuPop.isShowing()) {
+                    menuPop.dismiss();
+                }
+                if (contentDialog == null) {
+                    showContentDialog();
+                } else {
+                    contentDialog.show();
+                }
+                chapterTitleListView.setSelection(mBookRecord.getCurrentChapterPos() - 2);
+                contentAdapter.notifyDataSetChanged();
+                break;
+            case R.id.font:
+                if (menuPop.isShowing()) {
+                    menuPop.dismiss();
+                }
+                if (fontDialog == null) {
+                    showFontDialog();
+                } else {
+                    fontDialog.showDialog();
+                }
+                break;
+            case R.id.loading:
+                switchChapter(mBookRecord.getCurrentUrl(), false, true);
+                break;
+            case R.id.brightness:
+                // 切换书源
+                if (menuPop.isShowing()) {
+                    menuPop.dismiss();
+                }
+                if (mSourceChangeDialog == null) {
+                    showChangeDialog();
+                } else {
+                    mSourceChangeDialog.show();
+                }
+                //TODO: 更新
+                break;
+            default:
+        }
+    }
 }

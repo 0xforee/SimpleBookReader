@@ -48,4 +48,17 @@ public class DateUtils {
         SimpleDateFormat simpleFormat = getUpdateTimeFormat();
         return simpleFormat.format(new Date());
     }
+
+    public static Date formateJSDate(String time){
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
+        try {
+            Date date = simpleDateFormat.parse(time);
+            Log.d(TAG, date.toString());
+            return date;
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

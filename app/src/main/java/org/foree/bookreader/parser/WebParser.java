@@ -2,6 +2,7 @@ package org.foree.bookreader.parser;
 
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
+import org.foree.bookreader.bean.book.Source;
 import org.foree.bookreader.net.NetCallback;
 
 import java.util.ArrayList;
@@ -59,7 +60,7 @@ public class WebParser implements IWebParser {
 //            String keyUrl = url.substring(0, index == -1 ? url.length() : index);
 //            return mParserMap.get(keyUrl);
 //        } else {
-            return new ZhuishuWebParser();
+        return new ZhuishuWebParser();
 //        }
     }
 
@@ -163,6 +164,11 @@ public class WebParser implements IWebParser {
             }
         }
         return list;
+    }
+
+    @Override
+    public List<Source> getBookSource(String bookId) {
+        return getWebParser(bookId).getBookSource(bookId);
     }
 
 

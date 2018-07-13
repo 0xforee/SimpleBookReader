@@ -11,6 +11,9 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -193,6 +196,19 @@ public class ZhuishuWebParserUnitTest {
         } catch (IOException e) {
             e.printStackTrace();
         } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testTimeStyle(){
+        String time = "2018-07-13T01:23:15.261Z";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        try {
+            Date date = simpleDateFormat.parse(time);
+            Log.d(TAG, date.toString());
+
+        } catch (ParseException e) {
             e.printStackTrace();
         }
     }

@@ -21,6 +21,7 @@
 
     <!-- page popupMenu -->
     <string name="content">目录</string>
+    <string name="source_change">书源切换</string>
     <string name="progress">进度</string>
     <string name="font">字体</string>
     <string name="brightness">亮度</string>

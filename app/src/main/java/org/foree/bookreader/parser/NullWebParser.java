@@ -2,7 +2,6 @@ package org.foree.bookreader.parser;
 
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
-import org.jsoup.nodes.Document;
 
 import java.util.List;
 
@@ -11,7 +10,7 @@ import java.util.List;
  * 空对象模式
  */
 
-class NullWebParser extends AbsWebParser{
+class NullWebParser extends AbsWebParser {
 
     @Override
     WebInfo getWebInfo() {

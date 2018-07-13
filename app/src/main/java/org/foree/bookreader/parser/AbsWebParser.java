@@ -2,6 +2,7 @@ package org.foree.bookreader.parser;
 
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
+import org.foree.bookreader.bean.book.Source;
 import org.foree.bookreader.net.NetCallback;
 
 import java.util.HashMap;
@@ -51,10 +52,14 @@ abstract class AbsWebParser implements IWebParser {
         return Integer.parseInt(subString[subString.length - 2]);
     }
 
-    Map<String, String> getHeader(){
-        Map<String, String > headers = new HashMap<>();
+    Map<String, String> getHeader() {
+        Map<String, String> headers = new HashMap<>();
         headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36");
         return headers;
     }
 
+    @Override
+    public List<Source> getBookSource(String bookId) {
+        return null;
+    }
 }
