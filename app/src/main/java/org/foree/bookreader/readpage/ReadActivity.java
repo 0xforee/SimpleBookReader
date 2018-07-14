@@ -207,9 +207,8 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
             mHandler.removeMessages(MSG_LOADING);
 
         Chapter chapter = pageEvent.getChapter();
-        if (pageEvent.isCurrent()) {
-            if (chapter != null) {
 
+            if (chapter != null) {
                 mBookRecord.setChapterCached(chapter.getChapterUrl());
 
                 if (pageEvent.isCurrent()) {
@@ -228,7 +227,6 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
             } else {
                 mHandler.sendEmptyMessage(MSG_FAILED);
             }
-        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -390,9 +388,10 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
             pageAdapter.setChapter(null);
             if (skip)
                 mHandler.sendEmptyMessage(MSG_LOADING);
-            PaginationLoader.getInstance().loadPagination(newChapterUrl);
             mBookRecord.switchChapter(newChapterUrl);
             mSlipLeft = slipLeft;
+            PaginationLoader.getInstance().loadPagination(newChapterUrl);
+            contentAdapter.setSelectedPosition(mBookRecord.getChapterIndex(newChapterUrl));
         }
     }
 
