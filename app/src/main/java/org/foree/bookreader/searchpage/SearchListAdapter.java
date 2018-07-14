@@ -53,8 +53,10 @@ public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.My
 
     @Override
     public void onBindViewHolder(final SearchListAdapter.MyViewHolder holder, int position) {
-        if (bookList != null && !bookList.isEmpty())
+        if (bookList != null && !bookList.isEmpty()) {
             holder.tvBookName.setText(bookList.get(position).getBookName());
+            holder.tvAuthor.setText(bookList.get(position).getAuthor());
+        }
 
         // 如果设置了回调，则设置点击事件
         if (mOnItemClickListener != null) {
@@ -117,13 +119,14 @@ public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.My
     }
 
     class MyViewHolder extends RecyclerView.ViewHolder {
-        TextView tvBookName;
+        TextView tvBookName, tvAuthor;
         ImageView imageView;
 
         public MyViewHolder(View view) {
             super(view);
             tvBookName = (TextView) view.findViewById(R.id.tv_novel_name);
             imageView = (ImageView) view.findViewById(R.id.iv_novel_image);
+            tvAuthor = (TextView) view.findViewById(R.id.tv_novel_author);
         }
     }
 }
