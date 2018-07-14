@@ -26,6 +26,7 @@ import java.util.Map;
 public class ZhuishuWebParser extends AbsWebParser {
     private static final String TAG = ZhuishuWebParser.class.getSimpleName();
     private String mImageApi = "http://statics.zhuishushenqi.com";
+    private static final boolean DEBUG = false;
 
     @Override
     public List<Book> searchBook(String keyword) {
@@ -140,7 +141,9 @@ public class ZhuishuWebParser extends AbsWebParser {
                     String chapterTitle = chapterObject.getString("title");
                     int chapterIndex = i;
 
-//                    Log.d(TAG, chapterTitle + ", " + chatperUrl + ", " + chapterIndex);
+                    if(DEBUG) {
+                        Log.d(TAG, chapterTitle + ", " + chatperUrl + ", " + chapterIndex);
+                    }
 
                     chapter.setBookUrl(bookId);
                     chapter.setChapterIndex(chapterIndex);
@@ -176,7 +179,9 @@ public class ZhuishuWebParser extends AbsWebParser {
                 String content = "\n" + chapterObject.getString("body");
                 content = content.replaceAll("\n", "\n        ");
 
-                Log.d(TAG, content);
+                if (DEBUG) {
+                    Log.d(TAG, content);
+                }
                 chapter.setContents(content);
             }
         } catch (IOException e) {
@@ -247,7 +252,9 @@ public class ZhuishuWebParser extends AbsWebParser {
 
                     sourceList.add(source);
 
-                    Log.d(TAG, source.getHost() + ", " + source.getSourceName() + ", " + source.getLastChapter() + ", " + source.getUpdated());
+                    if(DEBUG) {
+                        Log.d(TAG, source.getHost() + ", " + source.getSourceName() + ", " + source.getLastChapter() + ", " + source.getUpdated());
+                    }
                 }
             }
         } catch (IOException e) {

@@ -255,7 +255,7 @@ public class BookRecord {
     private void initChapterIndexMap() {
         for (int i = 0; i < mChapters.size(); i++) {
             // 使用hashMap加快索引位置
-            mIndexMap.put(mChapters.get(i).getChapterUrl(), i++);
+            mIndexMap.put(mChapters.get(i).getChapterUrl(), i);
         }
     }
 
