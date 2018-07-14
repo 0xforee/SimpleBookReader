@@ -173,7 +173,8 @@ public class ZhuishuWebParser extends AbsWebParser {
             if (document != null) {
                 JSONObject jsonObject = new JSONObject(document.body().text());
                 JSONObject chapterObject = jsonObject.getJSONObject("chapter");
-                String content = chapterObject.getString("body");
+                String content = "\n" + chapterObject.getString("body");
+                content = content.replaceAll("\n", "\n        ");
 
                 Log.d(TAG, content);
                 chapter.setContents(content);
