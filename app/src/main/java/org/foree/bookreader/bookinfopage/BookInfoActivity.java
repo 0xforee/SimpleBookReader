@@ -100,9 +100,8 @@ public class BookInfoActivity extends BaseActivity {
                 bookDao.addBook(book);
 
                 // update bt_add
-                mBtAdd.setBackgroundColor(getResources().getColor(R.color.material_drawer_dark_hint_text));
                 mBtAdd.setText(getResources().getText(R.string.bt_added));
-                mBtAdd.setClickable(false);
+                mBtAdd.setEnabled(false);
             }
         });
 

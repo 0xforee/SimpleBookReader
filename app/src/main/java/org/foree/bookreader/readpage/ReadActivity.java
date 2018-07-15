@@ -57,7 +57,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
     // view pager
     private ReadViewPager mViewPager;
     private PageAdapter pageAdapter;
-    private TextView mTextView;
+    private TextView mTvContent;
     private Button mBtnLoading;
 
     // popWindow
@@ -116,11 +116,10 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
 
         mHandler.sendEmptyMessage(MSG_LOADING);
 
-        mBookRecord.restoreBookRecord(mBookUrl, mOnline);
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        initViews(savedInstanceState);
+        initViews();
         initMenuPop();
 
     }
@@ -131,7 +130,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
         outState.putBoolean(BaseActivity.KEY_RECREATE, true);
     }
 
-    private void initViews(final Bundle savedInstanceState) {
+    private void initViews() {
         //init textView
         mBtnLoading = (Button) findViewById(R.id.loading);
         mBtnLoading.setOnClickListener(this);
@@ -144,42 +143,37 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
 
         mViewPager.setOnPageAreaClickListener(this);
 
-        initTextView(savedInstanceState);
+        initTextView();
 
     }
 
-    private void initTextView(final Bundle savedInstanceState) {
-        mTextView = (TextView) findViewById(R.id.book_content);
-        mTextView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+    private void initTextView() {
+        mTvContent = (TextView) findViewById(R.id.book_content);
+        mTvContent.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @SuppressWarnings("deprecation")
             @Override
             public void onGlobalLayout() {
                 // Removing layout listener to avoid multiple calls
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-                    mTextView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                    mTvContent.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                 } else {
-                    mTextView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    mTvContent.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 }
-                int top = mTextView.getPaddingTop();
-                int bottom = mTextView.getPaddingBottom();
-                int left = mTextView.getPaddingLeft();
-                int right = mTextView.getPaddingRight();
-                // init PaginationLoader
+                int top = mTvContent.getPaddingTop();
+                int bottom = mTvContent.getPaddingBottom();
+                int left = mTvContent.getPaddingLeft();
+                int right = mTvContent.getPaddingRight();
+                // first, init PaginationLoader
                 PaginationLoader.getInstance().init(new PaginationArgs(
-                        mTextView.getWidth() - left - right,
-                        mTextView.getHeight() - top - bottom,
-                        mTextView.getLineSpacingMultiplier(),
-                        mTextView.getLineSpacingExtra(),
-                        mTextView.getPaint(),
-                        mTextView.getIncludeFontPadding()));
+                        mTvContent.getWidth() - left - right,
+                        mTvContent.getHeight() - top - bottom,
+                        mTvContent.getLineSpacingMultiplier(),
+                        mTvContent.getLineSpacingExtra(),
+                        mTvContent.getPaint(),
+                        mTvContent.getIncludeFontPadding()));
 
-                if (savedInstanceState != null && savedInstanceState.getBoolean(BaseActivity.KEY_RECREATE)) {
-                    switchChapter(mBookRecord.getCurrentUrl(), false, false);
-                    Log.d(TAG, "onCreate: recreate activity for theme apply");
-                } else {
-                    // loading
-                    switchChapter(mBookRecord.getCurrentUrl(), false, true);
-                }
+                // second, init book info
+                mBookRecord.restoreBookRecord(mBookUrl, mOnline);
 
             }
         });
@@ -306,6 +300,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
         contentAdapter = new CustomChapterListAdapter(this);
         contentAdapter.updateData(mBookRecord.getChapters());
         chapterTitleListView.setAdapter(contentAdapter);
+        contentAdapter.setSelectedPosition(mBookRecord.getChapterIndex(mBookRecord.getCurrentUrl()));
 
         contentDialog.show();
 
@@ -391,7 +386,6 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
             mBookRecord.switchChapter(newChapterUrl);
             mSlipLeft = slipLeft;
             PaginationLoader.getInstance().loadPagination(newChapterUrl);
-            contentAdapter.setSelectedPosition(mBookRecord.getChapterIndex(newChapterUrl));
         }
     }
 
