@@ -39,4 +39,6 @@ dependencies {
     compile 'com.android.support:support-vector-drawable:23.4.0'
     testCompile 'junit:junit:4.12'
     testCompile 'org.json:json:20140107'
+    debugCompile 'com.amitshekhar.android:debug-db:1.0.0'
+
 }
