@@ -7,7 +7,7 @@
     <!-- read page dimens -->
     <dimen name="read_page_margin">18dp</dimen>
     <dimen name="tv_padding">15dp</dimen>
-    <dimen name="read_line_spacing">5dp</dimen>
+    <dimen name="read_line_spacing">10dp</dimen>
 
     <dimen name="toolbar_margin">6dp</dimen>
     <dimen name="toolbar_height_small">48dp</dimen>

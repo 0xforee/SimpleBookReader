@@ -9,7 +9,7 @@
 
     <!-- chapter offline state -->
     <color name="colorChapterOfflined">@color/md_black_1000</color>
-    <color name="colorChapterUnlined">@color/md_grey_600</color>
+    <color name="colorChapterUnlined">@color/md_grey_400</color>
 
     <color name="normal_page_background">#FFFFFF</color>
 

@@ -19,10 +19,12 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.foree.bookreader.R;
 import org.foree.bookreader.base.BaseActivity;
@@ -68,8 +70,10 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
     private ListView chapterTitleListView, mSourceChangeListView;
     private CustomChapterListAdapter contentAdapter;
     private SimpleAdapter mSourceChangeAdapter;
-    // menuPop
-    private TextView tvContent, tvProgress, tvFont, tvBrightness;
+    /**
+     * for menu pop image button
+      */
+    private ImageButton mIbContent, mIbProgress, mIbFont, mIbBrightness;
 
     // loading state
     private static final int MSG_FAILED = -1;
@@ -243,7 +247,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
 
     private void initMenuPop() {
         // 弹出一个popupMenu
-        View view = LayoutInflater.from(this).inflate(R.layout.popupmenu_read_menu, null);
+        View view = LayoutInflater.from(this).inflate(R.layout.popupmenu_read_menu, null, false);
 
         DisplayMetrics dp = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dp);
@@ -254,20 +258,20 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
         menuPop.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         menuPop.setFocusable(true);
         menuPop.setBackgroundDrawable(new ColorDrawable(GlobalConfig.getInstance().getPageBackground()));
+        menuPop.setElevation(100);
 
         menuPop.setOutsideTouchable(true);
 
-        tvContent = (TextView) view.findViewById(R.id.content);
-        tvProgress = (TextView) view.findViewById(R.id.progress);
-        tvFont = (TextView) view.findViewById(R.id.font);
-        tvBrightness = (TextView) view.findViewById(R.id.brightness);
+        mIbContent = (ImageButton) view.findViewById(R.id.content);
+        mIbProgress = (ImageButton) view.findViewById(R.id.progress);
+        mIbFont = (ImageButton) view.findViewById(R.id.font);
+        mIbBrightness = (ImageButton) view.findViewById(R.id.brightness);
 
+        mIbContent.setOnClickListener(this);
+        mIbProgress.setOnClickListener(this);
+        mIbBrightness.setOnClickListener(this);
 
-        tvContent.setOnClickListener(this);
-
-        tvBrightness.setOnClickListener(this);
-
-        tvFont.setOnClickListener(this);
+        mIbFont.setOnClickListener(this);
     }
 
     @Override
@@ -437,6 +441,9 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
                     mSourceChangeDialog.show();
                 }
                 //TODO: 更新
+                break;
+            case R.id.progress:
+                Toast.makeText(this, R.string.about_tips, Toast.LENGTH_SHORT).show();
                 break;
             default:
         }

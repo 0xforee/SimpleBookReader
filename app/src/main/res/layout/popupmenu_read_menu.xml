@@ -2,34 +2,32 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="horizontal">
 
-
-    <LinearLayout
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_height="56dp"
         android:orientation="horizontal">
 
-        <TextView
+        <ImageButton
             android:id="@+id/content"
-            style="@style/ReadPopupMenuItemTextView"
-            android:drawableTop="@mipmap/ic_catalog" />
+            style="@style/ReadPopupMenuItemImageButton"
+            android:src="@mipmap/ic_catalog" />
 
-        <TextView
+        <ImageButton
             android:id="@+id/progress"
-            style="@style/ReadPopupMenuItemTextView"
-            android:drawableTop="@mipmap/ic_progress" />
+            style="@style/ReadPopupMenuItemImageButton"
+            android:src="@mipmap/ic_progress" />
 
-        <TextView
+        <ImageButton
             android:id="@+id/font"
-            style="@style/ReadPopupMenuItemTextView"
-            android:drawableTop="@mipmap/ic_textsize" />
+            style="@style/ReadPopupMenuItemImageButton"
+            android:src="@mipmap/ic_textsize" />
 
-        <TextView
+        <ImageButton
             android:id="@+id/brightness"
-            style="@style/ReadPopupMenuItemTextView"
-            android:drawableTop="@mipmap/ic_brightness" />
+            style="@style/ReadPopupMenuItemImageButton"
+            android:src="@mipmap/ic_brightness" />
 
     </LinearLayout>
 </LinearLayout>

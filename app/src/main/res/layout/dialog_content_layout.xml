@@ -4,6 +4,7 @@
     android:id="@+id/rv_item_list"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:divider="@color/md_grey_600"
     android:fastScrollEnabled="true"
     android:scrollbarThumbVertical="@color/md_grey_800"
     android:scrollbars="vertical" />
