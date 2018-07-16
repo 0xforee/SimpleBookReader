@@ -262,6 +262,14 @@ public class ZhuishuWebParser extends AbsWebParser {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        //交换第一个和第二个书源（zhuishuvip为第一个，不可用）
+        if(!sourceList.isEmpty() && sourceList.size() > 1){
+            Source tmp = sourceList.get(0);
+            sourceList.set(0, sourceList.get(1));
+            sourceList.set(1, tmp);
+        }
+
         return sourceList;
     }
 
@@ -269,7 +277,7 @@ public class ZhuishuWebParser extends AbsWebParser {
         //根据book_id获取书源，后续章节列表需要从某个书源获取
 
         List<Source> sourceList = getBookSource(bookId);
-        String sourceId = sourceList.get(sourceList.size() > 1 ? 1 : 0).getSourceId();
+        String sourceId = sourceList.get(0).getSourceId();
         return sourceId;
     }
 }
