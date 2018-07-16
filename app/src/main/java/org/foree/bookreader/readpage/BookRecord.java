@@ -10,6 +10,7 @@ import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.book.Source;
 import org.foree.bookreader.bean.dao.BReaderContract;
 import org.foree.bookreader.bean.dao.BReaderProvider;
+import org.foree.bookreader.bean.dao.BookDao;
 import org.foree.bookreader.bean.event.BookLoadCompleteEvent;
 import org.foree.bookreader.parser.WebParser;
 import org.foree.bookreader.utils.DateUtils;
@@ -61,12 +62,14 @@ public class BookRecord {
      */
     private boolean mOnline = false;
     private String mBookUrl;
+    private BookDao mBookDao;
 
     public BookRecord(Context context) {
         mBook = new Book();
         mChapters = new ArrayList<>();
         mIndexMap = new HashMap<>();
         mContext = context;
+        mBookDao = new BookDao(context);
     }
 
     /**
@@ -197,6 +200,15 @@ public class BookRecord {
         return mSourceList;
     }
 
+    public int getSourceIndex(){
+        for (int i = 0; i < getSourceList().size(); i++) {
+            if(mBook.getContentUrl().equals(getSourceList().get(i).getSourceId())){
+                Log.d(TAG, "[foree] getSourceIndex: i = " + i);
+                return i;
+            }
+        }
+        return 0;
+    }
     /**
      * 获取指定chapter url对应偏移量的章节url
      *
@@ -297,6 +309,7 @@ public class BookRecord {
             book.setRecentChapterUrl(cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_RECENT_CHAPTER_URL)));
             book.setPageIndex(cursor.getInt(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_PAGE_INDEX)));
             book.setBookCoverUrl(cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_COVER_URL)));
+            book.setContentUrl(cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_CONTENT_URL)));
         }
         if (cursor != null) cursor.close();
 
@@ -332,4 +345,38 @@ public class BookRecord {
 
         );
     }
+
+    public void changeSourceId(final String sourceId){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // firstly, update db
+                mBook.setContentUrl(sourceId);
+                ContentValues contentValues = new ContentValues();
+                contentValues.put(BReaderContract.Books.COLUMN_NAME_CONTENT_URL, sourceId);
+                mContext.getContentResolver().update(
+                        BReaderProvider.CONTENT_URI_BOOKS,
+                        contentValues,
+                        BReaderContract.Books.COLUMN_NAME_BOOK_URL + "=?",
+                        new String[]{mBookUrl}
+                );
+                Log.d(TAG, "[foree] run: update content url = " + sourceId);
+                // secondly, clean chapters
+                mContext.getContentResolver().delete(
+                        BReaderProvider.CONTENT_URI_CHAPTERS,
+                        BReaderContract.Books.COLUMN_NAME_BOOK_URL + "=?",
+                        new String[]{mBookUrl}
+                );
+                //thirdly, reload from network and insert db
+                mBook.setContentUrl(sourceId);
+                mBookDao.insertChapters(initChapterListOnline(mBookUrl));
+
+                // finally, restore
+                restoreBookRecord(mBookUrl, mOnline);
+                mBook.setRecentChapterUrl(mChapters.get(0).getChapterUrl());
+            }
+        }).start();
+
+    }
+
 }

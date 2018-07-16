@@ -37,6 +37,7 @@ import org.foree.bookreader.common.FontDialog;
 import org.foree.bookreader.pagination.PaginationArgs;
 import org.foree.bookreader.pagination.PaginationLoader;
 import org.foree.bookreader.settings.SettingsActivity;
+import org.foree.bookreader.utils.DateUtils;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -69,7 +70,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
     private View rootView;
     private ListView chapterTitleListView, mSourceChangeListView;
     private CustomChapterListAdapter contentAdapter;
-    private SimpleAdapter mSourceChangeAdapter;
+    private CustomSourceListAdapter mSourceChangeAdapter;
     /**
      * for menu pop image button
       */
@@ -324,15 +325,15 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
         List<Map<String, ?>> sourceList = new ArrayList<>();
         for (int i = 0; i < mBookRecord.getSourceList().size(); i++) {
             Source source = mBookRecord.getSourceList().get(i);
-            Map<String, String> map = new HashMap<>();
-            map.put("updated", source.getUpdated().toString());
+            Map<String, String> map = new HashMap<>(3);
+            map.put("updated", getString(R.string.source_change_updated) + DateUtils.fromatDateToString(source.getUpdated()));
             map.put("title", source.getLastChapter());
-            map.put("host", source.getHost());
+            map.put("host", getString(R.string.source_change_host) + source.getHost());
 
             sourceList.add(map);
         }
 
-        mSourceChangeAdapter = new SimpleAdapter(this, sourceList, R.layout.lv_source_change_item_holder,
+        mSourceChangeAdapter = new CustomSourceListAdapter(this, sourceList, R.layout.lv_source_change_item_holder,
                 new String[]{"updated", "title", "host"}, new int[]{R.id.tv_updated, R.id.tv_last_chapter, R.id.tv_source_host});
 
 
@@ -344,7 +345,11 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 mSourceChangeDialog.dismiss();
-                //TODO:点击切换书源
+                mSourceChangeAdapter.setSelectedPosition(position);
+                mSourceChangeAdapter.notifyDataSetChanged();
+                mHandler.sendEmptyMessage(MSG_LOADING);
+                // change sourceId (contentUrl)
+                mBookRecord.changeSourceId(mBookRecord.getSourceList().get(position).getSourceId());
             }
         });
     }
@@ -440,7 +445,8 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
                 } else {
                     mSourceChangeDialog.show();
                 }
-                //TODO: 更新
+                mSourceChangeAdapter.setSelectedPosition(mBookRecord.getSourceIndex());
+                mSourceChangeAdapter.notifyDataSetChanged();
                 break;
             case R.id.progress:
                 Toast.makeText(this, R.string.about_tips, Toast.LENGTH_SHORT).show();

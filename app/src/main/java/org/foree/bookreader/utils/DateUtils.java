@@ -40,16 +40,16 @@ public class DateUtils {
         return false;
     }
 
-    public static SimpleDateFormat getUpdateTimeFormat(){
+    public static SimpleDateFormat getUpdateTimeFormat() {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ENGLISH);
     }
 
-    public static String getCurrentTime(){
+    public static String getCurrentTime() {
         SimpleDateFormat simpleFormat = getUpdateTimeFormat();
         return simpleFormat.format(new Date());
     }
 
-    public static Date formateJSDate(String time){
+    public static Date formatJSDate(String time) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
         try {
             Date date = simpleDateFormat.parse(time);
@@ -60,5 +60,12 @@ public class DateUtils {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static String fromatDateToString(Date date) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.CHINA);
+        String dateString = simpleDateFormat.format(date);
+        Log.d(TAG, date.toString());
+        return dateString;
     }
 }

@@ -102,14 +102,14 @@ public class ZhuishuWebParser extends AbsWebParser {
                 String cate = bookInfoObject.getString("majorCate");
                 String description = bookInfoObject.getString("longIntro");
                 String updateTime = bookInfoObject.getString("updated");
-                String contentsUrl = getBookSourceId(bookId);
+                String contentUrl = getDefaultSourceId(bookId);
 
                 Log.d(TAG, bookUrl + ", " + bookName + ", " + author + ", " + coverUrl + ", " + cate + ", " +
-                        description + ", " + updateTime + ", " + contentsUrl);
+                        description + ", " + updateTime + ", " + contentUrl);
 
                 book.setDescription(description);
                 book.setUpdateTime(updateTime);
-                book.setContentUrl(contentsUrl);
+                book.setContentUrl(contentUrl);
                 book.setBookName(bookName);
                 book.setBookUrl(bookUrl);
                 book.setAuthor(author);
@@ -133,8 +133,10 @@ public class ZhuishuWebParser extends AbsWebParser {
         Map<String, String> data = new HashMap<>();
         data.put("view", "chapters");
 
+        Log.d(TAG, "getContents() called with: bookId = [" + bookId + "], contentsUrl = [" + contentsUrl + "]");
+
         try {
-            Document document = Jsoup.connect(contentsApi + getBookSourceId(bookId)).data(data).ignoreContentType(true).get();
+            Document document = Jsoup.connect(contentsApi + contentsUrl).data(data).ignoreContentType(true).get();
             if (document != null) {
                 JSONObject jsonObject = new JSONObject(document.body().text());
 
@@ -163,6 +165,7 @@ public class ZhuishuWebParser extends AbsWebParser {
             e.printStackTrace();
         } catch (JSONException e) {
             e.printStackTrace();
+            Log.e(TAG, "get url = " + contentsApi + contentsUrl + " error");
         }
         Log.d(TAG, "[foree] getContents finish!");
         return chapterList;
@@ -254,7 +257,7 @@ public class ZhuishuWebParser extends AbsWebParser {
                     source.setSourceLink(sourceObject.getString("link"));
                     source.setSourceName(sourceObject.getString("name"));
                     source.setStarting(sourceObject.getBoolean("starting"));
-                    source.setUpdated(DateUtils.formateJSDate(sourceObject.getString("updated")));
+                    source.setUpdated(DateUtils.formatJSDate(sourceObject.getString("updated")));
 
                     sourceList.add(source);
 
@@ -279,7 +282,12 @@ public class ZhuishuWebParser extends AbsWebParser {
         return sourceList;
     }
 
-    private String getBookSourceId(String bookId) {
+    /**
+     * source对应的就是章节列表，sourceId = contentUrl
+     * @param bookId 书籍id
+     * @return 默认的sourceId
+     */
+    private String getDefaultSourceId(String bookId) {
         //根据book_id获取书源，后续章节列表需要从某个书源获取
 
         List<Source> sourceList = getBookSource(bookId);

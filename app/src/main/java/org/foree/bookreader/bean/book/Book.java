@@ -23,7 +23,9 @@ public class Book {
      */
     private int pageIndex;
 
-    // set content url
+    /**
+     * contentUrl = sourceId默认为第一个（因为zhuishuapi是第一个，默认不可用，所以第一和第二交换）
+      */
     private String contentUrl;
 
     private String bookCoverUrl;

@@ -89,4 +89,7 @@
         <item>7</item>
     </string-array>
 
+    <string name="source_change_updated">最近更新：</string>
+    <string name="source_change_host">来源：</string>
+
 </resources>
