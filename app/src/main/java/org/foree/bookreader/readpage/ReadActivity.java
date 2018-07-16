@@ -304,7 +304,6 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
         contentAdapter = new CustomChapterListAdapter(this);
         contentAdapter.updateData(mBookRecord.getChapters());
         chapterTitleListView.setAdapter(contentAdapter);
-        contentAdapter.setSelectedPosition(mBookRecord.getChapterIndex(mBookRecord.getCurrentUrl()));
 
         contentDialog.show();
 
@@ -414,6 +413,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
                 } else {
                     contentDialog.show();
                 }
+                contentAdapter.setSelectedPosition(mBookRecord.getChapterIndex(mBookRecord.getCurrentUrl()));
                 chapterTitleListView.setSelection(mBookRecord.getCurrentChapterPos() - 2);
                 contentAdapter.notifyDataSetChanged();
                 break;

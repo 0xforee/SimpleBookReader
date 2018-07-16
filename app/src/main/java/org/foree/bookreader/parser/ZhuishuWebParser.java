@@ -33,7 +33,9 @@ public class ZhuishuWebParser extends AbsWebParser {
         List<Book> bookList = new ArrayList<>();
         String encodeKeyword = URLEncoder.encode(keyword);
 
-        Log.d(TAG, "encodeKeyword = " + encodeKeyword);
+        if (DEBUG) {
+            Log.d(TAG, "encodeKeyword = " + encodeKeyword);
+        }
 
         Map<String, String> data = new HashMap<>();
         data.put("query", encodeKeyword);
@@ -46,7 +48,9 @@ public class ZhuishuWebParser extends AbsWebParser {
 
             if (document != null) {
                 String json = document.body().text().trim();
-                Log.d(TAG, json);
+                if (DEBUG) {
+                    Log.d(TAG, json);
+                }
 
                 JSONObject topObject = new JSONObject(json);
 
@@ -59,7 +63,9 @@ public class ZhuishuWebParser extends AbsWebParser {
                     String bookCoverUrl = mImageApi + bookObject.getString("cover");
                     String author = bookObject.getString("author");
                     String category = bookObject.getString("cat");
-                    Log.d(TAG, bookName + ", " + bookUrl + ", " + bookCoverUrl);
+                    if (DEBUG) {
+                        Log.d(TAG, bookName + ", " + bookUrl + ", " + bookCoverUrl);
+                    }
                     book.setBookName(bookName);
                     book.setAuthor(author);
                     book.setCategory(category);
@@ -141,7 +147,7 @@ public class ZhuishuWebParser extends AbsWebParser {
                     String chapterTitle = chapterObject.getString("title");
                     int chapterIndex = i;
 
-                    if(DEBUG) {
+                    if (DEBUG) {
                         Log.d(TAG, chapterTitle + ", " + chatperUrl + ", " + chapterIndex);
                     }
 
@@ -252,7 +258,7 @@ public class ZhuishuWebParser extends AbsWebParser {
 
                     sourceList.add(source);
 
-                    if(DEBUG) {
+                    if (DEBUG) {
                         Log.d(TAG, source.getHost() + ", " + source.getSourceName() + ", " + source.getLastChapter() + ", " + source.getUpdated());
                     }
                 }
