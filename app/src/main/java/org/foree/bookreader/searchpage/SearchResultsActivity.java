@@ -184,6 +184,8 @@ public class SearchResultsActivity extends BaseActivity {
             mEtSearchText.setText(null);
             mEtSearchText.requestFocus();
             //showKeyboard();
+            bookList.clear();
+            mAdapter.notifyDataSetChanged();
             return true;
         }
         return super.onOptionsItemSelected(item);
