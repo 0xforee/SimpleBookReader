@@ -3,6 +3,9 @@ package org.foree.bookreader.readpage;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Process;
 import android.util.Log;
 
 import org.foree.bookreader.bean.book.Book;
@@ -43,11 +46,12 @@ public class BookRecord {
     private List<Source> mSourceList;
 
     private Context mContext;
+    private Handler mHandler;
 
     /**
      * 存储mChapters的url对应的index，加快索引速度
      */
-    private Map<String, Integer> mIndexMap;
+    private Map<String, Integer> mIndexMap = new HashMap<>();
 
     /**
      * 初始化是否完成，指第一次页码切换是否完成
@@ -63,13 +67,15 @@ public class BookRecord {
     private boolean mOnline = false;
     private String mBookUrl;
     private BookDao mBookDao;
+    private String mOldContentUrl;
 
     public BookRecord(Context context) {
-        mBook = new Book();
-        mChapters = new ArrayList<>();
-        mIndexMap = new HashMap<>();
-        mContext = context;
+        mContext = context.getApplicationContext();
         mBookDao = new BookDao(context);
+
+        HandlerThread workThread = new HandlerThread("workThread", Process.THREAD_PRIORITY_BACKGROUND);
+        workThread.start();
+        mHandler = new Handler(workThread.getLooper());
     }
 
     /**
@@ -81,30 +87,39 @@ public class BookRecord {
         mOnline = onLine;
         mBookUrl = bookUrl;
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                mBook = mOnline ? initBookInfoOnline(mBookUrl) : initBookInfoLocal(mBookUrl);
-                mChapters = mOnline ? initChapterListOnline(mBookUrl) : initChapterListLocal(mBookUrl);
-                mSourceList = initSourceList(mBookUrl);
-                if (onLine) {
-                    mBook.setRecentChapterUrl(mChapters.get(0).getChapterUrl());
-                }
-
-                initChapterIndexMap();
-
-                // send compelete message
-                EventBus.getDefault().post(new BookLoadCompleteEvent(mBook != null && mChapters != null));
-            }
-        }).start();
-
-        // 打开书的时候就更新书籍的修改时间
-        mBook.setModifiedTime(DateUtils.getCurrentTime());
-
+        mHandler.post(mRestoreBookRunnable);
     }
 
-    private List<Source> initSourceList(String mBookUrl) {
-        return WebParser.getInstance().getBookSource(mBookUrl);
+    /**
+     * 恢复书籍状态
+     */
+    private Runnable mRestoreBookRunnable = new Runnable() {
+        @Override
+        public void run() {
+            initBookInfo();
+            initChapters(false);
+            initSourceList();
+            if (mOnline) {
+                mBook.setRecentChapterUrl(mChapters.get(0).getChapterUrl());
+            }
+
+            // 打开书的时候就更新书籍的修改时间
+            mBook.setModifiedTime(DateUtils.getCurrentTime());
+
+            mOldContentUrl = mBook.getContentUrl();
+
+            sendCompleteMessage();
+
+        }
+    };
+
+    private void sendCompleteMessage() {
+        // send complete message
+        EventBus.getDefault().post(new BookLoadCompleteEvent(mBook != null && mChapters != null));
+    }
+
+    private void initSourceList() {
+        mSourceList = WebParser.getInstance().getBookSource(mBookUrl);
     }
 
     /**
@@ -115,12 +130,13 @@ public class BookRecord {
      * TODO:网络模式进入不做处理，后续根据是否加入书架这一行为来处理
      */
     public void saveBookRecord() {
-        if (mOnline) {
-            return;
-        }
         completed = false;
 
-        saveToDatabase(mBook);
+        if(mOnline){
+            return;
+        }
+
+        saveToDatabase();
     }
 
     public boolean isOnline() {
@@ -227,12 +243,23 @@ public class BookRecord {
         return null;
     }
 
-    public String getOffsetChapter(int offset) {
+    public String getCurrentOffsetChapter(int offset) {
         return getOffsetChapter(offset, getCurrentUrl());
     }
 
-    private List<Chapter> initChapterListLocal(String bookUrl) {
-        Log.d(TAG, "get chapterList from db, bookUrl = " + bookUrl);
+    private void initChapters(boolean force){
+        mChapters = mOnline || force ? initChapterListOnline() : initChapterListLocal();
+
+        if(mChapters == null){
+            mChapters = new ArrayList<>();
+        }
+
+        // update chapters index
+        initChapterIndexMap(mChapters);
+    }
+
+    private List<Chapter> initChapterListLocal() {
+        Log.d(TAG, "get chapterList from db, mBookUrl = " + mBookUrl);
 
         List<Chapter> chapterList = new ArrayList<>();
         String selection = BReaderContract.Chapters.COLUMN_NAME_BOOK_URL + "=?";
@@ -243,7 +270,7 @@ public class BookRecord {
                 BReaderProvider.CONTENT_URI_CHAPTERS,
                 null,
                 selection,
-                new String[]{bookUrl},
+                new String[]{mBookUrl},
                 orderBy
         );
 
@@ -253,7 +280,7 @@ public class BookRecord {
                 String url = cursor.getString(cursor.getColumnIndex(BReaderContract.Chapters.COLUMN_NAME_CHAPTER_URL));
                 boolean offline = cursor.getInt(cursor.getColumnIndex(BReaderContract.Chapters.COLUMN_NAME_CACHED)) == 1;
                 int chapter_id = cursor.getInt(cursor.getColumnIndex(BReaderContract.Chapters.COLUMN_NAME_CHAPTER_ID));
-                Chapter chapter = new Chapter(title, url, bookUrl, chapter_id, offline);
+                Chapter chapter = new Chapter(title, url, mBookUrl, chapter_id, offline);
                 chapterList.add(chapter);
 
             }
@@ -264,29 +291,33 @@ public class BookRecord {
 
     }
 
-    private void initChapterIndexMap() {
-        for (int i = 0; i < mChapters.size(); i++) {
-            // 使用hashMap加快索引位置
-            mIndexMap.put(mChapters.get(i).getChapterUrl(), i);
-        }
-    }
-
     /**
      * 从网络获取章节信息
      *
      * @param bookUrl book_id or book_url
      * @return 章节列表
      */
-    private List<Chapter> initChapterListOnline(String bookUrl) {
-        List<Chapter> chapters;
-
-        chapters = WebParser.getInstance().getContents(bookUrl, mBook.getContentUrl());
-
-        return chapters;
+    private List<Chapter> initChapterListOnline() {
+        return WebParser.getInstance().getContents(mBookUrl, mBook.getContentUrl());
     }
 
-    private Book initBookInfoLocal(String bookUrl) {
-        Log.d(TAG, "get book info from db, mBookUrl = " + bookUrl);
+    private void initChapterIndexMap(List<Chapter> chapters) {
+        for (int i = 0; i < chapters.size(); i++) {
+            // 使用hashMap加快索引位置
+            mIndexMap.put(chapters.get(i).getChapterUrl(), i);
+        }
+    }
+
+    private void initBookInfo(){
+        mBook = mOnline ? initBookInfoOnline() : initBookInfoLocal();
+
+        if (mBook == null){
+            mBook = new Book();
+        }
+    }
+
+    private Book initBookInfoLocal() {
+        Log.d(TAG, "get book info from db, mBookUrl = " + mBookUrl);
 
         Book book = new Book();
         Cursor cursor;
@@ -295,14 +326,14 @@ public class BookRecord {
                 BReaderProvider.CONTENT_URI_BOOKS,
                 null,
                 selection,
-                new String[]{bookUrl},
+                new String[]{mBookUrl},
                 null
         );
         if (cursor != null && cursor.getCount() != 0 && cursor.moveToFirst()) {
             book.setBookName(cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_BOOK_NAME)));
             book.setUpdateTime(cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_UPDATE_TIME)));
             book.setModifiedTime(cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_MODIFIED_TIME)));
-            book.setBookUrl(bookUrl);
+            book.setBookUrl(mBookUrl);
             book.setCategory(cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_CATEGORY)));
             book.setAuthor(cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_AUTHOR)));
             book.setDescription(cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_DESCRIPTION)));
@@ -320,63 +351,56 @@ public class BookRecord {
 
     /**
      * 通过网络初始化书籍信息
-     *
-     * @param bookUrl book_id or book_url
      */
-    private Book initBookInfoOnline(String bookUrl) {
-        Book book = WebParser.getInstance().getBookInfo(bookUrl);
+    private Book initBookInfoOnline() {
+        Book book = WebParser.getInstance().getBookInfo(mBookUrl);
         book.setPageIndex(0);
         return book;
     }
 
-    private void saveToDatabase(Book book) {
+    private void saveToDatabase() {
+        // if content url changed
+        boolean change = !mOnline && !mOldContentUrl.equals(mBook.getContentUrl());
+
+        // update bookInfo
         ContentValues contentValues = new ContentValues();
         String selection = BReaderContract.Books.COLUMN_NAME_BOOK_URL + "=?";
         // 内容不重复
-        contentValues.put(BReaderContract.Books.COLUMN_NAME_MODIFIED_TIME, book.getModifiedTime());
-        contentValues.put(BReaderContract.Books.COLUMN_NAME_RECENT_CHAPTER_URL, book.getRecentChapterUrl());
-        contentValues.put(BReaderContract.Books.COLUMN_NAME_PAGE_INDEX, book.getPageIndex());
+        contentValues.put(BReaderContract.Books.COLUMN_NAME_MODIFIED_TIME, mBook.getModifiedTime());
+        contentValues.put(BReaderContract.Books.COLUMN_NAME_RECENT_CHAPTER_URL, mBook.getRecentChapterUrl());
+        contentValues.put(BReaderContract.Books.COLUMN_NAME_PAGE_INDEX, mBook.getPageIndex());
+        contentValues.put(BReaderContract.Books.COLUMN_NAME_CONTENT_URL, mBook.getContentUrl());
 
         mContext.getContentResolver().update(
                 BReaderProvider.CONTENT_URI_BOOKS,
                 contentValues,
                 selection,
-                new String[]{book.getBookUrl()}
+                new String[]{mBook.getBookUrl()}
 
         );
+
+        if (change){
+            // clean old chapters, and update new
+            mContext.getContentResolver().delete(
+                    BReaderProvider.CONTENT_URI_CHAPTERS,
+                    BReaderContract.Books.COLUMN_NAME_BOOK_URL + "=?",
+                    new String[]{mBookUrl}
+            );
+            //thirdly, reload from network and insert db
+            mBookDao.insertChapters(mChapters);
+        }
+
     }
 
     public void changeSourceId(final String sourceId){
-        new Thread(new Runnable() {
+        mHandler.post(new Runnable() {
             @Override
             public void run() {
-                // firstly, update db
                 mBook.setContentUrl(sourceId);
-                ContentValues contentValues = new ContentValues();
-                contentValues.put(BReaderContract.Books.COLUMN_NAME_CONTENT_URL, sourceId);
-                mContext.getContentResolver().update(
-                        BReaderProvider.CONTENT_URI_BOOKS,
-                        contentValues,
-                        BReaderContract.Books.COLUMN_NAME_BOOK_URL + "=?",
-                        new String[]{mBookUrl}
-                );
-                Log.d(TAG, "[foree] run: update content url = " + sourceId);
-                // secondly, clean chapters
-                mContext.getContentResolver().delete(
-                        BReaderProvider.CONTENT_URI_CHAPTERS,
-                        BReaderContract.Books.COLUMN_NAME_BOOK_URL + "=?",
-                        new String[]{mBookUrl}
-                );
-                //thirdly, reload from network and insert db
-                mBook.setContentUrl(sourceId);
-                mBookDao.insertChapters(initChapterListOnline(mBookUrl));
-
-                // finally, restore
-                restoreBookRecord(mBookUrl, mOnline);
-                mBook.setRecentChapterUrl(mChapters.get(0).getChapterUrl());
+                initChapters(true);
+                sendCompleteMessage();
             }
-        }).start();
-
+        });
     }
 
 }

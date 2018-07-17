@@ -22,7 +22,6 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupWindow;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -98,6 +97,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
                 case MSG_SUCCESS:
                     mBtnLoading.setVisibility(View.GONE);
                     break;
+                default:
 
             }
         }
@@ -283,12 +283,12 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
 
     @Override
     public void onPreChapterClick() {
-        switchChapter(mBookRecord.getOffsetChapter(-1), true, false);
+        switchChapter(mBookRecord.getCurrentOffsetChapter(-1), true, false);
     }
 
     @Override
     public void onNextChapterClick() {
-        switchChapter(mBookRecord.getOffsetChapter(1), false, false);
+        switchChapter(mBookRecord.getCurrentOffsetChapter(1), false, false);
     }
 
     private void showFontDialog() {
@@ -418,6 +418,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
                 } else {
                     contentDialog.show();
                 }
+                contentAdapter.updateData(mBookRecord.getChapters());
                 contentAdapter.setSelectedPosition(mBookRecord.getChapterIndex(mBookRecord.getCurrentUrl()));
                 chapterTitleListView.setSelection(mBookRecord.getCurrentChapterPos() - 2);
                 contentAdapter.notifyDataSetChanged();
