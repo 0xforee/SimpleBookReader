@@ -150,7 +150,7 @@ public class BReaderProvider extends ContentProvider {
      * 数据库创建升级的帮助类
      */
     protected static final class BookDataBaseHelper extends SQLiteOpenHelper {
-        private static final int DB_VERSION = 2;
+        private static final int DB_VERSION = 3;
         private static final String DB_NAME = "bookReader.db";
 
         BookDataBaseHelper(Context context) {
@@ -178,9 +178,37 @@ public class BReaderProvider extends ContentProvider {
                 case 2:
                     addModifiedTimeColumn(db);
                     break;
+                case 3:
+                    modifyChapterIdType(db);
+                    break;
                 default:
                     throw new IllegalStateException("Don't known to upgrade to " + version);
             }
+        }
+
+        /**
+         * 去掉chapter表中chapter_id的unique属性
+         * @param db
+         */
+        private void modifyChapterIdType(SQLiteDatabase db){
+            db.execSQL("alter table " + BReaderContract.Chapters.TABLE_NAME +
+                    " rename to temp_table_name");
+
+            db.execSQL("create table " + BReaderContract.Chapters.TABLE_NAME + "(" +
+                    BReaderContract.Chapters._ID + " integer primary key," +
+                    BReaderContract.Chapters.COLUMN_NAME_CHAPTER_URL + " varchar unique," +
+                    BReaderContract.Chapters.COLUMN_NAME_CHAPTER_ID + " integer," +
+                    BReaderContract.Chapters.COLUMN_NAME_BOOK_URL + " varchar," +
+                    BReaderContract.Chapters.COLUMN_NAME_CHAPTER_TITLE + " varchar," +
+                    BReaderContract.Chapters.COLUMN_NAME_CHAPTER_CONTENT + " varchar," +
+                    BReaderContract.Chapters.COLUMN_NAME_CACHED + " integer" +
+                    ")"
+            );
+
+            db.execSQL("insert into " + BReaderContract.Chapters.TABLE_NAME + " select * from temp_table_name");
+
+            db.execSQL("drop table temp_table_name");
+
         }
 
         private void addModifiedTimeColumn(SQLiteDatabase db) {
