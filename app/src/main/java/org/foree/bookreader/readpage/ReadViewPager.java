@@ -18,14 +18,13 @@ import android.view.WindowManager;
 
 public class ReadViewPager extends ViewPager {
     private static final String TAG = ReadViewPager.class.getSimpleName();
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     private int displayWidth;
     private int displayHeight;
 
-    private float startX = 0;
-    private float startY = 0;
-    private boolean scrolled = false;
+    private float mStartX = 0;
+    private float mStartY = 0;
 
     private onPageAreaClickListener onPageAreaClickListener;
 
@@ -43,43 +42,49 @@ public class ReadViewPager extends ViewPager {
         displayWidth = metrics.widthPixels;
     }
 
+    private boolean mPreScrollDisable, mPostScrollDisable;
+
+    public void setPreScrollDisable(boolean state){
+        Log.d(TAG, "[foree] setPreScrollDisable: " + state);
+        mPreScrollDisable = state;
+    }
+
+    public void setPostScrollDisable(boolean state){
+        Log.d(TAG, "[foree] setPostScrollDisable: " + state);
+        mPostScrollDisable = state;
+    }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        super.onTouchEvent(event);
-        switch (event.getAction()) {
+    public boolean onTouchEvent(MotionEvent ev) {
+        switch (ev.getAction()){
             case MotionEvent.ACTION_DOWN:
-                startX = event.getX();
-                startY = event.getY();
-                scrolled = false;
+                mStartX = ev.getX();
+                mStartY = ev.getY();
                 break;
-            case MotionEvent.ACTION_UP:
-                // 点击事件
-                if (startX == event.getX() && startY == event.getY()) {
+            case MotionEvent.ACTION_MOVE:
+                float offset = ev.getX() - mStartX;
+                Log.d(TAG, "[foree] onTouchEvent: offset = " + offset);
+                if (offset < 0){
+                    Log.d(TAG, "[foree] onTouchEvent: 向右滑动");
+                    if(mPostScrollDisable){
+                        return true;
+                    }
+                }else if (offset > 0){
+                    Log.d(TAG, "[foree] onTouchEvent: 向左滑动");
+                    if(mPreScrollDisable){
+                        return true;
+                    }
+                }else{
 
-                    if (!isMenuArea(event)) {
-                        if (isPrePageArea(event)) {
-                            if (getCurrentItem() > 0) {
-                                if (DEBUG) Log.d(TAG, "上一页");
-                                setCurrentItem(getCurrentItem() - 1, false);
-                            } else {
-                                if (DEBUG) Log.d(TAG, "上一章");
-                                if (onPageAreaClickListener != null) {
-                                    onPageAreaClickListener.onPreChapterClick();
-                                }
-                            }
+                    // menu click
+                    if (!isMenuArea(ev)) {
+                        if (isPrePageArea(ev)) {
+                            if (DEBUG) Log.d(TAG, "上一页");
+                            setCurrentItem(getCurrentItem() - 1, false);
                         } else {
-                            if (getAdapter() != null)
-                                if (getCurrentItem() < getAdapter().getCount() - 1) {
-                                    if (DEBUG) Log.d(TAG, "下一页");
-                                    setCurrentItem(getCurrentItem() + 1, false);
-                                } else {
-                                    // 切换下一章
-                                    if (DEBUG) Log.d(TAG, "下一章");
-                                    if (onPageAreaClickListener != null) {
-                                        onPageAreaClickListener.onNextChapterClick();
-                                    }
-                                }
+                            if (DEBUG) Log.d(TAG, "下一页");
+                            setCurrentItem(getCurrentItem() + 1, false);
+
                         }
                     } else {
                         if (DEBUG) Log.d(TAG, "呼出菜单");
@@ -88,31 +93,14 @@ public class ReadViewPager extends ViewPager {
                         }
                     }
                 }
-
-
                 break;
-            case MotionEvent.ACTION_MOVE:
-                if (!scrolled) {
-                    if (getCurrentItem() == 0 && startX < event.getX()) {
-                        scrolled = true;
-                        if (onPageAreaClickListener != null) {
-                            onPageAreaClickListener.onPreChapterClick();
-                        }
-                        if (DEBUG) Log.d(TAG, "滑动上一章");
+            default:
 
-                    } else if (getCurrentItem() == getAdapter().getCount() - 1 && startX > event.getX()) {
-                        scrolled = true;
-                        if (onPageAreaClickListener != null) {
-                            onPageAreaClickListener.onNextChapterClick();
-                        }
-                        if (DEBUG) Log.d(TAG, "滑动下一章");
-                    }
-                }
-                break;
         }
-        if (DEBUG) Log.d(TAG, "x = " + event.getX() + ", y = " + event.getY());
 
-        return true;
+        if (DEBUG) Log.d(TAG, "x = " + ev.getX() + ", y = " + ev.getY());
+
+        return super.onTouchEvent(ev);
     }
 
     @Override
@@ -145,10 +133,6 @@ public class ReadViewPager extends ViewPager {
 
     public interface onPageAreaClickListener {
         void onMediumAreaClick();
-
-        void onPreChapterClick();
-
-        void onNextChapterClick();
     }
 }
 

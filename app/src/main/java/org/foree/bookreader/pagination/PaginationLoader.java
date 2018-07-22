@@ -58,8 +58,6 @@ public class PaginationLoader {
 
     public void loadPagination(final String url) {
         mRequestQueue.add(new ChapterRequest(url, paginationArgs, true));
-
-        smartLoad();
     }
 
     public ChapterCache getChapterCache() {
@@ -69,7 +67,7 @@ public class PaginationLoader {
     /**
      * 获取指定章节的前后偏移章节
      */
-    private void smartLoad() {
+    public void smartLoad() {
         if (mBookRecord != null && mOffset != 0) {
             new Thread() {
                 @Override

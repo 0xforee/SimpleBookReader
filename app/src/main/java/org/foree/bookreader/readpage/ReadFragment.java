@@ -21,11 +21,11 @@ public class ReadFragment extends Fragment implements SharedPreferences.OnShared
     private TextView tvContents, tvTitle, tvTime, tvIndex, tvPageNum, tvSeparator;
     private View rootView;
 
-    public static ReadFragment newInstance(ReadPageDataSet readPageDataSet) {
+    public static ReadFragment newInstance() {
         ReadFragment fragment = new ReadFragment();
-        Bundle args = new Bundle();
-        args.putSerializable(ARG_TITLE, readPageDataSet);
-        fragment.setArguments(args);
+       // Bundle args = new Bundle();
+       // args.putSerializable(ARG_TITLE, readPageDataSet);
+       // fragment.setArguments(args);
         return fragment;
     }
 
@@ -33,19 +33,21 @@ public class ReadFragment extends Fragment implements SharedPreferences.OnShared
 
     }
 
-    private void setData(ReadPageDataSet readPageDataSet) {
-        if (tvContents != null) {
-            tvContents.setText(readPageDataSet.getContents());
-        }
+    public void setData(ReadPageDataSet readPageDataSet) {
+        if( readPageDataSet != null) {
+            if (tvContents != null) {
+                tvContents.setText(readPageDataSet.getContents());
+            }
 
-        if (tvTitle != null) {
-            tvTitle.setText(readPageDataSet.getTitle());
-        }
+            if (tvTitle != null) {
+                tvTitle.setText(readPageDataSet.getTitle());
+            }
 
-        tvTime.setText(getCurrentTime());
-        tvPageNum.setText(readPageDataSet.getPageNum());
-        tvIndex.setText(readPageDataSet.getIndex());
-        tvSeparator.setVisibility(View.VISIBLE);
+            tvTime.setText(getCurrentTime());
+            tvPageNum.setText(readPageDataSet.getPageNum() + "");
+            tvIndex.setText(readPageDataSet.getIndex() + "");
+            tvSeparator.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -58,9 +60,9 @@ public class ReadFragment extends Fragment implements SharedPreferences.OnShared
         tvIndex = (TextView) rootView.findViewById(R.id.tv_index);
         tvPageNum = (TextView) rootView.findViewById(R.id.tv_page_num);
         tvSeparator = (TextView) rootView.findViewById(R.id.tv_separator);
-        if (getArguments() != null) {
-            setData((ReadPageDataSet) getArguments().getSerializable(ARG_TITLE));
-        }
+//        if (getArguments() != null) {
+//            setData((ReadPageDataSet) getArguments().getSerializable(ARG_TITLE));
+//        }
 
         rootView.setBackgroundColor(GlobalConfig.getInstance().getPageBackground());
         return rootView;

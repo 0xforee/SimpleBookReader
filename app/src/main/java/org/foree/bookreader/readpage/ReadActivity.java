@@ -49,7 +49,7 @@ import java.util.Map;
 /**
  * Created by foree on 16-7-21.
  */
-public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAreaClickListener, View.OnClickListener {
+public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAreaClickListener, View.OnClickListener, ReadPageAdapter.Callback {
     private static final String TAG = ReadActivity.class.getSimpleName();
 
     String mBookUrl;
@@ -58,7 +58,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
     private boolean mSlipLeft = false;
     // view pager
     private ReadViewPager mViewPager;
-    private PageAdapter pageAdapter;
+    private ReadPageAdapter mReadPageAdapter;
     private TextView mTvContent;
     private Button mBtnLoading;
 
@@ -141,12 +141,12 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
         mBtnLoading.setOnClickListener(this);
 
         mViewPager = (ReadViewPager) findViewById(R.id.book_pager);
-        pageAdapter = new PageAdapter(getSupportFragmentManager());
+        mReadPageAdapter = new ReadPageAdapter(getSupportFragmentManager(), mViewPager, mBookRecord);
+        mReadPageAdapter.registerCallback(this);
+        mViewPager.setOnPageAreaClickListener(this);
 
         rootView = LayoutInflater.from(this).inflate(R.layout.vp_layout, null);
-        mViewPager.setAdapter(pageAdapter);
-
-        mViewPager.setOnPageAreaClickListener(this);
+        mViewPager.setAdapter(mReadPageAdapter);
 
         initTextView();
 
@@ -210,17 +210,17 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
             if (chapter != null) {
                 mBookRecord.setChapterCached(chapter.getChapterUrl());
 
+                mReadPageAdapter.addChapter(chapter);
+
                 if (pageEvent.isCurrent()) {
 
                     mHandler.sendEmptyMessage(MSG_SUCCESS);
 
-                    pageAdapter.setChapter(chapter);
-
                     // if open book ,load index page, otherwise load normal
                     if (mBookRecord.isInitCompleted()) {
-                        mViewPager.setCurrentItem(isSlipLeft() ? chapter.numberOfPages() - 1 : 0, false);
+                        mReadPageAdapter.initChapter(chapter.getChapterUrl());
                     } else {
-                        mViewPager.setCurrentItem(mBookRecord.getPageIndex(), false);
+                        mReadPageAdapter.initChapter(chapter.getChapterUrl(), mBookRecord.getPageIndex());
                     }
                 }
             } else {
@@ -233,7 +233,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
 
         mHandler.sendEmptyMessage(event.getState() ? MSG_SUCCESS : MSG_FAILED);
         if (event.getState()) {
-            switchChapter(mBookRecord.getCurrentUrl(), false, false);
+            switchChapter(mBookRecord.getCurrentUrl(), true);
         }
     }
 
@@ -281,16 +281,6 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
         menuPop.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
     }
 
-    @Override
-    public void onPreChapterClick() {
-        switchChapter(mBookRecord.getCurrentOffsetChapter(-1), true, false);
-    }
-
-    @Override
-    public void onNextChapterClick() {
-        switchChapter(mBookRecord.getCurrentOffsetChapter(1), false, false);
-    }
-
     private void showFontDialog() {
         fontDialog = new FontDialog.Builder(this);
         fontDialog.showDialog();
@@ -312,7 +302,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 contentDialog.dismiss();
-                switchChapter(mBookRecord.getChapterUrl(position), false, true);
+                switchChapter(mBookRecord.getChapterUrl(position),true);
                 contentAdapter.setSelectedPosition(position);
             }
         });
@@ -383,18 +373,14 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
      * 切换章节
      *
      * @param newChapterUrl 切换的目标章节url(id)
-     * @param slipLeft      是否向左翻页
-     * @param skip          非连续切换章节（从目录跳转）
+     * @param loadCurrent   是否重新load当前章节，重新load当前章节会初始化head指针，会从0开始加载
      */
-    private void switchChapter(String newChapterUrl, boolean slipLeft, boolean skip) {
-        if (newChapterUrl != null) {
-            pageAdapter.setChapter(null);
-            if (skip)
-                mHandler.sendEmptyMessage(MSG_LOADING);
-            mBookRecord.switchChapter(newChapterUrl);
-            mSlipLeft = slipLeft;
+    private void switchChapter(String newChapterUrl, boolean loadCurrent) {
+        mBookRecord.switchChapter(newChapterUrl);
+        if(loadCurrent) {
             PaginationLoader.getInstance().loadPagination(newChapterUrl);
         }
+        PaginationLoader.getInstance().smartLoad();
     }
 
     private boolean isSlipLeft() {
@@ -434,7 +420,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
                 }
                 break;
             case R.id.loading:
-                switchChapter(mBookRecord.getCurrentUrl(), false, true);
+                switchChapter(mBookRecord.getCurrentUrl(), true);
                 break;
             case R.id.brightness:
                 // 切换书源
@@ -454,5 +440,16 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
                 break;
             default:
         }
+    }
+
+    /**
+     * 在章节切换的时候触发，方便监听者做出处理
+     *
+     * @param newChapterUrl
+     */
+    @Override
+    public void onChapterSwitched(String newChapterUrl) {
+        switchChapter(newChapterUrl, false);
+
     }
 }

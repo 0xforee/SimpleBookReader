@@ -12,12 +12,18 @@ public class ReadPageDataSet implements Serializable {
     private String contents;
     private int pageNum;
     private int index;
+    private String url;
 
-    public ReadPageDataSet(String title, String contents, int pageNum, int index) {
+    public ReadPageDataSet(String url, String title, String contents, int pageNum, int index) {
+        this.url = url;
         this.title = title;
         this.contents = contents;
         this.pageNum = pageNum;
         this.index = index;
+    }
+
+    public String getUrl() {
+        return this.url;
     }
 
     public String getTitle() {
@@ -28,11 +34,11 @@ public class ReadPageDataSet implements Serializable {
         return contents;
     }
 
-    public String getPageNum() {
-        return pageNum + "";
+    public int getPageNum() {
+        return pageNum;
     }
 
-    public String getIndex() {
-        return index + "";
+    public int getIndex() {
+        return index;
     }
 }

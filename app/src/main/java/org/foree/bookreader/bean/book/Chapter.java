@@ -97,4 +97,15 @@ public class Chapter implements Serializable {
     public void setOffline(boolean offline) {
         this.offline = offline;
     }
+
+    @Override
+    public String toString() {
+        return "Chapter{" +
+                "chapterTitle='" + chapterTitle + '\'' +
+                ", chapterUrl='" + chapterUrl + '\'' +
+                ", bookUrl='" + bookUrl + '\'' +
+                ", chapterIndex=" + chapterIndex +
+                ", offline=" + offline +
+                '}';
+    }
 }
