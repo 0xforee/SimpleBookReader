@@ -25,6 +25,7 @@ public class ReadViewPager extends ViewPager {
 
     private float mStartX = 0;
     private float mStartY = 0;
+    private boolean mClick;
 
     private onPageAreaClickListener onPageAreaClickListener;
 
@@ -44,46 +45,58 @@ public class ReadViewPager extends ViewPager {
 
     private boolean mPreScrollDisable, mPostScrollDisable;
 
-    public void setPreScrollDisable(boolean state){
+    public void setPreScrollDisable(boolean state) {
         Log.d(TAG, "[foree] setPreScrollDisable: " + state);
         mPreScrollDisable = state;
     }
 
-    public void setPostScrollDisable(boolean state){
+    public void setPostScrollDisable(boolean state) {
         Log.d(TAG, "[foree] setPostScrollDisable: " + state);
         mPostScrollDisable = state;
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
-        switch (ev.getAction()){
+        Log.d(TAG, "[foree] onTouchEvent: mPreScrollDisable = " + mPreScrollDisable + ", mPostScrollDisable = " + mPostScrollDisable);
+        switch (ev.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
                 mStartX = ev.getX();
                 mStartY = ev.getY();
+                mClick = true;
                 break;
             case MotionEvent.ACTION_MOVE:
                 float offset = ev.getX() - mStartX;
-                Log.d(TAG, "[foree] onTouchEvent: offset = " + offset);
-                if (offset < 0){
-                    Log.d(TAG, "[foree] onTouchEvent: 向右滑动");
-                    if(mPostScrollDisable){
+                if (offset < 0) {
+                    mClick = false;
+                    if (DEBUG) Log.d(TAG, "[foree] onTouchEvent: 向右滑动");
+                    if (mPostScrollDisable) {
                         return true;
                     }
-                }else if (offset > 0){
-                    Log.d(TAG, "[foree] onTouchEvent: 向左滑动");
-                    if(mPreScrollDisable){
+                } else if (offset > 0) {
+                    mClick = false;
+                    if (DEBUG) Log.d(TAG, "[foree] onTouchEvent: 向左滑动");
+                    if (mPreScrollDisable) {
                         return true;
                     }
-                }else{
-
+                } else {
+                    if (DEBUG) Log.d(TAG, "[foree] onTouchEvent: Click");
+                    mClick = true;
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+                if (mClick) {
                     // menu click
                     if (!isMenuArea(ev)) {
                         if (isPrePageArea(ev)) {
                             if (DEBUG) Log.d(TAG, "上一页");
-                            setCurrentItem(getCurrentItem() - 1, false);
+                            if (!mPreScrollDisable) {
+                                setCurrentItem(getCurrentItem() - 1, false);
+                            }
                         } else {
                             if (DEBUG) Log.d(TAG, "下一页");
-                            setCurrentItem(getCurrentItem() + 1, false);
+                            if (!mPostScrollDisable) {
+                                setCurrentItem(getCurrentItem() + 1, false);
+                            }
 
                         }
                     } else {
