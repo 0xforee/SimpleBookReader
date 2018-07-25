@@ -41,4 +41,15 @@ public class ReadPageDataSet implements Serializable {
     public int getIndex() {
         return index;
     }
+
+    @Override
+    public String toString() {
+        return "ReadPageDataSet{" +
+                "title='" + title + '\'' +
+                ", contents='" + contents + '\'' +
+                ", pageNum=" + pageNum +
+                ", index=" + index +
+                ", url='" + url + '\'' +
+                '}';
+    }
 }

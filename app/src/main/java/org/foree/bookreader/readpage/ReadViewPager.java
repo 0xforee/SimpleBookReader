@@ -8,6 +8,11 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.WindowManager;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 /**
  * Created by foree on 17-2-8.
  * 自定义ViewPager
@@ -26,15 +31,19 @@ public class ReadViewPager extends ViewPager {
     private float mStartX = 0;
     private float mStartY = 0;
     private boolean mClick;
+    private Context mContext;
+    private AttributeSet mAttrs;
 
     private onPageAreaClickListener onPageAreaClickListener;
 
     public ReadViewPager(Context context) {
-        super(context);
+        this(context, null);
     }
 
     public ReadViewPager(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mContext = context;
+        mAttrs = attrs;
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         DisplayMetrics metrics = new DisplayMetrics();
         wm.getDefaultDisplay().getMetrics(metrics);
@@ -53,6 +62,20 @@ public class ReadViewPager extends ViewPager {
     public void setPostScrollDisable(boolean state) {
         Log.d(TAG, "[foree] setPostScrollDisable: " + state);
         mPostScrollDisable = state;
+    }
+
+    /**
+     * Call this view's OnClickListener, if it is defined.  Performs all normal
+     * actions associated with clicking: reporting accessibility event, playing
+     * a sound, etc.
+     *
+     * @return True there was an assigned OnClickListener that was called, false
+     * otherwise is returned.
+     */
+    @Override
+    public boolean performClick() {
+        Log.d(TAG, "[foree] performClick: ");
+        return super.performClick();
     }
 
     @Override
@@ -90,12 +113,14 @@ public class ReadViewPager extends ViewPager {
                         if (isPrePageArea(ev)) {
                             if (DEBUG) Log.d(TAG, "上一页");
                             if (!mPreScrollDisable) {
-                                setCurrentItem(getCurrentItem() - 1, false);
+//                                setCurrentItem(getCurrentItem() - 1, false);
+                                setPopulate(0);
                             }
                         } else {
                             if (DEBUG) Log.d(TAG, "下一页");
                             if (!mPostScrollDisable) {
-                                setCurrentItem(getCurrentItem() + 1, false);
+//                                setCurrentItem(getCurrentItem() + 1, false);
+                                setPopulate(2);
                             }
 
                         }
@@ -146,6 +171,35 @@ public class ReadViewPager extends ViewPager {
 
     public interface onPageAreaClickListener {
         void onMediumAreaClick();
+    }
+
+    private void setPopulate(int position){
+        try {
+            Class<?> clazz = this.getClass().getSuperclass();
+            Method method = clazz.getDeclaredMethod("setCurrentItemInternal", int.class, boolean.class, boolean.class);
+            Field field = clazz.getDeclaredField("mPopulatePending");
+            field.setAccessible(true);
+            Constructor constructor = clazz.getConstructor(Context.class, AttributeSet.class);
+            Object object = constructor.newInstance(mContext, mAttrs);
+
+            field.setBoolean(object, true);
+            Log.d(TAG, "[foree] setPopulate: " + field.getBoolean(object));
+            method.setAccessible(true);
+            method.invoke(object, position, false, true);
+            Log.d(TAG, "[foree] setPopulate: " + method.toString());
+
+
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }  catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
     }
 }
 
