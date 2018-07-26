@@ -208,6 +208,10 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
         Chapter chapter = pageEvent.getChapter();
 
             if (chapter != null) {
+                // add chapterTile
+                String chapterTile = mBookRecord.getChapter(chapter.getChapterUrl()).getChapterTitle();
+                chapter.setChapterTitle(chapterTile);
+
                 mBookRecord.setChapterCached(chapter.getChapterUrl());
 
                 mReadPageAdapter.addChapter(chapter);

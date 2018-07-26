@@ -192,6 +192,13 @@ public class BookRecord {
         }
     }
 
+    public Chapter getChapter(String url){
+        if(mIndexMap.get(url) != null){
+            return mChapters.get(mIndexMap.get(url));
+        }
+        return null;
+    }
+
     public boolean isChapterCached(int index) {
         return mChapters.get(index).isOffline();
     }
