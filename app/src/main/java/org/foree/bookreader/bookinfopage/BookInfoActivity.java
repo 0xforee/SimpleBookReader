@@ -49,7 +49,7 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
     private static final String TAG = BookInfoActivity.class.getSimpleName();
     private TextView mTvNovelAuthor, mTvNovelDescription, mTvBookLatestChapter;
     private Button mBtAdd, mBtRead;
-    private ListView lv;
+    private ListView mCommentList;
     private String bookUrl;
     private BookDao bookDao;
     private Toolbar toolbar;
@@ -147,7 +147,7 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
         relativeLayout = (RelativeLayout) findViewById(R.id.ll_book_info);
         mBtAdd = (Button) findViewById(R.id.bt_add);
         mBtRead = (Button) findViewById(R.id.bt_read);
-        lv = (ListView) findViewById(R.id.lv_chapter_list);
+        mCommentList = (ListView) findViewById(R.id.lv_comment_list);
         imageView = (ImageView) findViewById(R.id.iv_novel_image);
         mFrameBack = (ImageView) findViewById(R.id.frame_back);
         mFrameBack.setBackgroundColor(getResources().getColor(R.color.primary));

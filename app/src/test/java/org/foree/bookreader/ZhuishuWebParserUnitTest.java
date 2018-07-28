@@ -1,6 +1,7 @@
 package org.foree.bookreader;
 
 import org.foree.bookreader.bean.book.Book;
+import org.foree.bookreader.bean.book.Review;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,14 +34,14 @@ public class ZhuishuWebParserUnitTest {
     }
 
     @Test
-    public void testZhuiShuSearchBook(){
+    public void testZhuiShuSearchBook() {
         String TAG = "testZhuiShuSearchBook";
         String api = "http://api.zhuishushenqi.com/book/fuzzy-search";
         String imageApi = "http://statics.zhuishushenqi.com";
         String keyword = "五行天";
         String encodeKeyword = URLEncoder.encode(keyword);
 
-        Log.d(TAG,"encodeKeyword = " + encodeKeyword);
+        Log.d(TAG, "encodeKeyword = " + encodeKeyword);
 
 
         Map<String, String> data = new HashMap<>();
@@ -52,7 +53,7 @@ public class ZhuishuWebParserUnitTest {
         try {
             document = Jsoup.connect(api).headers(headers).data(data).ignoreContentType(true).get();
 
-            if( document != null){
+            if (document != null) {
                 String json = document.body().text().trim();
                 Log.d(TAG, json);
 
@@ -78,7 +79,7 @@ public class ZhuishuWebParserUnitTest {
         }
     }
 
-    private String getBookSourceId(String bookId){
+    private String getBookSourceId(String bookId) {
         //根据book_id获取书源，后续章节列表需要从某个书源获取
 
         String bookSourceApi = "http://api.zhuishushenqi.com/toc";
@@ -89,7 +90,7 @@ public class ZhuishuWebParserUnitTest {
 
         try {
             Document document = Jsoup.connect(bookSourceApi).data(data).ignoreContentType(true).get();
-            if (document != null){
+            if (document != null) {
                 JSONArray jsonArray = new JSONArray(document.body().text());
                 JSONObject sourceObject = (JSONObject) jsonArray.get(2);
                 String sourceId = sourceObject.getString("_id");
@@ -105,7 +106,7 @@ public class ZhuishuWebParserUnitTest {
     }
 
     @Test
-    public void testZhuiShuBookInfo(){
+    public void testZhuiShuBookInfo() {
         //api.zhuishushenqi.com/book/书籍id(_id)
         // 测试五行天，_id = 563552f7688af08743c2ce91
         String bookId = "563552f7688af08743c2ce91";
@@ -114,7 +115,7 @@ public class ZhuishuWebParserUnitTest {
 
         try {
             Document document = Jsoup.connect(bookInfoApi + bookId).ignoreContentType(true).headers(headers).get();
-            if(document != null){
+            if (document != null) {
 
                 JSONObject bookInfoObject = new JSONObject(document.body().text());
 
@@ -145,7 +146,7 @@ public class ZhuishuWebParserUnitTest {
     }
 
     @Test
-    public void testZhuiShuContents(){
+    public void testZhuiShuContents() {
         // http://api.zhuishushenqi.com/atoc/sourceId?view=chapters
         String contentsApi = "http://api.zhuishushenqi.com/atoc/";
         String sourceId = "57076a32326011945ee8616b";
@@ -155,7 +156,7 @@ public class ZhuishuWebParserUnitTest {
 
         try {
             Document document = Jsoup.connect(contentsApi + sourceId).data(data).ignoreContentType(true).get();
-            if (document != null){
+            if (document != null) {
                 JSONObject jsonObject = new JSONObject(document.body().text());
                 String bookUrl = jsonObject.getString("book");
 
@@ -178,7 +179,7 @@ public class ZhuishuWebParserUnitTest {
     }
 
     @Test
-    public void testZhuShuChapterContent(){
+    public void testZhuShuChapterContent() {
         String contentApi = "http://chapter2.zhuishushenqi.com/chapter/";
         String link = "http://book.my716.com/getBooks.aspx?method=content&bookId=857612&chapterFile=U_857612_201708021011392106_6506_1.txt";
 
@@ -187,7 +188,7 @@ public class ZhuishuWebParserUnitTest {
             Log.d(TAG, "get link = " + contentApi + encodeLink);
 
             Document document = Jsoup.connect(contentApi + encodeLink).ignoreContentType(true).get();
-            if (document != null){
+            if (document != null) {
                 JSONObject jsonObject = new JSONObject(document.body().text());
                 JSONObject chapterObject = jsonObject.getJSONObject("chapter");
                 String content = chapterObject.getString("body");
@@ -202,7 +203,7 @@ public class ZhuishuWebParserUnitTest {
     }
 
     @Test
-    public void testTimeStyle(){
+    public void testTimeStyle() {
         String time = "2018-07-13T01:23:15.261Z";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         try {
@@ -210,6 +211,60 @@ public class ZhuishuWebParserUnitTest {
             Log.d(TAG, date.toString());
 
         } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testReview() {
+        // 测试五行天，_id = 563552f7688af08743c2ce91
+        String short_review_api = "http://api.zhuishushenqi.com/post/short-review";
+        String testBookId = "563552f7688af08743c2ce91";
+        String imageApi = "http://statics.zhuishushenqi.com";
+
+        Map<String, String> data = new HashMap<>();
+        data.put("book", testBookId);
+        data.put("sortType", "newest");
+        data.put("start", "0");
+        data.put("limit", "20");
+
+        try {
+            Document document = Jsoup.connect(short_review_api).data(data).ignoreContentType(true).get();
+            if (document != null) {
+                Log.d(TAG, "[foree] testReview: " + document.body().text());
+
+                JSONObject jsonObject = new JSONObject(document.body().text());
+                JSONArray docs = jsonObject.getJSONArray("docs");
+                // 默认获取10个
+                for (int i = 0; i < docs.length(); i++) {
+                    if(i > 9){
+                        break;
+                    }
+
+                    JSONObject shortReview = docs.getJSONObject(i);
+                    Review review = new Review();
+                    review.setContent(shortReview.getString("content"));
+                    review.setId(shortReview.getString("_id"));
+                    review.setLikeCount(shortReview.getInt("likeCount"));
+                    review.setUpdated(shortReview.getString("updated"));
+                    review.setCreated(shortReview.getString("created"));
+
+                    JSONObject authorObject = shortReview.getJSONObject("author");
+                    Review.Author author = new Review.Author();
+                    author.setAvatar(imageApi + authorObject.getString("avatar"));
+                    author.setId(authorObject.getString("_id"));
+                    author.setLv(authorObject.getInt("lv"));
+                    author.setNickname(authorObject.getString("nickname"));
+
+                    review.setAuthor(author);
+
+                    Log.d(TAG, review.toString());
+                }
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
             e.printStackTrace();
         }
     }

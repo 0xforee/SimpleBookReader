@@ -4,6 +4,7 @@ import android.util.Log;
 
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
+import org.foree.bookreader.bean.book.Review;
 import org.foree.bookreader.bean.book.Source;
 import org.foree.bookreader.utils.DateUtils;
 import org.json.JSONArray;
@@ -295,5 +296,59 @@ public class ZhuishuWebParser extends AbsWebParser {
         List<Source> sourceList = getBookSource(bookId);
         String sourceId = sourceList.get(0).getSourceId();
         return sourceId;
+    }
+
+    @Override
+    public List<Review> getShortReviews(String bookId) {
+        List<Review> reviews = new ArrayList<>();
+        String shortReviewApi = "http://api.zhuishushenqi.com/post/short-review";
+        String imageApi = "http://statics.zhuishushenqi.com";
+
+        Map<String, String> data = new HashMap<>(4);
+        data.put("book", bookId);
+        data.put("sortType", "newest");
+        data.put("start", "0");
+        data.put("limit", "20");
+
+        try {
+            Document document = Jsoup.connect(shortReviewApi).data(data).ignoreContentType(true).get();
+            if (document != null) {
+                JSONObject jsonObject = new JSONObject(document.body().text());
+                JSONArray docs = jsonObject.getJSONArray("docs");
+                // 默认获取10个
+                for (int i = 0; i < docs.length(); i++) {
+                    if(i > 9){
+                        break;
+                    }
+
+                    JSONObject shortReview = docs.getJSONObject(i);
+                    Review review = new Review();
+                    review.setContent(shortReview.getString("content"));
+                    review.setId(shortReview.getString("_id"));
+                    review.setLikeCount(shortReview.getInt("likeCount"));
+                    review.setUpdated(shortReview.getString("updated"));
+                    review.setCreated(shortReview.getString("created"));
+
+                    JSONObject authorObject = shortReview.getJSONObject("author");
+                    Review.Author author = new Review.Author();
+                    author.setAvatar(imageApi + authorObject.getString("avatar"));
+                    author.setId(authorObject.getString("_id"));
+                    author.setLv(authorObject.getInt("lv"));
+                    author.setNickname(authorObject.getString("nickname"));
+
+                    review.setAuthor(author);
+
+                    reviews.add(review);
+                    Log.d(TAG, review.toString());
+                }
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return reviews;
     }
 }

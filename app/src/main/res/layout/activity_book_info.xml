@@ -146,10 +146,10 @@
                 android:textStyle="bold" />
 
             <ListView
-                android:id="@+id/lv_chapter_list"
+                android:layout_below="@id/book_comment"
+                android:id="@+id/lv_comment_list"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="gone" />
+                android:layout_height="wrap_content" />
 
 
         </RelativeLayout>
