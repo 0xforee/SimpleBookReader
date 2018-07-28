@@ -1,21 +1,34 @@
 package org.foree.bookreader.bookinfopage;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.commit451.nativestackblur.NativeStackBlur;
 
 import org.foree.bookreader.R;
 import org.foree.bookreader.base.BaseActivity;
@@ -32,20 +45,30 @@ import java.util.List;
  * Created by foree on 17-1-10.
  */
 
-public class BookInfoActivity extends BaseActivity {
-    private TextView tvNovelName, tvNovelAuthor, tvNovelDescription;
+public class BookInfoActivity extends BaseActivity implements View.OnClickListener {
+    private static final String TAG = BookInfoActivity.class.getSimpleName();
+    private TextView tvNovelAuthor, tvNovelDescription;
     private Button mBtAdd, mBtRead;
     private ListView lv;
     private String bookUrl;
     private BookDao bookDao;
     private Toolbar toolbar;
     private Book book;
-    private ImageView imageView;
-    private LinearLayout linearLayout;
+    private ImageView imageView, mFrameBack;
+    private RelativeLayout relativeLayout;
+    private ScrollView mScrollView;
+    private FrameLayout mContent;
+
+    private int mDisplayWidth;
 
     private static final int STATE_FAILED = -1;
     private static final int STATE_LOADING = 0;
     private static final int STATE_SUCCESS = 1;
+
+    /**
+     * 背景灰色蒙版
+     */
+    private final int MASK_HINT_COLOR = 0x39000000;
 
     private ProgressBar progressBar;
     private Handler mHandler = new Handler() {
@@ -60,11 +83,24 @@ public class BookInfoActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_info);
 
-        initLayout();
-
         Bundle bundle = getIntent().getExtras();
-
         bookUrl = bundle.getString("book_url");
+        bookDao = new BookDao(this);
+
+        // set status bar transparent
+        View decorView = getWindow().getDecorView();
+        int option = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+        decorView.setSystemUiVisibility(option);
+        getWindow().setStatusBarColor(Color.TRANSPARENT);
+
+        // get device width
+        WindowManager windowManager = getWindowManager();
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        windowManager.getDefaultDisplay().getMetrics(displayMetrics);
+        mDisplayWidth = displayMetrics.widthPixels;
+
+        initLayout();
 
         initViews();
 
@@ -72,10 +108,31 @@ public class BookInfoActivity extends BaseActivity {
     }
 
     private void initLayout() {
+        mContent = (FrameLayout) findViewById(R.id.activity_search_results);
+        mScrollView = (ScrollView) findViewById(R.id.content_scroll);
+        mScrollView.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
+            @Override
+            public void onScrollChanged() {
+                int scrollY = mScrollView.getScrollY();
+                int alpha = getAlpha(scrollY);
+                Log.d(TAG, "[foree] onScrollChange: scrollY = " + scrollY + ", alpha = " + alpha);
+
+                toolbar.getBackground().setAlpha(alpha);
+                int color = getResources().getColor(R.color.primary);
+                color = Color.argb(alpha, Color.red(color), Color.green(color), Color.blue(color));
+                getWindow().setStatusBarColor(color);
+            }
+        });
+
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle(R.string.book_info);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        toolbar.setTitle("");
+        toolbar.setTitleTextColor(getResources().getColor(R.color.md_white_1000));
+        toolbar.setNavigationIcon(R.drawable.ic_action_back);
+        toolbar.getBackground().setAlpha(0);
+
+
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -83,42 +140,43 @@ public class BookInfoActivity extends BaseActivity {
             }
         });
 
-        bookDao = new BookDao(this);
-        tvNovelName = (TextView) findViewById(R.id.tv_novel_name);
         tvNovelAuthor = (TextView) findViewById(R.id.tv_novel_author);
         tvNovelDescription = (TextView) findViewById(R.id.tv_description);
         progressBar = (ProgressBar) findViewById(R.id.pb_progress);
-        linearLayout = (LinearLayout) findViewById(R.id.ll_book_info);
+        relativeLayout = (RelativeLayout) findViewById(R.id.ll_book_info);
         mBtAdd = (Button) findViewById(R.id.bt_add);
         mBtRead = (Button) findViewById(R.id.bt_read);
         lv = (ListView) findViewById(R.id.lv_chapter_list);
         imageView = (ImageView) findViewById(R.id.iv_novel_image);
+        mFrameBack = (ImageView) findViewById(R.id.frame_back);
+        mFrameBack.setBackgroundColor(getResources().getColor(R.color.primary));
 
-        mBtAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                bookDao.addBook(book);
+        mBtAdd.setOnClickListener(this);
+        mBtRead.setOnClickListener(this);
 
-                // update bt_add
-                mBtAdd.setText(getResources().getText(R.string.bt_added));
-                mBtAdd.setEnabled(false);
-            }
-        });
+        // update toolbar top margin
+        int statbarHeight = -1;
+        statbarHeight = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (statbarHeight > 0) {
+            statbarHeight = getResources().getDimensionPixelSize(statbarHeight);
+            FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) toolbar.getLayoutParams();
+            Log.d(TAG, "[foree] initLayout: statusbarHeight = " + statbarHeight);
+            layoutParams.topMargin = statbarHeight;
+            mContent.updateViewLayout(toolbar, layoutParams);
+        }
 
-        mBtRead.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(BookInfoActivity.this, ReadActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putString("book_url", bookUrl);
-                bundle.putBoolean("online", true);
-                intent.putExtras(bundle);
+    }
 
-                startActivity(intent);
-            }
-        });
-
-
+    private int getAlpha(int scrollY) {
+        int alphaFadeLength = 160;
+        if (scrollY <= 0) {
+            return 0;
+        } else if (scrollY < alphaFadeLength) {
+            double sec = 255.0 / alphaFadeLength;
+            return (int) (sec * scrollY);
+        } else {
+            return 255;
+        }
     }
 
     private void notifyUpdate(int state) {
@@ -127,16 +185,16 @@ public class BookInfoActivity extends BaseActivity {
                 break;
             case STATE_LOADING:
                 progressBar.setVisibility(View.VISIBLE);
-                linearLayout.setVisibility(View.INVISIBLE);
+                relativeLayout.setVisibility(View.INVISIBLE);
                 tvNovelDescription.setVisibility(View.INVISIBLE);
                 break;
             case STATE_SUCCESS:
                 progressBar.setVisibility(View.GONE);
-                linearLayout.setVisibility(View.VISIBLE);
+                relativeLayout.setVisibility(View.VISIBLE);
                 tvNovelDescription.setVisibility(View.VISIBLE);
 
                 break;
-
+            default:
         }
     }
 
@@ -153,13 +211,23 @@ public class BookInfoActivity extends BaseActivity {
                             public void run() {
                                 book = data1;
                                 book.setChapters(data);
-                                tvNovelName.setText(data1.getBookName());
                                 tvNovelAuthor.setText(data1.getAuthor());
-                                if (data1.getDescription() != null)
-                                    tvNovelDescription.setText(Html.fromHtml(data1.getDescription()));
+                                toolbar.setTitle(data1.getBookName());
+                                if (data1.getDescription() != null) {
+                                    String text = Html.fromHtml(data1.getDescription()).toString();
+                                    tvNovelDescription.setText(text);
+                                }
 
                                 if (book.getBookCoverUrl() != null) {
-                                    Glide.with(BookInfoActivity.this).load(book.getBookCoverUrl()).crossFade().into(imageView);
+                                    Glide.with(BookInfoActivity.this).load(book.getBookCoverUrl()).asBitmap().into(new SimpleTarget<Bitmap>() {
+                                        @Override
+                                        public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                                            imageView.setImageBitmap(resource);
+
+                                            mFrameBack.setColorFilter(MASK_HINT_COLOR, PorterDuff.Mode.DARKEN);
+                                            mFrameBack.setImageBitmap(createFrameBlurBackground(resource));
+                                        }
+                                    });
                                 }
                                 notifyUpdate(STATE_SUCCESS);
                             }
@@ -183,5 +251,61 @@ public class BookInfoActivity extends BaseActivity {
         });
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // 重置toolbar的透明度，不然返回书架页toolbar会状态异常
+        toolbar.getBackground().setAlpha(255);
+    }
 
+    /**
+     * Called when a view has been clicked.
+     *
+     * @param v The view that was clicked.
+     */
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.bt_read:
+                Intent intent = new Intent(BookInfoActivity.this, ReadActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("book_url", bookUrl);
+                bundle.putBoolean("online", true);
+                intent.putExtras(bundle);
+
+                startActivity(intent);
+                break;
+            case R.id.bt_add:
+                bookDao.addBook(book);
+
+                // update bt_add
+                mBtAdd.setText(getResources().getText(R.string.bt_added));
+                mBtAdd.setEnabled(false);
+                break;
+            default:
+        }
+    }
+
+    private Bitmap createFrameBlurBackground(Bitmap source) {
+        int width = source.getWidth();
+        int height = source.getHeight();
+        Log.d(TAG, "[foree] createFrameBlurBackground: width = " + width + ", height = " + height);
+        Matrix matrix = new Matrix();
+
+        // 裁剪中间1/3，然后放大模糊
+        int frameImageHeight = getResources().getDimensionPixelSize(R.dimen.activity_book_info_frame_back_height);
+        Bitmap ddd = Bitmap.createBitmap(source, 0, height / 3,
+                width, height / 3, null, true);
+
+        // 放大
+        int oldWidth = ddd.getWidth();
+        int oldHeight = ddd.getHeight();
+        float scale = ((float) mDisplayWidth) / oldWidth;
+        float scaleY = ((float) frameImageHeight) / oldHeight;
+        matrix.postScale(scale, scaleY);
+        Bitmap dest = Bitmap.createBitmap(ddd, 0, 0,
+                ddd.getWidth(), ddd.getHeight(), matrix, true);
+
+        return NativeStackBlur.process(dest, 200);
+    }
 }
