@@ -36,6 +36,7 @@ public class Book {
      * recentChapterId默认为-1，在openBook时检查病初始化
      */
     private String recentChapterUrl;
+    private String rectentChapterTitle;
 
     public Book() {
     }
@@ -179,5 +180,13 @@ public class Book {
 
     public void setModifiedTime(String modifiedTime) {
         this.modifiedTime = modifiedTime;
+    }
+
+    public String getRectentChapterTitle() {
+        return rectentChapterTitle;
+    }
+
+    public void setRectentChapterTitle(String rectentChapterTitle) {
+        this.rectentChapterTitle = rectentChapterTitle;
     }
 }

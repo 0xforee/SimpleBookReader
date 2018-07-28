@@ -125,9 +125,10 @@ public class ZhuishuWebParserUnitTest {
                 String cate = bookInfoObject.getString("majorCate");
                 String description = bookInfoObject.getString("longIntro");
                 String updateTime = bookInfoObject.getString("updated");
+                String lastChapter = bookInfoObject.getString("lastChapter");
                 String contentsUrl = getBookSourceId(bookId);
 
-                Log.d(TAG, description + ", " + updateTime + ", " + contentsUrl);
+                Log.d(TAG, description + ", " + updateTime + ", " + contentsUrl + ", " + lastChapter);
             }
         } catch (IOException e) {
             e.printStackTrace();

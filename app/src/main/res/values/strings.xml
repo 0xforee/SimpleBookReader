@@ -91,5 +91,7 @@
 
     <string name="source_change_updated">最近更新：</string>
     <string name="source_change_host">来源：</string>
+    <string name="book_info_content_title">目录</string>
+    <string name="book_info_comment">书评</string>
 
 </resources>

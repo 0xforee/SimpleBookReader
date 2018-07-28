@@ -153,7 +153,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
     }
 
     private void initTextView() {
-        mTvContent = (TextView) findViewById(R.id.book_content);
+        mTvContent = (TextView) findViewById(R.id.book_content_layout);
         mTvContent.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @SuppressWarnings("deprecation")
             @Override

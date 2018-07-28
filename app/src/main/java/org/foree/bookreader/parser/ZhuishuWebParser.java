@@ -103,9 +103,10 @@ public class ZhuishuWebParser extends AbsWebParser {
                 String description = bookInfoObject.getString("longIntro");
                 String updateTime = bookInfoObject.getString("updated");
                 String contentUrl = getDefaultSourceId(bookId);
+                String lastChapter = bookInfoObject.getString("lastChapter");
 
                 Log.d(TAG, bookUrl + ", " + bookName + ", " + author + ", " + coverUrl + ", " + cate + ", " +
-                        description + ", " + updateTime + ", " + contentUrl);
+                        description + ", " + updateTime + ", " + contentUrl + ", " + lastChapter);
 
                 book.setDescription(description);
                 book.setUpdateTime(updateTime);
@@ -115,6 +116,7 @@ public class ZhuishuWebParser extends AbsWebParser {
                 book.setAuthor(author);
                 book.setBookCoverUrl(coverUrl);
                 book.setCategory(cate);
+                book.setRectentChapterTitle(lastChapter);
             }
         } catch (IOException e) {
             e.printStackTrace();

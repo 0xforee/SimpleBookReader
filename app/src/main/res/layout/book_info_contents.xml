@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/book_content_layout"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/book_info_content_height"
+    android:clickable="true"
+    android:focusable="true"
+    tools:showIn="@layout/activity_book_info">
+
+    <TextView
+        android:id="@+id/tv_book_info_content_tile"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/book_info_content_height"
+        android:layout_alignParentStart="true"
+        android:gravity="center_vertical"
+        android:text="@string/book_info_content_title" />
+
+    <TextView
+        android:id="@+id/tv_book_info_latest_chapter"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/book_info_content_height"
+        android:layout_toStartOf="@id/arrow"
+        android:gravity="center_vertical"
+        android:maxWidth="200dp"
+        android:singleLine="true" />
+
+    <ImageView
+        android:id="@+id/arrow"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/book_info_content_height"
+        android:layout_alignParentEnd="true"
+        android:src="@drawable/ic_arrow_back_ios" />
+</RelativeLayout>

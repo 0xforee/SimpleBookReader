@@ -54,7 +54,7 @@ public class ReadFragment extends Fragment implements SharedPreferences.OnShared
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_read, null);
-        tvContents = (TextView) rootView.findViewById(R.id.book_content);
+        tvContents = (TextView) rootView.findViewById(R.id.book_content_layout);
         tvTitle = (TextView) rootView.findViewById(R.id.tv_title);
         tvTime = (TextView) rootView.findViewById(R.id.tv_time);
         tvIndex = (TextView) rootView.findViewById(R.id.tv_index);

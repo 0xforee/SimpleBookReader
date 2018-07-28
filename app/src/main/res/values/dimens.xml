@@ -14,5 +14,7 @@
     <dimen name="toolbar_height_large">56dp</dimen>
 
     <dimen name="activity_book_info_frame_back_height">175dp</dimen>
+    <dimen name="book_info_side_margin">20dp</dimen>
+    <dimen name="book_info_content_height">24dp</dimen>
 
 </resources>

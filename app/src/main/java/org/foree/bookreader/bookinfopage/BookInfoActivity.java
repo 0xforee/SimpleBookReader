@@ -47,7 +47,7 @@ import java.util.List;
 
 public class BookInfoActivity extends BaseActivity implements View.OnClickListener {
     private static final String TAG = BookInfoActivity.class.getSimpleName();
-    private TextView tvNovelAuthor, tvNovelDescription;
+    private TextView mTvNovelAuthor, mTvNovelDescription, mTvBookLatestChapter;
     private Button mBtAdd, mBtRead;
     private ListView lv;
     private String bookUrl;
@@ -70,7 +70,7 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
      */
     private final int MASK_HINT_COLOR = 0x39000000;
 
-    private ProgressBar progressBar;
+    private ProgressBar mProgressBar;
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -129,7 +129,7 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
 
         toolbar.setTitle("");
         toolbar.setTitleTextColor(getResources().getColor(R.color.md_white_1000));
-        toolbar.setNavigationIcon(R.drawable.ic_action_back);
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back);
         toolbar.getBackground().setAlpha(0);
 
 
@@ -140,9 +140,10 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
             }
         });
 
-        tvNovelAuthor = (TextView) findViewById(R.id.tv_novel_author);
-        tvNovelDescription = (TextView) findViewById(R.id.tv_description);
-        progressBar = (ProgressBar) findViewById(R.id.pb_progress);
+        mTvNovelAuthor = (TextView) findViewById(R.id.tv_novel_author);
+        mTvNovelDescription = (TextView) findViewById(R.id.tv_description);
+        mTvBookLatestChapter = (TextView) findViewById(R.id.tv_book_info_latest_chapter);
+        mProgressBar = (ProgressBar) findViewById(R.id.pb_progress);
         relativeLayout = (RelativeLayout) findViewById(R.id.ll_book_info);
         mBtAdd = (Button) findViewById(R.id.bt_add);
         mBtRead = (Button) findViewById(R.id.bt_read);
@@ -184,15 +185,12 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
             case STATE_FAILED:
                 break;
             case STATE_LOADING:
-                progressBar.setVisibility(View.VISIBLE);
-                relativeLayout.setVisibility(View.INVISIBLE);
-                tvNovelDescription.setVisibility(View.INVISIBLE);
+                mProgressBar.setVisibility(View.VISIBLE);
+                mScrollView.setVisibility(View.INVISIBLE);
                 break;
             case STATE_SUCCESS:
-                progressBar.setVisibility(View.GONE);
-                relativeLayout.setVisibility(View.VISIBLE);
-                tvNovelDescription.setVisibility(View.VISIBLE);
-
+                mProgressBar.setVisibility(View.GONE);
+                mScrollView.setVisibility(View.VISIBLE);
                 break;
             default:
         }
@@ -211,11 +209,12 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
                             public void run() {
                                 book = data1;
                                 book.setChapters(data);
-                                tvNovelAuthor.setText(data1.getAuthor());
+                                mTvNovelAuthor.setText(data1.getAuthor());
+                                mTvBookLatestChapter.setText(book.getRectentChapterTitle());
                                 toolbar.setTitle(data1.getBookName());
                                 if (data1.getDescription() != null) {
                                     String text = Html.fromHtml(data1.getDescription()).toString();
-                                    tvNovelDescription.setText(text);
+                                    mTvNovelDescription.setText(text);
                                 }
 
                                 if (book.getBookCoverUrl() != null) {
@@ -226,10 +225,12 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
 
                                             mFrameBack.setColorFilter(MASK_HINT_COLOR, PorterDuff.Mode.DARKEN);
                                             mFrameBack.setImageBitmap(createFrameBlurBackground(resource));
+
+                                            notifyUpdate(STATE_SUCCESS);
                                         }
                                     });
                                 }
-                                notifyUpdate(STATE_SUCCESS);
+
                             }
                         }, 0);
 
