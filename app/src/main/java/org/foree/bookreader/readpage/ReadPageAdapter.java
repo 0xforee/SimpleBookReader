@@ -169,6 +169,7 @@ public class ReadPageAdapter extends FragmentPagerAdapter {
         int chapterIndex = mBookRecord.getChapterIndex(chapter.getChapterUrl());
         mUnlinkedData.put(chapterIndex, chapter);
         checkCacheMap();
+        updateContent();
     }
 
     /**
