@@ -5,27 +5,31 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.os.Message;
 import android.os.Process;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
@@ -35,10 +39,8 @@ import com.commit451.nativestackblur.NativeStackBlur;
 import org.foree.bookreader.R;
 import org.foree.bookreader.base.BaseActivity;
 import org.foree.bookreader.bean.book.Book;
-import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.book.Review;
 import org.foree.bookreader.bean.dao.BookDao;
-import org.foree.bookreader.net.NetCallback;
 import org.foree.bookreader.parser.WebParser;
 import org.foree.bookreader.readpage.ReadActivity;
 
@@ -50,21 +52,20 @@ import java.util.List;
 
 public class BookInfoActivity extends BaseActivity implements View.OnClickListener {
     private static final String TAG = BookInfoActivity.class.getSimpleName();
-    private TextView mTvNovelAuthor, mTvNovelDescription, mTvBookLatestChapter;
-    private Button mBtAdd, mBtRead;
+    private TextView mTvNovelAuthor, mTvNovelDescription, mTvBookLatestChapter, mTvCate, mTvCount;
+    private Button mBtAdd, mBtRead, mBtDownload;
     private CommentListView mCommentList;
     private String bookUrl;
     private BookDao bookDao;
     private Toolbar toolbar;
-    private Book book;
+    private Book mBook;
     private ImageView imageView, mFrameBack;
     private RelativeLayout relativeLayout;
     private ScrollView mScrollView;
     private FrameLayout mContent;
 
-    private List<Review> mReviews;
-
     private int mDisplayWidth;
+    private PopupWindow mActionPopMenu;
 
     private static final int STATE_FAILED = -1;
     private static final int STATE_LOADING = 0;
@@ -148,17 +149,14 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
         mTvNovelAuthor = (TextView) findViewById(R.id.tv_novel_author);
         mTvNovelDescription = (TextView) findViewById(R.id.tv_description);
         mTvBookLatestChapter = (TextView) findViewById(R.id.tv_book_info_latest_chapter);
+        mTvCate = (TextView) findViewById(R.id.tv_novel_cate);
+        mTvCount = (TextView) findViewById(R.id.tv_novel_count);
         mProgressBar = (ProgressBar) findViewById(R.id.pb_progress);
         relativeLayout = (RelativeLayout) findViewById(R.id.ll_book_info);
-        mBtAdd = (Button) findViewById(R.id.bt_add);
-        mBtRead = (Button) findViewById(R.id.bt_read);
         mCommentList = (CommentListView) findViewById(R.id.lv_comment_list);
         imageView = (ImageView) findViewById(R.id.iv_novel_image);
         mFrameBack = (ImageView) findViewById(R.id.frame_back);
         mFrameBack.setBackgroundColor(getResources().getColor(R.color.primary));
-
-        mBtAdd.setOnClickListener(this);
-        mBtRead.setOnClickListener(this);
 
         // update toolbar top margin
         int statbarHeight = -1;
@@ -170,6 +168,38 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
             layoutParams.topMargin = statbarHeight;
             mContent.updateViewLayout(toolbar, layoutParams);
         }
+
+        // init pop menu
+        initMenuPop();
+
+    }
+
+    private void initMenuPop() {
+        // 弹出一个popupMenu
+        View view = LayoutInflater.from(this).inflate(R.layout.popmenu_book_info_menu, null, false);
+
+        DisplayMetrics dp = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dp);
+
+        mActionPopMenu = new PopupWindow(this);
+        mActionPopMenu.setContentView(view);
+        mActionPopMenu.setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
+        mActionPopMenu.setHeight(getResources().getDimensionPixelSize(R.dimen.book_info_popmenu_height));
+        mActionPopMenu.setFocusable(false);
+        mActionPopMenu.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+        mActionPopMenu.setElevation(100);
+
+        mActionPopMenu.setOutsideTouchable(false);
+
+        mBtAdd = (Button) view.findViewById(R.id.bt_bookinfo_add);
+        mBtRead = (Button) view.findViewById(R.id.bt_bookinfo_read);
+        mBtDownload = (Button) view.findViewById(R.id.bt_bookinfo_download);
+        mBtRead.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+        mBtRead.setTextColor(Color.WHITE);
+
+        mBtRead.setOnClickListener(this);
+        mBtAdd.setOnClickListener(this);
+        mBtDownload.setOnClickListener(this);
 
     }
 
@@ -195,6 +225,7 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
                 break;
             case STATE_SUCCESS:
                 mProgressBar.setVisibility(View.GONE);
+                mActionPopMenu.showAtLocation(mContent, Gravity.BOTTOM, 0, 0);
                 mScrollView.setVisibility(View.VISIBLE);
                 break;
             default:
@@ -207,10 +238,10 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
             @Override
             public void run() {
                 // get bookinfo first
-                final Book book = WebParser.getInstance().getBookInfo(bookUrl);
-                if (book != null) {
+                mBook = WebParser.getInstance().getBookInfo(bookUrl);
+                if (mBook != null) {
                     // get chapters
-                    book.setChapters(WebParser.getInstance().getContents(bookUrl, book.getContentUrl()));
+                    mBook.setChapters(WebParser.getInstance().getContents(bookUrl, mBook.getContentUrl()));
 
                     // get comments
                     final List<Review> reviews = WebParser.getInstance().getLongReviews(bookUrl);
@@ -219,7 +250,7 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
                     mContent.post(new Runnable() {
                         @Override
                         public void run() {
-                            updateBookInfo(book, reviews);
+                            updateBookInfo(mBook, reviews);
                         }
                     });
 
@@ -231,7 +262,8 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
 
     /**
      * 更新UI，要在主线程执行
-     * @param book 书籍信息
+     *
+     * @param book    书籍信息
      * @param reviews 评论信息
      */
     private void updateBookInfo(Book book, List<Review> reviews) {
@@ -244,8 +276,17 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
             String text = Html.fromHtml(book.getDescription()).toString();
             mTvNovelDescription.setText(text);
         }
-        mCommentList.setFocusable(false);
+
+        // update category, serial, wordCount
+        mTvCate.setText(book.getCategory());
+        String serial = getResources().getString(book.isSerial() ? R.string.bookinfo_serial : R.string.bookinfo_not_serial);
+        String wordCount = book.getWordCount() / 10000 + getResources().getString(R.string.bookinfo_word_count);
+        String count = wordCount + getResources().getString(R.string.bookinfo_serial_count_divider) + serial;
+
+        mTvCount.setText(count);
+
         // update comment
+        mCommentList.setFocusable(false);
         CommentAdapter commentAdapter = new CommentAdapter(this, reviews);
         mCommentList.setAdapter(commentAdapter);
 
@@ -281,7 +322,7 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.bt_read:
+            case R.id.bt_bookinfo_read:
                 Intent intent = new Intent(BookInfoActivity.this, ReadActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putString("book_url", bookUrl);
@@ -290,12 +331,15 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
 
                 startActivity(intent);
                 break;
-            case R.id.bt_add:
-                bookDao.addBook(book);
+            case R.id.bt_bookinfo_add:
+                bookDao.addBook(mBook);
 
                 // update bt_add
-                mBtAdd.setText(getResources().getText(R.string.bt_added));
+                mBtAdd.setText(getResources().getText(R.string.bookinfo_menu_added));
                 mBtAdd.setEnabled(false);
+                break;
+            case R.id.bt_bookinfo_download:
+                Toast.makeText(getApplicationContext(), R.string.about_tips, Toast.LENGTH_SHORT).show();
                 break;
             default:
         }

@@ -28,9 +28,10 @@
 
     <!-- Action Mode Menu Items -->
     <string name="delete">删除</string>
-    <string name="bt_add">加入书架</string>
-    <string name="bt_added">已在书架</string>
-    <string name="bt_read">开始阅读</string>
+    <string name="bookinfo_menu_add">加入书架</string>
+    <string name="bookinfo_menu_added">已在书架</string>
+    <string name="bookinfo_menu_read">开始阅读</string>
+    <string name="bookinfo_menu_download">下载章节</string>
     <string name="contents">目录</string>
     <string name="separator">/</string>
 
@@ -93,5 +94,10 @@
     <string name="source_change_host">来源：</string>
     <string name="book_info_content_title">目录</string>
     <string name="book_info_comment">书评</string>
+
+    <string name="bookinfo_serial">连载</string>
+    <string name="bookinfo_not_serial">完结</string>
+    <string name="bookinfo_serial_count_divider">&#160;&#160;|&#160;&#160;</string>
+    <string name="bookinfo_word_count">万字</string>
 
 </resources>

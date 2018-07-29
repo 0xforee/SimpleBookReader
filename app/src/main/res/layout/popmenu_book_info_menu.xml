@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+    <Button
+        android:id="@+id/bt_bookinfo_add"
+        style="@style/ReadPopupMenuItemImageButton"
+        android:text="@string/bookinfo_menu_add" />
+
+    <Button
+        android:id="@+id/bt_bookinfo_read"
+        style="@style/ReadPopupMenuItemImageButton"
+        android:background="@color/colorPrimary"
+        android:text="@string/bookinfo_menu_read"
+        android:textColor="@color/md_white_1000" />
+
+    <Button
+        android:id="@+id/bt_bookinfo_download"
+        style="@style/ReadPopupMenuItemImageButton"
+        android:text="@string/bookinfo_menu_download" />
+
+</LinearLayout>

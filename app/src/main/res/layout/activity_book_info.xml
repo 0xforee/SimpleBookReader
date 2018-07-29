@@ -5,6 +5,7 @@
     android:id="@+id/activity_search_results"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingBottom="@dimen/book_info_popmenu_height"
     tools:context="org.foree.bookreader.searchpage.SearchResultsActivity">
 
     <ScrollView
@@ -22,7 +23,7 @@
             <FrameLayout
                 android:id="@+id/book_info_content"
                 android:layout_width="match_parent"
-                android:layout_height="190dp">
+                android:layout_height="200dp">
 
                 <ImageView
                     android:id="@+id/frame_back"
@@ -41,9 +42,9 @@
 
                     <org.foree.bookreader.common.RoundCornerImageView
                         android:id="@+id/iv_novel_image"
-                        android:layout_width="75dp"
-                        android:layout_height="104dp"
-                        android:layout_marginEnd="20dp"
+                        android:layout_width="83dp"
+                        android:layout_height="114dp"
+                        android:layout_marginEnd="25dp"
                         android:background="@drawable/background_book_cover"
                         android:elevation="5dp"
                         android:padding="3dp"
@@ -56,30 +57,28 @@
                         android:layout_below="@id/tv_novel_name"
                         android:layout_marginTop="10dp"
                         android:layout_toEndOf="@id/iv_novel_image"
-                        android:text="言语将技"
                         android:textColor="@color/md_white_1000"
                         android:textSize="15sp" />
-
-                    <Button
-                        android:id="@+id/bt_add"
-                        android:layout_width="100dp"
+                    <TextView
+                        android:id="@+id/tv_novel_cate"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_alignBottom="@id/iv_novel_image"
-                        android:layout_marginBottom="15dp"
+                        android:layout_below="@id/tv_novel_author"
+                        android:layout_marginTop="10dp"
                         android:layout_toEndOf="@id/iv_novel_image"
-                        android:text="加入书架"
-                        android:textSize="15sp" />
-
-                    <Button
-                        android:id="@+id/bt_read"
-                        android:layout_width="100dp"
+                        android:textColor="@color/md_grey_300"
+                        android:textSize="14sp" />
+                    <TextView
+                        android:id="@+id/tv_novel_count"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_alignBottom="@id/iv_novel_image"
-                        android:layout_marginBottom="15dp"
-                        android:layout_marginStart="5dp"
-                        android:layout_toEndOf="@id/bt_add"
-                        android:text="开始阅读"
-                        android:textSize="15sp" />
+                        android:layout_below="@id/tv_novel_cate"
+                        android:layout_marginTop="10dp"
+                        android:layout_toEndOf="@id/iv_novel_image"
+                        android:textColor="@color/md_grey_300"
+                        android:textSize="14sp" />
+
+
 
                 </RelativeLayout>
             </FrameLayout>

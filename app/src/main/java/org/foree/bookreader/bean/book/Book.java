@@ -38,6 +38,15 @@ public class Book {
     private String recentChapterUrl;
     private String rectentChapterTitle;
 
+    /**
+     * 是否连载
+     */
+    private boolean isSerial;
+    /**
+     * 书籍字数
+     */
+    private int wordCount;
+
     public Book() {
     }
 
@@ -188,5 +197,21 @@ public class Book {
 
     public void setRectentChapterTitle(String rectentChapterTitle) {
         this.rectentChapterTitle = rectentChapterTitle;
+    }
+
+    public boolean isSerial() {
+        return isSerial;
+    }
+
+    public void setSerial(boolean serial) {
+        isSerial = serial;
+    }
+
+    public int getWordCount() {
+        return wordCount;
+    }
+
+    public void setWordCount(int wordCount) {
+        this.wordCount = wordCount;
     }
 }
