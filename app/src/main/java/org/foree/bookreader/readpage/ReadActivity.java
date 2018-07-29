@@ -72,7 +72,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
     private CustomSourceListAdapter mSourceChangeAdapter;
     /**
      * for menu pop image button
-      */
+     */
     private ImageButton mIbContent, mIbProgress, mIbFont, mIbBrightness;
 
     // loading state
@@ -207,29 +207,29 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
 
         Chapter chapter = pageEvent.getChapter();
 
-            if (chapter != null) {
-                // add chapterTile
-                String chapterTile = mBookRecord.getChapter(chapter.getChapterUrl()).getChapterTitle();
-                chapter.setChapterTitle(chapterTile);
+        if (chapter != null) {
+            // add chapterTile
+            String chapterTile = mBookRecord.getChapter(chapter.getChapterUrl()).getChapterTitle();
+            chapter.setChapterTitle(chapterTile);
 
-                mBookRecord.setChapterCached(chapter.getChapterUrl());
+            mBookRecord.setChapterCached(chapter.getChapterUrl());
 
-                mReadPageAdapter.addChapter(chapter);
+            mReadPageAdapter.addChapter(chapter);
 
-                if (pageEvent.isCurrent()) {
+            if (pageEvent.isCurrent()) {
 
-                    mHandler.sendEmptyMessage(MSG_SUCCESS);
+                mHandler.sendEmptyMessage(MSG_SUCCESS);
 
-                    // if open book ,load index page, otherwise load normal
-                    if (mBookRecord.isInitCompleted()) {
-                        mReadPageAdapter.initChapter(chapter.getChapterUrl());
-                    } else {
-                        mReadPageAdapter.initChapter(chapter.getChapterUrl(), mBookRecord.getPageIndex());
-                    }
+                // if open book ,load index page, otherwise load normal
+                if (mBookRecord.isInitCompleted()) {
+                    mReadPageAdapter.initChapter(chapter.getChapterUrl());
+                } else {
+                    mReadPageAdapter.initChapter(chapter.getChapterUrl(), mBookRecord.getPageIndex());
                 }
-            } else {
-                mHandler.sendEmptyMessage(MSG_FAILED);
             }
+        } else {
+            mHandler.sendEmptyMessage(MSG_FAILED);
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -306,7 +306,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 contentDialog.dismiss();
-                switchChapter(mBookRecord.getChapterUrl(position),true);
+                switchChapter(mBookRecord.getChapterUrl(position), true);
                 contentAdapter.setSelectedPosition(position);
             }
         });
@@ -381,7 +381,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
      */
     private void switchChapter(String newChapterUrl, boolean loadCurrent) {
         mBookRecord.switchChapter(newChapterUrl);
-        if(loadCurrent) {
+        if (loadCurrent) {
             mReadPageAdapter.reset();
             PaginationLoader.getInstance().loadPagination(newChapterUrl);
         }

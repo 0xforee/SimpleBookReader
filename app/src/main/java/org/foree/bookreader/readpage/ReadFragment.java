@@ -45,7 +45,7 @@ public class ReadFragment extends Fragment implements SharedPreferences.OnShared
 
             tvTime.setText(getCurrentTime());
             tvPageNum.setText(readPageDataSet.getPageNum() + "");
-            tvIndex.setText(readPageDataSet.getIndex() + "");
+            tvIndex.setText(readPageDataSet.getIndex() + 1 + "");
             tvSeparator.setVisibility(View.VISIBLE);
         }
     }

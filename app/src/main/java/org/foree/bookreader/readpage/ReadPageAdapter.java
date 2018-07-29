@@ -162,7 +162,7 @@ public class ReadPageAdapter extends FragmentPagerAdapter {
 
     public int getCurrentPageIndex(){
         if(mChapterList.getCurrentData() != null) {
-            return mChapterList.getCurrentData().getIndex() + 1;
+            return mChapterList.getCurrentData().getIndex();
         }
         return 0;
     }
@@ -218,7 +218,7 @@ public class ReadPageAdapter extends FragmentPagerAdapter {
         int size = chapter.numberOfPages();
         for (int i = size - 1; i > 0; i--) {
             ReadPageDataSet data = new ReadPageDataSet(
-                    chapter.getChapterUrl(), chapter.getChapterTitle(), chapter.getPage(i), size, i + 1);
+                    chapter.getChapterUrl(), chapter.getChapterTitle(), chapter.getPage(i), size, i);
 
             mChapterList.addFirst(data);
         }
@@ -232,7 +232,7 @@ public class ReadPageAdapter extends FragmentPagerAdapter {
         int size = chapter.numberOfPages();
         for (int i = 0; i < size; i++) {
             ReadPageDataSet data = new ReadPageDataSet(
-                    chapter.getChapterUrl(), chapter.getChapterTitle(), chapter.getPage(i), size, i + 1);
+                    chapter.getChapterUrl(), chapter.getChapterTitle(), chapter.getPage(i), size, i);
 
             mChapterList.addLast(data);
         }

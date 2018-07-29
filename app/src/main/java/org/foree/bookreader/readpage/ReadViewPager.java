@@ -178,6 +178,11 @@ public class ReadViewPager extends ViewPager {
             method.setAccessible(true);
             method.invoke(this, position, false, true);
 
+            // must refresh again
+            Method populate = clazz.getDeclaredMethod("populate");
+            populate.setAccessible(true);
+            populate.invoke(this);
+
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
