@@ -382,6 +382,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
     private void switchChapter(String newChapterUrl, boolean loadCurrent) {
         mBookRecord.switchChapter(newChapterUrl);
         if(loadCurrent) {
+            mReadPageAdapter.reset();
             PaginationLoader.getInstance().loadPagination(newChapterUrl);
         }
         PaginationLoader.getInstance().smartLoad();

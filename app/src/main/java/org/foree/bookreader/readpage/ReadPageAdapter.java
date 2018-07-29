@@ -21,6 +21,7 @@ import java.util.Map;
  */
 public class ReadPageAdapter extends FragmentPagerAdapter {
     private static final String TAG = "ReadPageAdapter";
+    private static final boolean DEBUG = false;
 
     private ReadViewPager mViewPager;
     private ReadFragment[] fragments;
@@ -80,7 +81,7 @@ public class ReadPageAdapter extends FragmentPagerAdapter {
         }
     }
 
-    public void initChapter(String chapterUrl){
+    public void initChapter(String chapterUrl) {
         mUserExpectedUrl = chapterUrl;
         checkCacheMap();
 
@@ -125,10 +126,10 @@ public class ReadPageAdapter extends FragmentPagerAdapter {
         } else {
             if (offset < 0) {
                 mChapterList.movePrev();
-                Log.d(TAG, "[foree] onDataChanged: 向左滑动");
+                if (DEBUG) Log.d(TAG, "[foree] onDataChanged: 向左滑动");
             } else if (offset > 0) {
                 mChapterList.moveNext();
-                Log.d(TAG, "[foree] onDataChanged: 向右滑动");
+                if (DEBUG) Log.d(TAG, "[foree] onDataChanged: 向右滑动");
             }
             checkIfChapterSwitched();
         }
@@ -210,11 +211,11 @@ public class ReadPageAdapter extends FragmentPagerAdapter {
         int size = chapter.numberOfPages();
         for (int i = size - 1; i > 0; i--) {
             ReadPageDataSet data = new ReadPageDataSet(
-                    chapter.getChapterUrl(), chapter.getChapterTitle(), chapter.getPage(i), size, i+1);
+                    chapter.getChapterUrl(), chapter.getChapterTitle(), chapter.getPage(i), size, i + 1);
 
             mChapterList.addFirst(data);
         }
-        Log.d(TAG, "addPreChapter() called with: chapter = [" + chapter + "]");
+        if (DEBUG) Log.d(TAG, "addPreChapter() called with: chapter = [" + chapter + "]");
     }
 
     /**
@@ -224,11 +225,11 @@ public class ReadPageAdapter extends FragmentPagerAdapter {
         int size = chapter.numberOfPages();
         for (int i = 0; i < size; i++) {
             ReadPageDataSet data = new ReadPageDataSet(
-                    chapter.getChapterUrl(), chapter.getChapterTitle(), chapter.getPage(i), size, i+1);
+                    chapter.getChapterUrl(), chapter.getChapterTitle(), chapter.getPage(i), size, i + 1);
 
             mChapterList.addLast(data);
         }
-        Log.d(TAG, "addNextChapter() called with: chapter = [" + chapter + "]");
+        if (DEBUG) Log.d(TAG, "addNextChapter() called with: chapter = [" + chapter + "]");
     }
 
     public void reset() {
@@ -236,9 +237,9 @@ public class ReadPageAdapter extends FragmentPagerAdapter {
         mUserExpectedUrl = null;
     }
 
-    private void checkIfChapterSwitched(){
+    private void checkIfChapterSwitched() {
         String curChapterUrl = mChapterList.getCurrentData().getUrl();
-        if(!mUserExpectedUrl.equals(curChapterUrl)){
+        if (!mUserExpectedUrl.equals(curChapterUrl)) {
             mUserExpectedUrl = curChapterUrl;
             notifyChapterSwitched(curChapterUrl);
         }
@@ -270,6 +271,7 @@ public class ReadPageAdapter extends FragmentPagerAdapter {
     interface Callback {
         /**
          * 在章节切换的时候触发，方便监听者做出处理
+         *
          * @param newChapterUrl 切换到的新章节Url
          */
         void onChapterSwitched(String newChapterUrl);

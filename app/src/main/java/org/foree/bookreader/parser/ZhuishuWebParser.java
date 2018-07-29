@@ -186,7 +186,7 @@ public class ZhuishuWebParser extends AbsWebParser {
         chapter.setChapterUrl(chapterUrl);
         try {
             String encodeLink = URLEncoder.encode(chapterUrl);
-            Log.d(TAG, "get link = " + contentApi + encodeLink);
+            if(DEBUG) Log.d(TAG, "get link = " + contentApi + encodeLink);
 
             Document document = Jsoup.connect(contentApi + encodeLink).ignoreContentType(true).get();
             if (document != null) {
