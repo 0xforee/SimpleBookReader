@@ -1,5 +1,6 @@
 package org.foree.bookreader.utils;
 
+import android.content.Context;
 import android.util.Log;
 
 import java.text.ParseException;
@@ -67,5 +68,29 @@ public class DateUtils {
         String dateString = simpleDateFormat.format(date);
         Log.d(TAG, date.toString());
         return dateString;
+    }
+
+    public static String relativeDate(Context context, String dateString){
+        Date date = formatJSDate(dateString);
+        if(date != null){
+            Date current = new Date();
+            if(current.getYear() - date.getYear() > 0){
+                // 年前
+                return current.getYear() - date.getYear() + "年前";
+            }else if (current.getMonth() - date.getMonth() > 0){
+                // 月前
+                return current.getMonth() - date.getMonth() + "月前";
+            }else if (current.getDay() - date.getDay() > 0){
+                // 天前
+                return current.getDay() - date.getDay() + "天前";
+            }else if(current.getHours() - date.getHours() > 0){
+                // 小时前
+                return current.getHours() - date.getHours() + "小时前";
+            }else{
+                return 1 + "小时前";
+            }
+        }
+        return dateString;
+
     }
 }

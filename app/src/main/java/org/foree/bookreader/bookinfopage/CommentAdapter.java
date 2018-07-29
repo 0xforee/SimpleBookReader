@@ -14,6 +14,7 @@ import com.bumptech.glide.Glide;
 
 import org.foree.bookreader.R;
 import org.foree.bookreader.bean.book.Review;
+import org.foree.bookreader.utils.DateUtils;
 
 import java.util.List;
 
@@ -102,7 +103,7 @@ public class CommentAdapter extends BaseAdapter {
         Glide.with(mContext).load(review.getAuthor().getAvatar()).into(avatar);
         nickname.setText(review.getAuthor().getNickname());
         content.setText(review.getContent());
-        time.setText(review.getUpdated());
+        time.setText(DateUtils.relativeDate(mContext, review.getUpdated()));
         likeCount.setText(review.getLikeCount() + "");
 
         return root;

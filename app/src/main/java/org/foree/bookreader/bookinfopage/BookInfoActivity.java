@@ -52,7 +52,7 @@ import java.util.List;
 
 public class BookInfoActivity extends BaseActivity implements View.OnClickListener {
     private static final String TAG = BookInfoActivity.class.getSimpleName();
-    private TextView mTvNovelAuthor, mTvNovelDescription, mTvBookLatestChapter, mTvCate, mTvCount;
+    private TextView mTvNovelAuthor, mTvNovelDescription, mTvBookLatestChapter, mTvCate, mTvCount, mTvBookCommentTitle;
     private Button mBtAdd, mBtRead, mBtDownload;
     private CommentListView mCommentList;
     private String bookUrl;
@@ -149,6 +149,7 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
         mTvNovelAuthor = (TextView) findViewById(R.id.tv_novel_author);
         mTvNovelDescription = (TextView) findViewById(R.id.tv_description);
         mTvBookLatestChapter = (TextView) findViewById(R.id.tv_book_info_latest_chapter);
+        mTvBookCommentTitle = (TextView) findViewById(R.id.tv_book_comment_tile);
         mTvCate = (TextView) findViewById(R.id.tv_novel_cate);
         mTvCount = (TextView) findViewById(R.id.tv_novel_count);
         mProgressBar = (ProgressBar) findViewById(R.id.pb_progress);
@@ -286,6 +287,9 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
         mTvCount.setText(count);
 
         // update comment
+        int visible = (reviews == null || reviews.isEmpty()) ? View.GONE : View.VISIBLE;
+        mTvBookCommentTitle.setVisibility(visible);
+        mCommentList.setVisibility(visible);
         mCommentList.setFocusable(false);
         CommentAdapter commentAdapter = new CommentAdapter(this, reviews);
         mCommentList.setAdapter(commentAdapter);

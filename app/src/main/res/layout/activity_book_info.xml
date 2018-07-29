@@ -134,7 +134,7 @@
                 android:background="@color/md_grey_200" />
 
             <TextView
-                android:id="@+id/book_comment"
+                android:id="@+id/tv_book_comment_tile"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/split_larger"
@@ -145,7 +145,7 @@
                 android:textStyle="bold" />
 
             <org.foree.bookreader.bookinfopage.CommentListView
-                android:layout_below="@id/book_comment"
+                android:layout_below="@id/tv_book_comment_tile"
                 android:id="@+id/lv_comment_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
