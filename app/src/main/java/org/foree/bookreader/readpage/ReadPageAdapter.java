@@ -160,6 +160,13 @@ public class ReadPageAdapter extends FragmentPagerAdapter {
 
     }
 
+    public int getCurrentPageIndex(){
+        if(mChapterList.getCurrentData() != null) {
+            return mChapterList.getCurrentData().getIndex() + 1;
+        }
+        return 0;
+    }
+
     /**
      * 章节链表需要按顺序添加，且第一个添加的章节一定是要用户指定的初始化章节
      * 如果不满足加到缓存中，在每次调用时检查缓存是否可以添加到章节链表中

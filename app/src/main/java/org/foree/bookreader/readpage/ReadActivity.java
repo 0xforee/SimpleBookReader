@@ -246,7 +246,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
         EventBus.getDefault().unregister(this);
         super.onDestroy();
 
-        mBookRecord.switchPageIndex(mViewPager.getCurrentItem());
+        mBookRecord.switchPageIndex(mReadPageAdapter.getCurrentPageIndex());
         mBookRecord.saveBookRecord();
     }
 
