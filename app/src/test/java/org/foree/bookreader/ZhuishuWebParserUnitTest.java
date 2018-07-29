@@ -89,11 +89,18 @@ public class ZhuishuWebParserUnitTest {
         data.put("view", "summary");
         data.put("book", bookId);
 
+        int my716_index = 1;
         try {
             Document document = Jsoup.connect(bookSourceApi).data(data).ignoreContentType(true).get();
             if (document != null) {
                 JSONArray jsonArray = new JSONArray(document.body().text());
-                JSONObject sourceObject = (JSONObject) jsonArray.get(2);
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject sourceObject = (JSONObject) jsonArray.get(i);
+                    if(sourceObject.getString("host").contains("my716")){
+                        my716_index = i;
+                    }
+                }
+                JSONObject sourceObject = (JSONObject) jsonArray.get(my716_index);
                 String sourceId = sourceObject.getString("_id");
                 Log.d(TAG, sourceId);
                 return sourceId;
@@ -148,15 +155,17 @@ public class ZhuishuWebParserUnitTest {
 
     @Test
     public void testZhuiShuContents() {
+        // 测试五行天，_id = 563552f7688af08743c2ce91
         // http://api.zhuishushenqi.com/atoc/sourceId?view=chapters
         String contentsApi = "http://api.zhuishushenqi.com/atoc/";
         String sourceId = "57076a32326011945ee8616b";
+        String bookId = "563552f7688af08743c2ce91";
 
         Map<String, String> data = new HashMap<>();
         data.put("view", "chapters");
 
         try {
-            Document document = Jsoup.connect(contentsApi + sourceId).data(data).ignoreContentType(true).get();
+            Document document = Jsoup.connect(contentsApi + getBookSourceId(bookId)).data(data).ignoreContentType(true).get();
             if (document != null) {
                 JSONObject jsonObject = new JSONObject(document.body().text());
                 String bookUrl = jsonObject.getString("book");

@@ -249,6 +249,7 @@ public class ZhuishuWebParser extends AbsWebParser {
         data.put("view", "summary");
         data.put("book", bookId);
 
+        int my716_source_index = 1;
         try {
             Document document = Jsoup.connect(bookSourceApi).data(data).ignoreContentType(true).get();
             if (document != null) {
@@ -268,6 +269,10 @@ public class ZhuishuWebParser extends AbsWebParser {
 
                     sourceList.add(source);
 
+                    if(source.getHost().contains("my716")){
+                        my716_source_index = i;
+                    }
+
                     if (DEBUG) {
                         Log.d(TAG, source.getHost() + ", " + source.getSourceName() + ", " + source.getLastChapter() + ", " + source.getUpdated());
                     }
@@ -280,10 +285,10 @@ public class ZhuishuWebParser extends AbsWebParser {
         }
 
         //交换第一个和第二个书源（zhuishuvip为第一个，不可用）
-        if(!sourceList.isEmpty() && sourceList.size() > 1){
+        if(!sourceList.isEmpty() && sourceList.size() > my716_source_index){
             Source tmp = sourceList.get(0);
-            sourceList.set(0, sourceList.get(1));
-            sourceList.set(1, tmp);
+            sourceList.set(0, sourceList.get(my716_source_index));
+            sourceList.set(my716_source_index, tmp);
         }
 
         return sourceList;
@@ -344,7 +349,7 @@ public class ZhuishuWebParser extends AbsWebParser {
                     review.setAuthor(author);
 
                     reviews.add(review);
-                    Log.d(TAG, review.toString());
+                    if(DEBUG) Log.d(TAG, review.toString());
                 }
 
             }
@@ -374,7 +379,7 @@ public class ZhuishuWebParser extends AbsWebParser {
         try {
             Document document = Jsoup.connect(short_review_api).data(data).ignoreContentType(true).get();
             if (document != null) {
-                Log.d(TAG, "[foree] testLongReview: " + document.body().text());
+                if(DEBUG) Log.d(TAG, "[foree] testLongReview: " + document.body().text());
 
                 JSONObject jsonObject = new JSONObject(document.body().text());
                 JSONArray docs = jsonObject.getJSONArray("reviews");
@@ -403,7 +408,7 @@ public class ZhuishuWebParser extends AbsWebParser {
 
                     reviews.add(review);
 
-                    Log.d(TAG, review.toString());
+                    if(DEBUG) Log.d(TAG, review.toString());
                 }
 
             }
