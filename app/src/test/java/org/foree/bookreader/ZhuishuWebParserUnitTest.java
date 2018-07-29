@@ -2,6 +2,7 @@ package org.foree.bookreader;
 
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Review;
+import org.foree.bookreader.utils.DateUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -246,8 +247,8 @@ public class ZhuishuWebParserUnitTest {
                     review.setContent(shortReview.getString("content"));
                     review.setId(shortReview.getString("_id"));
                     review.setLikeCount(shortReview.getInt("likeCount"));
-                    review.setUpdated(shortReview.getString("updated"));
-                    review.setCreated(shortReview.getString("created"));
+                    review.setUpdated(DateUtils.formatJSDate(shortReview.getString("updated")));
+                    review.setCreated(DateUtils.formatJSDate(shortReview.getString("created")));
 
                     JSONObject authorObject = shortReview.getJSONObject("author");
                     Review.Author author = new Review.Author();
@@ -300,8 +301,8 @@ public class ZhuishuWebParserUnitTest {
                     review.setContent(shortReview.getString("content"));
                     review.setId(shortReview.getString("_id"));
                     review.setLikeCount(shortReview.getInt("likeCount"));
-                    review.setUpdated(shortReview.getString("updated"));
-                    review.setCreated(shortReview.getString("created"));
+                    review.setUpdated(DateUtils.formatJSDate(shortReview.getString("updated")));
+                    review.setCreated(DateUtils.formatJSDate(shortReview.getString("created")));
 
                     JSONObject authorObject = shortReview.getJSONObject("author");
                     Review.Author author = new Review.Author();

@@ -5,6 +5,7 @@ import android.util.Log;
 
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
+import org.foree.bookreader.utils.DateUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -180,7 +181,7 @@ class BiQuGeWebParser extends AbsWebParser {
                     book.setBookCoverUrl(bookCoverUrl);
                     break;
                 case "og:novel:update_time":
-                    book.setUpdateTime(update.attr("content"));
+                    book.setUpdateTime(DateUtils.parseNormal(update.attr("content")));
                     break;
                 case "og:novel:latest_chapter_name":
                     newestChapter.setChapterTitle(update.attr("content"));

@@ -51,7 +51,7 @@ public class SyncBooksThread extends Thread {
 
                         final Book newBook = WebParser.getInstance().getBookInfo(oldBook.getBookUrl());
 
-                        if (DateUtils.isNewer(oldBook.getUpdateTime(), newBook.getUpdateTime())) {
+                        if (newBook.getUpdateTime().after(oldBook.getUpdateTime())) {
                             // update chapters
                             chapterTasks.add(new Callable<Boolean>() {
                                 @Override
@@ -64,7 +64,7 @@ public class SyncBooksThread extends Thread {
                                 }
                             });
 
-                            bookDao.updateBookTime(newBook.getBookUrl(), newBook.getUpdateTime());
+                            bookDao.updateBookTime(newBook.getBookUrl(), DateUtils.formatDateToString(newBook.getUpdateTime()));
 
                             return newBook;
                         }

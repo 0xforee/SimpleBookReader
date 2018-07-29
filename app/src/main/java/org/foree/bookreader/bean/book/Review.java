@@ -1,5 +1,7 @@
 package org.foree.bookreader.bean.book;
 
+import java.util.Date;
+
 /**
  * @author foree
  * @date 2018/7/28
@@ -7,8 +9,8 @@ package org.foree.bookreader.bean.book;
  */
 public class Review {
     private String id;
-    private String updated;
-    private String created;
+    private Date updated;
+    private Date created;
     private int commentCount;
     private String content;
     private String title;
@@ -81,19 +83,19 @@ public class Review {
         this.id = id;
     }
 
-    public String getUpdated() {
+    public Date getUpdated() {
         return updated;
     }
 
-    public void setUpdated(String updated) {
+    public void setUpdated(Date updated) {
         this.updated = updated;
     }
 
-    public String getCreated() {
+    public Date getCreated() {
         return created;
     }
 
-    public void setCreated(String created) {
+    public void setCreated(Date created) {
         this.created = created;
     }
 

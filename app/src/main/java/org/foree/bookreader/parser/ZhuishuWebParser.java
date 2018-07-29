@@ -112,7 +112,7 @@ public class ZhuishuWebParser extends AbsWebParser {
                         description + ", " + updateTime + ", " + contentUrl + ", " + lastChapter + ", " + isSerial + ", " + wordCount);
 
                 book.setDescription(description);
-                book.setUpdateTime(updateTime);
+                book.setUpdateTime(DateUtils.formatJSDate(updateTime));
                 book.setContentUrl(contentUrl);
                 book.setBookName(bookName);
                 book.setBookUrl(bookUrl);
@@ -331,8 +331,8 @@ public class ZhuishuWebParser extends AbsWebParser {
                     review.setContent(shortReview.getString("content"));
                     review.setId(shortReview.getString("_id"));
                     review.setLikeCount(shortReview.getInt("likeCount"));
-                    review.setUpdated(shortReview.getString("updated"));
-                    review.setCreated(shortReview.getString("created"));
+                    review.setUpdated(DateUtils.formatJSDate(shortReview.getString("updated")));
+                    review.setCreated(DateUtils.formatJSDate(shortReview.getString("created")));
 
                     JSONObject authorObject = shortReview.getJSONObject("author");
                     Review.Author author = new Review.Author();
@@ -389,8 +389,8 @@ public class ZhuishuWebParser extends AbsWebParser {
                     review.setContent(shortReview.getString("content"));
                     review.setId(shortReview.getString("_id"));
                     review.setLikeCount(shortReview.getInt("likeCount"));
-                    review.setUpdated(shortReview.getString("updated"));
-                    review.setCreated(shortReview.getString("created"));
+                    review.setUpdated(DateUtils.formatJSDate(shortReview.getString("updated")));
+                    review.setCreated(DateUtils.formatJSDate(shortReview.getString("created")));
 
                     JSONObject authorObject = shortReview.getJSONObject("author");
                     Review.Author author = new Review.Author();

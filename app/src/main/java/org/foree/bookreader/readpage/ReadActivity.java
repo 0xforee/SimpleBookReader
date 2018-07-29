@@ -320,7 +320,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
         for (int i = 0; i < mBookRecord.getSourceList().size(); i++) {
             Source source = mBookRecord.getSourceList().get(i);
             Map<String, String> map = new HashMap<>(3);
-            map.put("updated", getString(R.string.source_change_updated) + DateUtils.fromatDateToString(source.getUpdated()));
+            map.put("updated", getString(R.string.source_change_updated) + DateUtils.relativeDate(getApplicationContext(), source.getUpdated()));
             map.put("title", source.getLastChapter());
             map.put("host", getString(R.string.source_change_host) + source.getHost());
 

@@ -46,7 +46,8 @@ public class BookDao {
             int pageIndex = cursor.getInt(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_PAGE_INDEX));
             String bookCoverUrl = cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_COVER_URL));
             String contentUrl = cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_CONTENT_URL));
-            Book book = new Book(bookName, bookUrl, updateTime, modifiedTime, category, author, description, pageIndex, recentChapterId, bookCoverUrl, contentUrl);
+            Book book = new Book(bookName, bookUrl, DateUtils.parseNormal(updateTime),
+                    DateUtils.parseNormal(modifiedTime), category, author, description, pageIndex, recentChapterId, bookCoverUrl, contentUrl);
             bookList.add(book);
         }
 
@@ -95,7 +96,7 @@ public class BookDao {
         // 内容不重复
         contentValues.put(BReaderContract.Books.COLUMN_NAME_BOOK_URL, book.getBookUrl());
         contentValues.put(BReaderContract.Books.COLUMN_NAME_BOOK_NAME, book.getBookName());
-        contentValues.put(BReaderContract.Books.COLUMN_NAME_UPDATE_TIME, book.getUpdateTime());
+        contentValues.put(BReaderContract.Books.COLUMN_NAME_UPDATE_TIME, DateUtils.formatDateToString(book.getUpdateTime()));
         contentValues.put(BReaderContract.Books.COLUMN_NAME_MODIFIED_TIME, DateUtils.getCurrentTime());
         contentValues.put(BReaderContract.Books.COLUMN_NAME_CATEGORY, book.getCategory());
         contentValues.put(BReaderContract.Books.COLUMN_NAME_AUTHOR, book.getAuthor());

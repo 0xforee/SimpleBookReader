@@ -216,10 +216,9 @@ public class BReaderProvider extends ContentProvider {
                     BReaderContract.Books.COLUMN_NAME_MODIFIED_TIME + " varchar");
 
             // 设置点击时间为当前时间
-            SimpleDateFormat df = DateUtils.getUpdateTimeFormat();
             System.out.println();// new Date()为获取当前系统时间
             ContentValues contentValue = new ContentValues();
-            contentValue.put(BReaderContract.Books.COLUMN_NAME_MODIFIED_TIME, df.format(new Date()));
+            contentValue.put(BReaderContract.Books.COLUMN_NAME_MODIFIED_TIME, DateUtils.getCurrentTime());
             db.update(BReaderContract.Books.TABLE_NAME, contentValue, null, null);
         }
 

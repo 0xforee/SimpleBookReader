@@ -5,6 +5,7 @@ import android.util.Log;
 
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
+import org.foree.bookreader.utils.DateUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -142,7 +143,7 @@ class PiaoTianWebParser extends AbsWebParser {
                                 book.setCategory(tmp.split("：")[1]);
                             } else if (tmp.contains("更新")) {
                                 Log.d(TAG, "update time = " + tmp.split("：")[1]);
-                                book.setUpdateTime(tmp.split("：")[1]);
+                                book.setUpdateTime(DateUtils.parseNormal(tmp.split("：")[1]));
                             } else if (tmp.contains("最新")) {
                                 Log.d(TAG, "newest chapter link = " + getWebInfo().getHostUrl() + p.child(0).attr("href")
                                         + ", name = " + tmp.split("：")[1]);

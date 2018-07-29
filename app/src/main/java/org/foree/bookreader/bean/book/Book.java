@@ -1,5 +1,6 @@
 package org.foree.bookreader.bean.book;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -8,13 +9,13 @@ import java.util.List;
 public class Book {
     private String bookName;
     // android sqlite中数据是弱类型，所以用String存取时间，然后再转格式
-    private String updateTime;
+    private Date updateTime;
     /**
      * 用户点击进入书籍的时间
      * 1. 和updateTime比较来判断是否显示小圆点
      * 2. 用于书架书籍的排序
      */
-    private String modifiedTime;
+    private Date modifiedTime;
     private String category;
     private String author;
     private String bookUrl;
@@ -25,7 +26,7 @@ public class Book {
 
     /**
      * contentUrl = sourceId默认为第一个（因为zhuishuapi是第一个，默认不可用，所以第一和第二交换）
-      */
+     */
     private String contentUrl;
 
     private String bookCoverUrl;
@@ -55,10 +56,10 @@ public class Book {
     }
 
     public Book(String bookName, String bookUrl, String bookCoverUrl, String category, String description) {
-        this(bookName, bookUrl, "", category, "", description, 0, "", bookCoverUrl, "");
+        this(bookName, bookUrl, new Date(), category, "", description, 0, "", bookCoverUrl, "");
     }
 
-    public Book(String bookName, String bookUrl, String updateTime, String category, String author,
+    public Book(String bookName, String bookUrl, Date updateTime, String category, String author,
                 String description, int pageIndex, String recentChapterUrl, String bookCoverUrl, String contentUrl) {
         this.bookUrl = bookUrl;
         this.bookName = bookName;
@@ -72,8 +73,8 @@ public class Book {
         this.contentUrl = contentUrl;
     }
 
-    public Book(String bookName, String bookUrl, String updateTime, String modifiedTime, String category, String author,
-                String description,int pageIndex, String recentChapterUrl, String bookCoverUrl, String contentUrl) {
+    public Book(String bookName, String bookUrl, Date updateTime, Date modifiedTime, String category, String author,
+                String description, int pageIndex, String recentChapterUrl, String bookCoverUrl, String contentUrl) {
         this.bookName = bookName;
         this.updateTime = updateTime;
         this.modifiedTime = modifiedTime;
@@ -95,11 +96,11 @@ public class Book {
         this.bookName = bookName;
     }
 
-    public String getUpdateTime() {
+    public Date getUpdateTime() {
         return updateTime;
     }
 
-    public void setUpdateTime(String updateTime) {
+    public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
     }
 
@@ -183,11 +184,11 @@ public class Book {
         this.pageIndex = pageIndex;
     }
 
-    public String getModifiedTime() {
+    public Date getModifiedTime() {
         return modifiedTime;
     }
 
-    public void setModifiedTime(String modifiedTime) {
+    public void setModifiedTime(Date modifiedTime) {
         this.modifiedTime = modifiedTime;
     }
 

@@ -20,6 +20,7 @@ import org.foree.bookreader.utils.DateUtils;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -104,7 +105,7 @@ public class BookRecord {
             }
 
             // 打开书的时候就更新书籍的修改时间
-            mBook.setModifiedTime(DateUtils.getCurrentTime());
+            mBook.setModifiedTime(new Date());
 
             mOldContentUrl = mBook.getContentUrl();
 
@@ -338,8 +339,8 @@ public class BookRecord {
         );
         if (cursor != null && cursor.getCount() != 0 && cursor.moveToFirst()) {
             book.setBookName(cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_BOOK_NAME)));
-            book.setUpdateTime(cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_UPDATE_TIME)));
-            book.setModifiedTime(cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_MODIFIED_TIME)));
+            book.setUpdateTime(DateUtils.parseNormal(cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_UPDATE_TIME))));
+            book.setModifiedTime(DateUtils.parseNormal(cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_MODIFIED_TIME))));
             book.setBookUrl(mBookUrl);
             book.setCategory(cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_CATEGORY)));
             book.setAuthor(cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_AUTHOR)));
@@ -373,7 +374,7 @@ public class BookRecord {
         ContentValues contentValues = new ContentValues();
         String selection = BReaderContract.Books.COLUMN_NAME_BOOK_URL + "=?";
         // 内容不重复
-        contentValues.put(BReaderContract.Books.COLUMN_NAME_MODIFIED_TIME, mBook.getModifiedTime());
+        contentValues.put(BReaderContract.Books.COLUMN_NAME_MODIFIED_TIME, DateUtils.formatDateToString(mBook.getModifiedTime()));
         contentValues.put(BReaderContract.Books.COLUMN_NAME_RECENT_CHAPTER_URL, mBook.getRecentChapterUrl());
         contentValues.put(BReaderContract.Books.COLUMN_NAME_PAGE_INDEX, mBook.getPageIndex());
         contentValues.put(BReaderContract.Books.COLUMN_NAME_CONTENT_URL, mBook.getContentUrl());

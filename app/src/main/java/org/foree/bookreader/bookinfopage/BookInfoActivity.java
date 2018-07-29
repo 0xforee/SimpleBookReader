@@ -316,6 +316,8 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
         super.onDestroy();
         // 重置toolbar的透明度，不然返回书架页toolbar会状态异常
         toolbar.getBackground().setAlpha(255);
+        if(mActionPopMenu.isShowing())
+            mActionPopMenu.dismiss();
     }
 
     /**

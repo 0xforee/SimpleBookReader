@@ -16,6 +16,7 @@ import java.util.Locale;
 public class DateUtils {
     private static final String TAG = DateUtils.class.getSimpleName();
     private static final boolean DEBUG = false;
+    private static final String NORMAL_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     /**
      * 时间更新帮助类
@@ -25,7 +26,7 @@ public class DateUtils {
      * @return 更新返回true, 否则返回false
      */
     public static boolean isNewer(String currentTime, String newTime) {
-        SimpleDateFormat simpleFormat = getUpdateTimeFormat();
+        SimpleDateFormat simpleFormat = getNormalDateFormat();
         try {
             if (DEBUG) Log.d(TAG, "currentTime = " + currentTime);
             if (DEBUG) Log.d(TAG, "newTime = " + newTime);
@@ -41,21 +42,30 @@ public class DateUtils {
         return false;
     }
 
-    public static SimpleDateFormat getUpdateTimeFormat() {
-        return new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ENGLISH);
+    private static SimpleDateFormat getNormalDateFormat() {
+        return new SimpleDateFormat(NORMAL_FORMAT, Locale.CHINA);
+    }
+
+    public static Date parseNormal(String time) {
+        try {
+            return getNormalDateFormat().parse(time);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static String getCurrentTime() {
-        SimpleDateFormat simpleFormat = getUpdateTimeFormat();
-        return simpleFormat.format(new Date());
+        return getNormalDateFormat().format(new Date());
     }
 
     public static Date formatJSDate(String time) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
         try {
             Date date = simpleDateFormat.parse(time);
-            Log.d(TAG, date.toString());
-            return date;
+            if (DEBUG) Log.d(TAG, date.toString());
+            // 转换为通用格式
+            return parseNormal(formatDateToString(date));
 
         } catch (ParseException e) {
             e.printStackTrace();
@@ -63,34 +73,30 @@ public class DateUtils {
         return null;
     }
 
-    public static String fromatDateToString(Date date) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.CHINA);
+    public static String formatDateToString(Date date) {
+        SimpleDateFormat simpleDateFormat = getNormalDateFormat();
         String dateString = simpleDateFormat.format(date);
-        Log.d(TAG, date.toString());
+        if (DEBUG) Log.d(TAG, date.toString());
         return dateString;
     }
 
-    public static String relativeDate(Context context, String dateString){
-        Date date = formatJSDate(dateString);
-        if(date != null){
-            Date current = new Date();
-            if(current.getYear() - date.getYear() > 0){
-                // 年前
-                return current.getYear() - date.getYear() + "年前";
-            }else if (current.getMonth() - date.getMonth() > 0){
-                // 月前
-                return current.getMonth() - date.getMonth() + "月前";
-            }else if (current.getDay() - date.getDay() > 0){
-                // 天前
-                return current.getDay() - date.getDay() + "天前";
-            }else if(current.getHours() - date.getHours() > 0){
-                // 小时前
-                return current.getHours() - date.getHours() + "小时前";
-            }else{
-                return 1 + "小时前";
-            }
+    public static String relativeDate(Context context, Date date) {
+        if (DEBUG) Log.d(TAG, "[foree] relativeDate: ");
+        Date current = new Date();
+        if (current.getYear() - date.getYear() > 0) {
+            // 年前
+            return current.getYear() - date.getYear() + "年前";
+        } else if (current.getMonth() - date.getMonth() > 0) {
+            // 月前
+            return current.getMonth() - date.getMonth() + "月前";
+        } else if (current.getDay() - date.getDay() > 0) {
+            // 天前
+            return current.getDay() - date.getDay() + "天前";
+        } else if (current.getHours() - date.getHours() > 0) {
+            // 小时前
+            return current.getHours() - date.getHours() + "小时前";
+        } else {
+            return 1 + "小时前";
         }
-        return dateString;
-
     }
 }

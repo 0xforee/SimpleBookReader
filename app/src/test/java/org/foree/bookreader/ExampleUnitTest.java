@@ -4,6 +4,7 @@ import android.util.Log;
 
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
+import org.foree.bookreader.utils.DateUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -82,7 +83,7 @@ public class ExampleUnitTest {
                                 book.setCategory(otherInfoString.split("：")[1]);
                                 break;
                             case "更新":
-                                book.setUpdateTime(otherInfoString.split("：")[1]);
+                                book.setUpdateTime(DateUtils.parseNormal(otherInfoString.split("：")[1]));
                                 break;
                             case "最新":
                                 Elements newest_ele = otherInfo.getElementsByTag("a");

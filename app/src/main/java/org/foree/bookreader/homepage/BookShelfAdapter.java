@@ -14,7 +14,6 @@ import com.bumptech.glide.Glide;
 
 import org.foree.bookreader.R;
 import org.foree.bookreader.bean.book.Book;
-import org.foree.bookreader.utils.DateUtils;
 
 import java.util.List;
 
@@ -86,10 +85,11 @@ public class BookShelfAdapter extends RecyclerView.Adapter<BookShelfAdapter.MyVi
             }
 
             // 是否显示更新小圆点
-            if (DateUtils.isNewer(book.getModifiedTime(), book.getUpdateTime())) {
+            if (book.getUpdateTime().after(book.getModifiedTime())) {
                 holder.imageViewUpdate.setVisibility(View.VISIBLE);
-            } else
+            } else {
                 holder.imageViewUpdate.setVisibility(View.INVISIBLE);
+            }
         }
 
     }
