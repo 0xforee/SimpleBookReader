@@ -176,4 +176,9 @@ public class WebParser implements IWebParser {
     public List<Review> getShortReviews(String bookId) {
         return getWebParser(bookId).getShortReviews(bookId);
     }
+
+    @Override
+    public List<Review> getLongReviews(String bookId){
+        return getWebParser(bookId).getLongReviews(bookId);
+    }
 }

@@ -145,7 +145,7 @@
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
-            <ListView
+            <org.foree.bookreader.bookinfopage.CommentListView
                 android:layout_below="@id/book_comment"
                 android:id="@+id/lv_comment_list"
                 android:layout_width="match_parent"

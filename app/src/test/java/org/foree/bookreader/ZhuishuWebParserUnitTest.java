@@ -226,7 +226,7 @@ public class ZhuishuWebParserUnitTest {
         data.put("book", testBookId);
         data.put("sortType", "newest");
         data.put("start", "0");
-        data.put("limit", "20");
+        data.put("limit", "10");
 
         try {
             Document document = Jsoup.connect(short_review_api).data(data).ignoreContentType(true).get();
@@ -235,6 +235,60 @@ public class ZhuishuWebParserUnitTest {
 
                 JSONObject jsonObject = new JSONObject(document.body().text());
                 JSONArray docs = jsonObject.getJSONArray("docs");
+                // 默认获取10个
+                for (int i = 0; i < docs.length(); i++) {
+                    if(i > 9){
+                        break;
+                    }
+
+                    JSONObject shortReview = docs.getJSONObject(i);
+                    Review review = new Review();
+                    review.setContent(shortReview.getString("content"));
+                    review.setId(shortReview.getString("_id"));
+                    review.setLikeCount(shortReview.getInt("likeCount"));
+                    review.setUpdated(shortReview.getString("updated"));
+                    review.setCreated(shortReview.getString("created"));
+
+                    JSONObject authorObject = shortReview.getJSONObject("author");
+                    Review.Author author = new Review.Author();
+                    author.setAvatar(imageApi + authorObject.getString("avatar"));
+                    author.setId(authorObject.getString("_id"));
+                    author.setLv(authorObject.getInt("lv"));
+                    author.setNickname(authorObject.getString("nickname"));
+
+                    review.setAuthor(author);
+
+                    Log.d(TAG, review.toString());
+                }
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testLongReviews(){
+        // 测试五行天，_id = 563552f7688af08743c2ce91
+        String short_review_api = "http://api.zhuishushenqi.com/post/review/by-book";
+        String testBookId = "563552f7688af08743c2ce91";
+        String imageApi = "http://statics.zhuishushenqi.com";
+
+        Map<String, String> data = new HashMap<>();
+        data.put("book", testBookId);
+        data.put("sort", "updated");
+        data.put("start", "0");
+        data.put("limit", "10");
+
+        try {
+            Document document = Jsoup.connect(short_review_api).data(data).ignoreContentType(true).get();
+            if (document != null) {
+                Log.d(TAG, "[foree] testLongReview: " + document.body().text());
+
+                JSONObject jsonObject = new JSONObject(document.body().text());
+                JSONArray docs = jsonObject.getJSONArray("reviews");
                 // 默认获取10个
                 for (int i = 0; i < docs.length(); i++) {
                     if(i > 9){

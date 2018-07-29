@@ -7,7 +7,9 @@ import android.graphics.Matrix;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Message;
+import android.os.Process;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
@@ -34,6 +36,7 @@ import org.foree.bookreader.R;
 import org.foree.bookreader.base.BaseActivity;
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
+import org.foree.bookreader.bean.book.Review;
 import org.foree.bookreader.bean.dao.BookDao;
 import org.foree.bookreader.net.NetCallback;
 import org.foree.bookreader.parser.WebParser;
@@ -49,7 +52,7 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
     private static final String TAG = BookInfoActivity.class.getSimpleName();
     private TextView mTvNovelAuthor, mTvNovelDescription, mTvBookLatestChapter;
     private Button mBtAdd, mBtRead;
-    private ListView mCommentList;
+    private CommentListView mCommentList;
     private String bookUrl;
     private BookDao bookDao;
     private Toolbar toolbar;
@@ -58,6 +61,8 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
     private RelativeLayout relativeLayout;
     private ScrollView mScrollView;
     private FrameLayout mContent;
+
+    private List<Review> mReviews;
 
     private int mDisplayWidth;
 
@@ -71,17 +76,17 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
     private final int MASK_HINT_COLOR = 0x39000000;
 
     private ProgressBar mProgressBar;
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-        }
-    };
+    private Handler mBgHandler;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_info);
+
+        // create bg handler
+        HandlerThread mBgThread = new HandlerThread("bg", Process.THREAD_PRIORITY_BACKGROUND);
+        mBgThread.start();
+        mBgHandler = new Handler(mBgThread.getLooper());
 
         Bundle bundle = getIntent().getExtras();
         bookUrl = bundle.getString("book_url");
@@ -147,7 +152,7 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
         relativeLayout = (RelativeLayout) findViewById(R.id.ll_book_info);
         mBtAdd = (Button) findViewById(R.id.bt_add);
         mBtRead = (Button) findViewById(R.id.bt_read);
-        mCommentList = (ListView) findViewById(R.id.lv_comment_list);
+        mCommentList = (CommentListView) findViewById(R.id.lv_comment_list);
         imageView = (ImageView) findViewById(R.id.iv_novel_image);
         mFrameBack = (ImageView) findViewById(R.id.frame_back);
         mFrameBack.setBackgroundColor(getResources().getColor(R.color.primary));
@@ -197,59 +202,68 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
     }
 
     private void initViews() {
-        WebParser.getInstance().getBookInfoAsync(bookUrl, new NetCallback<Book>() {
+        // get bookInfo
+        mBgHandler.post(new Runnable() {
             @Override
-            public void onSuccess(final Book data1) {
-                if (data1 == null) return;
-                WebParser.getInstance().getContentsAsync(bookUrl, data1.getContentUrl(), new NetCallback<List<Chapter>>() {
-                    @Override
-                    public void onSuccess(final List<Chapter> data) {
-                        mHandler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                book = data1;
-                                book.setChapters(data);
-                                mTvNovelAuthor.setText(data1.getAuthor());
-                                mTvBookLatestChapter.setText(book.getRectentChapterTitle());
-                                toolbar.setTitle(data1.getBookName());
-                                if (data1.getDescription() != null) {
-                                    String text = Html.fromHtml(data1.getDescription()).toString();
-                                    mTvNovelDescription.setText(text);
-                                }
+            public void run() {
+                // get bookinfo first
+                final Book book = WebParser.getInstance().getBookInfo(bookUrl);
+                if (book != null) {
+                    // get chapters
+                    book.setChapters(WebParser.getInstance().getContents(bookUrl, book.getContentUrl()));
 
-                                if (book.getBookCoverUrl() != null) {
-                                    Glide.with(BookInfoActivity.this).load(book.getBookCoverUrl()).asBitmap().into(new SimpleTarget<Bitmap>() {
-                                        @Override
-                                        public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                                            imageView.setImageBitmap(resource);
+                    // get comments
+                    final List<Review> reviews = WebParser.getInstance().getLongReviews(bookUrl);
 
-                                            mFrameBack.setColorFilter(MASK_HINT_COLOR, PorterDuff.Mode.DARKEN);
-                                            mFrameBack.setImageBitmap(createFrameBlurBackground(resource));
+                    // update UI
+                    mContent.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            updateBookInfo(book, reviews);
+                        }
+                    });
 
-                                            notifyUpdate(STATE_SUCCESS);
-                                        }
-                                    });
-                                }
-
-                            }
-                        }, 0);
-
-                    }
-
-                    @Override
-                    public void onFail(String msg) {
-
-                    }
-                });
-
-
-            }
-
-            @Override
-            public void onFail(String msg) {
-
+                }
             }
         });
+
+    }
+
+    /**
+     * 更新UI，要在主线程执行
+     * @param book 书籍信息
+     * @param reviews 评论信息
+     */
+    private void updateBookInfo(Book book, List<Review> reviews) {
+        mTvNovelAuthor.setText(book.getAuthor());
+        mTvBookLatestChapter.setText(book.getRectentChapterTitle());
+        toolbar.setTitle(book.getBookName());
+
+        // update description
+        if (book.getDescription() != null) {
+            String text = Html.fromHtml(book.getDescription()).toString();
+            mTvNovelDescription.setText(text);
+        }
+        mCommentList.setFocusable(false);
+        // update comment
+        CommentAdapter commentAdapter = new CommentAdapter(this, reviews);
+        mCommentList.setAdapter(commentAdapter);
+
+        if (book.getBookCoverUrl() != null) {
+            Glide.with(BookInfoActivity.this).load(book.getBookCoverUrl()).asBitmap().into(new SimpleTarget<Bitmap>() {
+                @Override
+                public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                    imageView.setImageBitmap(resource);
+
+                    mFrameBack.setColorFilter(MASK_HINT_COLOR, PorterDuff.Mode.DARKEN);
+                    mFrameBack.setImageBitmap(createFrameBlurBackground(resource));
+
+                    notifyUpdate(STATE_SUCCESS);
+                }
+            });
+        }
+
+
     }
 
     @Override

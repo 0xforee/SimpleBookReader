@@ -68,4 +68,9 @@ abstract class AbsWebParser implements IWebParser {
     public List<Review> getShortReviews(String bookId) {
         return null;
     }
+
+    @Override
+    public List<Review> getLongReviews(String bookId) {
+        return null;
+    }
 }

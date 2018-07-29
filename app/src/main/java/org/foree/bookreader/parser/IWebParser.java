@@ -38,4 +38,6 @@ interface IWebParser {
     List<Source> getBookSource(String bookId);
 
     List<Review> getShortReviews(String bookId);
+
+    List<Review> getLongReviews(String bookId);
 }
