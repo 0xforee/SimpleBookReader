@@ -17,6 +17,8 @@ public class DateUtils {
     private static final String TAG = DateUtils.class.getSimpleName();
     private static final boolean DEBUG = false;
     private static final String NORMAL_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    private static final String JS_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+    private static final String OLD_FORMAT = "yyyy-MM-dd HH:mm";
 
     /**
      * 时间更新帮助类
@@ -46,21 +48,47 @@ public class DateUtils {
         return new SimpleDateFormat(NORMAL_FORMAT, Locale.CHINA);
     }
 
+    /**
+     * 解析String时间为Normal，兼容JS和OLD格式
+     * @param time
+     * @return
+     */
     public static Date parseNormal(String time) {
         try {
             return getNormalDateFormat().parse(time);
         } catch (ParseException e) {
-            e.printStackTrace();
+            Log.d(TAG, "[foree] parseNormal: error, try old fromat " + time);
+            // 兼容旧版本格式: 2018-11-11 23:11 和 JS格式
+            SimpleDateFormat old = new SimpleDateFormat(OLD_FORMAT, Locale.CHINA);
+            try {
+                return old.parse(time);
+            } catch (ParseException e1) {
+                SimpleDateFormat js = new SimpleDateFormat(JS_FORMAT, Locale.CHINA);
+                try {
+                    return js.parse(time);
+                } catch (ParseException e2) {
+                    e2.printStackTrace();
+                }
+            }
         }
         return null;
     }
 
+    /**
+     * 获取当前时间的String格式
+     * @return
+     */
     public static String getCurrentTime() {
         return getNormalDateFormat().format(new Date());
     }
 
+    /**
+     * 解析JS的String格式为Date
+     * @param time js时间
+     * @return Date格式
+     */
     public static Date formatJSDate(String time) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(JS_FORMAT, Locale.US);
         try {
             Date date = simpleDateFormat.parse(time);
             if (DEBUG) Log.d(TAG, date.toString());
@@ -73,6 +101,11 @@ public class DateUtils {
         return null;
     }
 
+    /**
+     * 将Date格式转换为Normal格式，数据库中存储这种String格式
+     * @param date Date对象
+     * @return 转换之后的格式
+     */
     public static String formatDateToString(Date date) {
         SimpleDateFormat simpleDateFormat = getNormalDateFormat();
         String dateString = simpleDateFormat.format(date);
@@ -80,6 +113,12 @@ public class DateUtils {
         return dateString;
     }
 
+    /**
+     * 计算给定的时间与当前时间的相对表示法
+     * @param context
+     * @param date 给定的时间
+     * @return String格式的表达
+     */
     public static String relativeDate(Context context, Date date) {
         if (DEBUG) Log.d(TAG, "[foree] relativeDate: ");
         Date current = new Date();
