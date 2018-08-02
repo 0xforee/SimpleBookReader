@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.WindowManager;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -23,7 +22,7 @@ import java.lang.reflect.Method;
 
 public class ReadViewPager extends ViewPager {
     private static final String TAG = ReadViewPager.class.getSimpleName();
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     private int displayWidth;
     private int displayHeight;
@@ -51,32 +50,24 @@ public class ReadViewPager extends ViewPager {
     private boolean mPreScrollDisable, mPostScrollDisable;
 
     public void setPreScrollDisable(boolean state) {
-        Log.d(TAG, "[foree] setPreScrollDisable: " + state);
+        if (DEBUG) {
+            Log.d(TAG, "[foree] setPreScrollDisable: " + state);
+        }
         mPreScrollDisable = state;
     }
 
     public void setPostScrollDisable(boolean state) {
-        Log.d(TAG, "[foree] setPostScrollDisable: " + state);
+        if (DEBUG) {
+            Log.d(TAG, "[foree] setPostScrollDisable: " + state);
+        }
         mPostScrollDisable = state;
-    }
-
-    /**
-     * Call this view's OnClickListener, if it is defined.  Performs all normal
-     * actions associated with clicking: reporting accessibility event, playing
-     * a sound, etc.
-     *
-     * @return True there was an assigned OnClickListener that was called, false
-     * otherwise is returned.
-     */
-    @Override
-    public boolean performClick() {
-        Log.d(TAG, "[foree] performClick: ");
-        return super.performClick();
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
-        Log.d(TAG, "[foree] onTouchEvent: mPreScrollDisable = " + mPreScrollDisable + ", mPostScrollDisable = " + mPostScrollDisable);
+        if (DEBUG) {
+            Log.d(TAG, "[foree] onTouchEvent: mPreScrollDisable = " + mPreScrollDisable + ", mPostScrollDisable = " + mPostScrollDisable);
+        }
         switch (ev.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
                 mStartX = ev.getX();
@@ -167,7 +158,7 @@ public class ReadViewPager extends ViewPager {
         void onMediumAreaClick();
     }
 
-    private void setPopulate(int position){
+    private void setPopulate(int position) {
         try {
             Class<?> clazz = this.getClass().getSuperclass();
             Field field = clazz.getDeclaredField("mPopulatePending");

@@ -52,6 +52,7 @@ import java.util.List;
 
 public class BookInfoActivity extends BaseActivity implements View.OnClickListener {
     private static final String TAG = BookInfoActivity.class.getSimpleName();
+    private static final boolean DEBUG = false;
     private TextView mTvNovelAuthor, mTvNovelDescription, mTvBookLatestChapter, mTvCate, mTvCount, mTvBookCommentTitle;
     private Button mBtAdd, mBtRead, mBtDownload;
     private CommentListView mCommentList;
@@ -121,7 +122,9 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
             public void onScrollChanged() {
                 int scrollY = mScrollView.getScrollY();
                 int alpha = getAlpha(scrollY);
-                Log.d(TAG, "[foree] onScrollChange: scrollY = " + scrollY + ", alpha = " + alpha);
+                if (DEBUG) {
+                    Log.d(TAG, "[foree] onScrollChange: scrollY = " + scrollY + ", alpha = " + alpha);
+                }
 
                 toolbar.getBackground().setAlpha(alpha);
                 int color = getResources().getColor(R.color.primary);
@@ -316,7 +319,7 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
         super.onDestroy();
         // 重置toolbar的透明度，不然返回书架页toolbar会状态异常
         toolbar.getBackground().setAlpha(255);
-        if(mActionPopMenu.isShowing())
+        if (mActionPopMenu.isShowing())
             mActionPopMenu.dismiss();
     }
 

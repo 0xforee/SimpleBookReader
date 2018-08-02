@@ -108,8 +108,10 @@ public class ZhuishuWebParser extends AbsWebParser {
                 boolean isSerial = bookInfoObject.getBoolean("isSerial");
                 int wordCount = bookInfoObject.getInt("wordCount");
 
-                Log.d(TAG, bookUrl + ", " + bookName + ", " + author + ", " + coverUrl + ", " + cate + ", " +
-                        description + ", " + updateTime + ", " + contentUrl + ", " + lastChapter + ", " + isSerial + ", " + wordCount);
+                if (DEBUG) {
+                    Log.d(TAG, bookUrl + ", " + bookName + ", " + author + ", " + coverUrl + ", " + cate + ", " +
+                            description + ", " + updateTime + ", " + contentUrl + ", " + lastChapter + ", " + isSerial + ", " + wordCount);
+                }
 
                 book.setDescription(description);
                 book.setUpdateTime(DateUtils.formatJSDate(updateTime));
@@ -140,7 +142,9 @@ public class ZhuishuWebParser extends AbsWebParser {
         Map<String, String> data = new HashMap<>();
         data.put("view", "chapters");
 
-        Log.d(TAG, "getContents() called with: bookId = [" + bookId + "], contentsUrl = [" + contentsUrl + "]");
+        if (DEBUG) {
+            Log.d(TAG, "getContents() called with: bookId = [" + bookId + "], contentsUrl = [" + contentsUrl + "]");
+        }
 
         try {
             Document document = Jsoup.connect(contentsApi + contentsUrl).data(data).ignoreContentType(true).get();
@@ -186,7 +190,7 @@ public class ZhuishuWebParser extends AbsWebParser {
         chapter.setChapterUrl(chapterUrl);
         try {
             String encodeLink = URLEncoder.encode(chapterUrl);
-            if(DEBUG) Log.d(TAG, "get link = " + contentApi + encodeLink);
+            if (DEBUG) Log.d(TAG, "get link = " + contentApi + encodeLink);
 
             Document document = Jsoup.connect(contentApi + encodeLink).ignoreContentType(true).get();
             if (document != null) {
@@ -249,7 +253,7 @@ public class ZhuishuWebParser extends AbsWebParser {
         data.put("view", "summary");
         data.put("book", bookId);
 
-        int my716_source_index = 1;
+        int my716SourceIndex = 1;
         try {
             Document document = Jsoup.connect(bookSourceApi).data(data).ignoreContentType(true).get();
             if (document != null) {
@@ -269,8 +273,8 @@ public class ZhuishuWebParser extends AbsWebParser {
 
                     sourceList.add(source);
 
-                    if(source.getHost().contains("my716")){
-                        my716_source_index = i;
+                    if (source.getHost().contains("my716")) {
+                        my716SourceIndex = i;
                     }
 
                     if (DEBUG) {
@@ -285,10 +289,10 @@ public class ZhuishuWebParser extends AbsWebParser {
         }
 
         //交换第一个和第二个书源（zhuishuvip为第一个，不可用）
-        if(!sourceList.isEmpty() && sourceList.size() > my716_source_index){
+        if (!sourceList.isEmpty() && sourceList.size() > my716SourceIndex) {
             Source tmp = sourceList.get(0);
-            sourceList.set(0, sourceList.get(my716_source_index));
-            sourceList.set(my716_source_index, tmp);
+            sourceList.set(0, sourceList.get(my716SourceIndex));
+            sourceList.set(my716SourceIndex, tmp);
         }
 
         return sourceList;
@@ -296,6 +300,7 @@ public class ZhuishuWebParser extends AbsWebParser {
 
     /**
      * source对应的就是章节列表，sourceId = contentUrl
+     *
      * @param bookId 书籍id
      * @return 默认的sourceId
      */
@@ -327,7 +332,7 @@ public class ZhuishuWebParser extends AbsWebParser {
                 JSONArray docs = jsonObject.getJSONArray("docs");
                 // 默认获取10个
                 for (int i = 0; i < docs.length(); i++) {
-                    if(i > 9){
+                    if (i > 9) {
                         break;
                     }
 
@@ -349,7 +354,7 @@ public class ZhuishuWebParser extends AbsWebParser {
                     review.setAuthor(author);
 
                     reviews.add(review);
-                    if(DEBUG) Log.d(TAG, review.toString());
+                    if (DEBUG) Log.d(TAG, review.toString());
                 }
 
             }
@@ -379,13 +384,13 @@ public class ZhuishuWebParser extends AbsWebParser {
         try {
             Document document = Jsoup.connect(short_review_api).data(data).ignoreContentType(true).get();
             if (document != null) {
-                if(DEBUG) Log.d(TAG, "[foree] testLongReview: " + document.body().text());
+                if (DEBUG) Log.d(TAG, "[foree] testLongReview: " + document.body().text());
 
                 JSONObject jsonObject = new JSONObject(document.body().text());
                 JSONArray docs = jsonObject.getJSONArray("reviews");
                 // 默认获取4个
                 for (int i = 0; i < docs.length(); i++) {
-                    if(i > 3){
+                    if (i > 3) {
                         break;
                     }
 
@@ -408,7 +413,7 @@ public class ZhuishuWebParser extends AbsWebParser {
 
                     reviews.add(review);
 
-                    if(DEBUG) Log.d(TAG, review.toString());
+                    if (DEBUG) Log.d(TAG, review.toString());
                 }
 
             }

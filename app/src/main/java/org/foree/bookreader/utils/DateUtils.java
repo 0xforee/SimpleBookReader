@@ -50,6 +50,7 @@ public class DateUtils {
 
     /**
      * 解析String时间为Normal，兼容JS和OLD格式
+     *
      * @param time
      * @return
      */
@@ -76,6 +77,7 @@ public class DateUtils {
 
     /**
      * 获取当前时间的String格式
+     *
      * @return
      */
     public static String getCurrentTime() {
@@ -84,6 +86,7 @@ public class DateUtils {
 
     /**
      * 解析JS的String格式为Date
+     *
      * @param time js时间
      * @return Date格式
      */
@@ -103,6 +106,7 @@ public class DateUtils {
 
     /**
      * 将Date格式转换为Normal格式，数据库中存储这种String格式
+     *
      * @param date Date对象
      * @return 转换之后的格式
      */
@@ -115,8 +119,9 @@ public class DateUtils {
 
     /**
      * 计算给定的时间与当前时间的相对表示法
+     *
      * @param context
-     * @param date 给定的时间
+     * @param date    给定的时间
      * @return String格式的表达
      */
     public static String relativeDate(Context context, Date date) {
