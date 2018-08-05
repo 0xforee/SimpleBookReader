@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="10dp"
+    android:paddingTop="10dp"
+    android:paddingStart="25dp"
+    android:paddingEnd="25dp">
+
+    <TextView
+        android:id="@+id/tv_update_version_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/update_version_name_title"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/split"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/tv_update_version_name"
+        android:textSize="16sp"
+        android:text="@string/bookinfo_serial_count_divider" />
+
+    <TextView
+        android:id="@+id/tv_update_apk_size"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/split"
+        android:textSize="16sp"
+        android:text="@string/update_size" />
+
+    <TextView
+        android:id="@+id/tv_update_log_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_update_apk_size"
+        android:layout_marginTop="10dp"
+        android:textSize="16sp"
+        android:text="@string/update_content_title" />
+
+    <TextView
+        android:id="@+id/tv_update_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_update_log_title" />
+</RelativeLayout>
+

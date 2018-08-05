@@ -40,6 +40,16 @@ public class SettingsActivity extends BaseActivity implements SharedPreferences.
     // page background
     public static final String KEY_PREF_PAGE_BACKGROUND = "pref_key_page_background";
 
+    /**
+     * check update
+     */
+    public static final String KEY_PREF_CHECK_UPDATE = "pref_key_check_update";
+
+    /**
+     * ignore update
+     */
+    public static final String KEY_IGNORE_UPDATE = "pref_key_ignore_update";
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +81,7 @@ public class SettingsActivity extends BaseActivity implements SharedPreferences.
         }
     }
 
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -82,4 +93,6 @@ public class SettingsActivity extends BaseActivity implements SharedPreferences.
         super.onPause();
         PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);
     }
+
+
 }

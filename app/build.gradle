@@ -25,8 +25,8 @@ android {
         applicationId "org.foree.bookreader"
         minSdkVersion 21
         targetSdkVersion 23
-        versionCode 3
-        versionName "1.1.0"
+        versionCode 4
+        versionName "1.2.0"
         setProperty("archivesBaseName", "zhuishu-v$versionName")
         vectorDrawables.useSupportLibrary = true
     }
@@ -37,6 +37,8 @@ android {
             signingConfig signingConfigs.config
         }
     }
+    //兼容Android6.0系统所需，如果这句话报错，可在dependencies标签下使用compile 'cn.bmob.android:http-legacy:1.0'**
+    useLibrary 'org.apache.http.legacy'
 }
 
 dependencies {
@@ -56,4 +58,9 @@ dependencies {
     testCompile 'org.json:json:20140107'
     debugCompile 'com.amitshekhar.android:debug-db:1.0.0'
     compile 'com.github.Commit451:NativeStackBlur:1.0.5'
+    // bmob
+    compile 'cn.bmob.android:bmob-sdk:3.5.8'
+    configurations {
+        all*.exclude group: 'com.google.code.gson'
+    }
 }

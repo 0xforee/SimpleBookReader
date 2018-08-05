@@ -9,7 +9,6 @@ import android.support.v7.widget.Toolbar;
 import android.transition.AutoTransition;
 import android.transition.Transition;
 import android.transition.TransitionManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -17,21 +16,12 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
-
 import org.foree.bookreader.R;
 import org.foree.bookreader.base.BaseActivity;
 import org.foree.bookreader.base.GlobalConfig;
+import org.foree.bookreader.update.UpdateAgent;
 import org.foree.bookreader.searchpage.SearchResultsActivity;
 import org.foree.bookreader.settings.SettingsActivity;
-import org.json.JSONObject;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
 public class BookShelfActivity extends BaseActivity {
 
@@ -50,6 +40,7 @@ public class BookShelfActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_shelf);
 
+        UpdateAgent.checkUpdate(this, false);
         initViews();
 
         mNightMode = GlobalConfig.getInstance().isNightMode();
@@ -159,8 +150,6 @@ public class BookShelfActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_about:
-                break;
             case R.id.action_settings:
                 Intent intent = new Intent(BookShelfActivity.this, SettingsActivity.class);
                 startActivity(intent);

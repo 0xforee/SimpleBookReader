@@ -6,8 +6,4 @@
         android:icon="@drawable/ic_settings_black_24dp"
         android:title="@string/action_settings"
         app:showAsAction="never"/>
-    <item
-        android:id="@+id/action_about"
-        android:title="@string/action_about"
-        app:showAsAction="never" />
 </menu>

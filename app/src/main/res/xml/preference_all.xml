@@ -2,8 +2,8 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory android:title="@string/pref_general">
         <SwitchPreference
-            android:key="pref_key_night_mode"
             android:enabled="false"
+            android:key="pref_key_night_mode"
             android:title="@string/pref_title_night_mode" />
         <SwitchPreference
             android:key="pref_key_offline_wifi_only"
@@ -50,8 +50,8 @@
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/pref_title_about">
-        <Preference android:title="@string/pref_title_about">
-            <intent android:action=".AboutActivity" />
-        </Preference>
+        <Preference
+            android:key="pref_key_check_update"
+            android:title="@string/pref_title_check_update" />
     </PreferenceCategory>
 </PreferenceScreen>

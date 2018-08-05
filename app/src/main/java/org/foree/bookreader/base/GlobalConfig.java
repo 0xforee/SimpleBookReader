@@ -1,11 +1,12 @@
 package org.foree.bookreader.base;
 
+import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Color;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatDelegate;
-import android.text.TextUtils;
 import android.util.Log;
 
 import org.foree.bookreader.R;
@@ -17,6 +18,7 @@ import org.foree.bookreader.settings.SettingsActivity;
 public class GlobalConfig {
     private static GlobalConfig ourInstance = new GlobalConfig();
     private static String TAG = GlobalConfig.class.getSimpleName();
+    private Context mContext;
 
     // 0 to 1 adjusts the brightness from dark to full bright.
     private static float mAppBrightness = -1;
@@ -28,7 +30,8 @@ public class GlobalConfig {
     }
 
     private GlobalConfig() {
-        mSharedPreference = PreferenceManager.getDefaultSharedPreferences(BaseApplication.getInstance());
+        mContext = BaseApplication.getInstance();
+        mSharedPreference = PreferenceManager.getDefaultSharedPreferences(mContext);
     }
 
     public boolean isNightMode() {
@@ -49,7 +52,7 @@ public class GlobalConfig {
         if (mAppBrightness == -1) {
             try {
                 // get system brightness value
-                mAppBrightness = Settings.System.getInt(BaseApplication.getInstance().getContentResolver(), Settings.System.SCREEN_BRIGHTNESS) / 255f;
+                mAppBrightness = Settings.System.getInt(mContext.getContentResolver(), Settings.System.SCREEN_BRIGHTNESS) / 255f;
             } catch (Settings.SettingNotFoundException e) {
                 e.printStackTrace();
             }
@@ -68,11 +71,41 @@ public class GlobalConfig {
     }
 
     public int getPageBackground() {
-        int color = BaseApplication.getInstance().getResources().getColor(R.color.normal_page_background);
+        int color = mContext.getResources().getColor(R.color.normal_page_background);
         return mSharedPreference.getInt(SettingsActivity.KEY_PREF_PAGE_BACKGROUND, color);
     }
 
     public void setPageBackground(int color) {
         mSharedPreference.edit().putInt(SettingsActivity.KEY_PREF_PAGE_BACKGROUND, color).apply();
+    }
+
+    public boolean skipUpdate(int newVersion){
+        return mSharedPreference.getInt(SettingsActivity.KEY_IGNORE_UPDATE, -1) == newVersion;
+    }
+
+    public void ignoreVersion(int newVersion){
+        mSharedPreference.edit().putInt(SettingsActivity.KEY_IGNORE_UPDATE, newVersion).apply();
+    }
+
+    public int getVersionCode(){
+        try {
+            PackageInfo info = mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), 0);
+            return info.versionCode;
+
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    public String getVersionName(){
+        try {
+            PackageInfo info = mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), 0);
+            return info.versionName;
+
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 }

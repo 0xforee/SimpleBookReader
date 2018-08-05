@@ -19,6 +19,8 @@ import org.foree.bookreader.settings.SettingsActivity;
 
 import java.io.File;
 
+import cn.bmob.v3.Bmob;
+
 /**
  * Created by foree on 16-7-19.
  */
@@ -71,6 +73,10 @@ public class BaseApplication extends Application {
         if (pm.getComponentEnabledSetting(receiver) != PackageManager.COMPONENT_ENABLED_STATE_ENABLED) {
             setReceiverEnable(true);
         }
+
+        // init bmob
+        Bmob.initialize(this, "15398f4ba7ca3337f4b6cff8756ebe35");
+
     }
 
     private long getInterval() {
