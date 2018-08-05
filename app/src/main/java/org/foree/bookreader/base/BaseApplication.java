@@ -20,6 +20,10 @@ import org.foree.bookreader.settings.SettingsActivity;
 import java.io.File;
 
 import cn.bmob.v3.Bmob;
+import cn.bmob.v3.BmobInstallation;
+import cn.bmob.v3.BmobInstallationManager;
+import cn.bmob.v3.InstallationListener;
+import cn.bmob.v3.exception.BmobException;
 
 /**
  * Created by foree on 16-7-19.
@@ -75,7 +79,18 @@ public class BaseApplication extends Application {
         }
 
         // init bmob
-        Bmob.initialize(this, "15398f4ba7ca3337f4b6cff8756ebe35");
+        Bmob.initialize(this, "15398f4ba7ca3337f4b6cff8756ebe35", "release");
+        BmobInstallationManager.getInstance().initialize(new InstallationListener<BmobInstallation>() {
+            @Override
+            public void done(BmobInstallation bmobInstallation, BmobException e) {
+                if (e == null) {
+                    Log.d(TAG, bmobInstallation.getObjectId() + "-" + bmobInstallation.getInstallationId());
+                } else {
+                    Log.e(TAG, e.getMessage());
+                }
+            }
+        });
+
 
     }
 

@@ -1,9 +1,13 @@
 package org.foree.bookreader.homepage;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.transition.AutoTransition;
@@ -19,9 +23,9 @@ import android.widget.FrameLayout;
 import org.foree.bookreader.R;
 import org.foree.bookreader.base.BaseActivity;
 import org.foree.bookreader.base.GlobalConfig;
-import org.foree.bookreader.update.UpdateAgent;
 import org.foree.bookreader.searchpage.SearchResultsActivity;
 import org.foree.bookreader.settings.SettingsActivity;
+import org.foree.bookreader.update.UpdateAgent;
 
 public class BookShelfActivity extends BaseActivity {
 
@@ -45,6 +49,16 @@ public class BookShelfActivity extends BaseActivity {
 
         mNightMode = GlobalConfig.getInstance().isNightMode();
 
+        checkPermission();
+
+    }
+
+    private void checkPermission() {
+        // check permision
+        int result = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
+        if (result != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 1);
+        }
     }
 
     @Override
