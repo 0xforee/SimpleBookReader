@@ -1,7 +1,12 @@
 package org.foree.bookreader.readpage;
 
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.drawable.ColorDrawable;
+import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -70,6 +75,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
     private ListView chapterTitleListView, mSourceChangeListView;
     private CustomChapterListAdapter contentAdapter;
     private CustomSourceListAdapter mSourceChangeAdapter;
+    private Receiver mReceiver;
     /**
      * for menu pop image button
      */
@@ -126,6 +132,9 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
 
         initViews();
         initMenuPop();
+
+        mReceiver = new Receiver();
+        mReceiver.init();
 
     }
 
@@ -456,5 +465,23 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
     public void onChapterSwitched(String newChapterUrl) {
         switchChapter(newChapterUrl, false);
 
+    }
+
+    private final class Receiver extends BroadcastReceiver {
+        public void init() {
+            IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
+            registerReceiver(this, intentFilter);
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (action.equals(Intent.ACTION_BATTERY_CHANGED)) {
+                int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 100);
+                Log.d(TAG, "[foree] onReceive: level = " + level);
+                mReadPageAdapter.updateBatteryLevel(level);
+            }
+        }
     }
 }

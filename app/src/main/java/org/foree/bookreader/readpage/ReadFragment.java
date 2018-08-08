@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.foree.bookreader.R;
@@ -18,14 +19,15 @@ import java.util.Calendar;
 public class ReadFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String ARG_TITLE = "title";
 
-    private TextView tvContents, tvTitle, tvTime, tvIndex, tvPageNum, tvSeparator;
+    private TextView tvContents, tvTitle, tvTime, tvIndex, tvBatteryLevel;
+    private ImageView mIvBatteryIcon;
     private View rootView;
 
     public static ReadFragment newInstance() {
         ReadFragment fragment = new ReadFragment();
-       // Bundle args = new Bundle();
-       // args.putSerializable(ARG_TITLE, readPageDataSet);
-       // fragment.setArguments(args);
+        // Bundle args = new Bundle();
+        // args.putSerializable(ARG_TITLE, readPageDataSet);
+        // fragment.setArguments(args);
         return fragment;
     }
 
@@ -34,7 +36,7 @@ public class ReadFragment extends Fragment implements SharedPreferences.OnShared
     }
 
     public void setData(ReadPageDataSet readPageDataSet) {
-        if( readPageDataSet != null) {
+        if (readPageDataSet != null) {
             if (tvContents != null) {
                 tvContents.setText(readPageDataSet.getContents());
             }
@@ -43,10 +45,11 @@ public class ReadFragment extends Fragment implements SharedPreferences.OnShared
                 tvTitle.setText(readPageDataSet.getTitle());
             }
 
+            String index = (readPageDataSet.getIndex() + 1) + "/" + readPageDataSet.getPageNum();
             tvTime.setText(getCurrentTime());
-            tvPageNum.setText(readPageDataSet.getPageNum() + "");
-            tvIndex.setText(readPageDataSet.getIndex() + 1 + "");
-            tvSeparator.setVisibility(View.VISIBLE);
+            tvIndex.setText(index);
+            tvBatteryLevel.setText(readPageDataSet.getBatteryLevel() + "");
+            mIvBatteryIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_battery_level));
         }
     }
 
@@ -58,11 +61,8 @@ public class ReadFragment extends Fragment implements SharedPreferences.OnShared
         tvTitle = (TextView) rootView.findViewById(R.id.tv_title);
         tvTime = (TextView) rootView.findViewById(R.id.tv_time);
         tvIndex = (TextView) rootView.findViewById(R.id.tv_index);
-        tvPageNum = (TextView) rootView.findViewById(R.id.tv_page_num);
-        tvSeparator = (TextView) rootView.findViewById(R.id.tv_separator);
-//        if (getArguments() != null) {
-//            setData((ReadPageDataSet) getArguments().getSerializable(ARG_TITLE));
-//        }
+        tvBatteryLevel = (TextView) rootView.findViewById(R.id.battery_level);
+        mIvBatteryIcon = (ImageView) rootView.findViewById(R.id.battery_icon);
 
         rootView.setBackgroundColor(GlobalConfig.getInstance().getPageBackground());
         return rootView;
