@@ -22,6 +22,7 @@ public class ReadFragment extends Fragment implements SharedPreferences.OnShared
     private TextView tvContents, tvTitle, tvTime, tvIndex, tvBatteryLevel;
     private ImageView mIvBatteryIcon;
     private View rootView;
+    private String mBatteryLevel;
 
     public static ReadFragment newInstance() {
         ReadFragment fragment = new ReadFragment();
@@ -48,7 +49,8 @@ public class ReadFragment extends Fragment implements SharedPreferences.OnShared
             String index = (readPageDataSet.getIndex() + 1) + "/" + readPageDataSet.getPageNum();
             tvTime.setText(getCurrentTime());
             tvIndex.setText(index);
-            tvBatteryLevel.setText(readPageDataSet.getBatteryLevel() + "");
+            tvBatteryLevel.setVisibility(View.VISIBLE);
+            tvBatteryLevel.setText(mBatteryLevel);
             mIvBatteryIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_battery_level));
         }
     }
@@ -66,6 +68,13 @@ public class ReadFragment extends Fragment implements SharedPreferences.OnShared
 
         rootView.setBackgroundColor(GlobalConfig.getInstance().getPageBackground());
         return rootView;
+    }
+
+    public void updateBatteryLevel(int level){
+        mBatteryLevel = level + "";
+        if(tvBatteryLevel != null) {
+            tvBatteryLevel.setText(mBatteryLevel);
+        }
     }
 
     private String getCurrentTime() {

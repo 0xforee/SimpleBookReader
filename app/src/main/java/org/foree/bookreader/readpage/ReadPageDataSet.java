@@ -13,15 +13,13 @@ public class ReadPageDataSet implements Serializable {
     private int pageNum;
     private int index;
     private String url;
-    private int batteryLevel;
 
-    public ReadPageDataSet(String url, String title, String contents, int pageNum, int index, int batteryLevel) {
+    public ReadPageDataSet(String url, String title, String contents, int pageNum, int index) {
         this.url = url;
         this.title = title;
         this.contents = contents;
         this.pageNum = pageNum;
         this.index = index;
-        this.batteryLevel = batteryLevel;
     }
 
     public String getUrl() {
@@ -44,10 +42,6 @@ public class ReadPageDataSet implements Serializable {
         return index;
     }
 
-    public int getBatteryLevel() {
-        return batteryLevel;
-    }
-
     @Override
     public String toString() {
         return "ReadPageDataSet{" +
@@ -56,7 +50,6 @@ public class ReadPageDataSet implements Serializable {
                 ", pageNum=" + pageNum +
                 ", index=" + index +
                 ", url='" + url + '\'' +
-                ", batteryLevel=" + batteryLevel +
                 '}';
     }
 }

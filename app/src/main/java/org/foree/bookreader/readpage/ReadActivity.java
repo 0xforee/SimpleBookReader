@@ -257,6 +257,8 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
 
         mBookRecord.switchPageIndex(mReadPageAdapter.getCurrentPageIndex());
         mBookRecord.saveBookRecord();
+
+        mReceiver.unregister();
     }
 
     private void initMenuPop() {
@@ -472,6 +474,10 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
             IntentFilter intentFilter = new IntentFilter();
             intentFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
             registerReceiver(this, intentFilter);
+        }
+
+        public void unregister(){
+            unregisterReceiver(this);
         }
 
         @Override

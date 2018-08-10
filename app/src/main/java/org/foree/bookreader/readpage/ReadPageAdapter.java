@@ -218,7 +218,7 @@ public class ReadPageAdapter extends FragmentPagerAdapter {
         int size = chapter.numberOfPages();
         for (int i = size - 1; i > 0; i--) {
             ReadPageDataSet data = new ReadPageDataSet(
-                    chapter.getChapterUrl(), chapter.getChapterTitle(), chapter.getPage(i), size, i, mBatteryLevel);
+                    chapter.getChapterUrl(), chapter.getChapterTitle(), chapter.getPage(i), size, i);
 
             mChapterList.addFirst(data);
         }
@@ -232,7 +232,7 @@ public class ReadPageAdapter extends FragmentPagerAdapter {
         int size = chapter.numberOfPages();
         for (int i = 0; i < size; i++) {
             ReadPageDataSet data = new ReadPageDataSet(
-                    chapter.getChapterUrl(), chapter.getChapterTitle(), chapter.getPage(i), size, i, mBatteryLevel);
+                    chapter.getChapterUrl(), chapter.getChapterTitle(), chapter.getPage(i), size, i);
 
             mChapterList.addLast(data);
         }
@@ -284,9 +284,10 @@ public class ReadPageAdapter extends FragmentPagerAdapter {
         void onChapterSwitched(String newChapterUrl);
     }
 
-    private int mBatteryLevel = 0;
     public void updateBatteryLevel(int level){
-        mBatteryLevel = level;
+        for (Fragment f: fragments) {
+            ((ReadFragment)f).updateBatteryLevel(level);
+        }
     }
 
 }
