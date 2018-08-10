@@ -1,12 +1,15 @@
 package org.foree.bookreader.readpage;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.WindowManager;
+
+import org.foree.bookreader.readpage.pageareaalgorithm.PageAreaAlgorithmContext;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -24,12 +27,12 @@ public class ReadViewPager extends ViewPager {
     private static final String TAG = ReadViewPager.class.getSimpleName();
     private static final boolean DEBUG = false;
 
-    private int displayWidth;
-    private int displayHeight;
-
     private float mStartX = 0;
     private float mStartY = 0;
     private boolean mClick;
+    private Context mContext;
+    private PageAreaAlgorithmContext mAlgorithm;
+    private WindowManager mManager;
 
     private onPageAreaClickListener onPageAreaClickListener;
 
@@ -39,12 +42,19 @@ public class ReadViewPager extends ViewPager {
 
     public ReadViewPager(Context context, AttributeSet attrs) {
         super(context, attrs);
-        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        DisplayMetrics metrics = new DisplayMetrics();
-        wm.getDefaultDisplay().getMetrics(metrics);
+        mContext = context;
+        mManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
 
-        displayHeight = metrics.heightPixels;
-        displayWidth = metrics.widthPixels;
+        mAlgorithm = new PageAreaAlgorithmContext(PageAreaAlgorithmContext.ALGORITHM.C);
+        updateScreenSize();
+
+    }
+
+    private void updateScreenSize() {
+        DisplayMetrics metrics = new DisplayMetrics();
+        mManager.getDefaultDisplay().getMetrics(metrics);
+
+        mAlgorithm.updateScreenSize(metrics.widthPixels, metrics.heightPixels);
     }
 
     private boolean mPreScrollDisable, mPostScrollDisable;
@@ -96,8 +106,8 @@ public class ReadViewPager extends ViewPager {
             case MotionEvent.ACTION_UP:
                 if (mClick) {
                     // menu click
-                    if (!isMenuArea(ev)) {
-                        if (isPrePageArea(ev)) {
+                    if (!mAlgorithm.isMenuArea(ev.getX(), ev.getY())) {
+                        if (mAlgorithm.isPreArea(ev.getX(), ev.getY())) {
                             if (DEBUG) Log.d(TAG, "上一页");
                             if (!mPreScrollDisable) {
                                 setPopulate(getCurrentItem() - 1);
@@ -131,30 +141,14 @@ public class ReadViewPager extends ViewPager {
         return super.onInterceptTouchEvent(ev);
     }
 
-    private boolean isMenuArea(MotionEvent event) {
-        // 取横5分竖3分屏幕的区域
-        if (event.getX() > displayWidth * 2 / 5 && event.getX() < displayWidth * 3 / 5) {
-            if (event.getY() > displayHeight / 3 && event.getY() < displayHeight * 2 / 3) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean isPrePageArea(MotionEvent event) {
-        // 取屏幕左半边区域
-        return (event.getX() < displayWidth / 2);
-    }
-
-    private boolean isNextPageArea(MotionEvent event) {
-        return (event.getX() > displayWidth / 2);
-    }
-
     public void setOnPageAreaClickListener(onPageAreaClickListener onPageAreaClickListener) {
         this.onPageAreaClickListener = onPageAreaClickListener;
     }
 
     public interface onPageAreaClickListener {
+        /**
+         * 菜单区域点击回调
+         */
         void onMediumAreaClick();
     }
 
@@ -183,6 +177,12 @@ public class ReadViewPager extends ViewPager {
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    protected void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        updateScreenSize();
     }
 }
 
