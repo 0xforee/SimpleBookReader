@@ -49,9 +49,14 @@
             android:title="@string/pref_title_sync_frequency" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/pref_title_about">
+    <PreferenceCategory android:title="@string/pref_title_about"
+        android:enabled="true"
+        android:key="pref_key_cate_about">
         <Preference
             android:key="pref_key_check_update"
             android:title="@string/pref_title_check_update" />
+        <Preference
+            android:key="pref_key_add_book"
+            android:title="增加书籍"/>
     </PreferenceCategory>
 </PreferenceScreen>

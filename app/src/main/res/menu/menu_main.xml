@@ -6,4 +6,8 @@
         android:icon="@drawable/ic_settings_black_24dp"
         android:title="@string/action_settings"
         app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_add_book"
+        android:title="添加书籍"
+        app:showAsAction="never"/>
 </menu>

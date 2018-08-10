@@ -41,6 +41,16 @@ public class SettingsActivity extends BaseActivity implements SharedPreferences.
     public static final String KEY_PREF_PAGE_BACKGROUND = "pref_key_page_background";
 
     /**
+     * 关于
+     */
+    public static final String KEY_PREF_CATE_ABOUT = "pref_key_cate_about";
+
+    /**
+     * 增加隐藏的书籍
+     */
+    public static final String KEY_PREF_ADD_BOOK = "pref_key_add_book";
+
+    /**
      * check update
      */
     public static final String KEY_PREF_CHECK_UPDATE = "pref_key_check_update";
