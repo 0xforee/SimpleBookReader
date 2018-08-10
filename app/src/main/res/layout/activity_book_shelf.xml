@@ -40,9 +40,9 @@
                 android:elevation="2dp"
                 android:gravity="center_vertical"
                 android:theme="@style/AppTheme"
-                app:popupTheme="@style/AppTheme.PopupOverlay"
-                app:title="@string/toolbar_search_hint"
-                app:titleTextAppearance="@style/Toolbar.TitleText" />
+                app:popupTheme="@style/AppTheme.PopupOverlay">
+                <include layout="@layout/bookshelf_toolbar_content"/>
+            </android.support.v7.widget.Toolbar>
         </FrameLayout>
 
 

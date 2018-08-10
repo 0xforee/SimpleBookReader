@@ -16,6 +16,8 @@
         <!-- it should be true otherwise action mode will not overlay toolbar -->
         <item name="windowActionModeOverlay">true</item>
 
+        <item name="actionOverflowMenuStyle">@style/OverflowMenuStyle</item>
+
         <!-- For Custom Action Mode Background Color/Drawable -->
         <item name="actionModeBackground">@color/colorPrimary</item>
     </style>
@@ -23,6 +25,10 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="OverflowMenuStyle" parent="@style/Widget.AppCompat.PopupMenu.Overflow">
+        <item name="android:dropDownVerticalOffset">5dp</item>
+    </style>
 
     <style name="ReadPopupMenuItemImageButton" parent="Base.Widget.AppCompat.Button">
         <item name="android:layout_width">0dp</item>

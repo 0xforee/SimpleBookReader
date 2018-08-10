@@ -9,6 +9,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.ActionMenuView;
 import android.support.v7.widget.Toolbar;
 import android.transition.AutoTransition;
 import android.transition.Transition;
@@ -27,7 +28,7 @@ import org.foree.bookreader.searchpage.SearchResultsActivity;
 import org.foree.bookreader.settings.SettingsActivity;
 import org.foree.bookreader.update.UpdateAgent;
 
-public class BookShelfActivity extends BaseActivity {
+public class BookShelfActivity extends BaseActivity implements ActionMenuView.OnMenuItemClickListener {
 
     private static final String TAG = BookShelfActivity.class.getSimpleName();
     private static final boolean DEBUG = false;
@@ -36,6 +37,7 @@ public class BookShelfActivity extends BaseActivity {
     ViewPager viewPager;
     TabLayout tabLayout;
     TabViewPagerAdapter tabViewPagerAdapter;
+    private ActionMenuView mMenuView;
 
     private boolean mNightMode;
 
@@ -84,7 +86,6 @@ public class BookShelfActivity extends BaseActivity {
     private void initViews() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setNavigationIcon(R.drawable.ic_action_search);
 
         toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,6 +95,9 @@ public class BookShelfActivity extends BaseActivity {
                 transitionToSearch();
             }
         });
+
+        mMenuView = (ActionMenuView) toolbar.findViewById(R.id.custom_menu_view);
+        mMenuView.setOnMenuItemClickListener(this);
 
         viewPager = (ViewPager) findViewById(R.id.view_pager_main);
         tabLayout = (TabLayout) findViewById(R.id.tab_layout_main);
@@ -156,19 +160,8 @@ public class BookShelfActivity extends BaseActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main, menu);
+        inflater.inflate(R.menu.menu_main, mMenuView.getMenu());
 
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                Intent intent = new Intent(BookShelfActivity.this, SettingsActivity.class);
-                startActivity(intent);
-                break;
-        }
         return true;
     }
 
@@ -202,5 +195,17 @@ public class BookShelfActivity extends BaseActivity {
     private void showKeyboard() {
         InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                Intent intent = new Intent(BookShelfActivity.this, SettingsActivity.class);
+                startActivity(intent);
+                break;
+            default:
+        }
+        return true;
     }
 }
