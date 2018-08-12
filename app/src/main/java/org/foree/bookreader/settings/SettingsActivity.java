@@ -60,6 +60,16 @@ public class SettingsActivity extends BaseActivity implements SharedPreferences.
      */
     public static final String KEY_IGNORE_UPDATE = "pref_key_ignore_update";
 
+    /**
+     * touch mode type
+     */
+    public static final String KEY_TOUCH_MODE_TYPE = "pref_key_touch_mode_type";
+
+    /**
+     * read activity first init
+     */
+    public static final String KEY_READ_INITIAL = "pref_key_read_initial";
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

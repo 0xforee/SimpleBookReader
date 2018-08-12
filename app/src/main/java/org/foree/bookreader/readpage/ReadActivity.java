@@ -136,6 +136,28 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
         mReceiver = new Receiver();
         mReceiver.init();
 
+        // show touch mode init page
+        boolean initialed = getPreferences(MODE_PRIVATE).getBoolean(SettingsActivity.KEY_READ_INITIAL, false);
+        if(!initialed){
+            Intent intent = new Intent(ReadActivity.this, TouchModeSelectorActivity.class);
+            startActivityForResult(intent, 0);
+        }
+
+    }
+
+    /**
+     * Dispatch incoming result to the correct fragment.
+     *
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 0){
+            getPreferences(MODE_PRIVATE).edit().putBoolean(SettingsActivity.KEY_READ_INITIAL, true).apply();
+        }
     }
 
     @Override
@@ -297,7 +319,9 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
     }
 
     private void showFontDialog() {
-        fontDialog = new FontDialog.Builder(this);
+        if(fontDialog == null) {
+            fontDialog = new FontDialog.Builder(this);
+        }
         fontDialog.showDialog();
     }
 
@@ -429,11 +453,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
                 if (menuPop.isShowing()) {
                     menuPop.dismiss();
                 }
-                if (fontDialog == null) {
-                    showFontDialog();
-                } else {
-                    fontDialog.showDialog();
-                }
+                showFontDialog();
                 break;
             case R.id.loading:
                 switchChapter(mBookRecord.getCurrentUrl(), true);

@@ -27,7 +27,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".readpage.ReadActivity" />
+            android:name=".readpage.ReadActivity"
+            android:screenOrientation="portrait"/>
 
         <activity
             android:name=".searchpage.SearchResultsActivity"
@@ -64,6 +65,10 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".readpage.TouchModeSelectorActivity"
+            android:theme="@style/TouchModeSelectorTheme"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

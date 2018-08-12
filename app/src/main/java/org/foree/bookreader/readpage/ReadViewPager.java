@@ -1,7 +1,10 @@
 package org.foree.bookreader.readpage;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.os.Parcelable;
+import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
@@ -10,10 +13,14 @@ import android.view.MotionEvent;
 import android.view.WindowManager;
 
 import org.foree.bookreader.readpage.pageareaalgorithm.PageAreaAlgorithmContext;
+import org.foree.bookreader.settings.SettingsActivity;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Set;
+import java.util.prefs.PreferenceChangeEvent;
+import java.util.prefs.PreferenceChangeListener;
 
 /**
  * Created by foree on 17-2-8.
@@ -23,7 +30,7 @@ import java.lang.reflect.Method;
  * 3. 首页末页可以滑动切换章节
  */
 
-public class ReadViewPager extends ViewPager {
+public class ReadViewPager extends ViewPager implements SharedPreferences.OnSharedPreferenceChangeListener{
     private static final String TAG = ReadViewPager.class.getSimpleName();
     private static final boolean DEBUG = false;
 
@@ -45,9 +52,22 @@ public class ReadViewPager extends ViewPager {
         mContext = context;
         mManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
 
-        mAlgorithm = new PageAreaAlgorithmContext(PageAreaAlgorithmContext.ALGORITHM.C);
-        updateScreenSize();
+        initTouchMode();
 
+    }
+
+    private void initTouchMode() {
+        // init touch mode
+        String defaultValue = PreferenceManager.getDefaultSharedPreferences(mContext).
+                getString(SettingsActivity.KEY_TOUCH_MODE_TYPE, PageAreaAlgorithmContext.ALGORITHM.A.getType());
+        for(PageAreaAlgorithmContext.ALGORITHM type: PageAreaAlgorithmContext.ALGORITHM.values()){
+            if(type.getType().equals(defaultValue)){
+                mAlgorithm = new PageAreaAlgorithmContext(type);
+            }
+        }
+        PreferenceManager.getDefaultSharedPreferences(mContext).registerOnSharedPreferenceChangeListener(this);
+
+        updateScreenSize();
     }
 
     private void updateScreenSize() {
@@ -143,6 +163,14 @@ public class ReadViewPager extends ViewPager {
 
     public void setOnPageAreaClickListener(onPageAreaClickListener onPageAreaClickListener) {
         this.onPageAreaClickListener = onPageAreaClickListener;
+    }
+
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if(key.equals(SettingsActivity.KEY_TOUCH_MODE_TYPE)){
+            initTouchMode();
+        }
     }
 
     public interface onPageAreaClickListener {

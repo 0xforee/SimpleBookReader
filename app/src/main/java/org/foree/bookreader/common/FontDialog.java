@@ -2,6 +2,7 @@ package org.foree.bookreader.common;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
@@ -16,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -25,6 +27,7 @@ import android.widget.SeekBar;
 import org.foree.bookreader.R;
 import org.foree.bookreader.base.GlobalConfig;
 import org.foree.bookreader.readpage.ReadActivity;
+import org.foree.bookreader.readpage.TouchModeSelectorActivity;
 import org.foree.bookreader.settings.SettingsActivity;
 
 /**
@@ -126,6 +129,16 @@ public class FontDialog extends Dialog implements SeekBar.OnSeekBarChangeListene
         seekBar = (SeekBar) rootView.findViewById(R.id.seekBar);
         seekBar.setOnSeekBarChangeListener(this);
         seekBar.setMax((int) BRIGHTNESS_MAX);
+
+        Button touchMode = (Button) rootView.findViewById(R.id.touch_mode);
+        touchMode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), TouchModeSelectorActivity.class);
+                getContext().startActivity(intent);
+                dismiss();
+            }
+        });
 
     }
 
