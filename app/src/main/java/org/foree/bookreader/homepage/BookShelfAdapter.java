@@ -88,7 +88,7 @@ public class BookShelfAdapter extends RecyclerView.Adapter<BookShelfAdapter.MyVi
             if (book.getUpdateTime().after(book.getModifiedTime())) {
                 holder.imageViewUpdate.setVisibility(View.VISIBLE);
             } else {
-                holder.imageViewUpdate.setVisibility(View.INVISIBLE);
+                holder.imageViewUpdate.setVisibility(View.GONE);
             }
         }
 
