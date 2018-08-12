@@ -14,13 +14,14 @@ import com.bumptech.glide.Glide;
 
 import org.foree.bookreader.R;
 import org.foree.bookreader.bean.book.Book;
+import org.foree.bookreader.common.BaseRecyclerAdapter;
 
 import java.util.List;
 
 /**
  * Created by foree on 16-7-22.
  */
-public class BookShelfAdapter extends RecyclerView.Adapter<BookShelfAdapter.MyViewHolder> {
+public class BookShelfAdapter extends BaseRecyclerAdapter<BookShelfAdapter.MyViewHolder> {
     private LayoutInflater mLayoutInflater;
     private List<Book> bookList;
     private SparseBooleanArray mSelectedItemsIds;
@@ -33,18 +34,6 @@ public class BookShelfAdapter extends RecyclerView.Adapter<BookShelfAdapter.MyVi
         mContext = context;
     }
 
-    public interface OnItemClickListener {
-        void onItemClick(View view, int position);
-
-        void onItemLongClick(View view, int position);
-    }
-
-    private OnItemClickListener mOnItemClickListener;
-
-    public void setOnItemClickListener(OnItemClickListener mOnItemClickListener) {
-        this.mOnItemClickListener = mOnItemClickListener;
-    }
-
     @Override
     public BookShelfAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new MyViewHolder(mLayoutInflater.inflate(R.layout.rv_book_shelf_holder, parent, false));
@@ -52,30 +41,11 @@ public class BookShelfAdapter extends RecyclerView.Adapter<BookShelfAdapter.MyVi
 
     @Override
     public void onBindViewHolder(final BookShelfAdapter.MyViewHolder holder, int position) {
+        super.onBindViewHolder(holder, position);
         if (bookList != null && !bookList.isEmpty()) {
             Book book = bookList.get(position);
 
             holder.tvBookName.setText(book.getBookName());
-
-            // 如果设置了回调，则设置点击事件
-            if (mOnItemClickListener != null) {
-                holder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        int pos = holder.getLayoutPosition();
-                        mOnItemClickListener.onItemClick(holder.itemView, pos);
-                    }
-                });
-
-                holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View v) {
-                        int pos = holder.getLayoutPosition();
-                        mOnItemClickListener.onItemLongClick(holder.itemView, pos);
-                        return false;
-                    }
-                });
-            }
 
             // 设置选中的背景颜色
             holder.itemView.setBackgroundColor(mSelectedItemsIds.get(position) ? 0x9934B5E4 : Color.TRANSPARENT);

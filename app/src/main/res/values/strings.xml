@@ -114,5 +114,6 @@
     <string name="update_notification_text">正在下载</string>
     <string name="update_already_new">已是最新版本</string>
     <string name="page_touch_mode">翻页模式</string>
+    <string name="bookshelf_edit_tips">本选中</string>
 
 </resources>

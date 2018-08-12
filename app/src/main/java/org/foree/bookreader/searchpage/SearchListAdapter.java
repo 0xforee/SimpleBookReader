@@ -7,6 +7,7 @@ import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -14,13 +15,14 @@ import com.bumptech.glide.Glide;
 
 import org.foree.bookreader.R;
 import org.foree.bookreader.bean.book.Book;
+import org.foree.bookreader.common.BaseRecyclerAdapter;
 
 import java.util.List;
 
 /**
  * Created by foree on 16-7-22.
  */
-public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.MyViewHolder> {
+public class SearchListAdapter extends BaseRecyclerAdapter<SearchListAdapter.MyViewHolder> {
     private LayoutInflater mLayoutInflater;
     private List<Book> bookList;
     private SparseBooleanArray mSelectedItemsIds;
@@ -33,18 +35,6 @@ public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.My
         mContext = context;
     }
 
-    public interface OnItemClickListener {
-        void onItemClick(View view, int position);
-
-        void onItemLongClick(View view, int position);
-    }
-
-    private OnItemClickListener mOnItemClickListener;
-
-    public void setOnItemClickListener(OnItemClickListener mOnItemClickListener) {
-        this.mOnItemClickListener = mOnItemClickListener;
-    }
-
     @Override
     public SearchListAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new MyViewHolder(mLayoutInflater.inflate(R.layout.rv_search_holder, parent, false));
@@ -53,29 +43,10 @@ public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.My
 
     @Override
     public void onBindViewHolder(final SearchListAdapter.MyViewHolder holder, int position) {
+        super.onBindViewHolder(holder, position);
         if (bookList != null && !bookList.isEmpty()) {
             holder.tvBookName.setText(bookList.get(position).getBookName());
             holder.tvAuthor.setText(bookList.get(position).getAuthor());
-        }
-
-        // 如果设置了回调，则设置点击事件
-        if (mOnItemClickListener != null) {
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int pos = holder.getLayoutPosition();
-                    mOnItemClickListener.onItemClick(holder.itemView, pos);
-                }
-            });
-
-            holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    int pos = holder.getLayoutPosition();
-                    mOnItemClickListener.onItemLongClick(holder.itemView, pos);
-                    return false;
-                }
-            });
         }
 
         // 设置选中的背景颜色

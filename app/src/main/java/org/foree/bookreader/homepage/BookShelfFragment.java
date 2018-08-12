@@ -254,7 +254,7 @@ public class BookShelfFragment extends Fragment implements SwipeRefreshLayout.On
         }
 
         if (mActionMode != null) {
-            mActionMode.setTitle(String.valueOf(mAdapter.getSelectedCount() + "selected"));
+            mActionMode.setTitle(String.valueOf(mAdapter.getSelectedCount() + "  " +getString(R.string.bookshelf_edit_tips)));
         }
     }
 
