@@ -53,6 +53,9 @@
         android:enabled="true"
         android:key="pref_key_cate_about">
         <Preference
+            android:key="pref_key_disclaimer"
+            android:title="@string/pref_key_disclaimer" />
+        <Preference
             android:key="pref_key_check_update"
             android:title="@string/pref_title_check_update" />
         <Preference

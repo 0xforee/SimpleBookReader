@@ -66,6 +66,11 @@ public class SettingsActivity extends BaseActivity implements SharedPreferences.
     public static final String KEY_TOUCH_MODE_TYPE = "pref_key_touch_mode_type";
 
     /**
+     * disclaimer
+     */
+    public static final String KEY_PREF_DISCLAIMER = "pref_key_disclaimer";
+
+    /**
      * read activity first init
      */
     public static final String KEY_READ_INITIAL = "pref_key_read_initial";

@@ -105,7 +105,19 @@ public class SettingsFragment extends PreferenceFragment {
                 });
                 builder.show();
                 break;
-                default:
+            case SettingsActivity.KEY_PREF_DISCLAIMER:
+                AlertDialog.Builder disclaimer = new AlertDialog.Builder(getActivity());
+                disclaimer.setTitle(R.string.pref_key_disclaimer)
+                        .setMessage(R.string.pref_message_disclaimer)
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        }).show();
+
+                break;
+            default:
         }
         return super.onPreferenceTreeClick(preferenceScreen, preference);
     }
