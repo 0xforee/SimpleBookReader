@@ -133,7 +133,7 @@ public class BookRecord {
     public void saveBookRecord() {
         completed = false;
 
-        if(mOnline){
+        if (mOnline) {
             return;
         }
 
@@ -154,7 +154,9 @@ public class BookRecord {
     }
 
     public void switchPageIndex(int pageIndex) {
-        mBook.setPageIndex(pageIndex);
+        if (mBook != null) {
+            mBook.setPageIndex(pageIndex);
+        }
     }
 
     public String getCurrentUrl() {
@@ -183,6 +185,10 @@ public class BookRecord {
         }
     }
 
+    public void reInit() {
+        completed = false;
+    }
+
     public String getChapterUrl(int position) {
         return mChapters.get(position).getChapterUrl();
     }
@@ -193,8 +199,8 @@ public class BookRecord {
         }
     }
 
-    public Chapter getChapter(String url){
-        if(mIndexMap.get(url) != null){
+    public Chapter getChapter(String url) {
+        if (mIndexMap.get(url) != null) {
             return mChapters.get(mIndexMap.get(url));
         }
         return null;
@@ -224,15 +230,16 @@ public class BookRecord {
         return mSourceList;
     }
 
-    public int getSourceIndex(){
+    public int getSourceIndex() {
         for (int i = 0; i < getSourceList().size(); i++) {
-            if(mBook.getContentUrl().equals(getSourceList().get(i).getSourceId())){
+            if (mBook.getContentUrl().equals(getSourceList().get(i).getSourceId())) {
                 Log.d(TAG, "[foree] getSourceIndex: i = " + i);
                 return i;
             }
         }
         return 0;
     }
+
     /**
      * 获取指定chapter url对应偏移量的章节url
      *
@@ -255,10 +262,10 @@ public class BookRecord {
         return getOffsetChapter(offset, getCurrentUrl());
     }
 
-    private void initChapters(boolean force){
+    private void initChapters(boolean force) {
         mChapters = mOnline || force ? initChapterListOnline() : initChapterListLocal();
 
-        if(mChapters == null){
+        if (mChapters == null) {
             mChapters = new ArrayList<>();
         }
 
@@ -316,10 +323,10 @@ public class BookRecord {
         }
     }
 
-    private void initBookInfo(){
+    private void initBookInfo() {
         mBook = mOnline ? initBookInfoOnline() : initBookInfoLocal();
 
-        if (mBook == null){
+        if (mBook == null) {
             mBook = new Book();
         }
     }
@@ -387,7 +394,7 @@ public class BookRecord {
 
         );
 
-        if (change){
+        if (change) {
             // clean old chapters, and update new
             mContext.getContentResolver().delete(
                     BReaderProvider.CONTENT_URI_CHAPTERS,
@@ -400,7 +407,7 @@ public class BookRecord {
 
     }
 
-    public void changeSourceId(final String sourceId){
+    public void changeSourceId(final String sourceId) {
         mHandler.post(new Runnable() {
             @Override
             public void run() {

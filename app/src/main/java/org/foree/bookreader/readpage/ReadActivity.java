@@ -54,7 +54,7 @@ import java.util.Map;
 /**
  * Created by foree on 16-7-21.
  */
-public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAreaClickListener, View.OnClickListener, ReadPageAdapter.Callback {
+public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAreaClickListener, View.OnClickListener, ReadPageAdapter.Callback, FontDialog.OnFontChangeListener {
     private static final String TAG = ReadActivity.class.getSimpleName();
 
     String mBookUrl;
@@ -138,7 +138,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
 
         // show touch mode init page
         boolean initialed = getPreferences(MODE_PRIVATE).getBoolean(SettingsActivity.KEY_READ_INITIAL, false);
-        if(!initialed){
+        if (!initialed) {
             Intent intent = new Intent(ReadActivity.this, TouchModeSelectorActivity.class);
             startActivityForResult(intent, 0);
         }
@@ -155,7 +155,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == 0){
+        if (requestCode == 0) {
             getPreferences(MODE_PRIVATE).edit().putBoolean(SettingsActivity.KEY_READ_INITIAL, true).apply();
         }
     }
@@ -195,24 +195,39 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
                 } else {
                     mTvContent.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 }
-                int top = mTvContent.getPaddingTop();
-                int bottom = mTvContent.getPaddingBottom();
-                int left = mTvContent.getPaddingLeft();
-                int right = mTvContent.getPaddingRight();
-                // first, init PaginationLoader
-                PaginationLoader.getInstance().init(new PaginationArgs(
-                        mTvContent.getWidth() - left - right,
-                        mTvContent.getHeight() - top - bottom,
-                        mTvContent.getLineSpacingMultiplier(),
-                        mTvContent.getLineSpacingExtra(),
-                        mTvContent.getPaint(),
-                        mTvContent.getIncludeFontPadding()));
 
-                // second, init book info
-                mBookRecord.restoreBookRecord(mBookUrl, mOnline);
+                // init pagination
+                reInitPaginationArgs();
 
             }
         });
+    }
+
+    private void reInitPaginationArgs() {
+        // get new textSize
+        float textSize = PreferenceManager.getDefaultSharedPreferences(this).getFloat(SettingsActivity.KEY_READ_PAGE_TEXT_SIZE,
+                mTvContent.getTextSize() / mTvContent.getPaint().density);
+        mTvContent.setTextSize(textSize);
+
+        //first, reset init var
+        mBookRecord.reInit();
+
+        // second, init pageArgs
+        int top = mTvContent.getPaddingTop();
+        int bottom = mTvContent.getPaddingBottom();
+        int left = mTvContent.getPaddingLeft();
+        int right = mTvContent.getPaddingRight();
+        // first, init PaginationLoader
+        PaginationLoader.getInstance().init(new PaginationArgs(
+                mTvContent.getWidth() - left - right,
+                mTvContent.getHeight() - top - bottom,
+                mTvContent.getLineSpacingMultiplier(),
+                mTvContent.getLineSpacingExtra(),
+                mTvContent.getPaint(),
+                mTvContent.getIncludeFontPadding()));
+
+        // third, init book info
+        mBookRecord.restoreBookRecord(mBookUrl, mOnline);
     }
 
     @Override
@@ -277,7 +292,6 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
         EventBus.getDefault().unregister(this);
         super.onDestroy();
 
-        mBookRecord.switchPageIndex(mReadPageAdapter.getCurrentPageIndex());
         mBookRecord.saveBookRecord();
 
         mReceiver.unregister();
@@ -319,9 +333,10 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
     }
 
     private void showFontDialog() {
-        if(fontDialog == null) {
+        if (fontDialog == null) {
             fontDialog = new FontDialog.Builder(this);
         }
+        fontDialog.setOnFontChangeListener(this);
         fontDialog.showDialog();
     }
 
@@ -489,6 +504,33 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
 
     }
 
+
+    /**
+     * 通知字体大小变化
+     *
+     * @param flag FLAG_FONT_DECREASE or FLAG_FONT_INCREASE
+     */
+    @Override
+    public void onFontChanged(int flag, float value) {
+        float scaleSize = mTvContent.getTextSize() / mTvContent.getPaint().density;
+        switch (flag) {
+            case FLAG_FONT_DECREASE:
+                scaleSize -= value;
+                break;
+            case FLAG_FONT_INCREASE:
+                scaleSize += value;
+                break;
+            default:
+        }
+
+        PreferenceManager.getDefaultSharedPreferences(this).edit().
+                putFloat(SettingsActivity.KEY_READ_PAGE_TEXT_SIZE, scaleSize).apply();
+        reInitPaginationArgs();
+        mReadPageAdapter.reset();
+        PaginationLoader.getInstance().loadPagination(mBookRecord.getCurrentUrl());
+
+    }
+
     private final class Receiver extends BroadcastReceiver {
         public void init() {
             IntentFilter intentFilter = new IntentFilter();
@@ -496,7 +538,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
             registerReceiver(this, intentFilter);
         }
 
-        public void unregister(){
+        public void unregister() {
             unregisterReceiver(this);
         }
 

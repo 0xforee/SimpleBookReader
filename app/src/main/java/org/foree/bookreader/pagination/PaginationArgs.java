@@ -47,4 +47,16 @@ public class PaginationArgs {
     public boolean ismIncludePad() {
         return mIncludePad;
     }
+
+    @Override
+    public String toString() {
+        return "PaginationArgs{" +
+                "mWidth=" + mWidth +
+                ", mHeight=" + mHeight +
+                ", mSpacingMult=" + mSpacingMult +
+                ", mSpacingAdd=" + mSpacingAdd +
+                ", mPaint=" + mPaint +
+                ", mIncludePad=" + mIncludePad +
+                '}';
+    }
 }

@@ -132,6 +132,8 @@ public class ReadPageAdapter extends FragmentPagerAdapter {
                 if (DEBUG) Log.d(TAG, "[foree] onDataChanged: 向右滑动");
             }
             checkIfChapterSwitched();
+            // 更新页索引
+            if (mBookRecord != null) mBookRecord.switchPageIndex(getCurrentPageIndex());
         }
 
         updateContent();
@@ -160,8 +162,8 @@ public class ReadPageAdapter extends FragmentPagerAdapter {
 
     }
 
-    public int getCurrentPageIndex(){
-        if(mChapterList.getCurrentData() != null) {
+    public int getCurrentPageIndex() {
+        if (mChapterList.getCurrentData() != null) {
             return mChapterList.getCurrentData().getIndex();
         }
         return 0;
@@ -284,9 +286,9 @@ public class ReadPageAdapter extends FragmentPagerAdapter {
         void onChapterSwitched(String newChapterUrl);
     }
 
-    public void updateBatteryLevel(int level){
-        for (Fragment f: fragments) {
-            ((ReadFragment)f).updateBatteryLevel(level);
+    public void updateBatteryLevel(int level) {
+        for (Fragment f : fragments) {
+            ((ReadFragment) f).updateBatteryLevel(level);
         }
     }
 

@@ -20,7 +20,7 @@
         android:layout_marginTop="50dp"
         android:lineSpacingExtra="@dimen/read_line_spacing"
         android:textColor="@color/md_grey_850"
-        android:textSize="17sp" />
+        android:textSize="12sp" />
 
     <RelativeLayout
         android:layout_width="match_parent"

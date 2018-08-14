@@ -3,12 +3,9 @@ package org.foree.bookreader.common;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.StateListDrawable;
-import android.preference.PreferenceManager;
-import android.text.Layout;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -28,13 +25,12 @@ import org.foree.bookreader.R;
 import org.foree.bookreader.base.GlobalConfig;
 import org.foree.bookreader.readpage.ReadActivity;
 import org.foree.bookreader.readpage.TouchModeSelectorActivity;
-import org.foree.bookreader.settings.SettingsActivity;
 
 /**
  * Created by foree on 17-4-7.
  */
 
-public class FontDialog extends Dialog implements SeekBar.OnSeekBarChangeListener {
+public class FontDialog extends Dialog implements SeekBar.OnSeekBarChangeListener, View.OnClickListener {
     private static final String TAG = FontDialog.class.getSimpleName();
 
     private static final float BRIGHTNESS_MAX = 255f;
@@ -120,10 +116,10 @@ public class FontDialog extends Dialog implements SeekBar.OnSeekBarChangeListene
             fontCustomBg.addView(radioButton);
         }
 
-        ImageView brightness_low = (ImageView) rootView.findViewById(R.id.brightness_low);
-        brightness_low.setAlpha(140);
-        ImageView brightness_high = (ImageView) rootView.findViewById(R.id.brightness_high);
-        brightness_high.setAlpha(140);
+        ImageView ivBrightDecrease = (ImageView) rootView.findViewById(R.id.brightness_decrease);
+        ivBrightDecrease.setAlpha(140);
+        ImageView ivBrightIncrease = (ImageView) rootView.findViewById(R.id.brightness_increase);
+        ivBrightIncrease.setAlpha(140);
 
         // init brightness
         seekBar = (SeekBar) rootView.findViewById(R.id.seekBar);
@@ -131,14 +127,13 @@ public class FontDialog extends Dialog implements SeekBar.OnSeekBarChangeListene
         seekBar.setMax((int) BRIGHTNESS_MAX);
 
         Button touchMode = (Button) rootView.findViewById(R.id.touch_mode);
-        touchMode.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getContext(), TouchModeSelectorActivity.class);
-                getContext().startActivity(intent);
-                dismiss();
-            }
-        });
+        touchMode.setOnClickListener(this);
+
+        Button increaseBt = (Button) rootView.findViewById(R.id.bt_font_increase);
+        increaseBt.setOnClickListener(this);
+
+        Button decreaseBt = (Button) rootView.findViewById(R.id.bt_font_decrease);
+        decreaseBt.setOnClickListener(this);
 
     }
 
@@ -201,10 +196,33 @@ public class FontDialog extends Dialog implements SeekBar.OnSeekBarChangeListene
         GlobalConfig.getInstance().setAppBrightness(mBrightness);
     }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.bt_font_increase:
+                if (mListener != null) {
+                    mListener.onFontChanged(OnFontChangeListener.FLAG_FONT_INCREASE, 1);
+                }
+                break;
+            case R.id.bt_font_decrease:
+                if (mListener != null) {
+                    mListener.onFontChanged(OnFontChangeListener.FLAG_FONT_DECREASE, 1);
+                }
+                break;
+            case R.id.touch_mode:
+                Intent intent = new Intent(getContext(), TouchModeSelectorActivity.class);
+                getContext().startActivity(intent);
+                dismiss();
+                break;
+            default:
+        }
+    }
+
     public static class Builder {
         private Context mContext;
         private int mThemeResId;
         private FontDialog fontDialog;
+        private OnFontChangeListener mListener;
 
         public Builder(Context context) {
             this(context, R.style.fontDialogStyle);
@@ -221,7 +239,37 @@ public class FontDialog extends Dialog implements SeekBar.OnSeekBarChangeListene
             fontDialog.rootView.setBackgroundColor(GlobalConfig.getInstance().getPageBackground());
             fontDialog.setContentView(fontDialog.rootView);
             fontDialog.initBrightness();
+            fontDialog.setOnFontChangeListener(mListener);
             fontDialog.show();
         }
+
+        public void setOnFontChangeListener(OnFontChangeListener l) {
+            mListener = l;
+        }
+    }
+
+    public interface OnFontChangeListener {
+        /**
+         * 字体减小
+         */
+        int FLAG_FONT_DECREASE = 0;
+        /**
+         * 字体增加
+         */
+        int FLAG_FONT_INCREASE = 1;
+
+        /**
+         * 通知字体大小变化
+         *
+         * @param flag  FLAG_FONT_DECREASE or FLAG_FONT_INCREASE
+         * @param value 差值
+         */
+        void onFontChanged(int flag, float value);
+    }
+
+    private OnFontChangeListener mListener;
+
+    public void setOnFontChangeListener(OnFontChangeListener l) {
+        mListener = l;
     }
 }

@@ -5,12 +5,12 @@
     android:orientation="vertical">
 
     <RelativeLayout
-        android:layout_margin="20dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp">
 
         <ImageView
-            android:id="@+id/brightness_low"
+            android:id="@+id/brightness_decrease"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
@@ -20,11 +20,11 @@
             android:id="@+id/seekBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@+id/brightness_low"
-            android:layout_toStartOf="@+id/brightness_high" />
+            android:layout_toEndOf="@+id/brightness_decrease"
+            android:layout_toStartOf="@+id/brightness_increase" />
 
         <ImageView
-            android:id="@+id/brightness_high"
+            android:id="@+id/brightness_increase"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
@@ -32,23 +32,47 @@
 
         <View
             android:id="@+id/split"
-            android:layout_below="@id/seekBar"
             android:layout_width="match_parent"
             android:layout_height="1dp"
+            android:layout_below="@id/seekBar"
             android:layout_marginBottom="20dp"
             android:layout_marginTop="20dp"
             android:background="#10757575" />
 
         <RadioGroup
-            android:layout_below="@id/split"
             android:id="@+id/font_custom_bg"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/split"
             android:layout_marginEnd="-5dp"
             android:layout_marginStart="-5dp"
             android:orientation="horizontal">
 
         </RadioGroup>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@id/font_custom_bg"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="20dp"
+            android:background="#10757575" />
+
+        <Button
+            android:id="@+id/bt_font_increase"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/font_custom_bg"
+            android:text="A+" />
+
+        <Button
+            android:id="@+id/bt_font_decrease"
+            android:layout_width="88dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/font_custom_bg"
+            android:layout_marginStart="-87dp"
+            android:layout_toEndOf="@id/brightness_increase"
+            android:text="A-" />
 
     </RelativeLayout>
 
@@ -58,11 +82,11 @@
         android:background="#10757575" />
 
     <Button
-        android:paddingStart="-20dp"
-        android:paddingEnd="-20dp"
-        android:background="?attr/selectableItemBackground"
         android:id="@+id/touch_mode"
-        android:text="@string/page_touch_mode"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:paddingEnd="-20dp"
+        android:paddingStart="-20dp"
+        android:text="@string/page_touch_mode" />
 </LinearLayout>

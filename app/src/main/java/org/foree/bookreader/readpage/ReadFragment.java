@@ -66,13 +66,18 @@ public class ReadFragment extends Fragment implements SharedPreferences.OnShared
         tvBatteryLevel = (TextView) rootView.findViewById(R.id.battery_level);
         mIvBatteryIcon = (ImageView) rootView.findViewById(R.id.battery_icon);
 
+        // set default textSize
+        float textSize = PreferenceManager.getDefaultSharedPreferences(getContext()).getFloat(SettingsActivity.KEY_READ_PAGE_TEXT_SIZE,
+                tvContents.getTextSize() / tvContents.getPaint().density);
+        tvContents.setTextSize(textSize);
+
         rootView.setBackgroundColor(GlobalConfig.getInstance().getPageBackground());
         return rootView;
     }
 
-    public void updateBatteryLevel(int level){
+    public void updateBatteryLevel(int level) {
         mBatteryLevel = level + "";
-        if(tvBatteryLevel != null) {
+        if (tvBatteryLevel != null) {
             tvBatteryLevel.setText(mBatteryLevel);
         }
     }
@@ -104,6 +109,9 @@ public class ReadFragment extends Fragment implements SharedPreferences.OnShared
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(SettingsActivity.KEY_PREF_PAGE_BACKGROUND)) {
             rootView.setBackgroundColor(GlobalConfig.getInstance().getPageBackground());
+        } else if (key.equals(SettingsActivity.KEY_READ_PAGE_TEXT_SIZE)) {
+            tvContents.setTextSize(sharedPreferences.getFloat(SettingsActivity.KEY_READ_PAGE_TEXT_SIZE,
+                    tvContents.getTextSize() / tvContents.getPaint().density));
         }
     }
 }
