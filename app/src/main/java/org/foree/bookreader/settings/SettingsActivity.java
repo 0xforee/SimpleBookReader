@@ -71,6 +71,10 @@ public class SettingsActivity extends BaseActivity implements SharedPreferences.
     public static final String KEY_READ_PAGE_TEXT_SIZE = "pref_read_page_text_size";
 
     /**
+     * read page line space
+     */
+    public static final String KEY_READ_PAGE_TEXT_LINE_SPACING = "pref_read_page_text_line_spacing";
+    /**
      * disclaimer
      */
     public static final String KEY_PREF_DISCLAIMER = "pref_key_disclaimer";

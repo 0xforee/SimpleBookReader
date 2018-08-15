@@ -209,6 +209,11 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
                 mTvContent.getTextSize() / mTvContent.getPaint().density);
         mTvContent.setTextSize(textSize);
 
+        // load line spacing
+        float lineSpacing = PreferenceManager.getDefaultSharedPreferences(this).getFloat(SettingsActivity.KEY_READ_PAGE_TEXT_LINE_SPACING,
+                mTvContent.getLineSpacingExtra());
+        mTvContent.setLineSpacing(lineSpacing, 1);
+
         //first, reset init var
         mBookRecord.reInit();
 
@@ -513,6 +518,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
     @Override
     public void onFontChanged(int flag, float value) {
         float scaleSize = mTvContent.getTextSize() / mTvContent.getPaint().density;
+        float lineSpacingExtra = mTvContent.getLineSpacingExtra();
         switch (flag) {
             case FLAG_FONT_DECREASE:
                 scaleSize -= value;
@@ -520,11 +526,19 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
             case FLAG_FONT_INCREASE:
                 scaleSize += value;
                 break;
+            case FLAG_SPACING_DECREASE:
+                lineSpacingExtra -= value;
+                break;
+            case FLAG_SPACING_INCREASE:
+                lineSpacingExtra += value;
+                break;
             default:
         }
 
         PreferenceManager.getDefaultSharedPreferences(this).edit().
                 putFloat(SettingsActivity.KEY_READ_PAGE_TEXT_SIZE, scaleSize).apply();
+        PreferenceManager.getDefaultSharedPreferences(this).edit().
+                putFloat(SettingsActivity.KEY_READ_PAGE_TEXT_LINE_SPACING, lineSpacingExtra).apply();
         reInitPaginationArgs();
         mReadPageAdapter.reset();
         PaginationLoader.getInstance().loadPagination(mBookRecord.getCurrentUrl());

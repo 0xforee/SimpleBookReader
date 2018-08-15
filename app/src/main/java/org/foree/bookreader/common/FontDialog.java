@@ -221,8 +221,14 @@ public class FontDialog extends Dialog implements SeekBar.OnSeekBarChangeListene
                 dismiss();
                 break;
             case R.id.iv_spacing_increase:
+                if (mListener != null) {
+                    mListener.onFontChanged(OnFontChangeListener.FLAG_SPACING_INCREASE, 10);
+                }
                 break;
             case R.id.iv_spacing_decrease:
+                if (mListener != null) {
+                    mListener.onFontChanged(OnFontChangeListener.FLAG_SPACING_DECREASE, 10);
+                }
                 break;
             default:
         }
@@ -267,6 +273,14 @@ public class FontDialog extends Dialog implements SeekBar.OnSeekBarChangeListene
          * 字体增加
          */
         int FLAG_FONT_INCREASE = 1;
+        /**
+         * 行距减少
+         */
+        int FLAG_SPACING_DECREASE = 2;
+        /**
+         * 行距增加
+         */
+        int FLAG_SPACING_INCREASE = 3;
 
         /**
          * 通知字体大小变化

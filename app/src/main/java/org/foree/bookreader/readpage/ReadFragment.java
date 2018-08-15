@@ -19,7 +19,7 @@ import java.util.Calendar;
 public class ReadFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String ARG_TITLE = "title";
 
-    private TextView tvContents, tvTitle, tvTime, tvIndex, tvBatteryLevel;
+    private TextView mTvContent, tvTitle, tvTime, tvIndex, tvBatteryLevel;
     private ImageView mIvBatteryIcon;
     private View rootView;
     private String mBatteryLevel;
@@ -38,8 +38,8 @@ public class ReadFragment extends Fragment implements SharedPreferences.OnShared
 
     public void setData(ReadPageDataSet readPageDataSet) {
         if (readPageDataSet != null) {
-            if (tvContents != null) {
-                tvContents.setText(readPageDataSet.getContents());
+            if (mTvContent != null) {
+                mTvContent.setText(readPageDataSet.getContents());
             }
 
             if (tvTitle != null) {
@@ -59,7 +59,7 @@ public class ReadFragment extends Fragment implements SharedPreferences.OnShared
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_read, null);
-        tvContents = (TextView) rootView.findViewById(R.id.book_content_layout);
+        mTvContent = (TextView) rootView.findViewById(R.id.book_content_layout);
         tvTitle = (TextView) rootView.findViewById(R.id.tv_title);
         tvTime = (TextView) rootView.findViewById(R.id.tv_time);
         tvIndex = (TextView) rootView.findViewById(R.id.tv_index);
@@ -68,8 +68,13 @@ public class ReadFragment extends Fragment implements SharedPreferences.OnShared
 
         // set default textSize
         float textSize = PreferenceManager.getDefaultSharedPreferences(getContext()).getFloat(SettingsActivity.KEY_READ_PAGE_TEXT_SIZE,
-                tvContents.getTextSize() / tvContents.getPaint().density);
-        tvContents.setTextSize(textSize);
+                mTvContent.getTextSize() / mTvContent.getPaint().density);
+        mTvContent.setTextSize(textSize);
+
+        // load line spacing
+        float lineSpacing = PreferenceManager.getDefaultSharedPreferences(getContext()).getFloat(SettingsActivity.KEY_READ_PAGE_TEXT_LINE_SPACING,
+                mTvContent.getLineSpacingExtra());
+        mTvContent.setLineSpacing(lineSpacing, 1);
 
         rootView.setBackgroundColor(GlobalConfig.getInstance().getPageBackground());
         return rootView;
@@ -110,8 +115,11 @@ public class ReadFragment extends Fragment implements SharedPreferences.OnShared
         if (key.equals(SettingsActivity.KEY_PREF_PAGE_BACKGROUND)) {
             rootView.setBackgroundColor(GlobalConfig.getInstance().getPageBackground());
         } else if (key.equals(SettingsActivity.KEY_READ_PAGE_TEXT_SIZE)) {
-            tvContents.setTextSize(sharedPreferences.getFloat(SettingsActivity.KEY_READ_PAGE_TEXT_SIZE,
-                    tvContents.getTextSize() / tvContents.getPaint().density));
+            mTvContent.setTextSize(sharedPreferences.getFloat(SettingsActivity.KEY_READ_PAGE_TEXT_SIZE,
+                    mTvContent.getTextSize() / mTvContent.getPaint().density));
+        } else if (key.equals(SettingsActivity.KEY_READ_PAGE_TEXT_LINE_SPACING)) {
+            mTvContent.setLineSpacing(sharedPreferences.getFloat(SettingsActivity.KEY_READ_PAGE_TEXT_LINE_SPACING,
+                    mTvContent.getLineSpacingExtra()), 1);
         }
     }
 }
