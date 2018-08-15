@@ -62,6 +62,18 @@
         <item name="android:layout_weight">1</item>
     </style>
 
+    <style name="ReadMenuButtonStyle" parent="Widget.AppCompat.Button.Borderless.Colored">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_marginStart">5dp</item>
+        <item name="android:layout_marginEnd">5dp</item>
+        <item name="android:clickable">true</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:textColor">@color/md_black_1000</item>
+        <item name="android:background">@drawable/bt_read_menu_background</item>
+    </style>
+
     <style name="windowTitle">
         <item name="android:textSize">20sp</item>
         <item name="android:textColor">@color/md_black_1000</item>

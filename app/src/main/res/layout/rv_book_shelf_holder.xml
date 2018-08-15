@@ -29,7 +29,6 @@
 
         <TextView
             android:textSize="13sp"
-            android:textStyle="bold"
             android:maxLines="2"
             android:ellipsize="end"
             android:id="@+id/tv_novel_name"

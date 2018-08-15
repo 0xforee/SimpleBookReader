@@ -10,34 +10,35 @@
         android:layout_margin="20dp">
 
         <ImageView
+            android:scaleX="0.7"
+            android:scaleY="0.7"
             android:id="@+id/brightness_decrease"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="25dp"
             android:layout_alignParentStart="true"
-            android:src="@drawable/ic_brightness_low_black_18dp" />
+            android:src="@mipmap/ic_brightness" />
 
         <SeekBar
             android:id="@+id/seekBar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="25dp"
             android:layout_toEndOf="@+id/brightness_decrease"
             android:layout_toStartOf="@+id/brightness_increase" />
 
         <ImageView
             android:id="@+id/brightness_increase"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="25dp"
             android:layout_alignParentEnd="true"
-            android:src="@drawable/ic_brightness_high_black_18dp" />
+            android:src="@mipmap/ic_brightness" />
 
         <View
             android:id="@+id/split"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_below="@id/seekBar"
-            android:layout_marginBottom="20dp"
-            android:layout_marginTop="20dp"
-            android:background="#10757575" />
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp" />
 
         <RadioGroup
             android:id="@+id/font_custom_bg"
@@ -51,28 +52,45 @@
         </RadioGroup>
 
         <View
+            android:id="@+id/split_2"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_below="@id/font_custom_bg"
-            android:layout_marginBottom="20dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
             android:background="#10757575" />
 
-        <Button
-            android:id="@+id/bt_font_increase"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/font_custom_bg"
-            android:text="A+" />
+        <LinearLayout
+            android:layout_marginEnd="-5dp"
+            android:layout_marginStart="-5dp"
+            android:layout_below="@id/split_2"
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="40dp">
+            <Button
+                style="@style/ReadMenuButtonStyle"
+                android:id="@+id/bt_font_decrease"
+                android:text="A-" />
 
-        <Button
-            android:id="@+id/bt_font_decrease"
-            android:layout_width="88dp"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/font_custom_bg"
-            android:layout_marginStart="-87dp"
-            android:layout_toEndOf="@id/brightness_increase"
-            android:text="A-" />
+            <Button
+                style="@style/ReadMenuButtonStyle"
+                android:id="@+id/bt_font_increase"
+                android:text="A+" />
+
+            <ImageView
+                android:padding="15dp"
+                style="@style/ReadMenuButtonStyle"
+                android:id="@+id/iv_spacing_decrease"
+                android:src="@drawable/menu_dec" />
+
+            <ImageView
+                android:padding="15dp"
+                style="@style/ReadMenuButtonStyle"
+                android:src="@drawable/menu_inc"
+                android:id="@+id/iv_spacing_increase" />
+        </LinearLayout>
+
+
 
     </RelativeLayout>
 

@@ -21,6 +21,6 @@
     <dimen name="book_info_review_margin">10dp</dimen>
 
     <dimen name="book_info_popmenu_height">56dp</dimen>
-    <dimen name="bookshelf_side_padding">14dp</dimen>
+    <dimen name="bookshelf_side_padding">12dp</dimen>
 
 </resources>

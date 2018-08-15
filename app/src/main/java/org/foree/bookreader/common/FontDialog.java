@@ -135,6 +135,12 @@ public class FontDialog extends Dialog implements SeekBar.OnSeekBarChangeListene
         Button decreaseBt = (Button) rootView.findViewById(R.id.bt_font_decrease);
         decreaseBt.setOnClickListener(this);
 
+        ImageView spacingIncreaseIv = (ImageView) rootView.findViewById(R.id.iv_spacing_increase);
+        spacingIncreaseIv.setOnClickListener(this);
+
+        ImageView spacingDecreaseIv = (ImageView) rootView.findViewById(R.id.iv_spacing_decrease);
+        spacingDecreaseIv.setOnClickListener(this);
+
     }
 
     @Override
@@ -213,6 +219,10 @@ public class FontDialog extends Dialog implements SeekBar.OnSeekBarChangeListene
                 Intent intent = new Intent(getContext(), TouchModeSelectorActivity.class);
                 getContext().startActivity(intent);
                 dismiss();
+                break;
+            case R.id.iv_spacing_increase:
+                break;
+            case R.id.iv_spacing_decrease:
                 break;
             default:
         }
