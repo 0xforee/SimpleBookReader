@@ -12,7 +12,7 @@
 
     <!-- main tab title -->
     <string name="tab_book_shelf">我的书架</string>
-    <string name="tab_book_store">书城</string>
+    <string name="tab_book_store">发现</string>
 
     <!-- Chapter loading text -->
     <string name="loading">正在加载 &#8230;</string>

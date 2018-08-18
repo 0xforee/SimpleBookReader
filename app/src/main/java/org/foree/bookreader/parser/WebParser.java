@@ -2,6 +2,7 @@ package org.foree.bookreader.parser;
 
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
+import org.foree.bookreader.bean.book.Rank;
 import org.foree.bookreader.bean.book.Review;
 import org.foree.bookreader.bean.book.Source;
 import org.foree.bookreader.net.NetCallback;
@@ -118,14 +119,14 @@ public class WebParser implements IWebParser {
     }
 
     @Override
-    public void getHomePageInfoAsync(final NetCallback<List<Book>> netCallback) {
+    public void getHomePageInfoAsync(final NetCallback<List<Rank>> netCallback) {
         new Thread() {
             @Override
             public void run() {
                 super.run();
-                List<Book> list = new ArrayList<>();
+                List<Rank> list = new ArrayList<>();
                 for (AbsWebParser parser : mParserMap.values()) {
-                    List<Book> result = parser.getHomePageInfo();
+                    List<Rank> result = (List<Rank>) parser.getHomePageInfo();
                     if (result != null) {
                         list.addAll(result);
                     }
@@ -156,10 +157,10 @@ public class WebParser implements IWebParser {
     }
 
     @Override
-    public List<Book> getHomePageInfo() {
-        List<Book> list = new ArrayList<>();
+    public List<Rank> getHomePageInfo() {
+        List<Rank> list = new ArrayList<>();
         for (AbsWebParser parser : mParserMap.values()) {
-            List<Book> result = parser.getHomePageInfo();
+            List<Rank> result = (List<Rank>) parser.getHomePageInfo();
             if (result != null) {
                 list.addAll(result);
             }
@@ -181,4 +182,5 @@ public class WebParser implements IWebParser {
     public List<Review> getLongReviews(String bookId){
         return getWebParser(bookId).getLongReviews(bookId);
     }
+
 }

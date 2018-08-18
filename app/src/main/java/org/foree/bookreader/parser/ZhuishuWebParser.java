@@ -4,6 +4,7 @@ import android.util.Log;
 
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
+import org.foree.bookreader.bean.book.Rank;
 import org.foree.bookreader.bean.book.Review;
 import org.foree.bookreader.bean.book.Source;
 import org.foree.bookreader.utils.DateUtils;
@@ -213,8 +214,51 @@ public class ZhuishuWebParser extends AbsWebParser {
     }
 
     @Override
-    public List<Book> getHomePageInfo() {
-        return null;
+    public List<Rank> getHomePageInfo() {
+        List<Rank> books = new ArrayList<>();
+        String bookRankListApi = "http://api.zhuishushenqi.com/ranking/gender";
+        String[] groups = new String[]{"male", "female", "picture", "epub"};
+        String[] groupsShowName = new String[]{"男生", "女生", "图书", "出版物"};
+
+        try {
+            Document document = Jsoup.connect(bookRankListApi).ignoreContentType(true).get();
+            if (document != null) {
+                Log.d(TAG, "homePage = " + document.body().text());
+                JSONObject object = new JSONObject(document.body().text());
+
+                for (int j = 0; j < groups.length; j++) {
+                    JSONArray cate = object.getJSONArray(groups[j]);
+                    for (int i = 0; i < cate.length(); i++) {
+                        JSONObject content = cate.getJSONObject(i);
+                        Rank rank = new Rank.Builder()
+                                .id(content.getString("_id"))
+                                .title(content.getString("title"))
+                                .cover(mImageApi + content.getString("cover"))
+                                .collapse(content.getBoolean("collapse"))
+                                .monthRank(content.has("monthRank") ? content.getString("monthRank"): "")
+                                .totalRank(content.has("totalRank") ? content.getString("totalRank") : "")
+                                .shortTitle(content.getString("shortTitle"))
+                                .group(groupsShowName[j])
+                                .build();
+
+                        books.add(rank);
+                    }
+                }
+
+                for (Rank rank :
+                        books) {
+                    Log.d(TAG, rank.toString());
+
+                }
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return books;
     }
 
     @Override
@@ -424,4 +468,6 @@ public class ZhuishuWebParser extends AbsWebParser {
         }
         return reviews;
     }
+
+
 }

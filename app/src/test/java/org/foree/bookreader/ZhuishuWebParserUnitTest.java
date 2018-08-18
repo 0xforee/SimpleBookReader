@@ -1,6 +1,7 @@
 package org.foree.bookreader;
 
 import org.foree.bookreader.bean.book.Book;
+import org.foree.bookreader.bean.book.Rank;
 import org.foree.bookreader.bean.book.Review;
 import org.foree.bookreader.utils.DateUtils;
 import org.json.JSONArray;
@@ -15,8 +16,10 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -96,7 +99,7 @@ public class ZhuishuWebParserUnitTest {
                 JSONArray jsonArray = new JSONArray(document.body().text());
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject sourceObject = (JSONObject) jsonArray.get(i);
-                    if(sourceObject.getString("host").contains("my716")){
+                    if (sourceObject.getString("host").contains("my716")) {
                         my716_index = i;
                     }
                 }
@@ -247,7 +250,7 @@ public class ZhuishuWebParserUnitTest {
                 JSONArray docs = jsonObject.getJSONArray("docs");
                 // 默认获取10个
                 for (int i = 0; i < docs.length(); i++) {
-                    if(i > 9){
+                    if (i > 9) {
                         break;
                     }
 
@@ -280,7 +283,7 @@ public class ZhuishuWebParserUnitTest {
     }
 
     @Test
-    public void testLongReviews(){
+    public void testLongReviews() {
         // 测试五行天，_id = 563552f7688af08743c2ce91
         String short_review_api = "http://api.zhuishushenqi.com/post/review/by-book";
         String testBookId = "563552f7688af08743c2ce91";
@@ -301,7 +304,7 @@ public class ZhuishuWebParserUnitTest {
                 JSONArray docs = jsonObject.getJSONArray("reviews");
                 // 默认获取10个
                 for (int i = 0; i < docs.length(); i++) {
-                    if(i > 9){
+                    if (i > 9) {
                         break;
                     }
 
@@ -332,4 +335,79 @@ public class ZhuishuWebParserUnitTest {
             e.printStackTrace();
         }
     }
+
+    @Test
+    public void testHomePage() {
+        List<Rank> books = new ArrayList<>();
+        String bookRankListApi = "http://api.zhuishushenqi.com/ranking/gender";
+        String imageApi = "http://statics.zhuishushenqi.com";
+        String[] groups = new String[]{"male", "female", "picture", "epub"};
+
+        try {
+            Document document = Jsoup.connect(bookRankListApi).ignoreContentType(true).get();
+            if (document != null) {
+                Log.d(TAG, "homePage = " + document.body().text());
+                JSONObject object = new JSONObject(document.body().text());
+
+                for (String cateName : groups) {
+                    JSONArray cate = object.getJSONArray(cateName);
+                    for (int i = 0; i < cate.length(); i++) {
+                        JSONObject content = cate.getJSONObject(i);
+                        Rank rank = new Rank.Builder()
+                                .id(content.getString("_id"))
+                                .title(content.getString("title"))
+                                .cover(imageApi + content.getString("cover"))
+                                .collapse(content.getBoolean("collapse"))
+                                .monthRank(content.has("monthRank") ? content.getString("monthRank"): "")
+                                .totalRank(content.has("totalRank") ? content.getString("totalRank") : "")
+                                .shortTitle(content.getString("shortTitle"))
+                                .group(cateName)
+                                .build();
+
+                        books.add(rank);
+                    }
+                }
+
+                for (Rank rank :
+                        books) {
+                    Log.d(TAG, rank.toString());
+
+                }
+
+                generateCategoryList(books);
+
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private List<List<Rank>> generateCategoryList(List<Rank> ranks){
+        Map<String, List<Rank>> rankMap = new HashMap<>();
+        List<List<Rank>> rankList = new ArrayList<>();
+
+        for (int i = 0; i < ranks.size(); i++) {
+            Rank rank = ranks.get(i);
+            if(rankMap.containsKey(rank.getGroup())){
+                rankMap.get(rank.getGroup()).add(rank);
+            }else{
+                List<Rank> innerRanks = new ArrayList<>();
+                innerRanks.add(rank);
+                rankMap.put(rank.getGroup(), innerRanks);
+            }
+        }
+
+        for (String key :
+                rankMap.keySet()) {
+            Log.d(TAG, key);
+            rankList.add(rankMap.get(key));
+        }
+
+        return rankList;
+    }
+
 }

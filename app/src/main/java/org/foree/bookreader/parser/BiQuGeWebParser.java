@@ -5,6 +5,7 @@ import android.util.Log;
 
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
+import org.foree.bookreader.bean.book.Rank;
 import org.foree.bookreader.utils.DateUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -108,17 +109,17 @@ class BiQuGeWebParser extends AbsWebParser {
     }
 
     @Override
-    public List<Book> getHomePageInfo() {
-        Document doc;
-        try {
-            doc = Jsoup.connect(getWebInfo().getHostUrl()).get();
-            if (doc != null) {
-                return parseHostUrl(getWebInfo().getHostUrl(), doc);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-
-        }
+    public List<Rank> getHomePageInfo() {
+//        Document doc;
+//        try {
+//            doc = Jsoup.connect(getWebInfo().getHostUrl()).get();
+//            if (doc != null) {
+//                return parseHostUrl(getWebInfo().getHostUrl(), doc);
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//
+//        }
 
         return new ArrayList<>();
     }

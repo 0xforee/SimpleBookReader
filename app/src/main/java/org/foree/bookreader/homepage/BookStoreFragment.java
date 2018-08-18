@@ -14,19 +14,25 @@ import android.widget.ExpandableListView;
 
 import org.foree.bookreader.R;
 import org.foree.bookreader.bean.book.Book;
+import org.foree.bookreader.bean.book.Rank;
 import org.foree.bookreader.bookinfopage.BookInfoActivity;
 import org.foree.bookreader.net.NetCallback;
 import org.foree.bookreader.parser.WebParser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+/**
+ * @author foree
+ */
 public class BookStoreFragment extends Fragment {
     private ExpandableListView mExpandableListView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ExpandableListAdapter mAdapter;
-    private List<List<Book>> bookStoreList;
-    private List<Book> categoryList;
+    private List<List<Rank>> bookStoreList;
+    private List<Rank> categoryList;
 
     public static BookStoreFragment newInstance() {
         BookStoreFragment fragment = new BookStoreFragment();
@@ -45,8 +51,9 @@ public class BookStoreFragment extends Fragment {
     }
 
     private void syncBookStoreInfo() {
-        // generate test data
         bookStoreList = new ArrayList<>();
+        // generate test data
+//        bookStoreList = new ArrayList<>();
 //
 //        for (int i = 0; i < 7; i++) {
 //            categoryList = new ArrayList<>();
@@ -75,19 +82,34 @@ public class BookStoreFragment extends Fragment {
         return view;
     }
 
-    private List<List<Book>> generateCategoryList(List<Book> books){
-        List<List<Book>> categories = new ArrayList<>();
+    private List<List<Rank>> generateCategoryList(List<Rank> ranks){
+        Map<String, List<Rank>> rankMap = new HashMap<>();
+        List<List<Rank>> rankList = new ArrayList<>();
 
-        categories.add(books);
+        for (int i = 0; i < ranks.size(); i++) {
+            Rank rank = ranks.get(i);
+            if(rankMap.containsKey(rank.getGroup())){
+                rankMap.get(rank.getGroup()).add(rank);
+            }else{
+                List<Rank> innerRanks = new ArrayList<>();
+                innerRanks.add(rank);
+                rankMap.put(rank.getGroup(), innerRanks);
+            }
+        }
 
-        return categories;
+        for (String key : rankMap.keySet()) {
+            rankList.add(rankMap.get(key));
+        }
+
+
+        return rankList;
     }
 
     private void initExpandableListView() {
         final Context context = this.getContext();
-        WebParser.getInstance().getHomePageInfoAsync(new NetCallback<List<Book>>() {
+        WebParser.getInstance().getHomePageInfoAsync(new NetCallback<List<Rank>>() {
             @Override
-            public void onSuccess(List<Book> data) {
+            public void onSuccess(List<Rank> data) {
                 if(data == null || data.isEmpty()) return;
                 bookStoreList.clear();
                 bookStoreList.addAll(generateCategoryList(data));
@@ -109,10 +131,10 @@ public class BookStoreFragment extends Fragment {
                             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
                                 Intent intent = new Intent(getActivity(), BookInfoActivity.class);
                                 Bundle bundle = new Bundle();
-                                bundle.putString("book_url", bookStoreList.get(groupPosition).get(childPosition).getBookUrl());
-                                intent.putExtras(bundle);
+//                                bundle.putString("book_url", bookStoreList.get(groupPosition).get(childPosition).getBookUrl());
+//                                intent.putExtras(bundle);
 
-                                startActivity(intent);
+//                                startActivity(intent);
                                 Log.d("BookStoreFragment", "onChildClick");
                                 return true;
                             }

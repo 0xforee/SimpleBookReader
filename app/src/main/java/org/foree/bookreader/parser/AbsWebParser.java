@@ -2,6 +2,7 @@ package org.foree.bookreader.parser;
 
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
+import org.foree.bookreader.bean.book.Rank;
 import org.foree.bookreader.bean.book.Review;
 import org.foree.bookreader.bean.book.Source;
 import org.foree.bookreader.net.NetCallback;
@@ -42,7 +43,7 @@ abstract class AbsWebParser implements IWebParser {
     }
 
     @Override
-    public void getHomePageInfoAsync(NetCallback<List<Book>> netCallback) {
+    public void getHomePageInfoAsync(NetCallback<List<Rank>> netCallback) {
         // default implement
     }
 

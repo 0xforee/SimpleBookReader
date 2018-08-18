@@ -12,7 +12,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 
 import org.foree.bookreader.R;
-import org.foree.bookreader.bean.book.Book;
+import org.foree.bookreader.bean.book.Rank;
 
 import java.util.List;
 
@@ -21,10 +21,10 @@ import java.util.List;
  */
 
 public class BookStoreExpandableListAdapter implements ExpandableListAdapter {
-    private List<List<Book>> bookStoreList;
+    private List<List<Rank>> bookStoreList;
     private Context mContext;
 
-    public BookStoreExpandableListAdapter(Context context, List<List<Book>> bookStoreList) {
+    public BookStoreExpandableListAdapter(Context context, List<List<Rank>> bookStoreList) {
         mContext = context;
         this.bookStoreList = bookStoreList;
     }
@@ -84,7 +84,7 @@ public class BookStoreExpandableListAdapter implements ExpandableListAdapter {
         } else {
             groupViewHolder = (GroupViewHolder) convertView.getTag();
         }
-        groupViewHolder.textView.setText(bookStoreList.get(groupPosition).get(0).getCategory());
+        groupViewHolder.textView.setText(bookStoreList.get(groupPosition).get(0).getGroup());
         return convertView;
     }
 
@@ -100,23 +100,16 @@ public class BookStoreExpandableListAdapter implements ExpandableListAdapter {
             childViewHolder = (ChildViewHolder) convertView.getTag();
         }
 
-        Book childBook = bookStoreList.get(groupPosition).get(childPosition);
-        childViewHolder.bookName.setText(childBook.getBookName());
+        Rank childRank = bookStoreList.get(groupPosition).get(childPosition);
+        childViewHolder.rankName.setText(childRank.getTitle());
 
 
-        if (!childBook.getBookCoverUrl().isEmpty()) {
-            Glide.with(mContext).load(childBook.getBookCoverUrl()).crossFade().into(childViewHolder.bookCover);
-            childViewHolder.bookCover.setVisibility(View.VISIBLE);
+        if (!childRank.getCover().isEmpty()) {
+            Glide.with(mContext).load(childRank.getCover()).crossFade().into(childViewHolder.rankCover);
+            childViewHolder.rankCover.setVisibility(View.VISIBLE);
 
         } else {
-            childViewHolder.bookCover.setVisibility(View.GONE);
-        }
-
-        if (!childBook.getDescription().isEmpty()) {
-            childViewHolder.description.setText(childBook.getDescription());
-            childViewHolder.description.setVisibility(View.VISIBLE);
-        } else {
-            childViewHolder.description.setVisibility(View.GONE);
+            childViewHolder.rankCover.setVisibility(View.GONE);
         }
 
         return convertView;
@@ -166,14 +159,12 @@ public class BookStoreExpandableListAdapter implements ExpandableListAdapter {
     }
 
     private static class ChildViewHolder {
-        private TextView bookName;
-        private ImageView bookCover;
-        private TextView description;
+        private TextView rankName;
+        private ImageView rankCover;
 
         ChildViewHolder(View view) {
-            bookName = (TextView) view.findViewById(R.id.book_store_item_name);
-            bookCover = (ImageView) view.findViewById(R.id.book_store_item_cover);
-            description = (TextView) view.findViewById(R.id.book_store_item_description);
+            rankName = (TextView) view.findViewById(R.id.book_store_item_name);
+            rankCover = (ImageView) view.findViewById(R.id.book_store_item_cover);
         }
     }
 }

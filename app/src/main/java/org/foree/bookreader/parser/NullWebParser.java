@@ -2,6 +2,7 @@ package org.foree.bookreader.parser;
 
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
+import org.foree.bookreader.bean.book.Rank;
 
 import java.util.List;
 
@@ -58,7 +59,7 @@ class NullWebParser extends AbsWebParser {
     }
 
     @Override
-    public List<Book> getHomePageInfo() {
+    public List<Rank> getHomePageInfo() {
         return null;
     }
 }
