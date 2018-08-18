@@ -25,8 +25,8 @@ android {
         applicationId "org.foree.bookreader"
         minSdkVersion 21
         targetSdkVersion 23
-        versionCode 5
-        versionName "1.2.1"
+        versionCode 6
+        versionName "1.2.2"
         setProperty("archivesBaseName", "zhuishu-v$versionName")
         vectorDrawables.useSupportLibrary = true
     }
