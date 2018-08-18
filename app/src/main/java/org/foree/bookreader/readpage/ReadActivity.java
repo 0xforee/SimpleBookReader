@@ -199,6 +199,9 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
                 // init pagination
                 reInitPaginationArgs();
 
+                //init book info
+                mBookRecord.restoreBookRecord(mBookUrl, mOnline);
+
             }
         });
     }
@@ -231,8 +234,6 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
                 mTvContent.getPaint(),
                 mTvContent.getIncludeFontPadding()));
 
-        // third, init book info
-        mBookRecord.restoreBookRecord(mBookUrl, mOnline);
     }
 
     @Override
@@ -540,8 +541,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
         PreferenceManager.getDefaultSharedPreferences(this).edit().
                 putFloat(SettingsActivity.KEY_READ_PAGE_TEXT_LINE_SPACING, lineSpacingExtra).apply();
         reInitPaginationArgs();
-        mReadPageAdapter.reset();
-        PaginationLoader.getInstance().loadPagination(mBookRecord.getCurrentUrl());
+        switchChapter(mBookRecord.getCurrentUrl(), true);
 
     }
 

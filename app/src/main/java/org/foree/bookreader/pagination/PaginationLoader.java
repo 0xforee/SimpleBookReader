@@ -1,5 +1,7 @@
 package org.foree.bookreader.pagination;
 
+import android.util.Log;
+
 import org.foree.bookreader.bean.cache.MemoryCache;
 import org.foree.bookreader.readpage.BookRecord;
 import org.foree.bookreader.bean.cache.ChapterCache;
@@ -11,6 +13,7 @@ import org.foree.bookreader.bean.cache.PaginationCache;
  */
 
 public class PaginationLoader {
+    private static final String TAG = "PaginationLoader";
     private PaginationArgs paginationArgs;
     private RequestQueue mRequestQueue;
 
@@ -76,10 +79,11 @@ public class PaginationLoader {
                     int tmp = 1;
                     final int index = mBookRecord.getChapterIndex(mBookRecord.getCurrentUrl());
                     if (index != -1) {
+                        Log.i(TAG, "[foree] run: smartLoad: load chapter = " + index);
 
                         // 前几章
                         int newIndex = index - tmp;
-                        while (newIndex > 0 && tmp <= mOffset) {
+                        while (newIndex >= 0 && tmp <= mOffset) {
 //                            if (!mBookRecord.isChapterCached(newIndex)) {
                                 // add request
                                 mRequestQueue.add(new ChapterRequest(mBookRecord.getChapterUrl(newIndex), paginationArgs, false));
