@@ -42,7 +42,7 @@ public class ZhuishuWebParser extends AbsWebParser {
         Map<String, String> data = new HashMap<>();
         data.put("query", encodeKeyword);
         data.put("start", "0");
-        data.put("limit", "20");
+//        data.put("limit", "20");
 
         Document document;
         try {
@@ -218,7 +218,7 @@ public class ZhuishuWebParser extends AbsWebParser {
         List<Rank> books = new ArrayList<>();
         String bookRankListApi = "http://api.zhuishushenqi.com/ranking/gender";
         String[] groups = new String[]{"male", "female", "picture", "epub"};
-        String[] groupsShowName = new String[]{"男生", "女生", "图书", "出版物"};
+        String[] groupsShowName = new String[]{"男生", "女生", "漫画", "出版物"};
 
         try {
             Document document = Jsoup.connect(bookRankListApi).ignoreContentType(true).get();
@@ -469,5 +469,30 @@ public class ZhuishuWebParser extends AbsWebParser {
         return reviews;
     }
 
+    @Override
+    public List<Book> getRankList(String rankId) {
+        List<Book> rankList = new ArrayList<>();
+        String rankApi = "http://api.zhuishushenqi.com/ranking/";
+        try {
+            Document document = Jsoup.connect(rankApi + rankId).ignoreContentType(true).get();
+            if(document != null){
+                JSONArray booksArray = new JSONObject(document.body().text()).getJSONObject("ranking").getJSONArray("books");
+                for (int i = 0; i < booksArray.length(); i++) {
+                    JSONObject bookObj = booksArray.getJSONObject(i);
+                    Book book = new Book();
+                    book.setBookUrl(bookObj.getString("_id"));
+                    book.setBookName(bookObj.getString("title"));
+                    book.setAuthor(bookObj.getString("author"));
+                    book.setBookCoverUrl(mImageApi + bookObj.getString("cover"));
 
+                    rankList.add(book);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return rankList;
+    }
 }

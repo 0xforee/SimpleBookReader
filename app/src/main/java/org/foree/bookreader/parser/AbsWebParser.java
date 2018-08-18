@@ -47,6 +47,11 @@ abstract class AbsWebParser implements IWebParser {
         // default implement
     }
 
+    @Override
+    public void getRankListAsync(String rankId, NetCallback<List<Book>> netCallback) {
+
+    }
+
     int getChapterId(String url) {
         // convert http://m.bxwx9.org/0_168/2512063.html ==> 2512063
 
@@ -72,6 +77,11 @@ abstract class AbsWebParser implements IWebParser {
 
     @Override
     public List<Review> getLongReviews(String bookId) {
+        return null;
+    }
+
+    @Override
+    public List<Book> getRankList(String rankId) {
         return null;
     }
 }

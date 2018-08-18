@@ -129,12 +129,11 @@ public class BookStoreFragment extends Fragment {
                         mExpandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
                             @Override
                             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                                Intent intent = new Intent(getActivity(), BookInfoActivity.class);
-                                Bundle bundle = new Bundle();
-//                                bundle.putString("book_url", bookStoreList.get(groupPosition).get(childPosition).getBookUrl());
-//                                intent.putExtras(bundle);
+                                Intent intent = new Intent(getActivity(), RankListActivity.class);
+                                intent.putExtra("rankId", bookStoreList.get(groupPosition).get(childPosition).getId());
+                                intent.putExtra("title", bookStoreList.get(groupPosition).get(childPosition).getTitle());
 
-//                                startActivity(intent);
+                                startActivity(intent);
                                 Log.d("BookStoreFragment", "onChildClick");
                                 return true;
                             }

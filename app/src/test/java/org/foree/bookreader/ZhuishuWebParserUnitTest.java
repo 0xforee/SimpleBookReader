@@ -410,4 +410,32 @@ public class ZhuishuWebParserUnitTest {
         return rankList;
     }
 
+    private void getRankList(){
+        List<Book> rankList = new ArrayList<>();
+        String rankId = "54d43437d47d13ff21cad58b";
+        String rankApi = "http://api.zhuishushenqi.com/ranking/";
+        String imageApi = "http://statics.zhuishushenqi.com";
+
+        try {
+            Document document = Jsoup.connect(rankApi + rankId).ignoreContentType(true).get();
+            if(document != null){
+                JSONArray booksArray = new JSONObject(document.body().text()).getJSONArray("books");
+                for (int i = 0; i < booksArray.length(); i++) {
+                    JSONObject bookObj = booksArray.getJSONObject(i);
+                    Book book = new Book();
+                    book.setBookUrl(bookObj.getString("_id"));
+                    book.setBookName(bookObj.getString("title"));
+                    book.setAuthor(bookObj.getString("author"));
+                    book.setBookCoverUrl(imageApi + bookObj.getString("cover"));
+
+                    rankList.add(book);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

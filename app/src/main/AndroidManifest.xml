@@ -69,6 +69,8 @@
         <activity android:name=".readpage.TouchModeSelectorActivity"
             android:theme="@style/TouchModeSelectorTheme"
             android:screenOrientation="portrait"/>
+
+        <activity android:name=".homepage.RankListActivity"/>
     </application>
 
 </manifest>

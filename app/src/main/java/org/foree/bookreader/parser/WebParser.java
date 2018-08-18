@@ -183,4 +183,22 @@ public class WebParser implements IWebParser {
         return getWebParser(bookId).getLongReviews(bookId);
     }
 
+    @Override
+    public List<Book> getRankList(String rankId) {
+        return getWebParser(rankId).getRankList(rankId);
+    }
+
+    @Override
+    public void getRankListAsync(final String rankId, final NetCallback<List<Book>> netCallback) {
+        new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                List<Book> books = getRankList(rankId);
+                if(books != null){
+                    netCallback.onSuccess(books);
+                }
+            }
+        }.start();
+    }
 }

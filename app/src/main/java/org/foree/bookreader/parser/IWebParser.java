@@ -25,6 +25,8 @@ interface IWebParser {
 
     void getHomePageInfoAsync(NetCallback<List<Rank>> netCallback);
 
+    void getRankListAsync(String rankId, NetCallback<List<Book>> netCallback);
+
     // sync function
     List<Book> searchBook(String keyword);
 
@@ -41,4 +43,6 @@ interface IWebParser {
     List<Review> getShortReviews(String bookId);
 
     List<Review> getLongReviews(String bookId);
+
+    List<Book> getRankList(String rankId);
 }
