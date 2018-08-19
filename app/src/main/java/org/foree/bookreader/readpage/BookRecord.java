@@ -412,7 +412,11 @@ public class BookRecord {
             @Override
             public void run() {
                 mBook.setContentUrl(sourceId);
+                // get old index
+                int oldChapterIndex = getChapterIndex(getCurrentUrl());
                 initChapters(true);
+                // set new chapter use old index
+                switchChapter(getChapterUrl(oldChapterIndex));
                 sendCompleteMessage();
             }
         });

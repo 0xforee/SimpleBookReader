@@ -60,7 +60,6 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
     String mBookUrl;
     boolean mOnline;
     private BookRecord mBookRecord;
-    private boolean mSlipLeft = false;
     // view pager
     private ReadViewPager mViewPager;
     private ReadPageAdapter mReadPageAdapter;
@@ -398,6 +397,8 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
                 mSourceChangeAdapter.setSelectedPosition(position);
                 mSourceChangeAdapter.notifyDataSetChanged();
                 mHandler.sendEmptyMessage(MSG_LOADING);
+                // reload
+                reInitPaginationArgs();
                 // change sourceId (contentUrl)
                 mBookRecord.changeSourceId(mBookRecord.getSourceList().get(position).getSourceId());
             }
@@ -442,10 +443,6 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
             PaginationLoader.getInstance().loadPagination(newChapterUrl);
         }
         PaginationLoader.getInstance().smartLoad();
-    }
-
-    private boolean isSlipLeft() {
-        return mSlipLeft;
     }
 
     /**
