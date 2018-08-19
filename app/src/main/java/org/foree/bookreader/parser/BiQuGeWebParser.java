@@ -26,8 +26,8 @@ class BiQuGeWebParser extends AbstractWebParser {
     private static boolean DEBUG = false;
 
     @Override
-    WebInfo getWebInfo() {
-        return new WebInfo() {
+    AbstractWebInfo getWebInfo() {
+        return new AbstractWebInfo() {
             @Override
             public String getHostName() {
                 return "笔趣阁";

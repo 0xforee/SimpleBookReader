@@ -120,7 +120,7 @@ public class BookRecord {
     }
 
     private void initSourceList() {
-        mSourceList = WebParser.getInstance().getBookSource(mBookUrl);
+        mSourceList = WebParser.getInstance().getBookSource(mBookUrl, "");
     }
 
     /**
@@ -313,7 +313,7 @@ public class BookRecord {
      * @return 章节列表
      */
     private List<Chapter> initChapterListOnline() {
-        return WebParser.getInstance().getContents(mBookUrl, mBook.getContentUrl());
+        return WebParser.getInstance().getContents(mBookUrl, mBookUrl, mBook.getContentUrl());
     }
 
     private void initChapterIndexMap(List<Chapter> chapters) {
@@ -368,7 +368,7 @@ public class BookRecord {
      * 通过网络初始化书籍信息
      */
     private Book initBookInfoOnline() {
-        Book book = WebParser.getInstance().getBookInfo(mBookUrl);
+        Book book = WebParser.getInstance().getBookInfo(mBookUrl, mBookUrl);
         book.setPageIndex(0);
         return book;
     }

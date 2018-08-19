@@ -252,8 +252,8 @@ public class ZhuishuWebParser extends AbstractWebParser {
     }
 
     @Override
-    WebInfo getWebInfo() {
-        return new WebInfo() {
+    AbstractWebInfo getWebInfo() {
+        return new AbstractWebInfo() {
             @Override
             public String getHostName() {
                 return "追书";
@@ -266,7 +266,7 @@ public class ZhuishuWebParser extends AbstractWebParser {
 
             @Override
             public String getHostUrl() {
-                return "api.zhuishu.com";
+                return "http://api.zhuishu.com";
             }
 
             @Override

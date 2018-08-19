@@ -242,13 +242,13 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
             @Override
             public void run() {
                 // get bookinfo first
-                mBook = WebParser.getInstance().getBookInfo(bookUrl);
+                mBook = WebParser.getInstance().getBookInfo(bookUrl, bookUrl);
                 if (mBook != null) {
                     // get chapters
-                    mBook.setChapters(WebParser.getInstance().getContents(bookUrl, mBook.getContentUrl()));
+                    mBook.setChapters(WebParser.getInstance().getContents(bookUrl, bookUrl, mBook.getContentUrl()));
 
                     // get comments
-                    final List<Review> reviews = WebParser.getInstance().getLongReviews(bookUrl);
+                    final List<Review> reviews = WebParser.getInstance().getLongReviews(bookUrl, bookUrl);
 
                     // update UI
                     mContent.post(new Runnable() {

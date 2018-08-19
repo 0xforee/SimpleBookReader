@@ -35,7 +35,7 @@ public class RequestDispatcher extends Thread {
                     chapter = chapterCache.get(request.getUrl());
                     if (chapter == null || chapter.getChapterUrl() == null) {
                         // download from net
-                        chapter = WebParser.getInstance().getChapter("", request.getUrl());
+                        chapter = WebParser.getInstance().getChapter("","", request.getUrl());
                     }
 
                     if (chapter != null && chapter.getContents() != null) {

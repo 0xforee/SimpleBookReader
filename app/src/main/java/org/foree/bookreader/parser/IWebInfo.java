@@ -4,7 +4,7 @@ package org.foree.bookreader.parser;
  * Created by foree on 2018/6/19.
  */
 
-public interface WebInfo {
+public interface IWebInfo {
     /**
      * 获取目标网站名称
      *

@@ -43,7 +43,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
     public void testParseBookInfo() {
         String url = "http://www.biquge.com/0_168/";
-        WebParser.getInstance().getBookInfoAsync(url, new NetCallback<Book>() {
+        WebParser.getInstance().getBookInfoAsync(url, url, new NetCallback<Book>() {
             @Override
             public void onSuccess(Book data) {
 

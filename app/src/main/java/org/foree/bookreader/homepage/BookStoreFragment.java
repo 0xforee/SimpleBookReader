@@ -107,7 +107,7 @@ public class BookStoreFragment extends Fragment {
 
     private void initExpandableListView() {
         final Context context = this.getContext();
-        WebParser.getInstance().getHomePageInfoAsync(new NetCallback<List<Rank>>() {
+        WebParser.getInstance().getHomePageInfoAsync(null, new NetCallback<List<Rank>>() {
             @Override
             public void onSuccess(List<Rank> data) {
                 if(data == null || data.isEmpty()) return;

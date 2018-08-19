@@ -15,28 +15,8 @@ import java.util.Map;
 class NullWebParser extends AbstractWebParser {
 
     @Override
-    WebInfo getWebInfo() {
-        return new WebInfo() {
-            @Override
-            public String getHostName() {
-                return null;
-            }
-
-            @Override
-            public String getWebChar() {
-                return null;
-            }
-
-            @Override
-            public String getHostUrl() {
-                return null;
-            }
-
-            @Override
-            public String getSearchApi(String keyword) {
-                return null;
-            }
-        };
+    AbstractWebInfo getWebInfo() {
+        return null;
     }
 
     @Override

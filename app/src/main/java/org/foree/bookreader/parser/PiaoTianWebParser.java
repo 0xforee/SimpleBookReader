@@ -26,8 +26,8 @@ class PiaoTianWebParser extends AbstractWebParser {
     private static final String TAG = PiaoTianWebParser.class.getSimpleName();
 
     @Override
-    WebInfo getWebInfo() {
-        return new WebInfo() {
+    AbstractWebInfo getWebInfo() {
+        return new AbstractWebInfo() {
             @Override
             public String getHostName() {
                 return "飘天文学";

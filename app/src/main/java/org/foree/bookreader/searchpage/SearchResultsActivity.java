@@ -137,7 +137,7 @@ public class SearchResultsActivity extends BaseActivity {
     private void handlerSearch(String query) {
         Log.d(TAG, "query keywords = " + query);
 
-        WebParser.getInstance().searchBookAsync(query, new NetCallback<List<Book>>() {
+        WebParser.getInstance().searchBookAsync(null, query, new NetCallback<List<Book>>() {
             @Override
             public void onSuccess(final List<Book> data) {
                 mHandler.postDelayed(new Runnable() {

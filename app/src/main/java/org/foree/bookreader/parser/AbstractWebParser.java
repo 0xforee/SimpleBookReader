@@ -17,7 +17,7 @@ abstract class AbstractWebParser implements IWebParser {
     private static final String TAG = AbstractWebParser.class.getSimpleName();
     static boolean DEBUG = false;
 
-    abstract WebInfo getWebInfo();
+    abstract AbstractWebInfo getWebInfo();
 
     int getChapterId(String url) {
         // convert http://m.bxwx9.org/0_168/2512063.html ==> 2512063
