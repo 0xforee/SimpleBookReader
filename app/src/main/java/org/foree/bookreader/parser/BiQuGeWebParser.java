@@ -15,12 +15,13 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by foree on 17-1-7.
  */
 
-class BiQuGeWebParser extends AbsWebParser {
+class BiQuGeWebParser extends AbstractWebParser {
     private static final String TAG = BiQuGeWebParser.class.getSimpleName();
     private static boolean DEBUG = false;
 
@@ -50,7 +51,7 @@ class BiQuGeWebParser extends AbsWebParser {
     }
 
     @Override
-    public List<Book> searchBook(String keyword) {
+    public List<Book> searchBook(String keyword, Map<String, String> params) {
         Document doc;
         try {
             doc = Jsoup.connect(getWebInfo().getSearchApi(keyword)).get();

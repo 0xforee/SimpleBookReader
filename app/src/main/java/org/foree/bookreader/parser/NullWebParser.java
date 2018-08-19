@@ -5,13 +5,14 @@ import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.book.Rank;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by foree on 17-1-19.
  * 空对象模式
  */
 
-class NullWebParser extends AbsWebParser {
+class NullWebParser extends AbstractWebParser {
 
     @Override
     WebInfo getWebInfo() {
@@ -39,7 +40,7 @@ class NullWebParser extends AbsWebParser {
     }
 
     @Override
-    public List<Book> searchBook(String keyword) {
+    public List<Book> searchBook(String keyword, Map<String, String> params) {
         return null;
     }
 

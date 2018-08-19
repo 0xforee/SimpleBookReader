@@ -25,28 +25,18 @@ import java.util.Map;
  * Created by foree on 2018/4/8.
  */
 
-public class ZhuishuWebParser extends AbsWebParser {
+public class ZhuishuWebParser extends AbstractWebParser {
     private static final String TAG = ZhuishuWebParser.class.getSimpleName();
     private String mImageApi = "http://statics.zhuishushenqi.com";
     private static final boolean DEBUG = false;
 
     @Override
-    public List<Book> searchBook(String keyword) {
+    public List<Book> searchBook(String keyword, Map<String, String> params) {
         List<Book> bookList = new ArrayList<>();
-        String encodeKeyword = URLEncoder.encode(keyword);
-
-        if (DEBUG) {
-            Log.d(TAG, "encodeKeyword = " + encodeKeyword);
-        }
-
-        Map<String, String> data = new HashMap<>();
-        data.put("query", encodeKeyword);
-        data.put("start", "0");
-//        data.put("limit", "20");
 
         Document document;
         try {
-            document = Jsoup.connect(getWebInfo().getSearchApi("")).headers(getHeader()).data(data).ignoreContentType(true).get();
+            document = Jsoup.connect(getWebInfo().getSearchApi("")).headers(getHeader()).data(params).ignoreContentType(true).get();
 
             if (document != null) {
                 String json = document.body().text().trim();
@@ -235,7 +225,7 @@ public class ZhuishuWebParser extends AbsWebParser {
                                 .title(content.getString("title"))
                                 .cover(mImageApi + content.getString("cover"))
                                 .collapse(content.getBoolean("collapse"))
-                                .monthRank(content.has("monthRank") ? content.getString("monthRank"): "")
+                                .monthRank(content.has("monthRank") ? content.getString("monthRank") : "")
                                 .totalRank(content.has("totalRank") ? content.getString("totalRank") : "")
                                 .shortTitle(content.getString("shortTitle"))
                                 .group(groupsShowName[j])
@@ -357,20 +347,15 @@ public class ZhuishuWebParser extends AbsWebParser {
     }
 
     @Override
-    public List<Review> getShortReviews(String bookId) {
+    public List<Review> getShortReviews(String bookId, Map<String, String> params) {
         Log.d(TAG, "getShortReviews() called with: bookId = [" + bookId + "]");
         List<Review> reviews = new ArrayList<>();
         String shortReviewApi = "http://api.zhuishushenqi.com/post/short-review";
         String imageApi = "http://statics.zhuishushenqi.com";
 
-        Map<String, String> data = new HashMap<>(4);
-        data.put("book", bookId);
-        data.put("sortType", "newest");
-        data.put("start", "0");
-        data.put("limit", "20");
 
         try {
-            Document document = Jsoup.connect(shortReviewApi).data(data).ignoreContentType(true).get();
+            Document document = Jsoup.connect(shortReviewApi).data(params).ignoreContentType(true).get();
             if (document != null) {
                 JSONObject jsonObject = new JSONObject(document.body().text());
                 JSONArray docs = jsonObject.getJSONArray("docs");
@@ -412,21 +397,16 @@ public class ZhuishuWebParser extends AbsWebParser {
     }
 
     @Override
-    public List<Review> getLongReviews(String bookId) {
+    public List<Review> getLongReviews(String bookId, Map<String, String> params) {
         List<Review> reviews = new ArrayList<>();
         // 测试五行天，_id = 563552f7688af08743c2ce91
         String short_review_api = "http://api.zhuishushenqi.com/post/review/by-book";
         String testBookId = "563552f7688af08743c2ce91";
         String imageApi = "http://statics.zhuishushenqi.com";
 
-        Map<String, String> data = new HashMap<>(4);
-        data.put("book", bookId);
-        data.put("sort", "updated");
-        data.put("start", "0");
-        data.put("limit", "4");
 
         try {
-            Document document = Jsoup.connect(short_review_api).data(data).ignoreContentType(true).get();
+            Document document = Jsoup.connect(short_review_api).data(params).ignoreContentType(true).get();
             if (document != null) {
                 if (DEBUG) Log.d(TAG, "[foree] testLongReview: " + document.body().text());
 
@@ -475,7 +455,7 @@ public class ZhuishuWebParser extends AbsWebParser {
         String rankApi = "http://api.zhuishushenqi.com/ranking/";
         try {
             Document document = Jsoup.connect(rankApi + rankId).ignoreContentType(true).get();
-            if(document != null){
+            if (document != null) {
                 JSONArray booksArray = new JSONObject(document.body().text()).getJSONObject("ranking").getJSONArray("books");
                 for (int i = 0; i < booksArray.length(); i++) {
                     JSONObject bookObj = booksArray.getJSONObject(i);

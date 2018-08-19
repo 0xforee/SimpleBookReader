@@ -7,6 +7,7 @@ import org.foree.bookreader.bean.book.Review;
 import org.foree.bookreader.bean.book.Source;
 import org.foree.bookreader.net.NetCallback;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,8 +18,8 @@ import java.util.Map;
  * 用于对外的统一接口，所有的对书籍的资源请求都通过这个代理类处理
  */
 
-public class WebParser implements IWebParser {
-    private Map<String, AbsWebParser> mParserMap = new HashMap<>();
+public class WebParser {
+    private Map<String, AbstractWebParser> mParserMap = new HashMap<>();
     private static WebParser mInstance;
 
     private WebParser() {
@@ -44,7 +45,7 @@ public class WebParser implements IWebParser {
     }
 
 
-    public void registerParser(String url, AbsWebParser parser) {
+    public void registerParser(String url, AbstractWebParser parser) {
         if (!url.startsWith("http://"))
             throw new RuntimeException("Url Must be start With \"http://\"");
         else
@@ -55,7 +56,7 @@ public class WebParser implements IWebParser {
         mParserMap.remove(url);
     }
 
-    private AbsWebParser getWebParser(String url) {
+    private AbstractWebParser getWebParser(String url) {
         // parse host url
 //        if (url.contains("http://") && url.length() > 7) {
 //            int index = url.indexOf("/", 7);
@@ -66,15 +67,22 @@ public class WebParser implements IWebParser {
 //        }
     }
 
-    @Override
     public void searchBookAsync(final String keyword, final NetCallback<List<Book>> netCallback) {
         new Thread() {
             @Override
             public void run() {
                 super.run();
+
+                String encodeKeyword = URLEncoder.encode(keyword);
+
+                Map<String, String> data = new HashMap<>();
+                data.put("query", encodeKeyword);
+                data.put("start", "0");
+//        data.put("limit", "20");
+
                 List<Book> books = new ArrayList<>();
-                for (AbsWebParser parser : mParserMap.values()) {
-                    List<Book> results = parser.searchBook(keyword);
+                for (AbstractWebParser parser : mParserMap.values()) {
+                    List<Book> results = parser.searchBook(keyword, data);
                     if (results != null) {
                         books.addAll(results);
                     }
@@ -84,7 +92,6 @@ public class WebParser implements IWebParser {
         }.start();
     }
 
-    @Override
     public void getBookInfoAsync(final String bookUrl, final NetCallback<Book> netCallback) {
         new Thread() {
             @Override
@@ -95,7 +102,6 @@ public class WebParser implements IWebParser {
         }.start();
     }
 
-    @Override
     public void getContentsAsync(final String bookUrl, final String contentsUrl, final NetCallback<List<Chapter>> netCallback) {
         new Thread() {
             @Override
@@ -106,7 +112,6 @@ public class WebParser implements IWebParser {
         }.start();
     }
 
-    @Override
     public void getChapterAsync(final String bookUrl, final String chapterUrl, final NetCallback<Chapter> netCallback) {
         new Thread() {
             @Override
@@ -118,14 +123,13 @@ public class WebParser implements IWebParser {
         }.start();
     }
 
-    @Override
     public void getHomePageInfoAsync(final NetCallback<List<Rank>> netCallback) {
         new Thread() {
             @Override
             public void run() {
                 super.run();
                 List<Rank> list = new ArrayList<>();
-                for (AbsWebParser parser : mParserMap.values()) {
+                for (AbstractWebParser parser : mParserMap.values()) {
                     List<Rank> result = (List<Rank>) parser.getHomePageInfo();
                     if (result != null) {
                         list.addAll(result);
@@ -136,30 +140,25 @@ public class WebParser implements IWebParser {
         }.start();
     }
 
-    @Override
     public List<Book> searchBook(String keyword) {
         return null;
     }
 
-    @Override
     public Book getBookInfo(String bookUrl) {
         return getWebParser(bookUrl).getBookInfo(bookUrl);
     }
 
-    @Override
     public List<Chapter> getContents(String bookUrl, String contentsUrl) {
         return getWebParser(bookUrl).getContents(bookUrl, contentsUrl);
     }
 
-    @Override
     public Chapter getChapter(String bookUrl, String chapterUrl) {
         return getWebParser(chapterUrl).getChapter(bookUrl, chapterUrl);
     }
 
-    @Override
     public List<Rank> getHomePageInfo() {
         List<Rank> list = new ArrayList<>();
-        for (AbsWebParser parser : mParserMap.values()) {
+        for (AbstractWebParser parser : mParserMap.values()) {
             List<Rank> result = (List<Rank>) parser.getHomePageInfo();
             if (result != null) {
                 list.addAll(result);
@@ -168,34 +167,40 @@ public class WebParser implements IWebParser {
         return list;
     }
 
-    @Override
     public List<Source> getBookSource(String bookId) {
         return getWebParser(bookId).getBookSource(bookId);
     }
 
-    @Override
     public List<Review> getShortReviews(String bookId) {
-        return getWebParser(bookId).getShortReviews(bookId);
+
+        Map<String, String> params = new HashMap<>(4);
+        params.put("book", bookId);
+        params.put("sortType", "newest");
+        params.put("start", "0");
+        params.put("limit", "20");
+        return getWebParser(bookId).getShortReviews(bookId, params);
     }
 
-    @Override
-    public List<Review> getLongReviews(String bookId){
-        return getWebParser(bookId).getLongReviews(bookId);
+    public List<Review> getLongReviews(String bookId) {
+        Map<String, String> params = new HashMap<>(4);
+        params.put("book", bookId);
+        params.put("sort", "updated");
+        params.put("start", "0");
+        params.put("limit", "4");
+        return getWebParser(bookId).getLongReviews(bookId, params);
     }
 
-    @Override
     public List<Book> getRankList(String rankId) {
         return getWebParser(rankId).getRankList(rankId);
     }
 
-    @Override
     public void getRankListAsync(final String rankId, final NetCallback<List<Book>> netCallback) {
-        new Thread(){
+        new Thread() {
             @Override
             public void run() {
                 super.run();
                 List<Book> books = getRankList(rankId);
-                if(books != null){
+                if (books != null) {
                     netCallback.onSuccess(books);
                 }
             }

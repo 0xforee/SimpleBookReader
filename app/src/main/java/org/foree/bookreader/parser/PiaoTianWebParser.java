@@ -22,7 +22,7 @@ import java.util.Map;
  * Created by foree on 2018/3/15.
  */
 
-class PiaoTianWebParser extends AbsWebParser {
+class PiaoTianWebParser extends AbstractWebParser {
     private static final String TAG = PiaoTianWebParser.class.getSimpleName();
 
     @Override
@@ -53,7 +53,7 @@ class PiaoTianWebParser extends AbsWebParser {
     }
 
     @Override
-    public List<Book> searchBook(String keyword) {
+    public List<Book> searchBook(String keyword, Map<String, String> params) {
         Document doc;
         Map<String, String> data = new HashMap<>();
         data.put("type", "articlename");
