@@ -24,6 +24,7 @@ public class ThirdWebParserTest {
     private static final String TAG = "ThirdWebParserTest";
     private static final String TEST_KEYWORD = "五行天";
     private static final String TEST_BOOK_URL = "http://www.b5200.net/5_5864/";
+    private static final String TEST_CHAPTER_URL = "http://www.b5200.net/5_5864/155452620.html";
     private static final String TEST_SOURCE_PATH = "F:\\Android\\文档\\source_test.txt";
     JSONObject mSourceObject;
 
@@ -84,6 +85,9 @@ public class ThirdWebParserTest {
                     // book name
                     String bookName = getElementString(mSourceObject.getString("ruleSearchName"), target);
                     Log.d(TAG, "bookName = " + bookName);
+                    if ("".equals(bookName)) {
+                        continue;
+                    }
 
                     // book author
                     String bookAuthor = getElementString(mSourceObject.getString("ruleSearchAuthor"), target);
@@ -105,11 +109,10 @@ public class ThirdWebParserTest {
                     String ruleSearchCoverUrl = getElementString(mSourceObject.getString("ruleSearchCoverUrl"), target);
                     Log.d(TAG, "ruleSearchCoverUrl = " + ruleSearchCoverUrl);
 
-                } catch (NoSuchElementException e){
+                } catch (NoSuchElementException e) {
                     continue;
                 }
             }
-
 
 
         } catch (JSONException e) {
@@ -120,7 +123,7 @@ public class ThirdWebParserTest {
     }
 
     @Test
-    public void testBookInfo(){
+    public void testBookInfo() {
         String[] rules = new String[]{
                 "ruleBookAuthor",
                 "ruleBookName",
@@ -131,7 +134,7 @@ public class ThirdWebParserTest {
 
         try {
             Document doc = Jsoup.connect(TEST_BOOK_URL).ignoreContentType(true).get();
-            if(doc != null){
+            if (doc != null) {
                 for (int i = 0; i < rules.length; i++) {
                     String rule = rules[i];
                     String result = getElementString(mSourceObject.getString(rule), doc.body());
@@ -158,136 +161,131 @@ public class ThirdWebParserTest {
 
     }
 
+    @Test
+    public void testChapter() {
+        try {
+            Document doc = Jsoup.connect(TEST_CHAPTER_URL).ignoreContentType(true).get();
+            if (doc != null) {
+                String content = getElementString(mSourceObject.getString("ruleBookContent"), doc.body());
+                Log.d(TAG, "content = " + content);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 
-    private Elements getElements(String ruleString, Element target){
-        Elements result = null;
+    private Elements getElements(String ruleString, Element target) {
+        Elements result = new Elements();
         String[] rulesAll = ruleString.split("!");
 
-        // 使用忽略规则
-        String[] ignoreRule = rulesAll[1].split(":");
-
         // 匹配规则
-        String[] rules = rulesAll[0].split("@");
+        String[] findRules = rulesAll[0].split("@");
 
-        for (int i = 0; i < rules.length; i++) {
-            String[] subRules = rules[i].split("\\.");
-            String type = subRules[0];
-            String element_name = subRules[1];
+        result = getRecursion(findRules, new Elements(target), 0);
 
-            if(i != rules.length - 1){
-                int location = subRules.length == 2 ? 0 : Integer.valueOf(subRules[2]); // 如果之前的元素没有指定位置，默认取0
-                switch (type){
-                    case "class":
-                        target = target.getElementsByClass(element_name).get(location);
-                        break;
-                    case "tag":
-                        target = target.getElementsByTag(element_name).get(location);
-                        break;
+        // 忽略规则
+        if (rulesAll.length > 1) {
+            String[] ignoreRule = rulesAll[1].split(":");
+
+            for (int k = ignoreRule.length - 1; k >= 0; k--) {
+                if (ignoreRule[k].equals("%")) {
+                    ignoreRule[k] = (result.size() - 1) + "";
                 }
 
-            }else{
-                // last one, get content
-                switch (type){
-                    case "class":
-                        result = target.getElementsByClass(element_name);
-                        break;
-                    case "tag":
-                        result = target.getElementsByTag(element_name);
-                        break;
-
+                int index = Integer.valueOf(ignoreRule[k]);
+                if (result.size() > index) {
+                    result.remove(index);
                 }
-
-                if(result != null) {
-                    Elements temp = result.clone();
-                    result.clear();
-                    for (int j = 0; j < temp.size(); j++) {
-
-                        try {
-                            for (int k = 0; k < ignoreRule.length; k++) {
-                                if (ignoreRule[k].equals("%")) {
-                                    ignoreRule[k] = (temp.size() - 1) + "";
-                                }
-                                if (j == Integer.valueOf(ignoreRule[k])) {
-                                    throw new NoSuchElementException();
-                                }
-                            }
-                        } catch (NoSuchElementException e){
-                            continue;
-                        }
-
-                        result.add(temp.get(j));
-                    }
-                }
-
-
-
-//                Log.d(TAG, "result = " + (result != null ? result.toString() : "null"));
-
             }
         }
 
         return result;
     }
 
-    private String getElementString(String ruleString, Element target){
-        String result = "";
+    private String getElementString(String ruleString, Element target) {
+        StringBuilder result = new StringBuilder();
         // regex string
         String[] regexRules = ruleString.split("#");
 
         String[] rules = regexRules[0].split("@");
 
-        for (int i = 0; i < rules.length; i++) {
-            String[] subRules = rules[i].split("\\.");
+        // get all elements
+        Elements all = getRecursion(rules, new Elements(target), 0);
 
-            if(i != rules.length - 1){
-                switch (subRules[0]){
-                    case "class":
-                        Elements classes = target.getElementsByClass(subRules[1]);
-                        if (classes.isEmpty()) {
-                            throw new NoSuchElementException();
-                        }
-                        target = classes.get(Integer.valueOf(subRules[2]));
-                        break;
-                    case "id":
-                        target = target.getElementById(subRules[1]);
-                        break;
-                    case "tag":
-                        Elements tags = target.getElementsByTag(subRules[1]);
-                        if(tags.isEmpty()) {
-                            throw new NoSuchElementException();
-                        }
-                        target = tags.get(Integer.valueOf(subRules[2]));
-                        break;
-                }
+        // get text from elements
+        String[] subRules = rules[rules.length - 1].split("\\.");
 
-            }else{
-                // last one, get content
-                switch (subRules[0]){
+        // last one, get content
+        if (all != null && !all.isEmpty()) {
+            for (Element el : all) {
+                String temp = "";
+                switch (subRules[0]) {
                     case "text":
-                        result = target.text();
+                        temp = el.text();
                         break;
                     case "href":
-                        result = target.attr("href");
+                        temp = el.attr("href");
                         break;
                     case "src":
-                        result = target.attr("src");
-
+                        temp = el.attr("src");
+                        break;
                 }
 
-//                Log.d(TAG, "result = " + result);
-
                 // remove all space
-                result = result.replaceAll(" ", "");
+                temp = temp.replaceAll(" ", "");
 
                 if (regexRules.length > 1) {
                     // use regex replace
-                    result = result.replaceAll(regexRules[1], "");
+                    temp = temp.replaceAll(regexRules[1], "");
 //                  Log.d(TAG, "after regex: result = " + result);
                 }
 
+                result.append(temp);
             }
+
         }
 
-        return result;
+        return result.toString();
+    }
+
+    private Elements getRecursion(String[] ruleString, Elements target, int level) {
+        if (level == ruleString.length) {
+            // 如果规则解析到达末尾，结束递归
+            return target;
+        } else {
+            // 计算值
+            Elements result = new Elements();
+            String[] subRules = ruleString[level].split("\\.");
+            for (Element el : target) {
+                Elements classes = null;
+                switch (subRules[0]) {
+                    case "id":
+                        result.add(el.getElementById(subRules[1]));
+                        continue;
+                    case "class":
+                        classes = (el.getElementsByClass(subRules[1]));
+                        break;
+                    case "tag":
+                        classes = el.getElementsByTag(subRules[1]);
+                        break;
+                    default:
+                        // 如果最后一个字段为text或者href，textNode等，那么结束递归
+                        return target;
+                }
+
+                if (classes == null || classes.isEmpty()) {
+                    continue;
+                }
+                if (subRules.length > 2) {
+                    result.add(classes.get(Integer.valueOf(subRules[2])));
+                } else {
+                    result.addAll(classes);
+                }
+            }
+
+            return getRecursion(ruleString, result, level + 1);
+        }
     }
 }
