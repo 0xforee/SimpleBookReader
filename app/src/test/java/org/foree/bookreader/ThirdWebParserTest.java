@@ -1,5 +1,6 @@
 package org.foree.bookreader;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
@@ -13,6 +14,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.NoSuchElementException;
 
 /**
@@ -22,10 +24,11 @@ import java.util.NoSuchElementException;
  */
 public class ThirdWebParserTest {
     private static final String TAG = "ThirdWebParserTest";
-    private static final String TEST_KEYWORD = "五行天";
-    private static final String TEST_BOOK_URL = "http://www.b5200.net/5_5864/";
-    private static final String TEST_CHAPTER_URL = "http://www.b5200.net/5_5864/155452620.html";
+    private static String TEST_KEYWORD = "五行天";
+    private static String TEST_BOOK_URL = "http://www.b5200.net/5_5864/";
+    private static String TEST_CHAPTER_URL = "http://www.b5200.net/5_5864/155452620.html";
     private static final String TEST_SOURCE_PATH = "F:\\Android\\文档\\source_test.txt";
+    private static final String TEST_SOME_SOURCE_PATH = "F:\\Android\\文档\\sources.txt";
     JSONObject mSourceObject;
 
     @Before
@@ -45,14 +48,86 @@ public class ThirdWebParserTest {
             mSourceObject = new JSONObject(sb.toString());
 
             // 书源网站
-            Log.d(TAG, "sourceUrl = " + mSourceObject.getString("bookSourceUrl"));
-            // 书源分组
-            Log.d(TAG, "sourceName = " + mSourceObject.getString("bookSourceName"));
-            // 书源名称
-            Log.d(TAG, "sourceGroup = " + mSourceObject.getString("bookSourceGroup"));
+//            Log.d(TAG, "sourceUrl = " + mSourceObject.getString("bookSourceUrl"));
+//            // 书源分组
+//            Log.d(TAG, "sourceName = " + mSourceObject.getString("bookSourceName"));
+//            // 书源名称
+//            Log.d(TAG, "sourceGroup = " + mSourceObject.getString("bookSourceGroup"));
+//
+//            // 是否合法
+//            Log.d(TAG, "enable = " + mSourceObject.getBoolean("enable"));
 
-            // 是否合法
-            Log.d(TAG, "enable = " + mSourceObject.getBoolean("enable"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testSomeSource(){
+        // load test source json
+        StringBuffer sb = new StringBuffer();
+        try {
+            byte[] temp = new byte[1024];
+            InputStream f = new FileInputStream(TEST_SOME_SOURCE_PATH);
+
+            while (f.read(temp) != -1) {
+                sb.append(new String(temp));
+            }
+
+            f.close();
+
+            JSONArray jsonArray = new JSONArray(sb.toString());
+            for (int i = 0; i < jsonArray.length(); i++) {
+                mSourceObject = jsonArray.getJSONObject(i);
+
+                // 书源名称
+                String sourceName = mSourceObject.getString("bookSourceName");
+
+                // 是否合法
+                boolean enable = mSourceObject.getBoolean("enable");
+                if(!enable) {
+                    Log.d(TAG, sourceName + " disabled, skip!!!");
+                    continue;
+                }
+
+
+                Log.d(TAG, "sourceName = " + sourceName);
+                // 书源网站
+                Log.d(TAG, "sourceUrl = " + mSourceObject.getString("bookSourceUrl"));
+                // 书源分组
+//                Log.d(TAG, "sourceGroup = " + mSourceObject.getString("bookSourceGroup"));
+
+                try {
+                    // customize keyword
+                    String[] keywords = new String[]{"郡主", "五行天", "大道朝天", "大主宰"};
+                    for (int j = 0; j < keywords.length; j++) {
+                        TEST_KEYWORD = keywords[j];
+                        Elements books = getSearchBook(TEST_KEYWORD);
+
+                        // customize book url
+                        int random = (int) (Math.random() * 1);
+                        if (books.size() > random) {
+                            String bookUrl = getElementString(mSourceObject.getString("ruleSearchNoteUrl"), books.get(random));
+
+                            Elements chapters = getBookInfo(bookUrl);
+
+                            // customize chapter url
+                            int chapterRandom = (int) (Math.random() * 1);
+                            if (chapters.size() > chapterRandom) {
+                                String chapterUrl = getElementString(mSourceObject.getString("ruleContentUrl"), chapters.get(chapterRandom));
+                                Log.d(TAG, getChapter(chapterUrl));
+                            }
+                        }
+                    }
+                }catch (SearchUrlInvalidException e){
+                    Log.d(TAG, " search url invalid, skip!!!!");
+                }
+            }
+
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -66,21 +141,54 @@ public class ThirdWebParserTest {
 
     @Test
     public void testSearch() {
+        try {
+            getSearchBook(TEST_KEYWORD);
+        } catch (SearchUrlInvalidException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testBookInfo() {
+        getBookInfo(TEST_BOOK_URL);
+    }
+
+    @Test
+    public void testChapter() {
+        String result = getChapter(TEST_CHAPTER_URL);
+        Log.d(TAG, "content = " + result);
+    }
+
+    private Elements getSearchBook(String keyword) throws SearchUrlInvalidException{
+        Elements books = null;
         Log.d(TAG, mSourceObject.toString());
         try {
             // search url
             String searchUrl = mSourceObject.getString("ruleSearchUrl");
-            searchUrl = searchUrl.replace("searchKey", TEST_KEYWORD);
 
-            // load search result
-            Document doc = Jsoup.connect(searchUrl).ignoreContentType(true).get();
+            // invalid search url
+            if(!searchUrl.startsWith("http")){
+                throw new SearchUrlInvalidException();
+            }
+
+            searchUrl = searchUrl.replace("searchKey", keyword);
+
+            Document doc;
+
+            if(searchUrl.contains("@")){
+                // post and get location
+                doc = Jsoup.connect(searchUrl.split("@")[0]).requestBody(searchUrl.split("@")[1]).followRedirects(true).post();
+            }else{
+                // load search result
+                doc = Jsoup.connect(searchUrl).ignoreContentType(true).get();
+            }
 
             Element body = doc.body();
 
             // search list
-            Elements elements = getElements(mSourceObject.getString("ruleSearchList"), body);
+            books = getElements(mSourceObject.getString("ruleSearchList"), body);
 
-            for (Element target : elements) {
+            for (Element target : books) {
                 try {
                     // book name
                     String bookName = getElementString(mSourceObject.getString("ruleSearchName"), target);
@@ -120,10 +228,12 @@ public class ThirdWebParserTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        return books;
     }
 
-    @Test
-    public void testBookInfo() {
+    private Elements getBookInfo(String bookUrl){
+        Elements chapters = null;
         String[] rules = new String[]{
                 "ruleBookAuthor",
                 "ruleBookName",
@@ -133,7 +243,7 @@ public class ThirdWebParserTest {
         };
 
         try {
-            Document doc = Jsoup.connect(TEST_BOOK_URL).ignoreContentType(true).get();
+            Document doc = Jsoup.connect(bookUrl).ignoreContentType(true).get();
             if (doc != null) {
                 for (int i = 0; i < rules.length; i++) {
                     String rule = rules[i];
@@ -142,8 +252,8 @@ public class ThirdWebParserTest {
                 }
 
                 // test contents
-                Elements elements = getElements(mSourceObject.getString("ruleChapterList"), doc.body());
-                for (Element target : elements) {
+                chapters = getElements(mSourceObject.getString("ruleChapterList"), doc.body());
+                for (Element target : chapters) {
                     // chapter name
                     String chapterName = getElementString(mSourceObject.getString("ruleChapterName"), target);
                     // chapter url
@@ -159,21 +269,22 @@ public class ThirdWebParserTest {
             e.printStackTrace();
         }
 
+        return chapters;
     }
 
-    @Test
-    public void testChapter() {
+    private String getChapter(String chapterUrl){
+        String content = null;
         try {
-            Document doc = Jsoup.connect(TEST_CHAPTER_URL).ignoreContentType(true).get();
+            Document doc = Jsoup.connect(chapterUrl).ignoreContentType(true).get();
             if (doc != null) {
-                String content = getElementString(mSourceObject.getString("ruleBookContent"), doc.body());
-                Log.d(TAG, "content = " + content);
+                content = getElementString(mSourceObject.getString("ruleBookContent"), doc.body());
             }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        return content;
     }
 
     private Elements getElements(String ruleString, Element target) {
@@ -258,6 +369,7 @@ public class ThirdWebParserTest {
             // 计算值
             Elements result = new Elements();
             String[] subRules = ruleString[level].split("\\.");
+            Log.d(TAG, "subRules = " + Arrays.toString(subRules));
             for (Element el : target) {
                 Elements classes = null;
                 switch (subRules[0]) {
@@ -287,5 +399,9 @@ public class ThirdWebParserTest {
 
             return getRecursion(ruleString, result, level + 1);
         }
+    }
+
+    class SearchUrlInvalidException extends RuntimeException{
+
     }
 }
