@@ -28,9 +28,9 @@ public class ThirdWebParserTest {
     private static final String TAG = "ThirdWebParserTest";
     private static String TEST_KEYWORD = "五行天";
     private static String TEST_BOOK_URL = "http://www.b5200.net/5_5864/";
-    private static String TEST_CHAPTER_URL = "http://www.b5200.net/5_5864/155452620.html";
-    private static final String TEST_SOURCE_PATH = "F:\\Android\\文档\\source_test.txt";
-    private static final String TEST_SOME_SOURCE_PATH = "F:\\Android\\文档\\sources.txt";
+    private static String TEST_CHAPTER_URL = "http://www.b5200.net/67_67077/149766192.html";
+    private static final String TEST_SOURCE_PATH = "F:\\Android\\文档\\source_test.json";
+    private static final String TEST_SOME_SOURCE_PATH = "F:\\Android\\文档\\sources.json";
     JSONObject mSourceObject;
 
     private List<String> mAbortUrl = new ArrayList<>();
@@ -49,7 +49,7 @@ public class ThirdWebParserTest {
 
             f.close();
 
-            mSourceObject = new JSONArray(sb.toString()).getJSONObject(2);
+            mSourceObject = new JSONArray(sb.toString()).getJSONObject(0);
 
             mAbortUrl.add("https://b.faloo.com");
             mAbortUrl.add("http://www.gxwztv.com");
@@ -363,7 +363,7 @@ public class ThirdWebParserTest {
                 String temp = "";
                 switch (subRules[0]) {
                     case "text":
-                        temp = el.text();
+                        temp = el.text() + "\n";
                         break;
                     case "href":
                         temp = el.attr("abs:href");
@@ -374,7 +374,7 @@ public class ThirdWebParserTest {
                     case "textNodes":
                         StringBuilder sb = new StringBuilder();
                         for (TextNode tn : el.textNodes()) {
-                            sb.append(tn.text());
+                            sb.append(tn.text()).append("\n");
                         }
                         temp = sb.toString();
                         break;

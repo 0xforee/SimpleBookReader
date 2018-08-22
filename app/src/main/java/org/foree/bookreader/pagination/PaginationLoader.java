@@ -2,11 +2,11 @@ package org.foree.bookreader.pagination;
 
 import android.util.Log;
 
-import org.foree.bookreader.bean.cache.MemoryCache;
-import org.foree.bookreader.readpage.BookRecord;
 import org.foree.bookreader.bean.cache.ChapterCache;
 import org.foree.bookreader.bean.cache.DoubleCache;
+import org.foree.bookreader.bean.cache.MemoryCache;
 import org.foree.bookreader.bean.cache.PaginationCache;
+import org.foree.bookreader.readpage.BookRecord;
 
 /**
  * Created by foree on 17-2-6.
@@ -60,7 +60,8 @@ public class PaginationLoader {
     }
 
     public void loadPagination(final String url) {
-        mRequestQueue.add(new ChapterRequest(url, paginationArgs, true));
+        mRequestQueue.add(new ChapterRequest(mBookRecord.getSourceKey(),
+                url, paginationArgs, true));
     }
 
     public ChapterCache getChapterCache() {
@@ -85,8 +86,9 @@ public class PaginationLoader {
                         int newIndex = index - tmp;
                         while (newIndex >= 0 && tmp <= mOffset) {
 //                            if (!mBookRecord.isChapterCached(newIndex)) {
-                                // add request
-                                mRequestQueue.add(new ChapterRequest(mBookRecord.getChapterUrl(newIndex), paginationArgs, false));
+                            // add request
+                            mRequestQueue.add(new ChapterRequest(mBookRecord.getSourceKey(),
+                                    mBookRecord.getChapterUrl(newIndex), paginationArgs, false));
 //                            }
                             tmp++;
                             newIndex = index - tmp;
@@ -98,8 +100,9 @@ public class PaginationLoader {
 
                         while (newIndex < mBookRecord.getChaptersSize() && tmp <= mOffset) {
 //                            if (!mBookRecord.isChapterCached(newIndex)) {
-                                // add request
-                                mRequestQueue.add(new ChapterRequest(mBookRecord.getChapterUrl(newIndex), paginationArgs, false));
+                            // add request
+                            mRequestQueue.add(new ChapterRequest(mBookRecord.getSourceKey(),
+                                    mBookRecord.getChapterUrl(newIndex), paginationArgs, false));
 
 //                            }
                             tmp++;

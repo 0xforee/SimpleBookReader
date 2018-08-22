@@ -99,6 +99,7 @@ public class SettingsFragment extends PreferenceFragment {
                         Intent bookInfoIntent = new Intent(getActivity(), BookInfoActivity.class);
                         Bundle bundle = new Bundle();
                         bundle.putString("book_url", editText.getText().toString());
+                        bundle.putString("source_key", "http://api.zhuishu.com");
                         bookInfoIntent.putExtras(bundle);
                         startActivity(bookInfoIntent);
                     }

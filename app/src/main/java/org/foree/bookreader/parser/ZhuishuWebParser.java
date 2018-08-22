@@ -63,6 +63,7 @@ public class ZhuishuWebParser extends AbstractWebParser {
                     book.setCategory(category);
                     book.setBookUrl(bookUrl);
                     book.setBookCoverUrl(bookCoverUrl);
+                    book.setSourceKey(getWebInfo().getHostUrl());
 
                     bookList.add(book);
                 }
@@ -115,6 +116,7 @@ public class ZhuishuWebParser extends AbstractWebParser {
                 book.setRectentChapterTitle(lastChapter);
                 book.setSerial(isSerial);
                 book.setWordCount(wordCount);
+                book.setSourceKey(getWebInfo().getHostUrl());
             }
         } catch (IOException e) {
             e.printStackTrace();

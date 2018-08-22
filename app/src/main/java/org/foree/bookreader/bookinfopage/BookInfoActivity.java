@@ -44,6 +44,7 @@ import org.foree.bookreader.bean.dao.BookDao;
 import org.foree.bookreader.parser.WebParser;
 import org.foree.bookreader.readpage.ReadActivity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -57,6 +58,7 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
     private Button mBtAdd, mBtRead, mBtDownload;
     private CommentListView mCommentList;
     private String bookUrl;
+    private String mSourceKey;
     private BookDao bookDao;
     private Toolbar toolbar;
     private Book mBook;
@@ -92,6 +94,7 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
 
         Bundle bundle = getIntent().getExtras();
         bookUrl = bundle.getString("book_url");
+        mSourceKey = bundle.getString("source_key");
         bookDao = new BookDao(this);
 
         // set status bar transparent
@@ -242,13 +245,19 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
             @Override
             public void run() {
                 // get bookinfo first
-                mBook = WebParser.getInstance().getBookInfo(bookUrl, bookUrl);
+                mBook = WebParser.getInstance().getBookInfo(mSourceKey, bookUrl);
                 if (mBook != null) {
                     // get chapters
-                    mBook.setChapters(WebParser.getInstance().getContents(bookUrl, bookUrl, mBook.getContentUrl()));
+                    mBook.setChapters(WebParser.getInstance().getContents(mSourceKey, bookUrl, mBook.getContentUrl()));
 
                     // get comments
-                    final List<Review> reviews = WebParser.getInstance().getLongReviews(bookUrl, bookUrl);
+                    List<Review> tmp = WebParser.getInstance().getLongReviews(mSourceKey, bookUrl);
+                    final List<Review> reviews = new ArrayList<>();
+                    if (tmp == null){
+
+                    }else{
+                        reviews.addAll(tmp);
+                    }
 
                     // update UI
                     mContent.post(new Runnable() {
@@ -335,6 +344,7 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
                 Intent intent = new Intent(BookInfoActivity.this, ReadActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putString("book_url", bookUrl);
+                bundle.putString("source_key", mSourceKey);
                 bundle.putBoolean("online", true);
                 intent.putExtras(bundle);
 

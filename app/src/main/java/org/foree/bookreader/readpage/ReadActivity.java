@@ -58,6 +58,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
     private static final String TAG = ReadActivity.class.getSimpleName();
 
     String mBookUrl;
+    String mDefaultSourceKey;
     boolean mOnline;
     private BookRecord mBookRecord;
     // view pager
@@ -121,6 +122,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             mBookUrl = getIntent().getExtras().getString("book_url");
+            mDefaultSourceKey = getIntent().getExtras().getString("source_key");
             mOnline = bundle.getBoolean("online", false);
         }
 
@@ -199,7 +201,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
                 reInitPaginationArgs();
 
                 //init book info
-                mBookRecord.restoreBookRecord(mBookUrl, mOnline);
+                mBookRecord.restoreBookRecord(mBookUrl, mDefaultSourceKey, mOnline);
 
             }
         });

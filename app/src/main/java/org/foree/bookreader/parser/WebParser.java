@@ -1,12 +1,25 @@
 package org.foree.bookreader.parser;
 
+import android.util.Log;
+
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
+
+import org.foree.bookreader.R;
+import org.foree.bookreader.base.BaseApplication;
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.book.Rank;
 import org.foree.bookreader.bean.book.Review;
 import org.foree.bookreader.bean.book.Source;
 import org.foree.bookreader.net.NetCallback;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,6 +32,7 @@ import java.util.Map;
  */
 
 public class WebParser {
+    private static final String TAG = "WebParser";
     private Map<String, AbstractWebParser> mParserMap = new HashMap<>();
     private static WebParser mInstance;
 
@@ -37,20 +51,33 @@ public class WebParser {
     }
 
     private void loadIfNecessary(){
-        // 动态加载第三方api
-        AbstractWebInfo webInfo = new AbstractWebInfo() {
-            /**
-             * 获取目标网站地址
-             *
-             * @return 网页主机host地址
-             */
-            @Override
-            public String getHostUrl() {
-                return "http://www.piaotian.com";
+
+        try {
+            InputStream inputStream = BaseApplication.getInstance().getResources().openRawResource(R.raw.source_test);
+
+            byte[] bytes = new byte[1024];
+
+            StringBuilder sb = new StringBuilder();
+
+            while (inputStream.read(bytes) != -1) {
+                sb.append(new String(bytes));
             }
-        };
-        AbstractWebParser webParser = new ThirdSourceParser(webInfo);
-        registerParser(webParser.getWebInfo().getHostUrl(), webParser);
+
+            Gson gson = new Gson();
+            JsonReader reader = new JsonReader(new StringReader(sb.toString()));
+            reader.setLenient(true);
+            ThirdWebInfo[] webInfos = gson.fromJson(reader, ThirdWebInfo[].class);
+
+            for (int i = 0; i < webInfos.length; i++) {
+                // 动态加载第三方api
+                AbstractWebParser webParser = new ThirdSourceParser(webInfos[i]);
+                registerParser(webInfos[i].getBookSourceUrl(), webParser);
+            }
+
+
+        }catch (IOException e){
+            Log.e(TAG, e.toString());
+        }
     }
 
     private AbstractWebParser loadFromConfig(String sourceId){
@@ -96,17 +123,16 @@ public class WebParser {
      * @return parser
      */
     private AbstractWebParser getWebParser(String sourceId) {
-        return new ZhuishuWebParser();
-//        if(mParserMap.containsKey(sourceId)){
-//            return mParserMap.get(sourceId);
-//        }else{
-//            AbstractWebParser parser = loadFromConfig(sourceId);
-//            if(parser == null) {
-//                return new NullWebParser();
-//            }else{
-//                return parser;
-//            }
-//        }
+        if(mParserMap.containsKey(sourceId)){
+            return mParserMap.get(sourceId);
+        }else{
+            AbstractWebParser parser = loadFromConfig(sourceId);
+            if(parser == null) {
+                return new NullWebParser();
+            }else{
+                return parser;
+            }
+        }
     }
 
     /**

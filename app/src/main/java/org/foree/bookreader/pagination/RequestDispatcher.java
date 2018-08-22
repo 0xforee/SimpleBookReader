@@ -1,7 +1,5 @@
 package org.foree.bookreader.pagination;
 
-import android.util.Log;
-
 import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.cache.ChapterCache;
 import org.foree.bookreader.bean.event.PaginationEvent;
@@ -35,7 +33,7 @@ public class RequestDispatcher extends Thread {
                     chapter = chapterCache.get(request.getUrl());
                     if (chapter == null || chapter.getChapterUrl() == null) {
                         // download from net
-                        chapter = WebParser.getInstance().getChapter("","", request.getUrl());
+                        chapter = WebParser.getInstance().getChapter(request.getSourceKey(), "", request.getUrl());
                     }
 
                     if (chapter != null && chapter.getContents() != null) {
