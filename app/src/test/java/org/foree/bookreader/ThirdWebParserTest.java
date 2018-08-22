@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,7 +15,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
@@ -31,6 +33,8 @@ public class ThirdWebParserTest {
     private static final String TEST_SOME_SOURCE_PATH = "F:\\Android\\文档\\sources.txt";
     JSONObject mSourceObject;
 
+    private List<String> mAbortUrl = new ArrayList<>();
+
     @Before
     public void setUp() {
         // load test source json
@@ -45,7 +49,21 @@ public class ThirdWebParserTest {
 
             f.close();
 
-            mSourceObject = new JSONObject(sb.toString());
+            mSourceObject = new JSONArray(sb.toString()).getJSONObject(2);
+
+            mAbortUrl.add("https://b.faloo.com");
+            mAbortUrl.add("http://www.gxwztv.com");
+            mAbortUrl.add("http://www.3dllc.cc");
+            // 请求失败
+            mAbortUrl.add("https://www.biquwu.cc");
+            mAbortUrl.add("https://www.kuxiaoshuo.com");
+            // 未加入searchPage
+            mAbortUrl.add("https://www.biqubao.com");
+            mAbortUrl.add("http://www.biqubu.com");
+            mAbortUrl.add(" http://www.mibaoge.com");
+            // ssl
+            mAbortUrl.add("https://www.biqudu.com");
+
 
             // 书源网站
 //            Log.d(TAG, "sourceUrl = " + mSourceObject.getString("bookSourceUrl"));
@@ -66,8 +84,9 @@ public class ThirdWebParserTest {
         }
     }
 
+
     @Test
-    public void testSomeSource(){
+    public void testSomeSource() {
         // load test source json
         StringBuffer sb = new StringBuffer();
         try {
@@ -86,18 +105,24 @@ public class ThirdWebParserTest {
 
                 // 书源名称
                 String sourceName = mSourceObject.getString("bookSourceName");
+                // 书源网站
+                String sourceUrl = mSourceObject.getString("bookSourceUrl");
+                Log.d(TAG, "sourceUrl = " + sourceUrl);
 
                 // 是否合法
                 boolean enable = mSourceObject.getBoolean("enable");
-                if(!enable) {
+                if (!enable) {
                     Log.d(TAG, sourceName + " disabled, skip!!!");
                     continue;
                 }
 
+                // 屏蔽一些暂时不通过的源
+                if (mAbortUrl.contains(sourceUrl)) {
+                    continue;
+                }
 
                 Log.d(TAG, "sourceName = " + sourceName);
-                // 书源网站
-                Log.d(TAG, "sourceUrl = " + mSourceObject.getString("bookSourceUrl"));
+
                 // 书源分组
 //                Log.d(TAG, "sourceGroup = " + mSourceObject.getString("bookSourceGroup"));
 
@@ -122,8 +147,10 @@ public class ThirdWebParserTest {
                                 Log.d(TAG, getChapter(chapterUrl));
                             }
                         }
+
+                        Log.d(TAG, "===========================================================");
                     }
-                }catch (SearchUrlInvalidException e){
+                } catch (SearchUrlInvalidException e) {
                     Log.d(TAG, " search url invalid, skip!!!!");
                 }
             }
@@ -159,7 +186,7 @@ public class ThirdWebParserTest {
         Log.d(TAG, "content = " + result);
     }
 
-    private Elements getSearchBook(String keyword) throws SearchUrlInvalidException{
+    private Elements getSearchBook(String keyword) throws SearchUrlInvalidException {
         Elements books = null;
         Log.d(TAG, mSourceObject.toString());
         try {
@@ -167,7 +194,7 @@ public class ThirdWebParserTest {
             String searchUrl = mSourceObject.getString("ruleSearchUrl");
 
             // invalid search url
-            if(!searchUrl.startsWith("http")){
+            if (!searchUrl.startsWith("http")) {
                 throw new SearchUrlInvalidException();
             }
 
@@ -175,10 +202,11 @@ public class ThirdWebParserTest {
 
             Document doc;
 
-            if(searchUrl.contains("@")){
+            if (searchUrl.contains("@") || searchUrl.contains("searchPage")) {
+                throw new SearchUrlInvalidException();
                 // post and get location
-                doc = Jsoup.connect(searchUrl.split("@")[0]).requestBody(searchUrl.split("@")[1]).followRedirects(true).post();
-            }else{
+//                doc = Jsoup.connect(searchUrl.split("@")[0]).requestBody(searchUrl.split("@")[1]).followRedirects(true).post();
+            } else {
                 // load search result
                 doc = Jsoup.connect(searchUrl).ignoreContentType(true).get();
             }
@@ -232,7 +260,7 @@ public class ThirdWebParserTest {
         return books;
     }
 
-    private Elements getBookInfo(String bookUrl){
+    private Elements getBookInfo(String bookUrl) {
         Elements chapters = null;
         String[] rules = new String[]{
                 "ruleBookAuthor",
@@ -272,7 +300,7 @@ public class ThirdWebParserTest {
         return chapters;
     }
 
-    private String getChapter(String chapterUrl){
+    private String getChapter(String chapterUrl) {
         String content = null;
         try {
             Document doc = Jsoup.connect(chapterUrl).ignoreContentType(true).get();
@@ -316,6 +344,7 @@ public class ThirdWebParserTest {
     }
 
     private String getElementString(String ruleString, Element target) {
+        Log.d(TAG, "getElementString() called with: ruleString = [" + ruleString + "]");
         StringBuilder result = new StringBuilder();
         // regex string
         String[] regexRules = ruleString.split("#");
@@ -337,10 +366,17 @@ public class ThirdWebParserTest {
                         temp = el.text();
                         break;
                     case "href":
-                        temp = el.attr("href");
+                        temp = el.attr("abs:href");
                         break;
                     case "src":
-                        temp = el.attr("src");
+                        temp = el.attr("abs:src");
+                        break;
+                    case "textNodes":
+                        StringBuilder sb = new StringBuilder();
+                        for (TextNode tn : el.textNodes()) {
+                            sb.append(tn.text());
+                        }
+                        temp = sb.toString();
                         break;
                 }
 
@@ -369,7 +405,7 @@ public class ThirdWebParserTest {
             // 计算值
             Elements result = new Elements();
             String[] subRules = ruleString[level].split("\\.");
-            Log.d(TAG, "subRules = " + Arrays.toString(subRules));
+//            Log.d(TAG, "subRules = " + Arrays.toString(subRules));
             for (Element el : target) {
                 Elements classes = null;
                 switch (subRules[0]) {
@@ -401,7 +437,7 @@ public class ThirdWebParserTest {
         }
     }
 
-    class SearchUrlInvalidException extends RuntimeException{
+    class SearchUrlInvalidException extends RuntimeException {
 
     }
 }
