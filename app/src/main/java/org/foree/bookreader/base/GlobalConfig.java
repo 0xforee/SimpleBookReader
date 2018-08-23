@@ -25,6 +25,8 @@ public class GlobalConfig {
 
     private SharedPreferences mSharedPreference;
 
+    public static final String MAGIC_SPLIT_KEY = "~_~";
+
     public static GlobalConfig getInstance() {
         return ourInstance;
     }

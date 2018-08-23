@@ -47,10 +47,6 @@ public class Book {
      * 书籍字数
      */
     private int wordCount;
-    /**
-     * 用于标记来源的key，一般为host url
-     */
-    private String sourceKey;
 
     public Book() {
     }
@@ -218,13 +214,5 @@ public class Book {
 
     public void setWordCount(int wordCount) {
         this.wordCount = wordCount;
-    }
-
-    public String getSourceKey() {
-        return sourceKey;
-    }
-
-    public void setSourceKey(String sourceKey) {
-        this.sourceKey = sourceKey;
     }
 }

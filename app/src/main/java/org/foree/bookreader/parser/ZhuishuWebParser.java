@@ -2,6 +2,7 @@ package org.foree.bookreader.parser;
 
 import android.util.Log;
 
+import org.foree.bookreader.base.GlobalConfig;
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.book.Rank;
@@ -61,9 +62,8 @@ public class ZhuishuWebParser extends AbstractWebParser {
                     book.setBookName(bookName);
                     book.setAuthor(author);
                     book.setCategory(category);
-                    book.setBookUrl(bookUrl);
+                    book.setBookUrl(wrapSplitKey(bookUrl));
                     book.setBookCoverUrl(bookCoverUrl);
-                    book.setSourceKey(getWebInfo().getHostUrl());
 
                     bookList.add(book);
                 }
@@ -107,16 +107,15 @@ public class ZhuishuWebParser extends AbstractWebParser {
 
                 book.setDescription(description);
                 book.setUpdateTime(DateUtils.formatJSDate(updateTime));
-                book.setContentUrl(contentUrl);
+                book.setContentUrl(wrapSplitKey(contentUrl));
                 book.setBookName(bookName);
-                book.setBookUrl(bookUrl);
+                book.setBookUrl(wrapSplitKey(bookUrl));
                 book.setAuthor(author);
                 book.setBookCoverUrl(coverUrl);
                 book.setCategory(cate);
                 book.setRectentChapterTitle(lastChapter);
                 book.setSerial(isSerial);
                 book.setWordCount(wordCount);
-                book.setSourceKey(getWebInfo().getHostUrl());
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -157,10 +156,10 @@ public class ZhuishuWebParser extends AbstractWebParser {
                         Log.d(TAG, chapterTitle + ", " + chatperUrl + ", " + chapterIndex);
                     }
 
-                    chapter.setBookUrl(bookId);
+                    chapter.setBookUrl(wrapSplitKey(bookId));
                     chapter.setChapterIndex(chapterIndex);
                     chapter.setChapterTitle(chapterTitle);
-                    chapter.setChapterUrl(chatperUrl);
+                    chapter.setChapterUrl(wrapSplitKey(chatperUrl));
 
                     chapterList.add(chapter);
                 }
@@ -180,7 +179,7 @@ public class ZhuishuWebParser extends AbstractWebParser {
         Chapter chapter = new Chapter();
         String contentApi = "http://chapter2.zhuishushenqi.com/chapter/";
 
-        chapter.setChapterUrl(chapterUrl);
+        chapter.setChapterUrl(wrapSplitKey(chapterUrl));
         try {
             String encodeLink = URLEncoder.encode(chapterUrl);
             if (DEBUG) Log.d(TAG, "get link = " + contentApi + encodeLink);
@@ -462,7 +461,7 @@ public class ZhuishuWebParser extends AbstractWebParser {
                 for (int i = 0; i < booksArray.length(); i++) {
                     JSONObject bookObj = booksArray.getJSONObject(i);
                     Book book = new Book();
-                    book.setBookUrl(bookObj.getString("_id"));
+                    book.setBookUrl(wrapSplitKey(bookObj.getString("_id")));
                     book.setBookName(bookObj.getString("title"));
                     book.setAuthor(bookObj.getString("author"));
                     book.setBookCoverUrl(mImageApi + bookObj.getString("cover"));
@@ -477,4 +476,5 @@ public class ZhuishuWebParser extends AbstractWebParser {
         }
         return rankList;
     }
+
 }

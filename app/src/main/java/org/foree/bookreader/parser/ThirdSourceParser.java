@@ -85,8 +85,8 @@ public class ThirdSourceParser extends AbstractWebParser {
     @Override
     public Chapter getChapter(String bookUrl, String chapterUrl) {
         Chapter chapter = new Chapter();
-        chapter.setBookUrl(bookUrl);
-        chapter.setChapterUrl(chapterUrl);
+        chapter.setBookUrl(wrapSplitKey(bookUrl));
+        chapter.setChapterUrl(wrapSplitKey(chapterUrl));
         chapter.setContents(parseChapter(chapterUrl));
         return chapter;
     }
@@ -164,9 +164,8 @@ public class ThirdSourceParser extends AbstractWebParser {
                     book.setBookName(bookName);
                     book.setAuthor(bookAuthor);
                     book.setCategory(searchKind);
-                    book.setBookUrl(ruleSearchNoteUrl);
+                    book.setBookUrl(wrapSplitKey(ruleSearchNoteUrl));
                     book.setBookCoverUrl(ruleSearchCoverUrl);
-                    book.setSourceKey(mWebInfo.getBookSourceUrl());
 
                     bookList.add(book);
 
@@ -200,11 +199,10 @@ public class ThirdSourceParser extends AbstractWebParser {
                 }
 
                 book.setAuthor(bookAuthor);
-                book.setSourceKey(mWebInfo.getBookSourceUrl());
                 book.setBookName(bookName);
                 book.setDescription(description);
                 book.setBookCoverUrl(coverUrl);
-                book.setContentUrl(contentUrl);
+                book.setContentUrl(wrapSplitKey(contentUrl));
 
                 // test contents
                 List<Chapter> chapters = new ArrayList<>();
@@ -217,8 +215,8 @@ public class ThirdSourceParser extends AbstractWebParser {
 
                     Chapter chapter = new Chapter();
                     chapter.setChapterTitle(chapterName);
-                    chapter.setChapterUrl(chapterUrl);
-                    chapter.setBookUrl(bookUrl);
+                    chapter.setChapterUrl(wrapSplitKey(chapterUrl));
+                    chapter.setBookUrl(wrapSplitKey(bookUrl));
 
                     chapters.add(chapter);
                     if (DEBUG) {
@@ -382,5 +380,10 @@ public class ThirdSourceParser extends AbstractWebParser {
 
     class SearchUrlInvalidException extends RuntimeException {
 
+    }
+
+    @Override
+    String wrapSplitKey(String url) {
+        return mWebInfo.getBookSourceUrl() + SPLIT_KEY + url;
     }
 }

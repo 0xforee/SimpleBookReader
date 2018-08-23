@@ -98,7 +98,6 @@ public class SearchResultsActivity extends BaseActivity {
                 Intent intent = new Intent(SearchResultsActivity.this, BookInfoActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putString("book_url", bookList.get(position).getBookUrl());
-                bundle.putString("source_key", bookList.get(position).getSourceKey());
                 intent.putExtras(bundle);
 
                 startActivity(intent);

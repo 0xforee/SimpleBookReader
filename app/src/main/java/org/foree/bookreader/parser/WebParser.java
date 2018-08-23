@@ -7,6 +7,7 @@ import com.google.gson.stream.JsonReader;
 
 import org.foree.bookreader.R;
 import org.foree.bookreader.base.BaseApplication;
+import org.foree.bookreader.base.GlobalConfig;
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.book.Rank;
@@ -19,6 +20,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.SerializablePermission;
 import java.io.StringReader;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -35,6 +37,8 @@ public class WebParser {
     private static final String TAG = "WebParser";
     private Map<String, AbstractWebParser> mParserMap = new HashMap<>();
     private static WebParser mInstance;
+    private static final String SPLIT_KEY = GlobalConfig.MAGIC_SPLIT_KEY;
+    private static final String DEFAULT_SOURCE_ID = "http://api.zhuishu.com";
 
     private WebParser() {
         // init zhuishu
@@ -179,7 +183,16 @@ public class WebParser {
         }.start();
     }
 
-    public void getBookInfoAsync(final String sourceId, final String bookUrl, final NetCallback<Book> netCallback) {
+    /**
+     * 兼容旧格式
+     * @param bookUrl 新版本包含sourceId；旧版本不含sourceId，只有bookId
+     * @param netCallback 回调
+     */
+    public void getBookInfoAsync(String bookUrl, NetCallback<Book> netCallback){
+        getBookInfoAsync(getValidSourceId(bookUrl), getValidRealId(bookUrl), netCallback);
+    }
+
+    private void getBookInfoAsync(final String sourceId, final String bookUrl, final NetCallback<Book> netCallback) {
         new Thread() {
             @Override
             public void run() {
@@ -189,7 +202,7 @@ public class WebParser {
         }.start();
     }
 
-    public void getContentsAsync(final String sourceId, final String bookUrl, final String contentsUrl, final NetCallback<List<Chapter>> netCallback) {
+    private void getContentsAsync(final String sourceId, final String bookUrl, final String contentsUrl, final NetCallback<List<Chapter>> netCallback) {
         new Thread() {
             @Override
             public void run() {
@@ -199,7 +212,7 @@ public class WebParser {
         }.start();
     }
 
-    public void getChapterAsync(final String sourceId, final String bookUrl, final String chapterUrl, final NetCallback<Chapter> netCallback) {
+    private void getChapterAsync(final String sourceId, final String bookUrl, final String chapterUrl, final NetCallback<Chapter> netCallback) {
         new Thread() {
             @Override
             public void run() {
@@ -227,20 +240,20 @@ public class WebParser {
         }.start();
     }
 
-    public List<Book> searchBook(String sourceId, String keyword) {
+    public List<Book> searchBook(String[] sourceIds, String keyword) {
         return null;
     }
 
-    public Book getBookInfo(String sourceId, String bookUrl) {
-        return getWebParser(sourceId).getBookInfo(bookUrl);
+    public Book getBookInfo(String bookUrl) {
+        return getWebParser(getValidSourceId(bookUrl)).getBookInfo(getValidRealId(bookUrl));
     }
 
-    public List<Chapter> getContents(String sourceId, String bookUrl, String contentsUrl) {
-        return getWebParser(sourceId).getContents(bookUrl, contentsUrl);
+    public List<Chapter> getContents(String bookUrl, String contentsUrl) {
+        return getWebParser(getValidSourceId(bookUrl)).getContents(getValidRealId(bookUrl), getValidRealId(contentsUrl));
     }
 
-    public Chapter getChapter(String sourceId, String bookUrl, String chapterUrl) {
-        return getWebParser(sourceId).getChapter(bookUrl, chapterUrl);
+    public Chapter getChapter(String bookUrl, String chapterUrl) {
+        return getWebParser(getValidSourceId(chapterUrl)).getChapter(bookUrl, getValidRealId(chapterUrl));
     }
 
     public List<Rank> getHomePageInfo() {
@@ -269,23 +282,25 @@ public class WebParser {
         return getWebParser(bookId).getBookSource(bookId);
     }
 
-    public List<Review> getShortReviews(String sourceId, String bookId) {
+    public List<Review> getShortReviews(String bookId) {
 
+        String realBookId = getValidRealId(bookId);
         Map<String, String> params = new HashMap<>(4);
-        params.put("book", bookId);
+        params.put("book", realBookId);
         params.put("sortType", "newest");
         params.put("start", "0");
         params.put("limit", "20");
-        return getWebParser(sourceId).getShortReviews(bookId, params);
+        return getWebParser(getValidSourceId(bookId)).getShortReviews(realBookId, params);
     }
 
-    public List<Review> getLongReviews(String sourceId, String bookId) {
+    public List<Review> getLongReviews(String bookId) {
+        String realBookId = getValidRealId(bookId);
         Map<String, String> params = new HashMap<>(4);
-        params.put("book", bookId);
+        params.put("book", realBookId);
         params.put("sort", "updated");
         params.put("start", "0");
         params.put("limit", "4");
-        return getWebParser(sourceId).getLongReviews(bookId, params);
+        return getWebParser(getValidSourceId(bookId)).getLongReviews(realBookId, params);
     }
 
     public List<Book> getRankList(List<String> sourceIds, String rankId) {
@@ -311,5 +326,33 @@ public class WebParser {
                 }
             }
         }.start();
+    }
+
+    /**
+     * 获取合法的sourceId
+     * @param url 新版本包含sourceId，旧版本不包含sourceId，使用默认的Id
+     * @return sourceId
+     */
+    private String getValidSourceId(String url){
+        String[] values = url.split(SPLIT_KEY);
+        if(values.length == 1){
+            return DEFAULT_SOURCE_ID;
+        }
+
+        return values[0];
+    }
+
+    /**
+     * 解析合法真实的Id（包括bookId, contentsId, chapterId)
+     * @param url 可能为新、旧版本的id
+     * @return 解析的真实Id
+     */
+    private String getValidRealId(String url){
+        String[] values = url.split(SPLIT_KEY);
+        if(values.length == 1){
+            return values[0];
+        }else{
+            return values[1];
+        }
     }
 }

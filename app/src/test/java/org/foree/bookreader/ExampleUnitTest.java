@@ -12,6 +12,7 @@ import org.jsoup.select.Elements;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -39,6 +40,20 @@ public class ExampleUnitTest {
             String id = subString[subString.length - 2];
 
             assertEquals(id, url.getValue());
+        }
+    }
+
+    @Test
+    public void testUrlSplit(){
+        String url1 = "http://m.bxwx9.org/b/98/98289//0_168/2512063.html";
+        String url2 = "http://m.piaotian.com/html/7/7564/6285377.html";
+        String magicKey = "~_~";
+
+        String sourceUrl = url1 + magicKey;
+
+        String[] values = sourceUrl.split(magicKey);
+        if(values.length == 1){
+            values[1] = "http";
         }
     }
 

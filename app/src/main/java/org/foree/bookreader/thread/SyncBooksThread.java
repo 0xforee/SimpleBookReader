@@ -49,14 +49,14 @@ public class SyncBooksThread extends Thread {
                     @Override
                     public Book call() throws Exception {
 
-                        final Book newBook = WebParser.getInstance().getBookInfo(oldBook.getBookUrl(), oldBook.getBookUrl());
+                        final Book newBook = WebParser.getInstance().getBookInfo(oldBook.getBookUrl());
 
                         if (newBook.getUpdateTime().after(oldBook.getUpdateTime())) {
                             // update chapters
                             chapterTasks.add(new Callable<Boolean>() {
                                 @Override
                                 public Boolean call() throws Exception {
-                                    List<Chapter> chapters = WebParser.getInstance().getContents(newBook.getBookUrl(), newBook.getBookUrl(), newBook.getContentUrl());
+                                    List<Chapter> chapters = WebParser.getInstance().getContents(newBook.getBookUrl(), newBook.getContentUrl());
                                     if (chapters != null) {
                                         bookDao.insertChapters(chapters);
                                     }

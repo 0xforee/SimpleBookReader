@@ -60,8 +60,7 @@ public class PaginationLoader {
     }
 
     public void loadPagination(final String url) {
-        mRequestQueue.add(new ChapterRequest(mBookRecord.getSourceKey(),
-                url, paginationArgs, true));
+        mRequestQueue.add(new ChapterRequest(url, paginationArgs, true));
     }
 
     public ChapterCache getChapterCache() {
@@ -87,8 +86,7 @@ public class PaginationLoader {
                         while (newIndex >= 0 && tmp <= mOffset) {
 //                            if (!mBookRecord.isChapterCached(newIndex)) {
                             // add request
-                            mRequestQueue.add(new ChapterRequest(mBookRecord.getSourceKey(),
-                                    mBookRecord.getChapterUrl(newIndex), paginationArgs, false));
+                            mRequestQueue.add(new ChapterRequest(mBookRecord.getChapterUrl(newIndex), paginationArgs, false));
 //                            }
                             tmp++;
                             newIndex = index - tmp;
@@ -101,8 +99,7 @@ public class PaginationLoader {
                         while (newIndex < mBookRecord.getChaptersSize() && tmp <= mOffset) {
 //                            if (!mBookRecord.isChapterCached(newIndex)) {
                             // add request
-                            mRequestQueue.add(new ChapterRequest(mBookRecord.getSourceKey(),
-                                    mBookRecord.getChapterUrl(newIndex), paginationArgs, false));
+                            mRequestQueue.add(new ChapterRequest(mBookRecord.getChapterUrl(newIndex), paginationArgs, false));
 
 //                            }
                             tmp++;

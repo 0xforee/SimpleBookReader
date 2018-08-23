@@ -41,7 +41,7 @@ public class CustomChapterListLoader extends AsyncTaskLoader<List<Chapter>> {
         Log.d(TAG, "[foree] loadInBackground: mOnline = " + mOnline);
 
         if (mOnline) {
-            return WebParser.getInstance().getContents(mBookUrl, mBookUrl, mContentsUrl);
+            return WebParser.getInstance().getContents(mBookUrl, mContentsUrl);
         } else {
             List<Chapter> chapterList = null;
             Uri baseUri = BReaderProvider.CONTENT_URI_CHAPTERS;

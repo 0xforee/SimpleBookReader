@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
  */
 
 public class ChapterRequest implements Comparable {
-    private String sourceKey;
     private String url;
     private PaginationArgs paginationArgs;
     // 判断是缓存还是当前章节请求
@@ -15,8 +14,7 @@ public class ChapterRequest implements Comparable {
     // 请求的优先级，默认为2，数字越小优先级越高
     private int priority;
 
-    public ChapterRequest(String sourceKey, String url, PaginationArgs paginationArgs, boolean current) {
-        this.sourceKey = sourceKey;
+    public ChapterRequest(String url, PaginationArgs paginationArgs, boolean current) {
         this.url = url;
         this.paginationArgs = paginationArgs;
         this.current = current;
@@ -35,10 +33,6 @@ public class ChapterRequest implements Comparable {
 
     public boolean isCurrent() {
         return current;
-    }
-
-    public String getSourceKey() {
-        return sourceKey;
     }
 
     @Override

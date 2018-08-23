@@ -67,7 +67,6 @@ public class BookRecord {
      */
     private boolean mOnline = false;
     private String mBookUrl;
-    private String mDefaultSourceKey;
     private BookDao mBookDao;
     private String mOldContentUrl;
 
@@ -85,10 +84,9 @@ public class BookRecord {
      *
      * @param bookUrl book的唯一标示
      */
-    public void restoreBookRecord(final String bookUrl, String sourceKey, final boolean onLine) {
+    public void restoreBookRecord(final String bookUrl, final boolean onLine) {
         mOnline = onLine;
         mBookUrl = bookUrl;
-        mDefaultSourceKey = sourceKey;
 
         mHandler.post(mRestoreBookRunnable);
     }
@@ -193,10 +191,6 @@ public class BookRecord {
 
     public String getChapterUrl(int position) {
         return mChapters.get(position).getChapterUrl();
-    }
-
-    public String getSourceKey(){
-        return mDefaultSourceKey;
     }
 
     public void setChapterCached(String url) {
@@ -315,11 +309,10 @@ public class BookRecord {
     /**
      * 从网络获取章节信息
      *
-     * @param bookUrl book_id or book_url
      * @return 章节列表
      */
     private List<Chapter> initChapterListOnline() {
-        return WebParser.getInstance().getContents(mDefaultSourceKey, mBookUrl, mBook.getContentUrl());
+        return WebParser.getInstance().getContents(mBookUrl, mBook.getContentUrl());
     }
 
     private void initChapterIndexMap(List<Chapter> chapters) {
@@ -374,7 +367,7 @@ public class BookRecord {
      * 通过网络初始化书籍信息
      */
     private Book initBookInfoOnline() {
-        Book book = WebParser.getInstance().getBookInfo(mDefaultSourceKey, mBookUrl);
+        Book book = WebParser.getInstance().getBookInfo(mBookUrl);
         book.setPageIndex(0);
         return book;
     }
