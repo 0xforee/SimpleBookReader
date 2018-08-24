@@ -303,16 +303,8 @@ public class WebParser {
         return getWebParser(getValidSourceId(bookId)).getLongReviews(realBookId, params);
     }
 
-    public List<Book> getRankList(List<String> sourceIds, String rankId) {
-        if(sourceIds == null || sourceIds.isEmpty()) {
-            for (AbstractWebParser parser : mParserMap.values()) {
-                return parser.getRankList(rankId);
-
-            }
-            return null;
-        }else {
-            return getWebParser(sourceIds.get(0)).getRankList(rankId);
-        }
+    public List<Book> getRankList(String rankId) {
+        return getWebParser(getValidSourceId(rankId)).getRankList(rankId);
     }
 
     public void getRankListAsync(final String rankId, final NetCallback<List<Book>> netCallback) {
@@ -320,7 +312,7 @@ public class WebParser {
             @Override
             public void run() {
                 super.run();
-                List<Book> books = getRankList(null, rankId);
+                List<Book> books = getRankList(rankId);
                 if (books != null) {
                     netCallback.onSuccess(books);
                 }

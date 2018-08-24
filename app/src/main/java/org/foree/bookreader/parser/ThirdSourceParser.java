@@ -5,6 +5,7 @@ import android.util.Log;
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.book.Rank;
+import org.foree.bookreader.utils.DateUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -14,6 +15,7 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -203,6 +205,9 @@ public class ThirdSourceParser extends AbstractWebParser {
                 book.setDescription(description);
                 book.setBookCoverUrl(coverUrl);
                 book.setContentUrl(wrapSplitKey(contentUrl));
+                book.setUpdateTime(new Date());
+                book.setBookUrl(wrapSplitKey(bookUrl));
+                book.setCategory("其他");
 
                 // test contents
                 List<Chapter> chapters = new ArrayList<>();

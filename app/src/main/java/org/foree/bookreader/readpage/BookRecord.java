@@ -120,7 +120,7 @@ public class BookRecord {
     }
 
     private void initSourceList() {
-        mSourceList = WebParser.getInstance().getBookSource(mBookUrl, "");
+        mSourceList = WebParser.getInstance().getBookSource(mBookUrl, mBook.getBookName());
     }
 
     /**
