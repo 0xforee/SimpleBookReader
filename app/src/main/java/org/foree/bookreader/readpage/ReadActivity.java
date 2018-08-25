@@ -1,6 +1,5 @@
 package org.foree.bookreader.readpage;
 
-import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -20,12 +19,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.Window;
 import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,27 +30,21 @@ import org.foree.bookreader.R;
 import org.foree.bookreader.base.BaseActivity;
 import org.foree.bookreader.base.GlobalConfig;
 import org.foree.bookreader.bean.book.Chapter;
-import org.foree.bookreader.bean.book.Source;
 import org.foree.bookreader.bean.event.BookLoadCompleteEvent;
 import org.foree.bookreader.bean.event.PaginationEvent;
 import org.foree.bookreader.common.FontDialog;
 import org.foree.bookreader.pagination.PaginationArgs;
 import org.foree.bookreader.pagination.PaginationLoader;
 import org.foree.bookreader.settings.SettingsActivity;
-import org.foree.bookreader.utils.DateUtils;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  * Created by foree on 16-7-21.
  */
-public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAreaClickListener, View.OnClickListener, ReadPageAdapter.Callback, FontDialog.OnFontChangeListener {
+public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAreaClickListener, View.OnClickListener,
+        ReadPageAdapter.Callback, FontDialog.OnFontChangeListener, ItemListDialog.OnItemClickListener {
     private static final String TAG = ReadActivity.class.getSimpleName();
 
     String mBookUrl;
@@ -68,12 +58,9 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
 
     // popWindow
     private PopupWindow menuPop;
-    private Dialog contentDialog, mSourceChangeDialog;
+    private ItemListDialog mContentsDialog;
     private FontDialog.Builder fontDialog;
     private View rootView;
-    private ListView chapterTitleListView, mSourceChangeListView;
-    private CustomChapterListAdapter contentAdapter;
-    private CustomSourceListAdapter mSourceChangeAdapter;
     private Receiver mReceiver;
     /**
      * for menu pop image button
@@ -253,8 +240,9 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
     public void onEventMainThread(PaginationEvent pageEvent) {
         Log.d("EventBus", "notifyState");
 
-        if (mHandler.hasMessages(MSG_LOADING))
+        if (mHandler.hasMessages(MSG_LOADING)) {
             mHandler.removeMessages(MSG_LOADING);
+        }
 
         Chapter chapter = pageEvent.getChapter();
 
@@ -346,88 +334,32 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
     }
 
 
-    private void showContentDialog() {
-        contentDialog = getDialog(getString(R.string.content));
+    private void showContentDialog(int id) {
+        ItemListDialog.Builder builder = new ItemListDialog.Builder(this);
 
-        chapterTitleListView = (ListView) contentDialog.findViewById(R.id.rv_item_list);
+        if (mContentsDialog == null || mContentsDialog.getId() != id) {
 
-        contentAdapter = new CustomChapterListAdapter(this);
-        contentAdapter.updateData(mBookRecord.getChapters());
-        chapterTitleListView.setAdapter(contentAdapter);
-
-        contentDialog.show();
-
-        chapterTitleListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                contentDialog.dismiss();
-                switchChapter(mBookRecord.getChapterUrl(position), true);
-                contentAdapter.setSelectedPosition(position);
+            switch (id) {
+                case R.id.content:
+                    builder = builder.withTitle(getString(R.string.content))
+                            .withAdapter(new CusChapterListAdapter(this));
+                    break;
+                case R.id.brightness:
+                    builder.withTitle(getString(R.string.source_change))
+                            .withAdapter(new CusSourceListAdapter(this));
+                    break;
+                default:
             }
-        });
-    }
 
-    private void showChangeDialog() {
-        mSourceChangeDialog = getDialog(getString(R.string.source_change));
-
-        mSourceChangeListView = (ListView) mSourceChangeDialog.findViewById(R.id.rv_item_list);
-        List<Map<String, ?>> sourceList = new ArrayList<>();
-        for (int i = 0; i < mBookRecord.getSourceList().size(); i++) {
-            Source source = mBookRecord.getSourceList().get(i);
-            Map<String, String> map = new HashMap<>(3);
-            map.put("updated", getString(R.string.source_change_updated) + DateUtils.relativeDate(getApplicationContext(), source.getUpdated()));
-            map.put("title", source.getLastChapter());
-            map.put("host", getString(R.string.source_change_host) + source.getHost());
-
-            sourceList.add(map);
+            mContentsDialog = builder.withBook(mBookRecord.getBook())
+                    .withClickListener(this)
+                    .withId(id)
+                    .build();
         }
 
-        mSourceChangeAdapter = new CustomSourceListAdapter(this, sourceList, R.layout.lv_source_change_item_holder,
-                new String[]{"updated", "title", "host"}, new int[]{R.id.tv_updated, R.id.tv_last_chapter, R.id.tv_source_host});
+        mContentsDialog.updateBook(mBookRecord.getBook());
 
-
-        mSourceChangeListView.setAdapter(mSourceChangeAdapter);
-
-        mSourceChangeDialog.show();
-
-        mSourceChangeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                mSourceChangeDialog.dismiss();
-                mSourceChangeAdapter.setSelectedPosition(position);
-                mSourceChangeAdapter.notifyDataSetChanged();
-                mHandler.sendEmptyMessage(MSG_LOADING);
-                // reload
-                reInitPaginationArgs();
-                // change sourceId (contentUrl)
-                mBookRecord.changeSourceId(mBookRecord.getSourceList().get(position).getSourceId());
-            }
-        });
-    }
-
-    private Dialog getDialog(String tile) {
-        View view = LayoutInflater.from(this).inflate(R.layout.dialog_content_layout, null);
-        DisplayMetrics dp = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(dp);
-
-        Dialog contentDialog = new Dialog(this, R.style.contentDialogStyle);
-        contentDialog.setTitle(tile);
-        contentDialog.setContentView(view);
-        Window dialogWindow = contentDialog.getWindow();
-        if (dialogWindow != null) {
-            WindowManager.LayoutParams lp = dialogWindow.getAttributes();
-            dialogWindow.setGravity(Gravity.BOTTOM);
-
-            lp.x = 0;
-            lp.y = 0;
-            lp.width = dp.widthPixels;
-            lp.height = dp.heightPixels / 5 * 4;
-
-            dialogWindow.setAttributes(lp);
-        }
-        contentDialog.setCanceledOnTouchOutside(true);
-
-        return contentDialog;
+        mContentsDialog.show();
     }
 
     /**
@@ -457,15 +389,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
                 if (menuPop.isShowing()) {
                     menuPop.dismiss();
                 }
-                if (contentDialog == null) {
-                    showContentDialog();
-                } else {
-                    contentDialog.show();
-                }
-                contentAdapter.updateData(mBookRecord.getChapters());
-                contentAdapter.setSelectedPosition(mBookRecord.getChapterIndex(mBookRecord.getCurrentUrl()));
-                chapterTitleListView.setSelection(mBookRecord.getCurrentChapterPos() - 2);
-                contentAdapter.notifyDataSetChanged();
+                showContentDialog(R.id.content);
                 break;
             case R.id.font:
                 if (menuPop.isShowing()) {
@@ -481,13 +405,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
                 if (menuPop.isShowing()) {
                     menuPop.dismiss();
                 }
-                if (mSourceChangeDialog == null) {
-                    showChangeDialog();
-                } else {
-                    mSourceChangeDialog.show();
-                }
-                mSourceChangeAdapter.setSelectedPosition(mBookRecord.getSourceIndex());
-                mSourceChangeAdapter.notifyDataSetChanged();
+                showContentDialog(R.id.brightness);
                 break;
             case R.id.progress:
                 Toast.makeText(this, R.string.about_tips, Toast.LENGTH_SHORT).show();
@@ -506,7 +424,6 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
         switchChapter(newChapterUrl, false);
 
     }
-
 
     /**
      * 通知字体大小变化
@@ -540,6 +457,25 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
         reInitPaginationArgs();
         switchChapter(mBookRecord.getCurrentUrl(), true);
 
+    }
+
+    /**
+     * 在列表中的子项被点击之后
+     *
+     * @param position location
+     * @param value 需要更新的值
+     */
+    @Override
+    public void onItemClick(int position, String value) {
+        if (mContentsDialog.getId() == R.id.brightness) {
+            mHandler.sendEmptyMessage(MSG_LOADING);
+            // reload
+            reInitPaginationArgs();
+            // change sourceId (contentUrl)
+            mBookRecord.changeSourceId(value);
+        } else if (mContentsDialog.getId() == R.id.content) {
+            switchChapter(value, true);
+        }
     }
 
     private final class Receiver extends BroadcastReceiver {

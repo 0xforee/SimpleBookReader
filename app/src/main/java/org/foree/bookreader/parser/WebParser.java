@@ -203,12 +203,12 @@ public class WebParser {
         }.start();
     }
 
-    private void getContentsAsync(final String sourceId, final String bookUrl, final String contentsUrl, final NetCallback<List<Chapter>> netCallback) {
+    public void getContentsAsync(final String bookUrl, final String contentsUrl, final NetCallback<List<Chapter>> netCallback) {
         new Thread() {
             @Override
             public void run() {
                 super.run();
-                netCallback.onSuccess(getWebParser(sourceId).getContents(bookUrl, contentsUrl));
+                netCallback.onSuccess(getContents(bookUrl, contentsUrl));
             }
         }.start();
     }
@@ -270,7 +270,8 @@ public class WebParser {
 
     /**
      * 获取书源
-     * @param bookId
+     * @param bookId bookUrl or anyway
+     * @param bookKey bookName + KEY + bookAuthor，用于标识一本书
      * @return
      */
     public List<Source> getBookSource(String bookId, String bookKey) {
@@ -288,6 +289,30 @@ public class WebParser {
         }
 
         return sourceList;
+    }
+
+    public void getBookSourceAsync(final String bookId, final String bookKey, final NetCallback<List<Source>> netCallback){
+        new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                List<Source> sourceList = new ArrayList<>();
+                // if from zhuishu ,get source first
+                AbstractWebParser currentParser = mParserMap.get(getValidSourceId(bookId));
+                if(currentParser instanceof ZhuishuWebParser){
+                    sourceList.addAll(currentParser.getBookSource(getValidRealId(bookId)));
+                    netCallback.onSuccess(sourceList);
+                }
+                for(AbstractWebParser parser : mParserMap.values()) {
+                    // skip zhuishu
+                    if (!(parser instanceof ZhuishuWebParser)) {
+                        sourceList.addAll(parser.getBookSource(bookId, bookKey));
+                        netCallback.onSuccess(sourceList);
+                    }
+                }
+
+            }
+        }.start();
     }
 
     public List<Review> getShortReviews(String bookId) {

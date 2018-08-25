@@ -11,7 +11,6 @@ import android.util.Log;
 import org.foree.bookreader.base.GlobalConfig;
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
-import org.foree.bookreader.bean.book.Source;
 import org.foree.bookreader.bean.dao.BReaderContract;
 import org.foree.bookreader.bean.dao.BReaderProvider;
 import org.foree.bookreader.bean.dao.BookDao;
@@ -45,7 +44,6 @@ public class BookRecord {
 
     private Book mBook;
     private List<Chapter> mChapters;
-    private List<Source> mSourceList;
 
     private Context mContext;
     private Handler mHandler;
@@ -100,7 +98,6 @@ public class BookRecord {
         public void run() {
             initBookInfo();
             initChapters(false);
-            initSourceList();
             if (mOnline) {
                 mBook.setRecentChapterUrl(mChapters.get(0).getChapterUrl());
             }
@@ -118,10 +115,6 @@ public class BookRecord {
     private void sendCompleteMessage() {
         // send complete message
         EventBus.getDefault().post(new BookLoadCompleteEvent(mBook != null && mChapters != null));
-    }
-
-    private void initSourceList() {
-        mSourceList = WebParser.getInstance().getBookSource(mBookUrl, mBook.getBookName() + GlobalConfig.MAGIC_SPLIT_KEY + mBook.getAuthor());
     }
 
     /**
@@ -227,18 +220,8 @@ public class BookRecord {
         return mChapters;
     }
 
-    public List<Source> getSourceList() {
-        return mSourceList;
-    }
-
-    public int getSourceIndex() {
-        for (int i = 0; i < getSourceList().size(); i++) {
-            if (mBook.getContentUrl().equals(getSourceList().get(i).getSourceId())) {
-                Log.d(TAG, "[foree] getSourceIndex: i = " + i);
-                return i;
-            }
-        }
-        return 0;
+    public Book getBook() {
+        return mBook;
     }
 
     /**
@@ -358,7 +341,9 @@ public class BookRecord {
             book.setBookCoverUrl(cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_COVER_URL)));
             book.setContentUrl(cursor.getString(cursor.getColumnIndex(BReaderContract.Books.COLUMN_NAME_CONTENT_URL)));
         }
-        if (cursor != null) cursor.close();
+        if (cursor != null) {
+            cursor.close();
+        }
 
         return book;
 
