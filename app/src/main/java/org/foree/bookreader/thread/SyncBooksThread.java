@@ -58,7 +58,7 @@ public class SyncBooksThread extends Thread {
                                 public Boolean call() throws Exception {
                                     List<Chapter> chapters = WebParser.getInstance().getContents(newBook.getBookUrl(), newBook.getContentUrl());
                                     if (chapters != null) {
-                                        bookDao.insertChapters(chapters);
+                                        bookDao.insertChapters(oldBook.getBookUrl(), chapters);
                                     }
                                     return false;
                                 }
@@ -89,8 +89,7 @@ public class SyncBooksThread extends Thread {
                     updatedBooks.add(future.get());
                 }
             }
-            // 3. notify update
-            EventBus.getDefault().post(new BookUpdateEvent(updatedBooks));
+
 
             // 3. sync chapters
             executor.invokeAll(chapterTasks);
@@ -101,6 +100,9 @@ public class SyncBooksThread extends Thread {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        // notify update anyway
+        EventBus.getDefault().post(new BookUpdateEvent(updatedBooks));
 
         executor.shutdown();
 

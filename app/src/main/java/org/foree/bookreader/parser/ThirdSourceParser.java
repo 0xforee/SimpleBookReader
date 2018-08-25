@@ -5,6 +5,7 @@ import android.util.Log;
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.book.Rank;
+import org.foree.bookreader.bean.book.Source;
 import org.foree.bookreader.utils.DateUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -74,7 +75,7 @@ public class ThirdSourceParser extends AbstractWebParser {
      */
     @Override
     public List<Chapter> getContents(String bookUrl, String contentsUrl) {
-        return parseBookInfo(bookUrl).getChapters();
+        return parseContents(bookUrl, contentsUrl);
     }
 
     /**
@@ -101,6 +102,38 @@ public class ThirdSourceParser extends AbstractWebParser {
     @Override
     public List<Rank> getHomePageInfo() {
         return null;
+    }
+
+    /**
+     * get book source info (sourceId == contentsId)
+     *
+     * @param bookId  book id or url
+     * @param bookKey use for third parser recognize different book
+     * @return source list
+     */
+    @Override
+    public List<Source> getBookSource(String bookId, String bookKey) {
+        List<Source> sources = new ArrayList<>();
+
+        String searchBookName = bookKey.split(SPLIT_KEY)[0];
+        List<Book> searchResult = searchBook(searchBookName, null);
+        for(Book book: searchResult){
+            String resultBookKey = book.getBookName() + SPLIT_KEY + book.getAuthor();
+            // congratulation !! you get a book source
+            if(bookKey.equals(resultBookKey)){
+                Book bookInfo = getBookInfo(getValidRealId(book.getBookUrl()));
+                Source source = new Source();
+                source.setSourceName(mWebInfo.getBookSourceName());
+                source.setSourceId(bookInfo.getContentUrl());
+                source.setLastChapter(bookInfo.getRectentChapterTitle());
+                source.setChapterCount(bookInfo.getChapters().size());
+                source.setHost(mWebInfo.getBookSourceUrl());
+
+                sources.add(source);
+            }
+        }
+
+        return sources;
     }
 
     private List<Book> parseSearchBook(String keyword) throws SearchUrlInvalidException {
@@ -185,7 +218,6 @@ public class ThirdSourceParser extends AbstractWebParser {
     }
 
     private Book parseBookInfo(String bookUrl) {
-        Elements chapterElements = null;
         Book book = new Book();
         try {
             Document doc = Jsoup.connect(bookUrl).ignoreContentType(true).get();
@@ -208,9 +240,27 @@ public class ThirdSourceParser extends AbstractWebParser {
                 book.setBookUrl(wrapSplitKey(bookUrl));
                 book.setCategory("其他");
 
+                List<Chapter> chapters = parseContents(bookUrl, contentUrl);
+
+                book.setRectentChapterTitle(chapters.get(chapters.size() -1).getChapterTitle());
+                book.setChapters(chapters);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return book;
+    }
+
+    private List<Chapter> parseContents(String bookUrl, String contentsUrl){
+        List<Chapter> chapters = new ArrayList<>();
+
+        try {
+            Document doc = Jsoup.connect(contentsUrl).ignoreContentType(true).get();
+            if (doc != null) {
                 // test contents
-                List<Chapter> chapters = new ArrayList<>();
-                chapterElements = getElements(mWebInfo.getRuleChapterList(), doc.body());
+                Elements chapterElements = getElements(mWebInfo.getRuleChapterList(), doc.body());
                 for (Element target : chapterElements) {
                     // chapter name
                     String chapterName = getElementString(mWebInfo.getRuleChapterName(), target);
@@ -220,6 +270,7 @@ public class ThirdSourceParser extends AbstractWebParser {
                     Chapter chapter = new Chapter();
                     chapter.setChapterTitle(chapterName);
                     chapter.setChapterUrl(wrapSplitKey(chapterUrl));
+                    chapter.setChapterIndex(chapterElements.indexOf(target));
                     chapter.setBookUrl(wrapSplitKey(bookUrl));
 
                     chapters.add(chapter);
@@ -227,15 +278,12 @@ public class ThirdSourceParser extends AbstractWebParser {
                         Log.d(TAG, "chapterName = " + chapterName + ", chapterUrl = " + chapterUrl);
                     }
                 }
-
-                book.setChapters(chapters);
             }
-
-        } catch (IOException e) {
+        }catch (IOException e) {
             e.printStackTrace();
         }
 
-        return book;
+        return chapters;
     }
 
     private String parseChapter(String chapterUrl) {
@@ -302,7 +350,7 @@ public class ThirdSourceParser extends AbstractWebParser {
                 String temp = "";
                 switch (subRules[0]) {
                     case "text":
-                        temp = el.text() + "\n";
+                        temp = el.text();
                         break;
                     case "href":
                         temp = el.attr("abs:href");

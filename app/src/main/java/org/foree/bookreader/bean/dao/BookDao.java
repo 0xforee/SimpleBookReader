@@ -55,14 +55,16 @@ public class BookDao {
         return bookList;
     }
 
-    public void insertChapters(List<Chapter> chapters) {
+    public void insertChapters(String bookUrl, List<Chapter> chapters) {
+        Log.d(TAG, "[foree] insertChapters: bookUrl = " + bookUrl);
+
         ContentValues[] contentValues = new ContentValues[chapters.size()];
         for (int i = 0; i < chapters.size(); i++) {
             ContentValues contentValue = new ContentValues();
             contentValue.put(BReaderContract.Chapters.COLUMN_NAME_CHAPTER_TITLE, chapters.get(i).getChapterTitle());
             contentValue.put(BReaderContract.Chapters.COLUMN_NAME_CHAPTER_URL, chapters.get(i).getChapterUrl());
             contentValue.put(BReaderContract.Chapters.COLUMN_NAME_CHAPTER_ID, chapters.get(i).getChapterIndex());
-            contentValue.put(BReaderContract.Chapters.COLUMN_NAME_BOOK_URL, chapters.get(i).getBookUrl());
+            contentValue.put(BReaderContract.Chapters.COLUMN_NAME_BOOK_URL, bookUrl);
 
             contentValues[i] = contentValue;
         }
@@ -112,7 +114,7 @@ public class BookDao {
         );
 
         // insert chapters
-        insertChapters(book.getChapters());
+        insertChapters(book.getBookUrl(), book.getChapters());
     }
 
     public void removeBook(String book_url) {

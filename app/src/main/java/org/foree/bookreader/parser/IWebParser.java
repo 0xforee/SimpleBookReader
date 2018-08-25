@@ -69,6 +69,15 @@ interface IWebParser {
     List<Source> getBookSource(String bookId);
 
     /**
+     * get book source info (sourceId == contentsId)
+     *
+     * @param bookId book id or url
+     * @param bookKey use for third parser recognize different book
+     * @return source list
+     */
+    List<Source> getBookSource(String bookId, String bookKey);
+
+    /**
      * get short review info
      *
      * @param bookId book id or url

@@ -250,7 +250,7 @@ public class WebParser {
     }
 
     public List<Chapter> getContents(String bookUrl, String contentsUrl) {
-        return getWebParser(getValidSourceId(bookUrl)).getContents(getValidRealId(bookUrl), getValidRealId(contentsUrl));
+        return getWebParser(getValidSourceId(contentsUrl)).getContents(getValidRealId(bookUrl), getValidRealId(contentsUrl));
     }
 
     public Chapter getChapter(String bookUrl, String chapterUrl) {
@@ -273,14 +273,21 @@ public class WebParser {
      * @param bookId
      * @return
      */
-    public List<Source> getBookSource(String bookId, String bookName) {
-        if(!bookId.startsWith("http")){
-            // zhuishu
-
+    public List<Source> getBookSource(String bookId, String bookKey) {
+        List<Source> sourceList = new ArrayList<>();
+        // if from zhuishu ,get source first
+        AbstractWebParser currentParser = mParserMap.get(getValidSourceId(bookId));
+        if(currentParser instanceof ZhuishuWebParser){
+            sourceList.addAll(currentParser.getBookSource(getValidRealId(bookId)));
+        }
+        for(AbstractWebParser parser : mParserMap.values()) {
+            // skip zhuishu
+            if (!(parser instanceof ZhuishuWebParser)) {
+                sourceList.addAll(parser.getBookSource(bookId, bookKey));
+            }
         }
 
-        // third
-        return getWebParser(bookId).getBookSource(bookId);
+        return sourceList;
     }
 
     public List<Review> getShortReviews(String bookId) {

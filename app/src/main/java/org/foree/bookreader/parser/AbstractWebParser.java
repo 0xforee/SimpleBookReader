@@ -18,7 +18,8 @@ abstract class AbstractWebParser implements IWebParser {
     private static final String TAG = AbstractWebParser.class.getSimpleName();
     static boolean DEBUG = false;
 
-    final String SPLIT_KEY = GlobalConfig.MAGIC_SPLIT_KEY;
+    public static final String SPLIT_KEY = GlobalConfig.MAGIC_SPLIT_KEY;
+    public static final String DEFAULT_SOURCE_ID = "http://api.zhuishu.com";
 
 
     abstract AbstractWebInfo getWebInfo();
@@ -41,6 +42,18 @@ abstract class AbstractWebParser implements IWebParser {
         return null;
     }
 
+    /**
+     * get book source info (sourceId == contentsId)
+     *
+     * @param bookId  book id or url
+     * @param bookKey use for third parser recognize different book
+     * @return source list
+     */
+    @Override
+    public List<Source> getBookSource(String bookId, String bookKey) {
+        return null;
+    }
+
     @Override
     public List<Review> getShortReviews(String bookId, Map<String, String> params) {
         return null;
@@ -59,5 +72,33 @@ abstract class AbstractWebParser implements IWebParser {
 
     String wrapSplitKey(String url){
         return getWebInfo().getHostUrl() + SPLIT_KEY + url;
+    }
+
+    /**
+     * 获取合法的sourceId
+     * @param url 新版本包含sourceId，旧版本不包含sourceId，使用默认的Id
+     * @return sourceId
+     */
+    public static String getValidSourceId(String url){
+        String[] values = url.split(SPLIT_KEY);
+        if(values.length == 1){
+            return DEFAULT_SOURCE_ID;
+        }
+
+        return values[0];
+    }
+
+    /**
+     * 解析合法真实的Id（包括bookId, contentsId, chapterId)
+     * @param url 可能为新、旧版本的id
+     * @return 解析的真实Id
+     */
+    public static String getValidRealId(String url){
+        String[] values = url.split(SPLIT_KEY);
+        if(values.length == 1){
+            return values[0];
+        }else{
+            return values[1];
+        }
     }
 }

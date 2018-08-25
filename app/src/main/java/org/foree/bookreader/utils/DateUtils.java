@@ -126,6 +126,9 @@ public class DateUtils {
      */
     public static String relativeDate(Context context, Date date) {
         if (DEBUG) Log.d(TAG, "[foree] relativeDate: ");
+        if(date == null){
+            return "未知";
+        }
         Date current = new Date();
         if (current.getYear() - date.getYear() > 0) {
             // 年前

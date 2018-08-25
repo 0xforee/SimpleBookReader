@@ -8,6 +8,7 @@ import android.os.HandlerThread;
 import android.os.Process;
 import android.util.Log;
 
+import org.foree.bookreader.base.GlobalConfig;
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.book.Source;
@@ -120,7 +121,7 @@ public class BookRecord {
     }
 
     private void initSourceList() {
-        mSourceList = WebParser.getInstance().getBookSource(mBookUrl, mBook.getBookName());
+        mSourceList = WebParser.getInstance().getBookSource(mBookUrl, mBook.getBookName() + GlobalConfig.MAGIC_SPLIT_KEY + mBook.getAuthor());
     }
 
     /**
@@ -203,7 +204,7 @@ public class BookRecord {
         if (mIndexMap.get(url) != null) {
             return mChapters.get(mIndexMap.get(url));
         }
-        return null;
+        return new Chapter("", "");
     }
 
     public boolean isChapterCached(int index) {
@@ -218,7 +219,7 @@ public class BookRecord {
         if (mIndexMap.containsKey(url)) {
             return mIndexMap.get(url);
         } else {
-            return -1;
+            return 0;
         }
     }
 
@@ -316,6 +317,7 @@ public class BookRecord {
     }
 
     private void initChapterIndexMap(List<Chapter> chapters) {
+        mIndexMap.clear();
         for (int i = 0; i < chapters.size(); i++) {
             // 使用hashMap加快索引位置
             mIndexMap.put(chapters.get(i).getChapterUrl(), i);
@@ -393,6 +395,7 @@ public class BookRecord {
 
         );
 
+        Log.d(TAG, "[foree] saveToDatabase: change = " + change + ", bookUrl = " + mBookUrl);
         if (change) {
             // clean old chapters, and update new
             mContext.getContentResolver().delete(
@@ -401,7 +404,7 @@ public class BookRecord {
                     new String[]{mBookUrl}
             );
             //thirdly, reload from network and insert db
-            mBookDao.insertChapters(mChapters);
+            mBookDao.insertChapters(mBookUrl, mChapters);
         }
 
     }
