@@ -25,6 +25,7 @@ import java.io.StringReader;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +36,7 @@ import java.util.Map;
 
 public class WebParser {
     private static final String TAG = "WebParser";
-    private Map<String, AbstractWebParser> mParserMap = new HashMap<>();
+    private Map<String, AbstractWebParser> mParserMap = new LinkedHashMap<>();
     private static WebParser mInstance;
     private static final String SPLIT_KEY = GlobalConfig.MAGIC_SPLIT_KEY;
     private static final String DEFAULT_SOURCE_ID = "http://api.zhuishu.com";

@@ -45,6 +45,7 @@ import org.foree.bookreader.parser.WebParser;
 import org.foree.bookreader.readpage.ReadActivity;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -348,6 +349,7 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
                 startActivity(intent);
                 break;
             case R.id.bt_bookinfo_add:
+                mBook.setUpdateTime(new Date());
                 bookDao.addBook(mBook);
 
                 // update bt_add

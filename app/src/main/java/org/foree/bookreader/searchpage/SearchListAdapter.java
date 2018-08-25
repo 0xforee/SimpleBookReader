@@ -53,7 +53,7 @@ public class SearchListAdapter extends BaseRecyclerAdapter<SearchListAdapter.MyV
         holder.itemView.setBackgroundColor(mSelectedItemsIds.get(position) ? 0x9934B5E4 : Color.TRANSPARENT);
 
         if (bookList.get(position).getBookCoverUrl() != null) {
-            Glide.with(mContext).load(bookList.get(position).getBookCoverUrl()).crossFade().into(holder.imageView);
+            Glide.with(mContext).load(bookList.get(position).getBookCoverUrl()).error(R.drawable.search_error).crossFade().into(holder.imageView);
         }
     }
 

@@ -205,7 +205,6 @@ public class ThirdSourceParser extends AbstractWebParser {
                 book.setDescription(description);
                 book.setBookCoverUrl(coverUrl);
                 book.setContentUrl(wrapSplitKey(contentUrl));
-                book.setUpdateTime(new Date());
                 book.setBookUrl(wrapSplitKey(bookUrl));
                 book.setCategory("其他");
 
