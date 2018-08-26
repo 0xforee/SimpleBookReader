@@ -18,8 +18,6 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 
 import org.foree.bookreader.R;
-import org.foree.bookreader.base.GlobalConfig;
-import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.book.Source;
 import org.foree.bookreader.parser.WebParser;
@@ -39,10 +37,9 @@ public class ItemListDialog extends Dialog {
     private List data;
     private View mRootView;
     private Context mContext;
-    private Book mBook;
+    private BookRecord mBookRecord;
     private Handler mHandler;
     private int mId;
-    private String mCurrentItem;
     private ProgressBar mProgress;
 
     private ItemListDialog(@NonNull Context context) {
@@ -65,7 +62,7 @@ public class ItemListDialog extends Dialog {
         mClickListener = builder.mClickListener;
         mTitle = builder.mTitle;
         mContext = builder.mContext;
-        mBook = builder.mBook;
+        mBookRecord = builder.mRecord;
         mId = builder.id;
     }
 
@@ -104,13 +101,8 @@ public class ItemListDialog extends Dialog {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 mAdapter.setSelectedPosition(position);
                 mAdapter.notifyDataSetChanged();
+                mClickListener.onItemClick(position);
                 dismiss();
-
-                if (mAdapter instanceof CusChapterListAdapter) {
-                    mClickListener.onItemClick(position, ((Chapter) data.get(position)).getChapterUrl());
-                } else {
-                    mClickListener.onItemClick(position, ((Source) data.get(position)).getSourceId());
-                }
             }
         });
 
@@ -126,24 +118,23 @@ public class ItemListDialog extends Dialog {
         mProgress.setVisibility(View.VISIBLE);
 
         if (mAdapter instanceof CusChapterListAdapter) {
-            mCurrentItem = mBook.getRecentChapterUrl();
+            List<Chapter> cached = mBookRecord.getChapters();
+            if(cached != null){
+                mAdapter.updateData(cached);
+                setSelectedPosition(mBookRecord.getCurrentChapterPos());
+            }
 
             // 请求章节资源
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    data = WebParser.getInstance().getContents(mBook.getBookUrl(), mBook.getContentUrl());
-                    mAdapter.updateData(data);
+                    data = WebParser.getInstance().getContents(mBookRecord.getBookUrl(), mBookRecord.getContentsUrl());
                     mlvList.post(new Runnable() {
                         @Override
                         public void run() {
-                            for (int i = 0; i < data.size(); i++) {
-                                Chapter chapter = (Chapter) data.get(i);
-                                if (mCurrentItem.equals(chapter.getChapterUrl())) {
-                                    setSelectedPosition(i);
-                                }
-                            }
-                            mAdapter.notifyDataSetChanged();
+                            mBookRecord.updateChapters(data);
+                            mAdapter.updateData(mBookRecord.getChapters());
+                            setSelectedPosition(mBookRecord.getCurrentChapterPos());
                             mProgress.setVisibility(View.GONE);
                         }
                     });
@@ -151,25 +142,22 @@ public class ItemListDialog extends Dialog {
                 }
             });
         } else {
-            mCurrentItem = mBook.getContentUrl();
+            List<Source> sources = mBookRecord.getSources();
+            if( sources != null){
+                mAdapter.updateData(sources);
+                setSelectedPosition(mBookRecord.getCurrentSourcePos());
+            }
 
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    data = WebParser.getInstance().getBookSource(mBook.getBookUrl(),
-                            mBook.getBookName() + GlobalConfig.MAGIC_SPLIT_KEY + mBook.getAuthor());
-                    mAdapter.updateData(data);
-
+                    data = WebParser.getInstance().getBookSource(mBookRecord.getBookUrl(), mBookRecord.getBookKey());
                     mlvList.post(new Runnable() {
                         @Override
                         public void run() {
-                            for (int i = 0; i < data.size(); i++) {
-                                Source source = (Source) data.get(i);
-                                if (mCurrentItem.equals(source.getSourceId())) {
-                                    setSelectedPosition(i);
-                                }
-                            }
-                            mAdapter.notifyDataSetChanged();
+                            mBookRecord.updateSources(data);
+                            mAdapter.updateData(mBookRecord.getSources());
+                            setSelectedPosition(mBookRecord.getCurrentSourcePos());
                             mProgress.setVisibility(View.GONE);
                         }
                     });
@@ -202,18 +190,13 @@ public class ItemListDialog extends Dialog {
         return mId;
     }
 
-    public void updateBook(Book book) {
-        mBook = book;
-    }
-
     public interface OnItemClickListener {
         /**
          * 在列表中的子项被点击之后
          *
          * @param position location
-         * @param value    需要更新的值
          */
-        void onItemClick(int position, String value);
+        void onItemClick(int position);
     }
 
     public static final class Builder {
@@ -221,7 +204,7 @@ public class ItemListDialog extends Dialog {
         private OnItemClickListener mClickListener;
         private String mTitle;
         private Context mContext;
-        private Book mBook;
+        private BookRecord mRecord;
         private int id;
 
         public Builder(Context context) {
@@ -243,8 +226,8 @@ public class ItemListDialog extends Dialog {
             return this;
         }
 
-        public Builder withBook(Book val) {
-            mBook = val;
+        public Builder withBookRecord(BookRecord val) {
+            mRecord = val;
             return this;
         }
 

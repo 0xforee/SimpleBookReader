@@ -11,6 +11,7 @@ import android.util.Log;
 import org.foree.bookreader.base.GlobalConfig;
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
+import org.foree.bookreader.bean.book.Source;
 import org.foree.bookreader.bean.dao.BReaderContract;
 import org.foree.bookreader.bean.dao.BReaderProvider;
 import org.foree.bookreader.bean.dao.BookDao;
@@ -57,6 +58,16 @@ public class BookRecord {
      * 初始化是否完成，指第一次页码切换是否完成
      */
     private boolean completed = false;
+
+    /**
+     * 书籍源
+     */
+    private List<Source> mSources = new ArrayList<>();
+
+    /**
+     * magic split key
+     */
+    private final String SPLIT_KEY = GlobalConfig.MAGIC_SPLIT_KEY;
 
     /**
      * 是否从书籍详情页（在线）打开
@@ -131,7 +142,7 @@ public class BookRecord {
             return;
         }
 
-        saveToDatabase();
+        saveToDatabase(false);
     }
 
     public boolean isOnline() {
@@ -189,6 +200,7 @@ public class BookRecord {
 
     public void setChapterCached(String url) {
         if (mIndexMap.get(url) != null) {
+            Log.d(TAG, "[foree] setChapterCached: url = " + url);
             mChapters.get(mIndexMap.get(url)).setOffline(true);
         }
     }
@@ -209,6 +221,7 @@ public class BookRecord {
     }
 
     public int getChapterIndex(String url) {
+        Log.d(TAG, "getChapterIndex() called with: url = [" + url + "]");
         if (mIndexMap.containsKey(url)) {
             return mIndexMap.get(url);
         } else {
@@ -220,8 +233,75 @@ public class BookRecord {
         return mChapters;
     }
 
-    public Book getBook() {
-        return mBook;
+    public List<Source> getSources() {
+        return mSources;
+    }
+
+    public void updateSources(List<Source> newData){
+        if(newData != null && !newData.isEmpty()) {
+            mSources.clear();
+            mSources.addAll(newData);
+        }
+    }
+
+    public void updateChapters(List<Chapter> chapters){
+        if(mChapters == null){
+            mChapters = chapters;
+        }else{
+            if(chapters != null){
+                for (int i = chapters.size(); i < mChapters.size() - 1 ; i++) {
+                    mChapters.remove(i);
+                }
+
+                for (int i = 0; i < chapters.size(); i++) {
+                    if(i >= mChapters.size()){
+                        mChapters.set(i, chapters.get(i));
+                    }else{
+                        mChapters.set(i, updateChapterInfo(mChapters.get(i), chapters.get(i)));
+                    }
+                }
+            }
+            initChapterIndexMap(mChapters);
+            saveToDatabase(true);
+        }
+
+
+    }
+
+    private Chapter updateChapterInfo(Chapter oldData, Chapter newData){
+        oldData.setChapterUrl(newData.getChapterUrl());
+        oldData.setChapterTitle(newData.getChapterTitle());
+
+        return oldData;
+    }
+
+
+    public int getCurrentSourcePos(){
+        return getSourceIndex(getContentsUrl());
+    }
+
+    private int getSourceIndex(String contentsUrl){
+        if(mSources != null){
+            for (int i = 0; i < mSources.size(); i++) {
+                if(mSources.get(i).getSourceId().equals(contentsUrl)){
+                    return i;
+                }
+            }
+        }
+
+        return 0;
+    }
+
+    public String getBookKey(){
+        return mBook.getBookName() + SPLIT_KEY + mBook.getAuthor();
+    }
+
+    public String getBookUrl() {
+        return mBook.getBookUrl();
+    }
+
+    public String getContentsUrl() {
+        return mBook.getContentUrl();
     }
 
     /**
@@ -359,9 +439,9 @@ public class BookRecord {
         return book;
     }
 
-    private void saveToDatabase() {
+    private void saveToDatabase(boolean force) {
         // if content url changed
-        boolean change = !mOnline && !mOldContentUrl.equals(mBook.getContentUrl());
+        boolean change = force || (!mOnline && !mOldContentUrl.equals(mBook.getContentUrl()));
 
         // update bookInfo
         ContentValues contentValues = new ContentValues();

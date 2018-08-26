@@ -351,13 +351,11 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
                 default:
             }
 
-            mContentsDialog = builder.withBook(mBookRecord.getBook())
+            mContentsDialog = builder.withBookRecord(mBookRecord)
                     .withClickListener(this)
                     .withId(id)
                     .build();
         }
-
-        mContentsDialog.updateBook(mBookRecord.getBook());
 
         mContentsDialog.show();
     }
@@ -369,6 +367,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
      * @param loadCurrent   是否重新load当前章节，重新load当前章节会初始化head指针，会从0开始加载
      */
     private void switchChapter(String newChapterUrl, boolean loadCurrent) {
+        Log.d(TAG, "switchChapter() called with: newChapterUrl = [" + newChapterUrl + "], loadCurrent = [" + loadCurrent + "]");
         mBookRecord.switchChapter(newChapterUrl);
         if (loadCurrent) {
             mReadPageAdapter.reset();
@@ -463,18 +462,17 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
      * 在列表中的子项被点击之后
      *
      * @param position location
-     * @param value 需要更新的值
      */
     @Override
-    public void onItemClick(int position, String value) {
+    public void onItemClick(int position) {
         if (mContentsDialog.getId() == R.id.brightness) {
             mHandler.sendEmptyMessage(MSG_LOADING);
             // reload
             reInitPaginationArgs();
             // change sourceId (contentUrl)
-            mBookRecord.changeSourceId(value);
+            mBookRecord.changeSourceId(mBookRecord.getSources().get(position).getSourceId());
         } else if (mContentsDialog.getId() == R.id.content) {
-            switchChapter(value, true);
+            switchChapter(mBookRecord.getChapters().get(position).getChapterUrl(), true);
         }
     }
 
