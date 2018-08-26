@@ -177,23 +177,19 @@ public class ThirdSourceParser extends AbstractWebParser {
 
                     // book author
                     String bookAuthor = getElementString(mWebInfo.getRuleSearchAuthor(), target);
-                    Log.d(TAG, "bookAuthor = " + bookAuthor);
-
                     // last chapter
                     String lastChapter = getElementString(mWebInfo.getRuleSearchLastChapter(), target);
-                    Log.d(TAG, "lastChapter = " + lastChapter);
-
                     // search kind
                     String searchKind = getElementString(mWebInfo.getRuleSearchKind(), target);
-                    Log.d(TAG, "searchKind = " + searchKind);
-
                     // ruleSearchNoteUrl
                     String ruleSearchNoteUrl = getElementString(mWebInfo.getRuleSearchNoteUrl(), target);
-                    Log.d(TAG, "ruleSearchNoteUrl = " + ruleSearchNoteUrl);
 
                     // ruleSearchCoverUrl
                     String ruleSearchCoverUrl = getElementString(mWebInfo.getRuleSearchCoverUrl(), target);
-                    Log.d(TAG, "ruleSearchCoverUrl = " + ruleSearchCoverUrl);
+                    if(DEBUG) {
+                        Log.d(TAG, "bookAuthor = " + bookAuthor + ", lastChapter = " + lastChapter + ", searchKind = " + searchKind
+                                + ", ruleSearchNoteUrl = " + ruleSearchNoteUrl + ", ruleSearchCoverUrl = " + ruleSearchCoverUrl);
+                    }
 
                     Book book = new Book();
                     book.setBookName(bookName);
