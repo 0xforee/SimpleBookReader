@@ -367,7 +367,7 @@ public class ReadActivity extends BaseActivity implements ReadViewPager.onPageAr
      * @param loadCurrent   是否重新load当前章节，重新load当前章节会初始化head指针，会从0开始加载
      */
     private void switchChapter(String newChapterUrl, boolean loadCurrent) {
-        Log.d(TAG, "switchChapter() called with: newChapterUrl = [" + newChapterUrl + "], loadCurrent = [" + loadCurrent + "]");
+//        Log.d(TAG, "switchChapter() called with: newChapterUrl = [" + newChapterUrl + "], loadCurrent = [" + loadCurrent + "]");
         mBookRecord.switchChapter(newChapterUrl);
         if (loadCurrent) {
             mReadPageAdapter.reset();

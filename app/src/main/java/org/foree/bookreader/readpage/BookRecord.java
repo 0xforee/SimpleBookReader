@@ -42,6 +42,7 @@ import java.util.Map;
 
 public class BookRecord {
     private final static String TAG = BookRecord.class.getSimpleName();
+    private static final boolean DEBUG = Log.isLoggable(TAG, Log.DEBUG);
 
     private Book mBook;
     private List<Chapter> mChapters;
@@ -142,7 +143,7 @@ public class BookRecord {
             return;
         }
 
-        saveToDatabase(false);
+        saveToDatabase();
     }
 
     public boolean isOnline() {
@@ -200,7 +201,9 @@ public class BookRecord {
 
     public void setChapterCached(String url) {
         if (mIndexMap.get(url) != null) {
-            Log.d(TAG, "[foree] setChapterCached: url = " + url);
+            if(DEBUG) {
+                Log.d(TAG, "[foree] setChapterCached: url = " + url);
+            }
             mChapters.get(mIndexMap.get(url)).setOffline(true);
         }
     }
@@ -221,7 +224,9 @@ public class BookRecord {
     }
 
     public int getChapterIndex(String url) {
-        Log.d(TAG, "getChapterIndex() called with: url = [" + url + "]");
+        if(DEBUG) {
+            Log.d(TAG, "getChapterIndex() called with: url = [" + url + "]");
+        }
         if (mIndexMap.containsKey(url)) {
             return mIndexMap.get(url);
         } else {
@@ -255,14 +260,13 @@ public class BookRecord {
 
                 for (int i = 0; i < chapters.size(); i++) {
                     if(i >= mChapters.size()){
-                        mChapters.set(i, chapters.get(i));
+                        mChapters.add(i, chapters.get(i));
                     }else{
                         mChapters.set(i, updateChapterInfo(mChapters.get(i), chapters.get(i)));
                     }
                 }
             }
             initChapterIndexMap(mChapters);
-            saveToDatabase(true);
         }
 
 
@@ -439,9 +443,9 @@ public class BookRecord {
         return book;
     }
 
-    private void saveToDatabase(boolean force) {
+    private void saveToDatabase() {
         // if content url changed
-        boolean change = force || (!mOnline && !mOldContentUrl.equals(mBook.getContentUrl()));
+        boolean change = true || (!mOnline && !mOldContentUrl.equals(mBook.getContentUrl()));
 
         // update bookInfo
         ContentValues contentValues = new ContentValues();
@@ -460,7 +464,9 @@ public class BookRecord {
 
         );
 
-        Log.d(TAG, "[foree] saveToDatabase: change = " + change + ", bookUrl = " + mBookUrl);
+        if(DEBUG) {
+            Log.d(TAG, "[foree] saveToDatabase: change = " + change + ", bookUrl = " + mBookUrl);
+        }
         if (change) {
             // clean old chapters, and update new
             mContext.getContentResolver().delete(

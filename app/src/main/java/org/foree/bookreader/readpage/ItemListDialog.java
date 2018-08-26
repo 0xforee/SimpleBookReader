@@ -16,6 +16,7 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import org.foree.bookreader.R;
 import org.foree.bookreader.bean.book.Chapter;
@@ -73,7 +74,8 @@ public class ItemListDialog extends Dialog {
 
         View view = LayoutInflater.from(mContext).inflate(R.layout.dialog_content_layout, null);
 
-        setTitle(mTitle);
+        TextView title = (TextView) view.findViewById(R.id.tv_dialog_title);
+        title.setText(mTitle);
         setContentView(view);
 
         DisplayMetrics dp = new DisplayMetrics();

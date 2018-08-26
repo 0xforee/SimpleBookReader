@@ -82,8 +82,7 @@
     </style>
 
     <style name="contentDialogStyle" parent="Theme.AppCompat.DayNight.Dialog">
-        <item name="android:windowNoTitle">false</item>
-        <item name="android:windowTitleStyle">@style/windowTitle</item>
+        <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@color/windowBackgroundColor</item>
 
     </style>

@@ -1,22 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+    android:orientation="vertical"
     android:layout_height="match_parent">
 
-    <ListView
-        android:id="@+id/rv_item_list"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:divider="@color/md_grey_600"
-        android:fastScrollEnabled="true"
-        android:scrollbarThumbVertical="@color/md_grey_800"
-        android:scrollbars="vertical" />
+        android:layout_height="55dp">
+        <TextView
+            android:textColor="@color/md_black_1000"
+            android:layout_marginTop="13dp"
+            android:layout_marginStart="30dp"
+            android:layout_marginBottom="13dp"
+            android:id="@+id/tv_dialog_title"
+            android:textSize="22sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <ProgressBar
+            android:layout_margin="10dp"
+            android:layout_alignParentEnd="true"
+            android:id="@+id/pg_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+        <ListView
+            android:id="@+id/rv_item_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@color/md_grey_600"
+            android:fastScrollEnabled="true"
+            android:scrollbarThumbVertical="@color/md_grey_800"
+            android:scrollbars="vertical" />
 
-    <ProgressBar
-        android:layout_gravity="center"
-        android:id="@+id/pg_progress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-</FrameLayout>
+</LinearLayout>
 
