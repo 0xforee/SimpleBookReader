@@ -44,7 +44,8 @@ public class UpdateAgent {
                 if (e == null && !list.isEmpty()) {
                     // get newest query
                     AppVersionDb appVersionDb = list.get(0);
-                    Log.d(TAG, "[foree] done: appVersionDb = " + appVersionDb);
+                    Log.d(TAG, "[foree] done: get version  = " + appVersionDb.getVersionCode()
+                            + ", name = " + appVersionDb.getVersionName() + ", updateLog = " + appVersionDb.getUpdateLog());
 
                     // release file
                     BmobFile apkFile = appVersionDb.getApkFile();
@@ -60,7 +61,7 @@ public class UpdateAgent {
                         Toast.makeText(context, R.string.update_already_new, Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Log.e(TAG, "bmob query done: error", e);
+                    Log.e(TAG, "check update query done: error", e);
                 }
             }
         });

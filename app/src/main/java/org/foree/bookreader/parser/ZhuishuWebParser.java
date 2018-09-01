@@ -214,7 +214,7 @@ public class ZhuishuWebParser extends AbstractWebParser {
         try {
             Document document = Jsoup.connect(bookRankListApi).ignoreContentType(true).get();
             if (document != null) {
-                Log.d(TAG, "homePage = " + document.body().text());
+//                Log.d(TAG, "homePage = " + document.body().text());
                 JSONObject object = new JSONObject(document.body().text());
 
                 for (int j = 0; j < groups.length; j++) {
