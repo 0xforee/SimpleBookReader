@@ -12,11 +12,6 @@ import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 /**
  * Created by foree on 17-2-27.
@@ -36,78 +31,29 @@ public class SyncBooksThread extends Thread {
         ArrayList<Book> updatedBooks = new ArrayList<>();
         List<Book> books = bookDao.getAllBooks();
 
-        // init thread about
-        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-
-        final List<Callable<Book>> tasks = new ArrayList<>();
-        final List<Callable<Boolean>> chapterTasks = new ArrayList<>();
-        List<Future<Book>> futures;
-        // add task
-        for (final Book oldBook : books) {
-            if (oldBook != null) {
-                Callable<Book> callable = new Callable<Book>() {
-                    @Override
-                    public Book call() throws Exception {
-
-                        final Book newBook = WebParser.getInstance().getBookInfo(oldBook.getBookUrl());
-
-                        if (newBook.getUpdateTime().after(oldBook.getUpdateTime())) {
-                            // update chapters
-                            chapterTasks.add(new Callable<Boolean>() {
-                                @Override
-                                public Boolean call() throws Exception {
-                                    List<Chapter> chapters = WebParser.getInstance().getContents(newBook.getBookUrl(), newBook.getContentUrl());
-                                    if (chapters != null) {
-                                        bookDao.insertChapters(oldBook.getBookUrl(), chapters);
-                                    }
-                                    return false;
-                                }
-                            });
-
-                            bookDao.updateBookTime(newBook.getBookUrl(), DateUtils.formatDateToString(newBook.getUpdateTime()));
-
-                            return newBook;
-                        }
-                        return null;
-                    }
-                };
-
-                tasks.add(callable);
-            }
-        }
-
-
-        // results
         try {
+            for (Book oldBook : books) {
+                if (oldBook != null) {
+                    final Book newBook = WebParser.getInstance().getBookInfo(oldBook.getBookUrl());
+                    if (newBook.getUpdateTime().after(oldBook.getUpdateTime())) {
+                        List<Chapter> chapters = WebParser.getInstance().getContents(newBook.getBookUrl(), newBook.getContentUrl());
+                        if (chapters != null) {
+                            bookDao.insertChapters(oldBook.getBookUrl(), chapters);
+                        }
 
-            // 1. check update
-            futures = executor.invokeAll(tasks);
-
-            // 2. get results
-            for (Future<Book> future : futures) {
-                if (future.get() != null) {
-                    updatedBooks.add(future.get());
+                        bookDao.updateBookTime(newBook.getBookUrl(), DateUtils.formatDateToString(newBook.getUpdateTime()));
+                        updatedBooks.add(newBook);
+                    }
                 }
+
             }
-
-
-            // 3. sync chapters
-            executor.invokeAll(chapterTasks);
-
-
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            Log.e(TAG, e.toString());
         }
 
-        // notify update anyway
+        // notify update anyway（不能总是更新，如果检查失败，发送空内容）
         EventBus.getDefault().post(new BookUpdateEvent(updatedBooks));
 
-        executor.shutdown();
-
-
         Log.d(TAG, "costs " + (System.currentTimeMillis() - startTime) + " ms to check update, updated " + updatedBooks.size());
-
     }
 }
