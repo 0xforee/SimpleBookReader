@@ -1,7 +1,5 @@
 package org.foree.bookreader;
 
-import android.util.Log;
-
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.utils.DateUtils;
@@ -26,6 +24,60 @@ public class ExampleUnitTest {
     @Test
     public void addition_isCorrect() throws Exception {
         assertEquals(4, 2 + 2);
+    }
+
+    @Test
+    public void testSimilarity(){
+        String test = "大主宰";
+        String test1 = "五行天";
+        String test2 = "五行天师";
+        String test3 = "五行天域";
+        String test4 = "我是一个帅哥";
+        String test5 = "帅哥是我";
+
+        Map<Character, int[]> vectorMap = new HashMap<>();
+        // 分析第一个字符串
+        for(Character character: test2.toCharArray()){
+            if(vectorMap.containsKey(character)){
+                vectorMap.get(character)[0]++;
+            }else{
+                int[] tmp = new int[]{1, 0};
+                vectorMap.put(character, tmp);
+            }
+        }
+
+        // 分析第二个字符串
+        for(Character character: test3.toCharArray()){
+            if(vectorMap.containsKey(character)){
+                vectorMap.get(character)[1]++;
+            }else{
+                int[] tmp = new int[]{0, 1};
+                vectorMap.put(character, tmp);
+            }
+        }
+
+        // 余弦分母
+        double str1 = 0;
+        double str2 = 0;
+        for(Character character: vectorMap.keySet()){
+            int[] tmp = vectorMap.get(character);
+            str1 += tmp[0] * tmp[0];
+            str2 += tmp[1] * tmp[1];
+        }
+        double denominator = Math.sqrt(str1 * str2);
+
+        // 余弦分子
+        double numerator = 0;
+        for(Character character: vectorMap.keySet()){
+            int[] tmp = vectorMap.get(character);
+            numerator += tmp[0] * tmp[1];
+        }
+
+        // 计算余弦值
+        double similarity = numerator / denominator;
+
+        Log.d("TAG","similarity = " + similarity);
+
     }
 
     @Test
