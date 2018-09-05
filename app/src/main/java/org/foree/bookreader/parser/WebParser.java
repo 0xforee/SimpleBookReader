@@ -25,6 +25,7 @@ import java.io.StringReader;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -153,7 +154,8 @@ public class WebParser {
                 super.run();
 
                 String encodeKeyword = URLEncoder.encode(keyword);
-                List<Book> books = new ArrayList<>();
+                // filter repeat books use set
+                HashSet<Book> books = new HashSet<>();
 
                 Map<String, String> data = new HashMap<>();
                 data.put("query", encodeKeyword);
@@ -166,7 +168,7 @@ public class WebParser {
                         if (results != null) {
                             books.addAll(results);
                         }
-                        netCallback.onSuccess(books);
+                        netCallback.onSuccess(new ArrayList<Book>(books));
                     }
                 }else{
                     for (String sourceId : sourceIds) {
@@ -174,7 +176,7 @@ public class WebParser {
                         if(results != null){
                             books.addAll(results);
                         }
-                        netCallback.onSuccess(books);
+                        netCallback.onSuccess(new ArrayList<Book>(books));
 
 
                     }

@@ -2,7 +2,6 @@ package org.foree.bookreader.parser;
 
 import android.util.Log;
 
-import org.foree.bookreader.base.GlobalConfig;
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.book.Rank;

@@ -30,9 +30,12 @@ import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bookinfopage.BookInfoActivity;
 import org.foree.bookreader.net.NetCallback;
 import org.foree.bookreader.parser.WebParser;
+import org.foree.bookreader.utils.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.TreeSet;
 
 public class SearchResultsActivity extends BaseActivity {
     private static final String TAG = SearchResultsActivity.class.getSimpleName();
@@ -144,7 +147,10 @@ public class SearchResultsActivity extends BaseActivity {
                     @Override
                     public void run() {
                         bookList.clear();
-                        bookList.addAll(data);
+                        TreeSet<Book> books = new TreeSet<>(new BookComparator());
+                        books.addAll(data);
+                        bookList.addAll(books);
+
                         mAdapter.notifyDataSetChanged();
                         if (mSwipeRefreshLayout.isRefreshing()) {
                             mSwipeRefreshLayout.setRefreshing(false);
@@ -253,6 +259,32 @@ public class SearchResultsActivity extends BaseActivity {
     private void showToolBarContent() {
         for (int i = 0; i < toolbar.getChildCount(); i++) {
             toolbar.getChildAt(i).setVisibility(View.VISIBLE);
+        }
+    }
+
+    private class BookComparator implements Comparator<Book> {
+        @Override
+        public int compare(Book lhs, Book rhs) {
+            if (lhs.getBookName().equals(rhs.getBookName())
+                    && lhs.getAuthor().equals(rhs.getAuthor())) {
+                return 0;
+            } else {
+                // sort by book name descend
+                double similarityDiff = StringUtils.getSimilarity(mSearchString, lhs.getBookName())
+                        - StringUtils.getSimilarity(mSearchString, rhs.getBookName());
+                if (similarityDiff == 0) {
+                    // if book name equals, sort by author
+                    double similarityAuthorDiff = StringUtils.getSimilarity(mSearchString, lhs.getAuthor())
+                            - StringUtils.getSimilarity(mSearchString, rhs.getAuthor());
+                    if (similarityAuthorDiff == 0) {
+                        return -1;
+                    } else {
+                        return similarityAuthorDiff > 0 ? -1 : 1;
+                    }
+                } else {
+                    return similarityDiff > 0 ? -1 : 1;
+                }
+            }
         }
     }
 }

@@ -6,7 +6,6 @@ import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.book.Rank;
 import org.foree.bookreader.bean.book.Source;
-import org.foree.bookreader.utils.DateUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -16,7 +15,6 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -117,10 +115,10 @@ public class ThirdSourceParser extends AbstractWebParser {
 
         String searchBookName = bookKey.split(SPLIT_KEY)[0];
         List<Book> searchResult = searchBook(searchBookName, null);
-        for(Book book: searchResult){
+        for (Book book : searchResult) {
             String resultBookKey = book.getBookName() + SPLIT_KEY + book.getAuthor();
             // congratulation !! you get a book source
-            if(bookKey.equals(resultBookKey)){
+            if (bookKey.equals(resultBookKey)) {
                 Book bookInfo = getBookInfo(getValidRealId(book.getBookUrl()));
                 Source source = new Source();
                 source.setSourceName(mWebInfo.getBookSourceName());
@@ -238,7 +236,7 @@ public class ThirdSourceParser extends AbstractWebParser {
 
                 List<Chapter> chapters = parseContents(bookUrl, contentUrl);
 
-                book.setRectentChapterTitle(chapters.get(chapters.size() -1).getChapterTitle());
+                book.setRectentChapterTitle(chapters.get(chapters.size() - 1).getChapterTitle());
                 book.setChapters(chapters);
             }
 
@@ -249,7 +247,7 @@ public class ThirdSourceParser extends AbstractWebParser {
         return book;
     }
 
-    private List<Chapter> parseContents(String bookUrl, String contentsUrl){
+    private List<Chapter> parseContents(String bookUrl, String contentsUrl) {
         List<Chapter> chapters = new ArrayList<>();
 
         try {
@@ -275,7 +273,7 @@ public class ThirdSourceParser extends AbstractWebParser {
                     }
                 }
             }
-        }catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 

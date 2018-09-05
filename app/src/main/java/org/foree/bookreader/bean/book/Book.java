@@ -2,6 +2,7 @@ package org.foree.bookreader.bean.book;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by foree on 16-7-26.
@@ -214,5 +215,23 @@ public class Book {
 
     public void setWordCount(int wordCount) {
         this.wordCount = wordCount;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Book book = (Book) o;
+        return Objects.equals(bookName, book.bookName) &&
+                Objects.equals(author, book.author);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(bookName, author);
     }
 }
