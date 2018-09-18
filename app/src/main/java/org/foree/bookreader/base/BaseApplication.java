@@ -13,11 +13,14 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
 
+import org.foree.bookreader.bean.book.Book;
+import org.foree.bookreader.bean.dao.BookDao;
 import org.foree.bookreader.receiver.BootReceiver;
 import org.foree.bookreader.service.SyncService;
 import org.foree.bookreader.settings.SettingsActivity;
 
 import java.io.File;
+import java.util.List;
 
 import cn.bmob.v3.Bmob;
 import cn.bmob.v3.BmobInstallation;
@@ -91,7 +94,8 @@ public class BaseApplication extends Application {
             }
         });
 
-
+        // fix old book url style
+        fixBookUrlOldStyle(this);
     }
 
     private long getInterval() {
@@ -127,6 +131,30 @@ public class BaseApplication extends Application {
             pm.setComponentEnabledSetting(receiver,
                     PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
                     PackageManager.DONT_KILL_APP);
+        }
+    }
+
+    private void fixBookUrlOldStyle(final Context context) {
+        if (GlobalConfig.getInstance().getVersionCode() <= 9) {
+            new Thread() {
+                @Override
+                public void run() {
+                    super.run();
+                    BookDao bookDao = new BookDao(context);
+                    List<Book> allBooks = bookDao.getAllBooks();
+                    for (Book book : allBooks) {
+                        if (!book.getBookUrl().contains(GlobalConfig.MAGIC_SPLIT_KEY)) {
+                            String oldBookUrl = book.getBookUrl();
+
+                            // update bookUrl firstly
+
+                            bookDao.updateOldBookStyle(oldBookUrl);
+
+                            // update content url secondly
+                        }
+                    }
+                }
+            }.start();
         }
     }
 

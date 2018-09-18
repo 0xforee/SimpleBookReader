@@ -6,6 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
 
+import org.foree.bookreader.base.GlobalConfig;
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.utils.DateUtils;
@@ -90,6 +91,28 @@ public class BookDao {
                 selection,
                 new String[]{bookUrl}
         );
+    }
+
+    /**
+     * 更新旧版本bookUrl格式为新格式
+     * @param oldBookUrl 旧版本格式
+     */
+    public void updateOldBookStyle(String oldBookUrl) {
+        ContentValues contentValues = new ContentValues();
+        String selection = BReaderContract.Books.COLUMN_NAME_BOOK_URL + "=?";
+
+        // 更新为新版本bookUrl格式
+        String newBookUrl = "http://api.zhuishu.com" + GlobalConfig.MAGIC_SPLIT_KEY + oldBookUrl;
+        contentValues.put(BReaderContract.Books.COLUMN_NAME_BOOK_URL, newBookUrl);
+
+        mResolver.update(
+                BReaderProvider.CONTENT_URI_BOOKS,
+                contentValues,
+                selection,
+                new String[]{oldBookUrl}
+        );
+
+        //
     }
 
     public void addBook(Book book) {
