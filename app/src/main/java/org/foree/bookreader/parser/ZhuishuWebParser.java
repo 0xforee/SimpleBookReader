@@ -207,8 +207,9 @@ public class ZhuishuWebParser extends AbstractWebParser {
     public List<Rank> getHomePageInfo() {
         List<Rank> books = new ArrayList<>();
         String bookRankListApi = "http://api.zhuishushenqi.com/ranking/gender";
-        String[] groups = new String[]{"male", "female", "picture", "epub"};
-        String[] groupsShowName = new String[]{"男生", "女生", "漫画", "出版物"};
+        String[] groups = new String[]{"male", "female"};
+        String[] groupsShowName = new String[]{"男生", "女生"};
+        String defaultIconUrl = "http://statics.zhuishushenqi.com/ranking-cover/142319144267827";
 
         try {
             Document document = Jsoup.connect(bookRankListApi).ignoreContentType(true).get();
@@ -223,7 +224,7 @@ public class ZhuishuWebParser extends AbstractWebParser {
                         Rank rank = new Rank.Builder()
                                 .id(content.getString("_id"))
                                 .title(content.getString("title"))
-                                .cover(mImageApi + content.getString("cover"))
+                                .cover(content.has("monthRank")? mImageApi + content.getString("cover") : defaultIconUrl)
                                 .collapse(content.getBoolean("collapse"))
                                 .monthRank(content.has("monthRank") ? content.getString("monthRank") : "")
                                 .totalRank(content.has("totalRank") ? content.getString("totalRank") : "")
