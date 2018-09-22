@@ -168,7 +168,9 @@ public class ThirdSourceParser extends AbstractWebParser {
                 try {
                     // book name
                     String bookName = getElementString(mWebInfo.getRuleSearchName(), target);
-                    Log.d(TAG, "bookName = " + bookName);
+                    if (DEBUG) {
+                        Log.d(TAG, "bookName = " + bookName);
+                    }
                     if ("".equals(bookName)) {
                         continue;
                     }
@@ -184,7 +186,7 @@ public class ThirdSourceParser extends AbstractWebParser {
 
                     // ruleSearchCoverUrl
                     String ruleSearchCoverUrl = getElementString(mWebInfo.getRuleSearchCoverUrl(), target);
-                    if(DEBUG) {
+                    if (DEBUG) {
                         Log.d(TAG, "bookAuthor = " + bookAuthor + ", lastChapter = " + lastChapter + ", searchKind = " + searchKind
                                 + ", ruleSearchNoteUrl = " + ruleSearchNoteUrl + ", ruleSearchCoverUrl = " + ruleSearchCoverUrl);
                     }

@@ -1,6 +1,7 @@
 package org.foree.bookreader.bookinfopage;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -40,9 +41,12 @@ import org.foree.bookreader.R;
 import org.foree.bookreader.base.BaseActivity;
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Review;
+import org.foree.bookreader.bean.dao.BReaderContract;
+import org.foree.bookreader.bean.dao.BReaderProvider;
 import org.foree.bookreader.bean.dao.BookDao;
 import org.foree.bookreader.parser.WebParser;
 import org.foree.bookreader.readpage.ReadActivity;
+import org.foree.bookreader.service.BookAddService;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -69,6 +73,7 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
 
     private int mDisplayWidth;
     private PopupWindow mActionPopMenu;
+    private boolean mBookAdded;
 
     private static final int STATE_FAILED = -1;
     private static final int STATE_LOADING = 0;
@@ -165,13 +170,14 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
         mFrameBack.setBackgroundColor(getResources().getColor(R.color.primary));
 
         // update toolbar top margin
-        int statbarHeight = -1;
-        statbarHeight = getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (statbarHeight > 0) {
-            statbarHeight = getResources().getDimensionPixelSize(statbarHeight);
+        int statusBarHeight = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (statusBarHeight > 0) {
+            statusBarHeight = getResources().getDimensionPixelSize(statusBarHeight);
             FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) toolbar.getLayoutParams();
-            Log.d(TAG, "[foree] initLayout: statusbarHeight = " + statbarHeight);
-            layoutParams.topMargin = statbarHeight;
+            if (DEBUG) {
+                Log.d(TAG, "initLayout: statusbarHeight = " + statusBarHeight);
+            }
+            layoutParams.topMargin = statusBarHeight;
             mContent.updateViewLayout(toolbar, layoutParams);
         }
 
@@ -252,10 +258,20 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
                     // get comments
                     List<Review> tmp = WebParser.getInstance().getLongReviews(bookUrl);
                     final List<Review> reviews = new ArrayList<>();
-                    if (tmp == null){
+                    if (tmp == null) {
 
-                    }else{
+                    } else {
                         reviews.addAll(tmp);
+                    }
+
+                    String selection = BReaderContract.Books.COLUMN_NAME_BOOK_URL + "=?";
+                    Cursor cursor = getContentResolver().query(BReaderProvider.CONTENT_URI_BOOKS, null,
+                            selection, new String[]{bookUrl}, null);
+                    if (cursor != null) {
+                        if (cursor.getCount() > 0) {
+                            mBookAdded = true;
+                        }
+                        cursor.close();
                     }
 
                     // update UI
@@ -263,6 +279,7 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
                         @Override
                         public void run() {
                             updateBookInfo(mBook, reviews);
+                            updateAddState(mBookAdded);
                         }
                     });
 
@@ -350,11 +367,12 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
                 break;
             case R.id.bt_bookinfo_add:
                 mBook.setUpdateTime(new Date());
-                bookDao.addBook(mBook);
+                Intent bookAddIntent = new Intent(BookInfoActivity.this, BookAddService.class);
+                bookAddIntent.putExtra(BookAddService.EXTRA_PARAM1, bookUrl);
+                startService(bookAddIntent);
 
-                // update bt_add
-                mBtAdd.setText(getResources().getText(R.string.bookinfo_menu_added));
-                mBtAdd.setEnabled(false);
+                // update book added state
+                updateAddState(true);
                 break;
             case R.id.bt_bookinfo_download:
                 Toast.makeText(getApplicationContext(), R.string.about_tips, Toast.LENGTH_SHORT).show();
@@ -366,7 +384,9 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
     private Bitmap createFrameBlurBackground(Bitmap source) {
         int width = source.getWidth();
         int height = source.getHeight();
-        Log.d(TAG, "[foree] createFrameBlurBackground: width = " + width + ", height = " + height);
+        if (DEBUG) {
+            Log.d(TAG, "[foree] createFrameBlurBackground: width = " + width + ", height = " + height);
+        }
         Matrix matrix = new Matrix();
 
         // 裁剪中间1/3，然后放大模糊
@@ -384,5 +404,16 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
                 ddd.getWidth(), ddd.getHeight(), matrix, true);
 
         return NativeStackBlur.process(dest, 200);
+    }
+
+    private void updateAddState(boolean added) {
+        if (added) {
+            // update bt_add
+            mBtAdd.setText(getResources().getText(R.string.bookinfo_menu_added));
+            mBtAdd.setEnabled(false);
+        } else {
+            mBtAdd.setText(getResources().getText(R.string.bookinfo_menu_add));
+            mBtAdd.setEnabled(true);
+        }
     }
 }

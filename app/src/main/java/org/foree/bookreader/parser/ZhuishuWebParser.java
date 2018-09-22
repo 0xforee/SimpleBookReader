@@ -224,7 +224,7 @@ public class ZhuishuWebParser extends AbstractWebParser {
                         Rank rank = new Rank.Builder()
                                 .id(content.getString("_id"))
                                 .title(content.getString("title"))
-                                .cover(content.has("monthRank")? mImageApi + content.getString("cover") : defaultIconUrl)
+                                .cover(content.has("monthRank") ? mImageApi + content.getString("cover") : defaultIconUrl)
                                 .collapse(content.getBoolean("collapse"))
                                 .monthRank(content.has("monthRank") ? content.getString("monthRank") : "")
                                 .totalRank(content.has("totalRank") ? content.getString("totalRank") : "")
@@ -236,10 +236,10 @@ public class ZhuishuWebParser extends AbstractWebParser {
                     }
                 }
 
-                for (Rank rank :
-                        books) {
-                    Log.d(TAG, rank.toString());
-
+                if (DEBUG) {
+                    for (Rank rank : books) {
+                        Log.d(TAG, rank.toString());
+                    }
                 }
 
             }
