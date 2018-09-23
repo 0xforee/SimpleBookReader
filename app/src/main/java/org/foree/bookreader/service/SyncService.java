@@ -1,71 +1,126 @@
 package org.foree.bookreader.service;
 
+import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import org.foree.bookreader.R;
+import org.foree.bookreader.bean.book.Book;
+import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.dao.BookDao;
 import org.foree.bookreader.bean.event.BookUpdateEvent;
 import org.foree.bookreader.homepage.BookShelfActivity;
-import org.foree.bookreader.thread.SyncBooksThread;
+import org.foree.bookreader.parser.WebParser;
+import org.foree.bookreader.utils.DateUtils;
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
-public class SyncService extends Service {
-    public static final String TAG = SyncService.class.getSimpleName();
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+
+/**
+ * @author foree
+ * @date 2018/9/22
+ */
+public class SyncService extends IntentService {
+    private static final String TAG = "SyncService";
+    public static final String ACTION_SYNC = "org.foree.bookreader.service.sync";
+    public static final String ACTION_ADD = "org.foree.bookreader.service.add";
+    public static final String EXTRA_PARAM_BOOK_URL = "bookUrl";
+    public static final String EXTRA_NOTIFY = "notify";
+    private static final boolean DEBUG = true;
+
+    private BookDao mBookDao;
 
     public SyncService() {
+        super("SyncService");
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        EventBus.getDefault().register(this);
+        mBookDao = new BookDao(this);
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        EventBus.getDefault().unregister(this);
+    protected void onHandleIntent(Intent intent) {
+        if (intent != null) {
+            final String action = intent.getAction();
+            if(ACTION_SYNC.equals(action)){
+                handleActionSync(intent);
+            }else if(ACTION_ADD.equals(action)){
+                handleActionAdd(intent);
+            }
+        }
     }
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
+    private void handleActionSync(Intent intent){
+        boolean notify = intent.getBooleanExtra(EXTRA_NOTIFY, false);
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        // start sync
-        BookDao bookDao = new BookDao(getApplicationContext());
-        SyncBooksThread syncBooksThread = new SyncBooksThread(bookDao);
+        long startTime = System.currentTimeMillis();
+        ArrayList<Book> updatedBooks = new ArrayList<>();
+        List<Book> books = mBookDao.getAllBooks();
 
-        syncBooksThread.start();
-        return super.onStartCommand(intent, flags, startId);
+        try {
+            for (Book oldBook : books) {
+                if (oldBook != null) {
+                    final Book newBook = WebParser.getInstance().getBookInfo(oldBook.getBookUrl());
+                    if (newBook.getUpdateTime().after(oldBook.getUpdateTime())) {
+                        Log.d(TAG, "get chapters");
+                        List<Chapter> chapters = WebParser.getInstance().getContents(newBook.getBookUrl(), newBook.getContentUrl());
+                        if (chapters != null) {
+                            // TODO: 检查切换源会不会导致原有的章节缓存没有删除
+                            mBookDao.insertChapters(oldBook.getBookUrl(), chapters);
+                        }
 
-    }
+                        mBookDao.updateBookTime(newBook.getBookUrl(), DateUtils.formatDateToString(newBook.getUpdateTime()));
+                        updatedBooks.add(newBook);
+                    }
+                }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(final BookUpdateEvent bookUpdateEvent) {
-        Log.d(TAG, "on SyncService: updated = " + bookUpdateEvent.getUpdatedNum());
+            }
+        } catch (Exception e) {
+            Log.e(TAG, e.toString());
+        }
 
-        int updatedNovelNum = bookUpdateEvent.getUpdatedNum();
+        // notify update anyway（不能总是更新，如果检查失败，发送空内容）
+        BookUpdateEvent bookEvent = new BookUpdateEvent(updatedBooks);
+        Log.d(TAG, "post event bus");
+        EventBus.getDefault().post(bookEvent);
+
+        Log.d(TAG, "costs " + (System.currentTimeMillis() - startTime) + " ms to check update, updated " + updatedBooks.size());
 
         // update UI
-        if (updatedNovelNum > 0) {
-            String title = updatedNovelNum + "本小说更新啦";
-            String message = bookUpdateEvent.getUpdateBooksName();
+        if (notify && updatedBooks.size() > 0) {
+            String title = updatedBooks.size() + "本小说更新啦";
+            String message = bookEvent.getUpdateBooksName();
 
             // send notification
             sendNotification(title, message);
+        }
+    }
+
+    private void handleActionAdd(Intent intent){
+        // get book url first
+        String bookUrl = intent.getStringExtra(EXTRA_PARAM_BOOK_URL);
+
+        Book book = WebParser.getInstance().getBookInfo(bookUrl);
+        if (book != null) {
+            book.setUpdateTime(new Date());
+            // get chapters
+            book.setChapters(WebParser.getInstance().getContents(bookUrl, book.getContentUrl()));
+            mBookDao.addBook(book);
+            if (DEBUG) {
+                Log.d(TAG, "[foree] add book End");
+            }
+        } else {
+            Log.e(TAG, "[foree] onHandleIntent: book is null, add error");
         }
 
     }

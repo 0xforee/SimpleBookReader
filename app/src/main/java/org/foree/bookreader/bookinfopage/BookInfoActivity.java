@@ -46,7 +46,7 @@ import org.foree.bookreader.bean.dao.BReaderProvider;
 import org.foree.bookreader.bean.dao.BookDao;
 import org.foree.bookreader.parser.WebParser;
 import org.foree.bookreader.readpage.ReadActivity;
-import org.foree.bookreader.service.BookAddService;
+import org.foree.bookreader.service.SyncService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -365,8 +365,9 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
                 startActivity(intent);
                 break;
             case R.id.bt_bookinfo_add:
-                Intent bookAddIntent = new Intent(BookInfoActivity.this, BookAddService.class);
-                bookAddIntent.putExtra(BookAddService.EXTRA_PARAM1, bookUrl);
+                Intent bookAddIntent = new Intent(BookInfoActivity.this, SyncService.class);
+                bookAddIntent.setAction(SyncService.ACTION_ADD);
+                bookAddIntent.putExtra(SyncService.EXTRA_PARAM_BOOK_URL, bookUrl);
                 startService(bookAddIntent);
 
                 // update book added state

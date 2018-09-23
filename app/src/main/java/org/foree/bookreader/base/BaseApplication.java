@@ -68,6 +68,8 @@ public class BaseApplication extends Application {
         //init background data sync
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(this, SyncService.class);
+        intent.setAction(SyncService.ACTION_SYNC);
+        intent.putExtra(SyncService.EXTRA_NOTIFY, true);
         alarmIntent = PendingIntent.getService(this, 0, intent, 0);
 
         if (GlobalConfig.getInstance().isSyncEnable()) {

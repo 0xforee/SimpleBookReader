@@ -28,7 +28,7 @@ import org.foree.bookreader.bean.dao.BReaderProvider;
 import org.foree.bookreader.bean.dao.BookDao;
 import org.foree.bookreader.bean.event.BookUpdateEvent;
 import org.foree.bookreader.readpage.ReadActivity;
-import org.foree.bookreader.thread.SyncBooksThread;
+import org.foree.bookreader.service.SyncService;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -46,8 +46,6 @@ public class BookShelfFragment extends Fragment implements SwipeRefreshLayout.On
     private RecyclerView mRecyclerView;
     private BookShelfAdapter mAdapter;
     private List<Book> bookList = new ArrayList<>();
-
-    private Thread syncThread;
 
     SwipeRefreshLayout mSwipeRefreshLayout;
 
@@ -177,8 +175,13 @@ public class BookShelfFragment extends Fragment implements SwipeRefreshLayout.On
             }
 
             // if refresh start, get newer book info
-            syncThread = new SyncBooksThread(bookDao);
-            syncThread.start();
+            if(bookShelfActivity != null) {
+                Intent intent = new Intent(bookShelfActivity, SyncService.class);
+                intent.setAction(SyncService.ACTION_SYNC);
+                intent.putExtra(SyncService.EXTRA_NOTIFY, false);
+                bookShelfActivity.startService(intent);
+                Log.d(TAG, "start sync");
+            }
 
         } else {
             // bookList is empty, set refresh false
@@ -205,8 +208,6 @@ public class BookShelfFragment extends Fragment implements SwipeRefreshLayout.On
         super.onDestroy();
 
         EventBus.getDefault().unregister(this);
-        if (syncThread != null && !syncThread.isInterrupted())
-            syncThread.interrupt();
 
         getContext().getContentResolver().unregisterContentObserver(bookObserver);
     }
