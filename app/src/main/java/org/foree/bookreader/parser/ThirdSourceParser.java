@@ -287,7 +287,7 @@ public class ThirdSourceParser extends AbstractWebParser {
         try {
             Document doc = Jsoup.connect(chapterUrl).ignoreContentType(true).get();
             if (doc != null) {
-                content = getElementString(mWebInfo.getRuleBookContent(), doc.body());
+                content = getElementString(mWebInfo.getRuleBookContent(), doc.body(), true);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -325,6 +325,10 @@ public class ThirdSourceParser extends AbstractWebParser {
     }
 
     private String getElementString(String ruleString, Element target) {
+        return getElementString(ruleString, target, false);
+    }
+
+    private String getElementString(String ruleString, Element target, boolean warpLineBreak) {
         if (DEBUG) {
             Log.d(TAG, "getElementString() called with: ruleString = [" + ruleString + "]");
         }
@@ -346,7 +350,7 @@ public class ThirdSourceParser extends AbstractWebParser {
                 String temp = "";
                 switch (subRules[0]) {
                     case "text":
-                        temp = el.text();
+                        temp = el.text() + (warpLineBreak ? "\n" : "");
                         break;
                     case "href":
                         temp = el.attr("abs:href");
@@ -357,10 +361,13 @@ public class ThirdSourceParser extends AbstractWebParser {
                     case "textNodes":
                         StringBuilder sb = new StringBuilder();
                         for (TextNode tn : el.textNodes()) {
-                            sb.append(tn.text()).append("\n");
-                            ;
+                            sb.append(tn.getWholeText());
+                            if(!tn.getWholeText().trim().isEmpty()){
+                                sb.append("\n");
+                            }
                         }
-                        temp = sb.toString();
+                        // 去除合并之后文章的开头结尾空格
+                        temp = sb.toString().trim();
                         break;
                     default:
                 }
