@@ -8,6 +8,8 @@ import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.dao.BookDao;
 import org.foree.bookreader.parser.WebParser;
 
+import java.util.Date;
+
 
 /**
  * @author foree
@@ -30,6 +32,7 @@ public class BookAddService extends IntentService {
 
             Book book = WebParser.getInstance().getBookInfo(bookUrl);
             if (book != null) {
+                book.setUpdateTime(new Date());
                 // get chapters
                 book.setChapters(WebParser.getInstance().getContents(bookUrl, book.getContentUrl()));
                 BookDao bookDao = new BookDao(this);

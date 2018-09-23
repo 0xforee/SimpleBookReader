@@ -49,7 +49,6 @@ import org.foree.bookreader.readpage.ReadActivity;
 import org.foree.bookreader.service.BookAddService;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -366,7 +365,6 @@ public class BookInfoActivity extends BaseActivity implements View.OnClickListen
                 startActivity(intent);
                 break;
             case R.id.bt_bookinfo_add:
-                mBook.setUpdateTime(new Date());
                 Intent bookAddIntent = new Intent(BookInfoActivity.this, BookAddService.class);
                 bookAddIntent.putExtra(BookAddService.EXTRA_PARAM1, bookUrl);
                 startService(bookAddIntent);
