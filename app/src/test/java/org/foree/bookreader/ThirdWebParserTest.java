@@ -18,6 +18,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author foree
@@ -28,7 +30,7 @@ public class ThirdWebParserTest {
     private static final String TAG = "ThirdWebParserTest";
     private static String TEST_KEYWORD = "五行天";
     private static String TEST_BOOK_URL = "http://www.b5200.net/5_5864/";
-    private static String TEST_CHAPTER_URL = "http://www.b5200.net/67_67077/149766192.html";
+    private static String TEST_CHAPTER_URL = "https://www.xxbiquge.com/17_17669/9184308.html";
     private static final String TEST_SOURCE_PATH = "F:\\Android\\文档\\source_test.json";
     private static final String TEST_SOME_SOURCE_PATH = "F:\\Android\\文档\\sources.json";
     JSONObject mSourceObject;
@@ -82,6 +84,50 @@ public class ThirdWebParserTest {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    private String getRuleContent(String url, String rule){
+        String pattern = "http[s]*://[^/]+";
+        Pattern r = Pattern.compile(pattern);
+
+        Matcher urlMatcher = r.matcher(url);
+        if(urlMatcher.find()){
+            url = urlMatcher.group(0);
+        }
+
+        // load test source json
+        StringBuffer sb = new StringBuffer();
+        try {
+            byte[] temp = new byte[1024];
+            InputStream f = new FileInputStream(TEST_SOURCE_PATH);
+
+            while (f.read(temp) != -1) {
+                sb.append(new String(temp));
+            }
+
+            f.close();
+
+            JSONArray array = new JSONArray(sb.toString());
+            for(int i=0; i < array.length(); i++){
+                JSONObject object = array.getJSONObject(i);
+                Matcher matcher = r.matcher(object.getString("bookSourceUrl"));
+                if(matcher.find()){
+                    String result = matcher.group(0);
+                    if(result.equals(url)){
+                        return object.getString(rule);
+                    }
+                }
+
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return "";
     }
 
 
@@ -182,7 +228,8 @@ public class ThirdWebParserTest {
 
     @Test
     public void testChapter() {
-        String result = getChapter(TEST_CHAPTER_URL);
+        String result = getChapter("https://www.xxbiquge.com/17_17669/9184308.html");
+//        String result = getChapter("http://www.biqux.com/xiangmichenchenjinrushuang/4048318.html");
         Log.d(TAG, "content = " + result);
     }
 
@@ -305,11 +352,9 @@ public class ThirdWebParserTest {
         try {
             Document doc = Jsoup.connect(chapterUrl).ignoreContentType(true).get();
             if (doc != null) {
-                content = getElementString(mSourceObject.getString("ruleBookContent"), doc.body());
+                content = getElementString(getRuleContent(chapterUrl, "ruleBookContent"), doc.body());
             }
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
             e.printStackTrace();
         }
         return content;
@@ -374,9 +419,13 @@ public class ThirdWebParserTest {
                     case "textNodes":
                         StringBuilder sb = new StringBuilder();
                         for (TextNode tn : el.textNodes()) {
-                            sb.append(tn.text()).append("\n");
+                            sb.append(tn.getWholeText());
+                            if(!tn.getWholeText().trim().isEmpty()){
+                                sb.append("\n");
+                            }
                         }
-                        temp = sb.toString();
+                        // 去除合并之后文章的开头结尾非法字符
+                        temp = sb.toString().trim();
                         break;
                 }
 
