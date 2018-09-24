@@ -6,7 +6,9 @@ import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.book.Rank;
 import org.foree.bookreader.bean.book.Review;
+import org.foree.bookreader.bean.book.SearchHotWord;
 import org.foree.bookreader.bean.book.Source;
+import org.foree.bookreader.searchpage.SearchHistoryView;
 import org.foree.bookreader.utils.DateUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -477,4 +479,31 @@ public class ZhuishuWebParser extends AbstractWebParser {
         return rankList;
     }
 
+    /**
+     * get search hot words
+     *
+     * @return hot word list
+     */
+    @Override
+    public List<SearchHotWord> getSearchHotWords() {
+        String hotApi = "http://api08mgip.zhuishushenqi.com/book/search-hotwords";
+        List<SearchHotWord> words = new ArrayList<>();
+
+        try {
+            Document document = Jsoup.connect(hotApi).ignoreContentType(true).get();
+            if(document != null){
+                JSONArray jsonArray = new JSONObject(document.body().text()).getJSONArray("searchHotWords");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    SearchHotWord hotWord = new SearchHotWord();
+                    hotWord.setWord(jsonArray.getJSONObject(i).getString("word"));
+                    words.add(hotWord);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return words;
+    }
 }

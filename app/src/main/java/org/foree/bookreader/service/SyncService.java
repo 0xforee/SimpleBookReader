@@ -10,15 +10,21 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import org.foree.bookreader.R;
+import org.foree.bookreader.base.GlobalConfig;
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
+import org.foree.bookreader.bean.book.SearchHotWord;
 import org.foree.bookreader.bean.dao.BookDao;
 import org.foree.bookreader.bean.event.BookUpdateEvent;
 import org.foree.bookreader.homepage.BookShelfActivity;
+import org.foree.bookreader.net.NetCallback;
 import org.foree.bookreader.parser.WebParser;
 import org.foree.bookreader.utils.DateUtils;
+import org.foree.bookreader.utils.FileUtils;
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -31,9 +37,12 @@ import java.util.List;
 public class SyncService extends IntentService {
     private static final String TAG = "SyncService";
     public static final String ACTION_SYNC = "org.foree.bookreader.service.sync";
+    public static final String EXTRA_NOTIFY = "notify";
+
     public static final String ACTION_ADD = "org.foree.bookreader.service.add";
     public static final String EXTRA_PARAM_BOOK_URL = "bookUrl";
-    public static final String EXTRA_NOTIFY = "notify";
+
+    public static final String ACTION_HOTWORD = "org.foree.bookreader.service.hotwords";
     private static final boolean DEBUG = true;
 
     private BookDao mBookDao;
@@ -52,15 +61,59 @@ public class SyncService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
             final String action = intent.getAction();
-            if(ACTION_SYNC.equals(action)){
+            if (ACTION_SYNC.equals(action)) {
                 handleActionSync(intent);
-            }else if(ACTION_ADD.equals(action)){
+            } else if (ACTION_ADD.equals(action)) {
                 handleActionAdd(intent);
+            } else if (ACTION_HOTWORD.equals(action)) {
+                handleActionHotword(intent);
             }
         }
     }
 
-    private void handleActionSync(Intent intent){
+    private void handleActionHotword(Intent intent) {
+        File externalDir = getExternalFilesDir("");
+        if (externalDir != null) {
+            try {
+                if (externalDir.isDirectory()) {
+                    final File hotwords = new File(externalDir, GlobalConfig.FILE_NAME_SEARCH_HOTWORD);
+                    boolean shouldSync = !hotwords.exists() || System.currentTimeMillis() - hotwords.lastModified() > 1000 * 60;
+                    if (!hotwords.exists()) {
+                        hotwords.createNewFile();
+                    }
+
+                    if (shouldSync) {
+                        WebParser.getInstance().getHotWordsAsync("", new NetCallback<List<SearchHotWord>>() {
+                            @Override
+                            public void onSuccess(final List<SearchHotWord> data) {
+                                StringBuilder sb = new StringBuilder();
+                                for (int i = 0; i < data.size(); i++) {
+                                    sb.append(data.get(i).getWord()).append(" ");
+                                }
+                                try {
+                                    FileUtils.writeFile(hotwords, sb.toString());
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void onFail(String msg) {
+
+                            }
+                        });
+                    }
+
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Log.e(TAG, "handleActionHotword: exteranl dir is null");
+        }
+    }
+
+    private void handleActionSync(Intent intent) {
         boolean notify = intent.getBooleanExtra(EXTRA_NOTIFY, false);
 
         long startTime = System.currentTimeMillis();
@@ -106,7 +159,7 @@ public class SyncService extends IntentService {
         }
     }
 
-    private void handleActionAdd(Intent intent){
+    private void handleActionAdd(Intent intent) {
         // get book url first
         String bookUrl = intent.getStringExtra(EXTRA_PARAM_BOOK_URL);
 

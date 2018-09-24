@@ -3,6 +3,7 @@ package org.foree.bookreader.parser;
 import org.foree.bookreader.base.GlobalConfig;
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Review;
+import org.foree.bookreader.bean.book.SearchHotWord;
 import org.foree.bookreader.bean.book.Source;
 
 import java.util.HashMap;
@@ -69,6 +70,15 @@ abstract class AbstractWebParser implements IWebParser {
         return null;
     }
 
+    /**
+     * get search hot words
+     *
+     * @return hot word list
+     */
+    @Override
+    public List<SearchHotWord> getSearchHotWords() {
+        return null;
+    }
 
     String wrapSplitKey(String url){
         return getWebInfo().getHostUrl() + SPLIT_KEY + url;

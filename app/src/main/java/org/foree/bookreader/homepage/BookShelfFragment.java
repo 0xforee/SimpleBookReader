@@ -175,8 +175,14 @@ public class BookShelfFragment extends Fragment implements SwipeRefreshLayout.On
             }
 
             // if refresh start, get newer book info
-            if(bookShelfActivity != null) {
+            if (bookShelfActivity != null) {
                 Intent intent = new Intent(bookShelfActivity, SyncService.class);
+                // sync hot word
+                intent.setAction(SyncService.ACTION_HOTWORD);
+                bookShelfActivity.startService(intent);
+                Log.d(TAG, "sync hot word");
+
+                // sync book update
                 intent.setAction(SyncService.ACTION_SYNC);
                 intent.putExtra(SyncService.EXTRA_NOTIFY, false);
                 bookShelfActivity.startService(intent);
@@ -255,7 +261,7 @@ public class BookShelfFragment extends Fragment implements SwipeRefreshLayout.On
         }
 
         if (mActionMode != null) {
-            mActionMode.setTitle(String.valueOf(mAdapter.getSelectedCount() + "  " +getString(R.string.bookshelf_edit_tips)));
+            mActionMode.setTitle(String.valueOf(mAdapter.getSelectedCount() + "  " + getString(R.string.bookshelf_edit_tips)));
         }
     }
 

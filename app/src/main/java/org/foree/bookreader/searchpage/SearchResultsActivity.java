@@ -26,18 +26,22 @@ import android.widget.TextView;
 
 import org.foree.bookreader.R;
 import org.foree.bookreader.base.BaseActivity;
+import org.foree.bookreader.base.GlobalConfig;
 import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bookinfopage.BookInfoActivity;
 import org.foree.bookreader.net.NetCallback;
 import org.foree.bookreader.parser.WebParser;
+import org.foree.bookreader.utils.FileUtils;
 import org.foree.bookreader.utils.StringUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
 
-public class SearchResultsActivity extends BaseActivity {
+public class SearchResultsActivity extends BaseActivity implements SearchHistoryView.SearchWordClickCallback {
     private static final String TAG = SearchResultsActivity.class.getSimpleName();
     private RecyclerView mRecyclerView;
     private SearchListAdapter mAdapter;
@@ -46,6 +50,7 @@ public class SearchResultsActivity extends BaseActivity {
     EditText mEtSearchText;
     private String mSearchString;
     SwipeRefreshLayout mSwipeRefreshLayout;
+    SearchHistoryView mSearchHistoryView;
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -125,20 +130,28 @@ public class SearchResultsActivity extends BaseActivity {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
                 if (i == EditorInfo.IME_ACTION_SEARCH) {
-                    mSearchString = textView.getText().toString();
                     hideKeyBoard();
                     mSwipeRefreshLayout.setRefreshing(true);
-                    handlerSearch(mSearchString);
+                    handlerSearch(textView.getText().toString());
 
                 }
                 return false;
             }
         });
 
+        mSearchHistoryView = (SearchHistoryView) findViewById(R.id.view_search_history);
+        mSearchHistoryView.setOnClickCallback(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        handleSearchWordUpdate();
     }
 
     private void handlerSearch(String query) {
         Log.d(TAG, "query keywords = " + query);
+        mSearchString = query;
 
         WebParser.getInstance().searchBookAsync(null, query, new NetCallback<List<Book>>() {
             @Override
@@ -168,6 +181,25 @@ public class SearchResultsActivity extends BaseActivity {
         });
     }
 
+    private void handleSearchWordUpdate() {
+        if (getExternalFilesDir("") != null) {
+            File hotwords = new File(getExternalFilesDir(""), GlobalConfig.FILE_NAME_SEARCH_HOTWORD);
+            try {
+                String out = FileUtils.readFile(hotwords);
+                if (!out.isEmpty()) {
+                    String[] result = out.split(" ");
+                    mSearchHistoryView.inflateFromSearchHot(result);
+                } else {
+                    mSearchHistoryView.inflateFromSearchHot(null);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            mSearchHistoryView.inflateFromSearchHot(null);
+        }
+    }
+
     private void hideKeyBoard() {
         InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
@@ -192,6 +224,7 @@ public class SearchResultsActivity extends BaseActivity {
             //showKeyboard();
             bookList.clear();
             mAdapter.notifyDataSetChanged();
+            mSearchHistoryView.setVisibility(View.VISIBLE);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -260,6 +293,19 @@ public class SearchResultsActivity extends BaseActivity {
         for (int i = 0; i < toolbar.getChildCount(); i++) {
             toolbar.getChildAt(i).setVisibility(View.VISIBLE);
         }
+    }
+
+    /**
+     * 按钮之后
+     *
+     * @param word 需要传入的关键字
+     */
+    @Override
+    public void onClick(String word) {
+        handlerSearch(word);
+        mEtSearchText.setText(word);
+        mEtSearchText.setSelection(word.length());
+        mSearchHistoryView.setVisibility(View.GONE);
     }
 
     private class BookComparator implements Comparator<Book> {

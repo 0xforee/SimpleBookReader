@@ -23,4 +23,8 @@
     <dimen name="book_info_popmenu_height">56dp</dimen>
     <dimen name="bookshelf_side_padding">12dp</dimen>
 
+    <!-- search hotwords and history page -->
+    <dimen name="search_hotwords_extra_space">12dp</dimen>
+    <dimen name="search_hotwords_extra_line_space">14dp</dimen>
+
 </resources>

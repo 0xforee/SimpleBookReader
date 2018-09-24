@@ -27,6 +27,8 @@ public class GlobalConfig {
 
     public static final String MAGIC_SPLIT_KEY = "~_~";
 
+    public static final String FILE_NAME_SEARCH_HOTWORD = "SearchHotWords";
+
     public static GlobalConfig getInstance() {
         return ourInstance;
     }

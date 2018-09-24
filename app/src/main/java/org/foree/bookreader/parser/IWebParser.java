@@ -4,6 +4,7 @@ import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.book.Rank;
 import org.foree.bookreader.bean.book.Review;
+import org.foree.bookreader.bean.book.SearchHotWord;
 import org.foree.bookreader.bean.book.Source;
 
 import java.util.List;
@@ -110,4 +111,10 @@ interface IWebParser {
      * @return book list of rankId
      */
     List<Book> getRankList(String rankId);
+
+    /**
+     * get search hot words
+     * @return hot word list
+     */
+    List<SearchHotWord> getSearchHotWords();
 }

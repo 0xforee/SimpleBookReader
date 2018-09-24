@@ -12,15 +12,12 @@ import org.foree.bookreader.bean.book.Book;
 import org.foree.bookreader.bean.book.Chapter;
 import org.foree.bookreader.bean.book.Rank;
 import org.foree.bookreader.bean.book.Review;
+import org.foree.bookreader.bean.book.SearchHotWord;
 import org.foree.bookreader.bean.book.Source;
 import org.foree.bookreader.net.NetCallback;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.SerializablePermission;
 import java.io.StringReader;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -56,7 +53,7 @@ public class WebParser {
         loadIfNecessary();
     }
 
-    private void loadIfNecessary(){
+    private void loadIfNecessary() {
 
         try {
             InputStream inputStream = BaseApplication.getInstance().getResources().openRawResource(R.raw.source_test);
@@ -81,12 +78,12 @@ public class WebParser {
             }
 
 
-        }catch (IOException e){
+        } catch (IOException e) {
             Log.e(TAG, e.toString());
         }
     }
 
-    private AbstractWebParser loadFromConfig(String sourceId){
+    private AbstractWebParser loadFromConfig(String sourceId) {
         // generate webInfo from config
 
         // init source to cachedMap
@@ -108,34 +105,36 @@ public class WebParser {
 
     /**
      * register source parser
+     *
      * @param sourceId
      * @param parser
      */
     public void registerParser(String sourceId, AbstractWebParser parser) {
-        if(!mParserMap.containsKey(sourceId)) {
+        if (!mParserMap.containsKey(sourceId)) {
             mParserMap.put(sourceId, parser);
         }
     }
 
     public void unRegisterParser(String sourceId) {
-        if(mParserMap.containsKey(sourceId)) {
+        if (mParserMap.containsKey(sourceId)) {
             mParserMap.remove(sourceId);
         }
     }
 
     /**
      * get parser by sourceId
+     *
      * @param sourceId id or url use for recognize parser
      * @return parser
      */
     private AbstractWebParser getWebParser(String sourceId) {
-        if(mParserMap.containsKey(sourceId)){
+        if (mParserMap.containsKey(sourceId)) {
             return mParserMap.get(sourceId);
-        }else{
+        } else {
             AbstractWebParser parser = loadFromConfig(sourceId);
-            if(parser == null) {
+            if (parser == null) {
                 return new NullWebParser();
-            }else{
+            } else {
                 return parser;
             }
         }
@@ -143,8 +142,9 @@ public class WebParser {
 
     /**
      * 异步搜索书籍
-     * @param sourceIds 需要发起搜索的sourceId列表，默认是全部
-     * @param keyword 关键字
+     *
+     * @param sourceIds   需要发起搜索的sourceId列表，默认是全部
+     * @param keyword     关键字
      * @param netCallback 异步回调
      */
     public void searchBookAsync(final List<String> sourceIds, final String keyword, final NetCallback<List<Book>> netCallback) {
@@ -162,7 +162,7 @@ public class WebParser {
                 data.put("start", "0");
 //        data.put("limit", "20");
 
-                if(sourceIds == null || sourceIds.isEmpty()){
+                if (sourceIds == null || sourceIds.isEmpty()) {
                     for (AbstractWebParser parser : mParserMap.values()) {
                         List<Book> results = parser.searchBook(keyword, data);
                         if (results != null) {
@@ -170,10 +170,10 @@ public class WebParser {
                         }
                         netCallback.onSuccess(new ArrayList<Book>(books));
                     }
-                }else{
+                } else {
                     for (String sourceId : sourceIds) {
                         List<Book> results = mParserMap.get(sourceId).searchBook(keyword, data);
-                        if(results != null){
+                        if (results != null) {
                             books.addAll(results);
                         }
                         netCallback.onSuccess(new ArrayList<Book>(books));
@@ -188,10 +188,11 @@ public class WebParser {
 
     /**
      * 兼容旧格式
-     * @param bookUrl 新版本包含sourceId；旧版本不含sourceId，只有bookId
+     *
+     * @param bookUrl     新版本包含sourceId；旧版本不含sourceId，只有bookId
      * @param netCallback 回调
      */
-    public void getBookInfoAsync(String bookUrl, NetCallback<Book> netCallback){
+    public void getBookInfoAsync(String bookUrl, NetCallback<Book> netCallback) {
         getBookInfoAsync(getValidSourceId(bookUrl), getValidRealId(bookUrl), netCallback);
     }
 
@@ -272,7 +273,8 @@ public class WebParser {
 
     /**
      * 获取书源
-     * @param bookId bookUrl or anyway
+     *
+     * @param bookId  bookUrl or anyway
      * @param bookKey bookName + KEY + bookAuthor，用于标识一本书
      * @return
      */
@@ -280,10 +282,10 @@ public class WebParser {
         List<Source> sourceList = new ArrayList<>();
         // if from zhuishu ,get source first
         AbstractWebParser currentParser = mParserMap.get(getValidSourceId(bookId));
-        if(currentParser instanceof ZhuishuWebParser){
+        if (currentParser instanceof ZhuishuWebParser) {
             sourceList.addAll(currentParser.getBookSource(getValidRealId(bookId)));
         }
-        for(AbstractWebParser parser : mParserMap.values()) {
+        for (AbstractWebParser parser : mParserMap.values()) {
             // skip zhuishu
             if (!(parser instanceof ZhuishuWebParser)) {
                 sourceList.addAll(parser.getBookSource(bookId, bookKey));
@@ -293,19 +295,19 @@ public class WebParser {
         return sourceList;
     }
 
-    public void getBookSourceAsync(final String bookId, final String bookKey, final NetCallback<List<Source>> netCallback){
-        new Thread(){
+    public void getBookSourceAsync(final String bookId, final String bookKey, final NetCallback<List<Source>> netCallback) {
+        new Thread() {
             @Override
             public void run() {
                 super.run();
                 List<Source> sourceList = new ArrayList<>();
                 // if from zhuishu ,get source first
                 AbstractWebParser currentParser = mParserMap.get(getValidSourceId(bookId));
-                if(currentParser instanceof ZhuishuWebParser){
+                if (currentParser instanceof ZhuishuWebParser) {
                     sourceList.addAll(currentParser.getBookSource(getValidRealId(bookId)));
                     netCallback.onSuccess(sourceList);
                 }
-                for(AbstractWebParser parser : mParserMap.values()) {
+                for (AbstractWebParser parser : mParserMap.values()) {
                     // skip zhuishu
                     if (!(parser instanceof ZhuishuWebParser)) {
                         sourceList.addAll(parser.getBookSource(bookId, bookKey));
@@ -355,14 +357,28 @@ public class WebParser {
         }.start();
     }
 
+    public void getHotWordsAsync(final String sourceId, final NetCallback<List<SearchHotWord>> netCallback) {
+        new Thread() {
+            @Override
+            public void run() {
+                super.run();
+                if (netCallback != null) {
+                    netCallback.onSuccess(getWebParser(getValidSourceId(sourceId)).getSearchHotWords());
+                }
+            }
+        }.start();
+
+    }
+
     /**
      * 获取合法的sourceId
+     *
      * @param url 新版本包含sourceId，旧版本不包含sourceId，使用默认的Id
      * @return sourceId
      */
-    private String getValidSourceId(String url){
+    private String getValidSourceId(String url) {
         String[] values = url.split(SPLIT_KEY);
-        if(values.length == 1){
+        if (values.length <= 1) {
             return DEFAULT_SOURCE_ID;
         }
 
@@ -371,14 +387,15 @@ public class WebParser {
 
     /**
      * 解析合法真实的Id（包括bookId, contentsId, chapterId)
+     *
      * @param url 可能为新、旧版本的id
      * @return 解析的真实Id
      */
-    private String getValidRealId(String url){
+    private String getValidRealId(String url) {
         String[] values = url.split(SPLIT_KEY);
-        if(values.length == 1){
+        if (values.length == 1) {
             return values[0];
-        }else{
+        } else {
             return values[1];
         }
     }
