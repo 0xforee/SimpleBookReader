@@ -152,6 +152,8 @@ public class SearchResultsActivity extends BaseActivity implements SearchHistory
     private void handlerSearch(String query) {
         Log.d(TAG, "query keywords = " + query);
         mSearchString = query;
+        mSearchHistoryView.setVisibility(View.GONE);
+        mRecyclerView.setVisibility(View.VISIBLE);
 
         WebParser.getInstance().searchBookAsync(null, query, new NetCallback<List<Book>>() {
             @Override
@@ -225,6 +227,7 @@ public class SearchResultsActivity extends BaseActivity implements SearchHistory
             bookList.clear();
             mAdapter.notifyDataSetChanged();
             mSearchHistoryView.setVisibility(View.VISIBLE);
+            mRecyclerView.setVisibility(View.INVISIBLE);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -305,7 +308,6 @@ public class SearchResultsActivity extends BaseActivity implements SearchHistory
         handlerSearch(word);
         mEtSearchText.setText(word);
         mEtSearchText.setSelection(word.length());
-        mSearchHistoryView.setVisibility(View.GONE);
     }
 
     private class BookComparator implements Comparator<Book> {
